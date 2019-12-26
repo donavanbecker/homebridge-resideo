@@ -1,0 +1,35 @@
+{
+  "name": "homebridge-honeywell-home",
+  "version": "2.0.0",
+  "description": "A Honeywell Home https://honeywellhome.com plugin for Homebridge: https://github.com/nfarina/homebridge",
+  "author": "d0n4v4nb3ck3r",
+  "main": "index.js",
+  "scripts": {
+    "developer": "DEBUG=honeywell-home homebridge -D -U `pwd` -P `pwd`",
+    "lint": "jshint package.json *.js"
+  },
+  "license": "ISC",
+  "keywords": [
+    "homebridge-plugin",
+    "honeywell",
+    "honeywell-home",
+    "thermostat"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/d0n4v4nb3ck3r/honeywellhome.git"
+  },
+  "bugs": {
+    "url": "https://github.com/d0n4v4nb3ck3r/honeywellhome/issues"
+  },
+  "engines": {
+    "node": ">=0.12.0",
+    "homebridge": ">=0.4.50"
+  },
+  "dependencies": {
+    "debug": "~4.1.1",
+    "hap-nodejs-community-types": "https://github.com/homespun/hap-nodejs-community-types.git",
+    "homespun-discovery": "0.3.4",
+    "underscore": "1.9.1"
+  }
+}
