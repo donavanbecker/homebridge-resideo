@@ -2,8 +2,7 @@
 A [Honeywell Home](https://honeywellhome.com) plugin for [Homebridge](https://homebridge.io/).
 
 At present,
-tested only on the Honeywell [T9 Smart Thermostat](https://t9.honeywellhome.com/).
-(Fun question: why are Lyric thermostats identified as `"TCC-`" and T-Series thermostats identified as `"LCC-`"?)
+tested only on the Honeywell [T9 Smart Thermostat](https://t9.honeywellhome.com/). I assume it will work on t5/t6 Thermostats also.
 
 # Installation
 Run these commands:
@@ -23,9 +22,14 @@ If you installed homebridge with --unsafe-perm (or want to) then install like th
 
 If you are still experiencing issues, You may have to install git and then re-run install with root
 
-        sudo -i
-        sudo apt-get install git-core
-        sudo npm install -g --unsafe-perm homebridge-honeywell-home
+    sudo -i
+    sudo apt-get install git-core
+    sudo npm install -g --unsafe-perm homebridge-honeywell-home
+    
+If in the end you are still experiencing issues, 
+
+    sudo npm install -g -f --unsafe-perm homebridge-honeywell-home    
+    *note* that -f is a force isntall and not recommended if you dont' have too.
 
 # Configuration
 If you're already running `homebridge` on your system,
@@ -42,8 +46,6 @@ then you already have a `~/.homebridge/config.json` file.
           , "accessToken"    : "..."
           , "refreshToken"   : "..."
           }
-        , "options"          : { "ttl": 600, "verboseP" : false }
-        }
       ]
 
 
@@ -62,3 +64,19 @@ The `options` line may be omitted.
 
 If present, `options.ttl` indicates the number of seconds between polls of the Honeywell Home service.
 The default is `"ttl: 60"`.
+
+
+
+    "platforms"            :
+      [
+        { "platform"         : "homebridge-honeywell-home.HoneywellHome"
+        , "name"             : "HoneywellHome"
+        , "credentials"      :
+          { "consumerKey"    : "..."
+          , "consumerSecret" : "..."
+          , "accessToken"    : "..."
+          , "refreshToken"   : "..."
+          }
+        , "options"          : { "ttl": 600, "verboseP" : false }
+        }
+      ]
