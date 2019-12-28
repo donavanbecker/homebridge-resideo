@@ -38,9 +38,9 @@ then you already have a `~/.homebridge/config.json` file.
 
     "platforms"            :
       [
-        { "platform"         : "homebridge-honeywell-home.HoneywellHome"
-        , "name"             : "HoneywellHome"
-        , "credentials"      :
+        { "platform"         : "homebridge-honeywell-home.HoneywellHome",
+          "name"             : "HoneywellHome",
+          "credentials"      :
           { "consumerKey"    : "..."
           , "consumerSecret" : "..."
           , "accessToken"    : "..."
@@ -69,14 +69,14 @@ The default is `"ttl: 60"`.
 
     "platforms"            :
       [
-        { "platform"         : "homebridge-honeywell-home.HoneywellHome"
-        , "name"             : "HoneywellHome"
-        , "credentials"      :
+        { "platform"         : "homebridge-honeywell-home.HoneywellHome",
+          "name"             : "HoneywellHome",
+          "credentials"      :
           { "consumerKey"    : "..."
           , "consumerSecret" : "..."
           , "accessToken"    : "..."
           , "refreshToken"   : "..."
-          }
-        , "options"          : { "ttl": 600, "verboseP" : false }
+          },
+          "options"          : { "ttl": 600, "verboseP" : false }
         }
       ]
