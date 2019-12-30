@@ -3,7 +3,7 @@
 // there is no known webhook/websocket to use for events, this results in very frequent polling under the push-sensor model...
 
 var debug       = require('debug')('honeywell-home')
-  , homespun    = require('homespun-discovery')
+  , homespun    = require('homespun-utilities')
   , querystring = require('querystring')
   , roundTrip   = homespun.utilities.roundtrip
   , underscore  = require('underscore')
@@ -13,19 +13,16 @@ var debug       = require('debug')('honeywell-home')
 var Accessory
   , Service
   , Characteristic
-  , CommunityTypes
   , UUIDGen
 
 module.exports = function (homebridge) {
   Accessory      = homebridge.platformAccessory
   Service        = homebridge.hap.Service
   Characteristic = homebridge.hap.Characteristic
-  CommunityTypes = require('hap-nodejs-community-types')(homebridge)
   UUIDGen        = homebridge.hap.uuid
 
   homebridge.registerPlatform('homebridge-honeywell-home', 'HoneywellHome', HoneywellHome, true)
 }
-
 
 var HoneywellHome = function (log, config, api) {
   if (!(this instanceof HoneywellHome)) return new HoneywellHome(log, config, api)

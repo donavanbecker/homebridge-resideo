@@ -27,9 +27,8 @@
     "homebridge": ">=0.4.50"
   },
   "dependencies": {
-    "debug": "~4.1.1",
-    "hap-nodejs-community-types": "https://github.com/homespun/hap-nodejs-community-types.git",
-    "homespun-discovery": "0.3.4",
-    "underscore": "1.9.1"
+    "debug": "^4.1.1",
+    "homespun-utilities": "^0.3.1",
+    "underscore": "^1.9.1"
   }
 }
