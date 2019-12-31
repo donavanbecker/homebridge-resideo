@@ -4,6 +4,8 @@ A [Honeywell Home](https://honeywellhome.com) plugin for [Homebridge](https://ho
 At present,
 tested only on the Honeywell [T9 Smart Thermostat](https://t9.honeywellhome.com/). I assume it will work on t5/t6 Thermostats also.
 
+Huge Thanks to @mkellsy and @homespun!
+
 # Installation
 Run these commands:
 
