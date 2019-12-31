@@ -7,7 +7,7 @@ tested only on the Honeywell [T9 Smart Thermostat](https://t9.honeywellhome.com/
 # Installation
 Run these commands:
 
-    npm install -g --unsafe-perm homebridge-honeywell-home
+    npm install --unsafe-perm homebridge-honeywell-home
 
 # Configuration
 If you're already running `homebridge` on your system,
