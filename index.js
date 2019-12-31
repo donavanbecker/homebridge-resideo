@@ -3,9 +3,8 @@
 // there is no known webhook/websocket to use for events, this results in very frequent polling under the push-sensor model...
 
 var debug       = require('debug')('honeywell-home')
-  , homespun    = require('homespun-utilities')
   , querystring = require('querystring')
-  , roundTrip   = homespun.utilities.roundtrip
+  , roundTrip   = require('lib/roundtrip')
   , underscore  = require('underscore')
   , url         = require('url')
 
