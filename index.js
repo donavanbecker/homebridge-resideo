@@ -4,7 +4,7 @@
 
 var debug       = require('debug')('honeywell-home')
   , querystring = require('querystring')
-  , roundTrip   = require('lib/roundtrip')
+  , roundTrip   = require('./lib/roundtrip')
   , underscore  = require('underscore')
   , url         = require('url')
 
