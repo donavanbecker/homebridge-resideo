@@ -7,29 +7,7 @@ tested only on the Honeywell [T9 Smart Thermostat](https://t9.honeywellhome.com/
 # Installation
 Run these commands:
 
-    % sudo npm install -g homebridge
-    % sudo npm install -g homebridge-honeywell-home
-
-On Linux and install is not successful, run these commands
-
-    % sudo apt-get install libpcap-dev
-    % sudo npm install -g homebridge-honeywell-home
-
-If you installed homebridge with --unsafe-perm (or want to) then install like this:
-
-    sudo npm install -g --unsafe-perm homebridge
-    sudo npm install -g --unsafe-perm homebridge-honeywell-home
-
-If you are still experiencing issues, You may have to install git and then re-run install with root
-
-    sudo -i
-    sudo apt-get install git-core
-    sudo npm install -g --unsafe-perm homebridge-honeywell-home
-    
-If in the end you are still experiencing issues, 
-
-    sudo npm install -g -f --unsafe-perm homebridge-honeywell-home    
-    *note* that -f is a force isntall and not recommended if you dont' have too.
+    npm install --unsafe-perm homebridge-honeywell-home
 
 # Configuration
 If you're already running `homebridge` on your system,
@@ -57,7 +35,7 @@ so it will automatically look for all devices accessible to your Honeywell Home 
 
 ## Credentials
 There are four values you need to put into the `"credentials"` object above.
-The [honeywell-js-setup](https://github.com/homespun/honeywell-js-setup) repository explains how to generate these.
+The [honeywell-js-setup](https://github.com/d0n4v4nb3ck3r/honeywell-js-setup) repository explains how to generate these.
 
 ## Options
 The `options` line may be omitted.
