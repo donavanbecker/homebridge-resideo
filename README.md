@@ -35,7 +35,7 @@ so it will automatically look for all devices accessible to your Honeywell Home 
 
 ## Credentials
 There are four values you need to put into the `"credentials"` object above.
-The [honeywell-js-setup](https://github.com/d0n4v4nb3ck3r/honeywell-js-setup) repository explains how to generate these.
+The [honeywell-api](https://github.com/d0n4v4nb3ck3r/honeywell-api) repository explains how to generate these.
 
 ## Options
 The `options` line may be omitted.
