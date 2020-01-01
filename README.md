@@ -5,6 +5,8 @@ A [Honeywell Home](https://honeywellhome.com) plugin for [Homebridge](https://ho
 At present,
 tested only on the Honeywell [T9 Smart Thermostat](https://t9.honeywellhome.com/). I assume it will work on t5/t6 Thermostats also.
 
+Huge Thanks to @mkellsy and @homespun!
+
 ## Installation
 
 Run these commands:
@@ -39,8 +41,7 @@ so it will automatically look for all devices accessible to your Honeywell Home 
 
 ## Credentials
 
-There are four values you need to put into the `credentials` object above.
-The [honeywell-js-setup](https://github.com/d0n4v4nb3ck3r/honeywell-js-setup) repository explains how to generate these.
+The [honeywell-api](https://github.com/d0n4v4nb3ck3r/honeywell-api) repository explains how to generate these.
 
 ## Options
 
