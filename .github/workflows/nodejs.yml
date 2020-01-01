@@ -17,8 +17,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: Automatic Changelog Generator
-      uses: CharMixer/auto-changelog-action@v1
+    - name: Changelog Generator
+      uses: timfallmk/github-changelog-generator-action@0.0.2
     - name: npm install, build, and test
       run: |
         npm ci
