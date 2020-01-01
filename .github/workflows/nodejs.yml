@@ -12,6 +12,8 @@ jobs:
         node-version: [8.x, 10.x, 12.x]
 
     steps:
+    - name: Conventional Changelog Action
+      uses: TriPSs/conventional-changelog-action@v1.2.0 
     - uses: actions/checkout@v1
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
