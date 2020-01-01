@@ -17,6 +17,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+    - name: autochangelog
+      uses: rubenfiszel/autochangelog-action@v0.10.0
     - name: npm install, build, and test
       run: |
         npm ci
