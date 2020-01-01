@@ -1,5 +1,5 @@
 {
-  "pluginAlias": "homebridge-honeywell-home.HoneywellHome",
+  "pluginAlias": "HoneywellHome",
   "pluginType": "platform",
   "singular": true,
   "headerDisplay": "You must supply consumerKey, consumerSecret, accessToken, and refreshToken.  There are four values you need to put into the object above, The honeywell-js-setup repository explains how to generate these > https://github.com/d0n4v4nb3ck3r/honeywell-api",

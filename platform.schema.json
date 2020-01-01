@@ -1,5 +1,5 @@
 {
-  "plugin_alias": "homebridge-honeywell-home.HoneywellHome",
+  "plugin_alias": "HoneywellHome",
   "schema": {
     "type": "object",
     "properties": {
@@ -7,6 +7,7 @@
         "type": "string",
         "title": "Name",
         "default": "HoneywellHome",
+        "readOnly": true,
         "required": true
       },
       "credentials": {
