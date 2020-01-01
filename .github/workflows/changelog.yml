@@ -1,0 +1,43 @@
+name: autochangelog
+
+on:
+  push:
+    branches:    
+      - master
+      - 'releases/**' 
+
+jobs:
+  push:
+    name: Push Container
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - name: autochangelog-action
+        id: ac
+        uses: rubenfiszel/autochangelog-action@v0.8.0
+        with:
+          changelog_file: './CHANGELOG.md'
+          manifest_file: './manifest.yml'
+          dry_run: false
+          issues_url_prefix: 'https://MY_REPO_URL_PREFIX.com/issues'
+          tag_prefix: 'v'
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'Update changelog and manifest'
+          title: 'ci: Release ${{ steps.ac.outputs.version }}'
+          body: |
+            Release v${{ steps.ac.outputs.version }}
+          labels: autorelease
+          branch: automatic-release-prs
+          branch-suffix: none
+      - name: Check outputs
+        run: |
+          echo "Pull Request Number - ${{ env.PULL_REQUEST_NUMBER }}"
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pr_number }}"
