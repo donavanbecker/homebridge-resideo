@@ -2,9 +2,9 @@
 
 ## Unclassified Changes
 
-- Create autorelease.yml
-- Create manifest.yml
-- Create changelog.yml
-- Update nodejs.yml
-- Update nodejs.yml
+-   Create autorelease.yml
+-   Create manifest.yml
+-   Create changelog.yml
+-   Update nodejs.yml
+-   Update nodejs.yml
 
