@@ -23,12 +23,13 @@ npm install -g --unsafe-perm homebridge-honeywell-home
 Option 1:
 To configure [homebridge-honeywell-home](https://www.npmjs.com/package/homebridge-honeywell-home) you must also be running [homebridge-config-ui-x](https://github.com/oznu/homebridge-config-ui-x).
 
-Navigate to the Plugins page in homebridge-config-ui-x.
-Click the Settings button for the Homebridge Honeywell Home plugin.
-Click the Link Account button.
-Sign in with your HoneywellHome account.
-Your account is now linked.
-Restart Homebridge for the changes to take effect.
+* Navigate to the Plugins page in homebridge-config-ui-x.
+* Click the Settings button for the Homebridge Honeywell Home plugin.
+* Click the Link Account button.
+* Sign in with your HoneywellHome account.
+* Your account is now linked.
+* Restart Homebridge for the changes to take effect.
+  
 <img src='honeywell/01.png' />
 <img src='honeywell/02.png' />
 <img src='honeywell/03.png' />
