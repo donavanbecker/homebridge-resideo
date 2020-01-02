@@ -2,11 +2,13 @@
 
 A [Honeywell Home](https://honeywellhome.com) plugin for [Homebridge](https://homebridge.io/).
 
-At present,
+At present this is read only,
 tested only on the Honeywell [T9 Smart Thermostat](https://t9.honeywellhome.com/).
 I assume it will work on t5/t6 Thermostats also.
 
-Huge Thanks to [@mkellsy](https://github.com/mkellsy) and @homespun!
+If you would like to help out with this plugin you can reach out to me on [@slack](http://homebridgeteam.slack.com/)
+
+Huge Thanks to [@mkellsy](https://github.com/mkellsy) and [@homespun](https://github.com/homespun) for getting this plugin to were it is. Also a big thank you to [@moznu](https://github.com/oznu) for implimenting his zero-config portal ui for homebridge-config-ui-x.
 
 ## Installation
 Run these commands:
