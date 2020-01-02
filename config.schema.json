@@ -2,7 +2,8 @@
   "pluginAlias": "HoneywellHome",
   "pluginType": "platform",
   "singular": true,
-  "headerDisplay": "You must supply consumerKey, consumerSecret, accessToken, and refreshToken.  There are four values you need to put into the object above, The honeywell-js-setup repository explains how to generate these > https://github.com/d0n4v4nb3ck3r/honeywell-api",
+  "headerDisplay": "Use the 'headerDisplay' in the config.schema.json to update this header text to provide instructions etc..",
+  "footerDisplay": "Use the 'footerDisplay' to display additional information after the account linking has completed.",
   "schema": {
     "type": "object",
     "properties": {
@@ -22,8 +23,7 @@
           },
           "consumerSecret": {
             "title": "Consumer Secret",
-            "type": "string",
-            "required": true
+            "type": "string"
           },
           "accessToken": {
             "title": "Access Token",
@@ -34,6 +34,12 @@
             "title": "Refresh Token",
             "type": "string",
             "required": true
+          },
+          "notice": {
+            "title": "Notice",
+            "type": "string",
+            "required": true,
+            "default": "Keep your tokens a secret!"
           }
         }
       },
@@ -42,7 +48,8 @@
         "properties": {
           "ttl": {
             "title": "TTL",
-            "type": "number"
+            "type": "number",
+            "default": "60"
           },
           "verboseP": {
             "title": "Verbose P",
@@ -51,5 +58,28 @@
         }
       }
     }
-  }
+  },
+    "layout": [
+      {
+        "type": "fieldset",
+        "title": "Advanced Settings",
+        "expandable": true,
+        "expanded": false,
+        "items": [
+          {
+            "type": "help",
+            "helpvalue": "<h5>TTL</h5><em class='primary-text'>TTL indicates the number of seconds between polls of the Honeywell Home service.</em>"
+          },
+          {
+            "key": "options.ttl",
+            "notitle": true
+          },
+          {
+            "type": "help",
+            "helpvalue": "<h5>Verbose</h5><em class='primary-text'>Indicate if verbose mode should be enabled.</em>"
+          },
+          "options.verboseP"
+        ]
+      }
+    ]
 }

@@ -1,0 +1,47 @@
+{
+  "name": "homebridge-honeywell-server",
+  "version": "1.0.0",
+  "description": "Server side oauth portal for the Homebrige Honeywell Home Plugin",
+  "license": "GPL-3.0",
+  "author": "oznu <dev@oz.nu>",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/d0n4v4nb3ck3r/homebridge-honeywell-home.git"
+  },
+  "bugs": {
+    "url": "https://github.com/d0n4v4nb3ck3r/homebridge-honeywell-home/issues"
+  },
+  "main": "dist/index.js",
+  "bin": {
+    "homebridge-honeywell-server": "dist/index.js"
+  },
+  "scripts": {
+    "watch": "concurrently \"npm run watch:server\" \"npm run watch:portal\"",
+    "watch:server": "nodemon",
+    "watch:portal": "npm run watch --prefix portal",
+    "build": "npm run build:portal && npm run build:server",
+    "build:server": "rimraf dist && tsc && npm pack",
+    "build:portal": "rimraf static && npm run build --prefix portal",
+    "start:server": "node dist/index.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "helmet": "^3.21.2",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.8",
+    "source-map-support": "^0.5.16"
+  },
+  "devDependencies": {
+    "@types/node": "^12.12.12",
+    "concurrently": "^5.0.2",
+    "nodemon": "^1.19.4",
+    "rimraf": "^3.0.0",
+    "ts-node": "^8.5.2",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.2"
+  }
+}

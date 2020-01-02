@@ -7,6 +7,7 @@ var debug       = require('debug')('honeywell-home')
   , roundTrip   = require('./lib/roundtrip')
   , underscore  = require('underscore')
   , url         = require('url')
+  , rp          = require('request-promise-native')
 
 
 var Accessory
@@ -24,9 +25,10 @@ module.exports = function (homebridge) {
 }
 
 var HoneywellHome = function (log, config, api) {
-  if (!(this instanceof HoneywellHome)) return new HoneywellHome(log, config, api)
-
+  // don't start if there is no config
   if (!config) return
+
+  if (!(this instanceof HoneywellHome)) return new HoneywellHome(log, config, api)
 
   this.log = log
   this.config = config
@@ -34,7 +36,7 @@ var HoneywellHome = function (log, config, api) {
 
   this.oauth2 = this.config.credentials || {}
   if (!this.oauth2.consumerKey) throw new Error('missing consumerKey')
-  if (!this.oauth2.consumerSecret) throw new Error('missing consumerSecret')
+  // if consumerSecret is not defined we will use the shared one if it's not provided
   // don't care about the accessToken...
   if (!this.oauth2.refreshToken) throw new Error('missing refreshToken')
   debug('OAuth2', this.oauth2)
@@ -91,24 +93,46 @@ HoneywellHome.prototype._didFinishLaunching = function () {
   }
 
   var refresh = function(callback) {
-    roundTrip({ location: self.location, logger: self.log, verboseP: self.options.verboseP },
-              { method : 'POST', path: '/oauth2/token',
-                headers: { authorization : 'Basic ' + new Buffer(self.oauth2.consumerKey + ':'
-                                                                + self.oauth2.consumerSecret).toString('base64')
-                         , 'content-type': 'application/x-www-form-urlencoded; charset=utf-8'
-                         },
-                payload: querystring.encode({ grant_type: 'refresh_token', refresh_token: self.oauth2.refreshToken })
-              },
-              (err, response, result) => {
-      if (!err) {
-        if (!result.access_token) err = new Error('invalid response: ' + JSON.stringify(result))
-        self.oauth2.accessToken = result.access_token
+    if (self.oauth2.consumerSecret) {
+       // if the user has defined their own consumerSecret, connect directly to the Honeywell API to get a refresh token
+      roundTrip(
+        { location: self.location, logger: self.log, verboseP: self.options.verboseP },
+        { 
+          method : 'POST',
+          path: '/oauth2/token',
+          headers: {
+            authorization : 'Basic ' + new Buffer(self.oauth2.consumerKey + ':' + self.oauth2.consumerSecret).toString('base64'),
+            'content-type': 'application/x-www-form-urlencoded; charset=utf-8'
+          },
+          payload: querystring.encode({ grant_type: 'refresh_token', refresh_token: self.oauth2.refreshToken })
+        },
+        (err, response, result) => {
+          if (!err) {
+            if (!result.access_token) err = new Error('invalid response: ' + JSON.stringify(result))
+            self.oauth2.accessToken = result.access_token
 
+            if (self.oauth2.refreshToken !== result.refresh_token) self.log.warn('new refreshToken: ' + result.refreshToken)
+          }
+          callback(err)
+        }
+      )
+    } else {
+      // if the user has not defined a consumerSecret, connect to the homebridge-honeywell server to get a refresh token
+      rp.post('https://homebridge-honeywell.iot.oz.nu/user/refresh', {
+        json: {
+          consumerKey: self.oauth2.consumerKey,
+          refresh_token: self.oauth2.refreshToken,
+        }
+      })
+      .then((result) => {
+        self.oauth2.accessToken = result.access_token;
         if (self.oauth2.refreshToken !== result.refresh_token) self.log.warn('new refreshToken: ' + result.refreshToken)
-      }
-
-      callback(err)
-    })
+        callback(null)
+      })
+      .catch((err) => {
+        callback(err)
+      })
+    }
   }
 
   refresh(function (err) {

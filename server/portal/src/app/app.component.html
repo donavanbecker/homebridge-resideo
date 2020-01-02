@@ -1,0 +1,44 @@
+<div class="app-container w-100 d-flex flex-column align-items-start">
+
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark w-100">
+    <a class="navbar-brand" routerLink="/">
+      <img class="menu-logo" src="/assets/homebridge-logo.svg" />
+      Homebridge Honeywell Home
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample04"
+      aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExample04">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          <a class="nav-link" routerLink="/">Home <span class="sr-only">(current)</span></a>
+        </li>
+      </ul>
+      <ul class="navbar-nav">
+
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container-fluid w-100">
+    <router-outlet></router-outlet>
+  </div>
+
+  <div class="mt-auto w-100 mb-2">
+    <div class="container-fluid w-100">
+      <div class="row">
+
+        <div class="col-md-4"></div>
+
+        <div class="col-md-4 w-100 mt-auto grey-text text-center">
+          <a class="grey-text small" href="https://github.com/oznu">
+            &copy; 2020 oznu
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
