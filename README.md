@@ -1,5 +1,15 @@
 # homebridge-honeywell-home
 
+[![npm](https://img.shields.io/npm/v/homebridge-honeywell-home?style=for-the-badge)](https://www.npmjs.com/package/homebridge-honeywell-home)
+[![npm](https://img.shields.io/npm/dt/homebridge-honeywell-home?style=for-the-badge)](https://www.npmjs.com/package/homebridge-honeywell-home)
+[![GitHub issues](https://img.shields.io/github/issues/donavanbecker/homebridge-honeywell-home?style=for-the-badge)](https://github.com/donavanbecker/homebridge-honeywell-home/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/donavanbecker/homebridge-honeywell-home?style=for-the-badge)](https://github.com/donavanbecker/homebridge-honeywell-home/pulls)
+[![node](https://img.shields.io/node/v/homebridge-honeywell-home?style=for-the-badge)](https://nodejs.org)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/donavanbecker/homebridge-honeywell-home/Node?style=for-the-badge)](https://github.com/donavanbecker/homebridge-honeywell-home/actions?query=workflow%3ANode)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/donavanbecker/homebridge-honeywell-home/Publish?style=for-the-badge)](https://github.com/donavanbecker/homebridge-honeywell-home/actions?query=workflow%3APublish)
+
+
+
 A [Honeywell Home](https://honeywellhome.com) plugin for [Homebridge](https://homebridge.io/).
 
 At present this is read only,
