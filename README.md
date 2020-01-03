@@ -3,6 +3,10 @@
 <p align="left">
   <a href="https://github.com/donavanbecker/homebridge-honeywell-home"><img alt="GitHub Actions status" src="https://github.com/donavanbecker/homebridge-honeywell-home/workflows/Node/badge.svg"></a>
 </p>
+<p align=left">
+  <a href="https://github.com/donavanbecker/homebridge-honeywell-home"><img alt="GitHub Actions status"
+                                                                                                       src="https://github.com/donavanbecker/homebridge-honeywell-home/workflows/Publish/badge.svg"></a>
+
 
 A [Honeywell Home](https://honeywellhome.com) plugin for [Homebridge](https://homebridge.io/).
 
