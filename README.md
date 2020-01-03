@@ -1,7 +1,7 @@
 # homebridge-honeywell-home
 
 <p align="left">
-  <a href="https://github.com/actions/setup-node"><img alt="GitHub Actions status" src="https://github.com/donavanbecker/homebridge-honeywell-home/workflows/node/badge.svg"></a>
+  <a href="https://github.com/donavanbecker/homebridge-honeywell-home"><img alt="GitHub Actions status" src="https://github.com/donavanbecker/homebridge-honeywell-home/workflows/Node/badge.svg"></a>
 </p>
 
 A [Honeywell Home](https://honeywellhome.com) plugin for [Homebridge](https://homebridge.io/).
