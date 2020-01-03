@@ -17,10 +17,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/d0n4v4nb3ck3r/honeywellhome.git"
+    "url": "git+https://github.com/donavanbecker/homebridge-honeywell-home.git"
   },
   "bugs": {
-    "url": "https://github.com/d0n4v4nb3ck3r/honeywellhome/issues"
+    "url": "https://github.com/donavanbecker/homebridge-honeywell-home/issues"
   },
   "engines": {
     "node": ">=0.12.0",
