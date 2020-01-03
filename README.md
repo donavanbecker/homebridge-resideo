@@ -1,11 +1,14 @@
 # homebridge-honeywell-home
 
-<p align="left">
-  <a href="https://github.com/donavanbecker/homebridge-honeywell-home"><img alt="GitHub Actions status" src="https://github.com/donavanbecker/homebridge-honeywell-home/workflows/Node/badge.svg"></a>
-</p>
-<p align=left">
-  <a href="https://github.com/donavanbecker/homebridge-honeywell-home"><img alt="GitHub Actions status"
-                                                                                                       src="https://github.com/donavanbecker/homebridge-honeywell-home/workflows/Publish/badge.svg"></a>
+[![npm](https://img.shields.io/npm/v/homebridge-honeywell-home)](https://www.npmjs.com/package/homebridge-honeywell-home)
+
+[![npm](https://img.shields.io/npm/dt/homebridge-honeywell-home)](https://www.npmjs.com/package/homebridge-honeywell-home)
+
+[![node](https://img.shields.io/node/v/homebridge-honeywell-home)](https://nodejs.org)
+
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/donavanbecker/homebridge-honeywell-home/Node)
+
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/donavanbecker/homebridge-honeywell-home/Publish)
 
 
 A [Honeywell Home](https://honeywellhome.com) plugin for [Homebridge](https://homebridge.io/).
