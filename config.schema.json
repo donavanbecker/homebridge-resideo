@@ -2,8 +2,8 @@
   "pluginAlias": "HoneywellHome",
   "pluginType": "platform",
   "singular": true,
-  "headerDisplay": "Use the 'headerDisplay' in the config.schema.json to update this header text to provide instructions etc..",
-  "footerDisplay": "Use the 'footerDisplay' to display additional information after the account linking has completed.",
+  "headerDisplay": "<p align='center'><img width='250px' src='https://user-images.githubusercontent.com/3979615/71876008-d99d7400-3179-11ea-909b-9d2a3d1e670f.png'></p>\n\nThe **Homebridge Honeywell Home** plugin allows you to control your T5, T6 and T9 Honeywell Home thermostats from HomeKit. To get started link your Honeywell Home account using the button below.",
+  "footerDisplay": "Your Honeywell Home account has been linked. Please raise any issues on our [project page](https://github.com/donavanbecker/homebridge-honeywell-home/issues).",
   "schema": {
     "type": "object",
     "properties": {
@@ -25,11 +25,6 @@
             "title": "Consumer Secret",
             "type": "string"
           },
-          "accessToken": {
-            "title": "Access Token",
-            "type": "string",
-            "required": true
-          },
           "refreshToken": {
             "title": "Refresh Token",
             "type": "string",
@@ -49,10 +44,11 @@
           "ttl": {
             "title": "TTL",
             "type": "number",
-            "default": "60"
+            "default": 60,
+            "minimum": 20
           },
-          "verboseP": {
-            "title": "Verbose P",
+          "debug": {
+            "title": "Debug Mode",
             "type": "boolean"
           }
         }
@@ -76,9 +72,9 @@
           },
           {
             "type": "help",
-            "helpvalue": "<h5>Verbose</h5><em class='primary-text'>Indicate if verbose mode should be enabled.</em>"
+            "helpvalue": "<h5>Debug Mode</h5><em class='primary-text'>Indicate if debug level logging should be enabled.</em>"
           },
-          "options.verboseP"
+          "options.debug"
         ]
       }
     ]

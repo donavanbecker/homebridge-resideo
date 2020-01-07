@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "developer": "DEBUG=honeywell-home homebridge -D -U `pwd` -P `pwd`",
-    "lint": "jshint package.json *.js"
+    "lint": "jshint package.json *.js",
+    "watch": "nodemon"
   },
   "license": "ISC",
   "keywords": [
@@ -27,10 +28,11 @@
     "homebridge": ">=0.4.50"
   },
   "dependencies": {
-    "debug": "^4.1.1",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.8",
-    "rxjs": "^6.5.4",
-    "underscore": "^1.9.2"
+    "rxjs": "^6.5.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
   }
 }
