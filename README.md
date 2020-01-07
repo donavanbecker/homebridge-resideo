@@ -10,22 +10,18 @@
 
 
 
-A [Honeywell Home](https://honeywellhome.com) plugin for [Homebridge](https://homebridge.io/).
-
-This Honeywell Home plugin for Homebridge allows you to control your T5, T6 and T9 Honeywell Home thermostats from HomeKit.
+This [Honeywell Home](https://honeywellhome.com) plugin for [Homebridge](https://homebridge.io/) allows you to control your T5, T6 and T9 Honeywell Home thermostats from HomeKit.
 
 If you would like to help out with this plugin you can reach out to me on [@slack](http://homebridgeteam.slack.com/)
 
-Huge Thanks to [@mkellsy](https://github.com/mkellsy) and [@homespun](https://github.com/homespun) for getting this plugin to were it is. Also a big thank you to [@oznu](https://github.com/oznu) for implimenting write to honeywell's API and adding his zero-config portal ui for homebridge-config-ui-x.
+Huge Thanks to [@mkellsy](https://github.com/mkellsy) and [@homespun](https://github.com/homespun) for getting this plugin to were it is.
+
+Even Bigger Thanks to [@oznu](https://github.com/oznu) for implementing the capability to write to the Honeywell's API and adding his zero-config portal ui for homebridge-config-ui-x.
 
 ## Installation
-Option 1: Install via Homebridge Config UI X:
+Install via Homebridge [Config UI X](https://github.com/oznu/homebridge-config-ui-x)
 
 Search for "Honeywell Home" in homebridge-config-ui-x and click Install.
-
-Option 2: Manually Install:
-
-npm install -g --unsafe-perm homebridge-honeywell-home
 
 ## Configuration
 To configure [homebridge-honeywell-home](https://www.npmjs.com/package/homebridge-honeywell-home) you must also be running [homebridge-config-ui-x](https://github.com/oznu/homebridge-config-ui-x).
@@ -41,7 +37,7 @@ To configure [homebridge-honeywell-home](https://www.npmjs.com/package/homebridg
 <img src='honeywell/02.png' />
 <img src='honeywell/03.png' />
 
-## Manaul Config
+## Manual Setup & Config
 
   Visit Manual Config [Wiki](https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Manual-Config)
 
