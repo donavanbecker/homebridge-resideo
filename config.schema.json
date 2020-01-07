@@ -25,11 +25,6 @@
             "title": "Consumer Secret",
             "type": "string"
           },
-          "accessToken": {
-            "title": "Access Token",
-            "type": "string",
-            "required": true
-          },
           "refreshToken": {
             "title": "Refresh Token",
             "type": "string",
@@ -49,10 +44,11 @@
           "ttl": {
             "title": "TTL",
             "type": "number",
-            "default": "60"
+            "default": 60,
+            "minimum": 20
           },
-          "verboseP": {
-            "title": "Verbose P",
+          "debug": {
+            "title": "Debug Mode",
             "type": "boolean"
           }
         }
@@ -76,9 +72,9 @@
           },
           {
             "type": "help",
-            "helpvalue": "<h5>Verbose</h5><em class='primary-text'>Indicate if verbose mode should be enabled.</em>"
+            "helpvalue": "<h5>Debug Mode</h5><em class='primary-text'>Indicate if debug level logging should be enabled.</em>"
           },
-          "options.verboseP"
+          "options.debug"
         ]
       }
     ]

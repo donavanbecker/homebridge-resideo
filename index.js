@@ -30,6 +30,15 @@ class HoneywellHomePlatform {
     this.accessories = {};
     this.activeAccessories = [];
 
+    // verify the config
+    try {
+      this.verifyConfig();
+      this.debug('Config OK')
+    } catch (e) {
+      this.log.error(e.message);
+      return;
+    }
+
     // setup the default http request handler
     this.rp = rp.defaults({
       auth: {
@@ -40,15 +49,6 @@ class HoneywellHomePlatform {
       },
       json: true,
     });
-
-    // verify the config
-    try {
-      this.verifyConfig();
-      this.log.debug('Config OK')
-    } catch (e) {
-      this.log.error(e.message);
-      return;
-    }
 
     // start accessory discovery
     this.discoverDevices();
@@ -65,7 +65,7 @@ class HoneywellHomePlatform {
 
   // Called when a cached accessory is loaded
   configureAccessory(accessory) {
-    this.log.debug('Loaded cached accessory', accessory.displayName);
+    this.debug('Loaded cached accessory', accessory.displayName);
     this.accessories[accessory.UUID] = accessory;
   }
 
@@ -73,6 +73,13 @@ class HoneywellHomePlatform {
    * Verify the config passed to the plugin is valid
    */
   verifyConfig() {
+    if (!this.config.options || typeof this.config.options !== 'object') {
+      this.config.options = {};
+    }
+
+    this.config.options.ttl = this.config.options.ttl || 60; // default 60 seconds
+    this.config.options.debug = this.config.options.debug || false; // default false
+
     if (!this.config.credentials) {
       throw new Error('Missing Credentials');
     }
@@ -103,7 +110,7 @@ class HoneywellHomePlatform {
 
         this.config.credentials.accessToken = result.access_token;
 
-        this.log.debug('Got access token:', this.config.credentials.accessToken);
+        this.debug('Got access token:', this.config.credentials.accessToken);
 
         // check if the refresh token has changed
         if (result.refresh_token !== this.config.credentials.refreshToken) {
@@ -132,11 +139,11 @@ class HoneywellHomePlatform {
     // get the locations
     const locations = await this.rp.get('https://api.honeywell.com/v2/locations');
 
-    this.log.debug(`Found ${locations.length} locations`);
+    this.debug(`Found ${locations.length} locations`);
 
     // get the devices at each location
     for (const location of locations) {
-      this.log.debug(`Getting devices for ${location.name}...`);
+      this.debug(`Getting devices for ${location.name}...`);
 
       const devices = await this.rp.get('https://api.honeywell.com/v2/devices', {
         qs: {
@@ -168,7 +175,7 @@ class HoneywellHomePlatform {
             this.startAccessory(this.accessories[UUID], device, location.locationID);
           }
         } else {
-          this.log.debug(`Ignoring device named ${device.name} as it is offline.`)
+          this.debug(`Ignoring device named ${device.name} as it is offline.`)
         }
       }
     }
@@ -179,6 +186,18 @@ class HoneywellHomePlatform {
    */
   startAccessory(accessory, device, locationId) {
     return new HoneywellHomePlatformThermostat(this.log, this, accessory, device, locationId);
+  }
+
+  /**
+   * If debug level logging is turned on, log to log.info
+   * Otherwise send debug logs to log.debug
+   */
+  debug(...log) {
+    if (this.config.options.debug) {
+      this.log.info('[DEBUG]', ...log);
+    } else{
+      this.log.debug(...log)
+    }
   }
 }
 
@@ -264,8 +283,7 @@ class HoneywellHomePlatformThermostat {
     this.updateHomeKitCharacteristics();
 
     // Start an update interval
-    // TODO - pass in TTL from user config
-    interval(60 * 1000).pipe(skipWhile(() => this.thermostatUpdateInProgress)).subscribe(() => {
+    interval(this.platform.config.options.ttl * 1000).pipe(skipWhile(() => this.thermostatUpdateInProgress)).subscribe(() => {
       this.refreshStatus();
     })
 
@@ -320,7 +338,7 @@ class HoneywellHomePlatformThermostat {
    * Asks the Honeywell Home API for the latest device information
    */
   async refreshStatus() {
-    this.log.debug(`Getting update for ${this.device.name} from Honeywell API`);
+    this.platform.debug(`Getting update for ${this.device.name} from Honeywell API`);
 
     try {
       const device = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}`, {
@@ -364,7 +382,7 @@ class HoneywellHomePlatformThermostat {
     }
 
     this.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}`);
-    this.log.debug(JSON.stringify(payload));
+    this.platform.debug(JSON.stringify(payload));
 
     // Make the API request
     await this.platform.rp.post(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}`, {
@@ -393,7 +411,7 @@ class HoneywellHomePlatformThermostat {
   }
 
   setTargetHeatingCoolingState(value, callback) {
-    this.log.debug('Set TargetHeatingCoolingState:', value);
+    this.platform.debug('Set TargetHeatingCoolingState:', value);
 
     this.TargetHeatingCoolingState = value;
     
@@ -410,28 +428,28 @@ class HoneywellHomePlatformThermostat {
   }
 
   setHeatingThresholdTemperature(value, callback) {
-    this.log.debug('Set HeatingThresholdTemperature:', value);
+    this.platform.debug('Set HeatingThresholdTemperature:', value);
     this.HeatingThresholdTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
   setCoolingThresholdTemperature(value, callback) {
-    this.log.debug('Set CoolingThresholdTemperature:', value);
+    this.platform.debug('Set CoolingThresholdTemperature:', value);
     this.CoolingThresholdTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
   setTargetTemperature(value, callback) {
-    this.log.debug('Set TargetTemperature:', value);
+    this.platform.debug('Set TargetTemperature:', value);
     this.TargetTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
   setTemperatureDisplayUnits(value, callback) {
-    this.log.debug('Set TemperatureDisplayUnits', value);
+    this.platform.debug('Set TemperatureDisplayUnits', value);
     this.log.warn('Changing the Hardware Display Units from HomeKit is not supported.');
 
     // change the temp units back to the one the Honeywell API said the thermostat was set to
