@@ -1,6 +1,6 @@
 {
   "name": "homebridge-honeywell-home",
-  "version": "3.0.5",
+  "version": "4.0.0",
   "description": "A Honeywell Home https://honeywellhome.com plugin for Homebridge: https://github.com/nfarina/homebridge",
   "author": "d0n4v4nb3ck3r",
   "main": "index.js",
@@ -30,6 +30,7 @@
     "debug": "^4.1.1",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.8",
+    "rxjs": "^6.5.4",
     "underscore": "^1.9.2"
   }
 }
