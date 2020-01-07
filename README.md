@@ -28,7 +28,6 @@ Option 2: Manually Install:
 npm install -g --unsafe-perm homebridge-honeywell-home
 
 ## Configuration
-Option 1:
 To configure [homebridge-honeywell-home](https://www.npmjs.com/package/homebridge-honeywell-home) you must also be running [homebridge-config-ui-x](https://github.com/oznu/homebridge-config-ui-x).
 
 * Navigate to the Plugins page in homebridge-config-ui-x.
@@ -42,10 +41,10 @@ To configure [homebridge-honeywell-home](https://www.npmjs.com/package/homebridg
 <img src='honeywell/02.png' />
 <img src='honeywell/03.png' />
 
-Option 2: Manually Config:
+## Manaul Config
 
   Visit Manual Config [Wiki](https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Manual-Config)
 
-## Options
+## Optional Config
 
   Visit Optional Config [Wiki](https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Optional-Config)
