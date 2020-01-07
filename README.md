@@ -39,7 +39,7 @@ To configure [homebridge-honeywell-home](https://www.npmjs.com/package/homebridg
 
 ## Manual Setup & Config
 
-  Visit Manual Config [Wiki](https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Manual-Config)
+  Visit Manual Config [Wiki](https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Manual-Install-&-Config)
 
 ## Optional Config
 
