@@ -4,7 +4,7 @@
 [![npm](https://img.shields.io/npm/dt/homebridge-honeywell-home?style=for-the-badge)](https://www.npmjs.com/package/homebridge-honeywell-home)
 [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/donavanbecker/homebridge-honeywell-home/Node?style=for-the-badge)](https://github.com/donavanbecker/homebridge-honeywell-home/actions?query=workflow%3ANode)
 [![GitHub issues](https://img.shields.io/github/issues/donavanbecker/homebridge-honeywell-home?style=for-the-badge)](https://github.com/donavanbecker/homebridge-honeywell-home/issues)
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/donavanbecker/homebridge-honeywell-home?style=for-the-badge)](https://github.com/donavanbecker/homebridge-honeywell-home/pulls)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/donavanbecker/homebridge-honeywell-home?style=for-the-badge)](https://github.com/donavanbecker/homebridge-honeywell-home/pulls) [![Greenkeeper badge](https://badges.greenkeeper.io/donavanbecker/homebridge-honeywell-home.svg)](https://greenkeeper.io/)
 
 
 
