@@ -77,7 +77,7 @@ class HoneywellHomePlatform {
       this.config.options = {};
     }
 
-    this.config.options.ttl = this.config.options.ttl || 300; // default 300 seconds
+    this.config.options.ttl = this.config.options.ttl || 600; // default 600 seconds
     this.config.options.debug = this.config.options.debug || false; // default false
 
     if (!this.config.credentials) {
