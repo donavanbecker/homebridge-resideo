@@ -44,8 +44,8 @@
           "ttl": {
             "title": "TTL",
             "type": "number",
-            "default": 300,
-            "minimum": 300
+            "default": 600,
+            "minimum": 600
           },
           "debug": {
             "title": "Debug Mode",
