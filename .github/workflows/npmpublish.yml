@@ -2,7 +2,7 @@ name: Changelog-Publish
 
 on:
   release:
-    types: [published]
+    types: [created]
 jobs:
   generate_changelog:
     runs-on: ubuntu-latest
@@ -16,11 +16,7 @@ jobs:
           changelog: "CHANGELOG.md"
           use_pullrequest: true 
           branch_name: ${{ join('changelog-', github.release.tag_name) }}
-on:
-  release:
-    types: [created]
 
-jobs:
   build:
     runs-on: ubuntu-latest
     steps:
