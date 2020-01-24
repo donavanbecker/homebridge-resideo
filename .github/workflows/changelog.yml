@@ -1,0 +1,18 @@
+name: Changelog	
+
+on:	
+  release:	
+    types: [published]	
+jobs:	
+  generate_changelog:	
+    runs-on: ubuntu-latest	
+    name: Update Changelog	
+    steps:	
+      - name: Create Changelog.md	
+        id: changelog	
+        uses: nextrelease/next-release-changelog-action@master	
+        with:	
+          token: ${{ secrets.GITHUB_TOKEN }} # Required	
+          changelog: "CHANGELOG.md"	
+          use_pullrequest: true 	
+          branch_name: ${{ join('changelog-', github.release.tag_name) }}
