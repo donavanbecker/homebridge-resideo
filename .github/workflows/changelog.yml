@@ -1,8 +1,7 @@
 name: Changelog	
 
-on:	
-  release:	
-    types: [published]	
+on: [push]
+
 jobs:	
   generate_changelog:	
     runs-on: ubuntu-latest	
