@@ -30,3 +30,6 @@ jobs:
         npm test
       env:
         CI: true
+    - name: release  
+      run: yarn semantic-release || true
+        
