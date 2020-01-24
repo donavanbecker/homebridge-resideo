@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Create Changelog.md
         id: changelog
-        uses: nextrelease/next-release-changelog-action@master
+        uses: nextrelease/changelog-generator-action@master
         with:
           token: ${{ secrets.GITHUB_TOKEN }} # Required
           changelog: "CHANGELOG.md"
