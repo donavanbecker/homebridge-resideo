@@ -1,10 +1,10 @@
 # Honeywell Home plugin for Homebridge
 
-[![npm](https://img.shields.io/npm/v/homebridge-honeywell-home)](https://www.npmjs.com/package/homebridge-honeywell-home)
-[![npm](https://img.shields.io/npm/dt/homebridge-honeywell-home)](https://www.npmjs.com/package/homebridge-honeywell-home)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/donavanbecker/homebridge-honeywell-home/Node)](https://github.com/donavanbecker/homebridge-honeywell-home/actions?query=workflow%3ANode)
-[![GitHub issues](https://img.shields.io/github/issues/donavanbecker/homebridge-honeywell-home)](https://github.com/donavanbecker/homebridge-honeywell-home/issues)
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/donavanbecker/homebridge-honeywell-home)](https://github.com/donavanbecker/homebridge-honeywell-home/pulls)
+[![npm](https://img.shields.io/npm/v/homebridge-honeywell-home?style=for-the-badge)](https://www.npmjs.com/package/homebridge-honeywell-home)
+[![npm](https://img.shields.io/npm/dt/homebridge-honeywell-home?style=for-the-badge)](https://www.npmjs.com/package/homebridge-honeywell-home)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/donavanbecker/homebridge-honeywell-home/Node?style=for-the-badge)](https://github.com/donavanbecker/homebridge-honeywell-home/actions?query=workflow%3ANode)
+[![GitHub issues](https://img.shields.io/github/issues/donavanbecker/homebridge-honeywell-home?style=for-the-badge)](https://github.com/donavanbecker/homebridge-honeywell-home/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/donavanbecker/homebridge-honeywell-home?style=for-the-badge)](https://github.com/donavanbecker/homebridge-honeywell-home/pulls)
 
 
 
