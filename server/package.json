@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@types/node": "12.12.25",
-    "concurrently": "5.0.2",
+    "concurrently": "5.1.0",
     "nodemon": "2.0.2",
     "rimraf": "3.0.0",
     "ts-node": "8.6.2",
