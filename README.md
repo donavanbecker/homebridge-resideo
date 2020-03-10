@@ -1,7 +1,7 @@
 # Honeywell Home plugin for Homebridge
 
-[![npm](https://img.shields.io/npm/v/homebridge-honeywell-home)](https://www.npmjs.com/package/homebridge-honeywell-home)
-[![npm](https://img.shields.io/npm/dt/homebridge-honeywell-home)](https://www.npmjs.com/package/homebridge-honeywell-home)
+[![npm](https://badgen.net/npm/v/homebridge-honeywell-home)](https://www.npmjs.com/package/homebridge-honeywell-home)
+[![npm](https://badgen.net/npm/dt/homebridge-honeywell-home)](https://www.npmjs.com/package/homebridge-honeywell-home)
 
 
 
