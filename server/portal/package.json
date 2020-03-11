@@ -39,7 +39,7 @@
     "@types/node": "12.12.29",
     "codelyzer": "5.2.1",
     "ts-node": "8.6.2",
-    "tslint": "5.20.1",
+    "tslint": "6.1.0",
     "typescript": "3.8.3"
   }
 }
