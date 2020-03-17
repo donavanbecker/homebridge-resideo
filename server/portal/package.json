@@ -28,7 +28,7 @@
     "jquery": "3.4.1",
     "popper.js": "1.16.1",
     "rxjs": "6.5.4",
-    "zone.js": "0.10.2"
+    "zone.js": "0.10.3"
   },
   "devDependencies": {
     "@angular/cli": "9.0.6",
