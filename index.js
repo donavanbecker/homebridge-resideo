@@ -80,6 +80,11 @@ class HoneywellHomePlatform {
     this.config.options.ttl = this.config.options.ttl || 1800; // default 1800 seconds
     this.config.options.debug = this.config.options.debug || false; // default false
 
+    if (!this.config.credentials.consumerSecret && this.config.options.ttl < 1800) {
+      this.log.debug('TTL must be set to 1800 or higher unless you setup your own consumerSecret.')
+      this.config.options.ttl;
+    }
+
     if (!this.config.credentials) {
       throw new Error('Missing Credentials');
     }
@@ -95,32 +100,41 @@ class HoneywellHomePlatform {
    * Exchange the refresh token for an access token
    */
   async getAccessToken() {
+    let result;
     if (this.config.credentials.consumerSecret) {
-      // user has defined their own consumer secret, make a direct call to the honeywell api
-      // TODO Impliment this call again
+      result = await rp.post('https://api.honeywell.com/oauth2/token', {
+        auth: {
+          user: this.config.credentials.consumerKey,
+          pass: this.config.credentials.consumerSecret,
+        },
+        form: {
+          grant_type: 'refresh_token',
+          refresh_token: this.config.credentials.refreshToken,
+        },
+        json: true,
+      });
     } else {
       // if no consumerSecret is defined, attempt to use the shared consumerSecret
       try {
-        const result = await rp.post('https://homebridge-honeywell.iot.oz.nu/user/refresh', {
+        result = await rp.post('https://homebridge-honeywell.iot.oz.nu/user/refresh', {
           json: {
             consumerKey: this.config.credentials.consumerKey,
             refresh_token: this.config.credentials.refreshToken,
           }
         });
-
-        this.config.credentials.accessToken = result.access_token;
-
-        this.debug('Got access token:', this.config.credentials.accessToken);
-
-        // check if the refresh token has changed
-        if (result.refresh_token !== this.config.credentials.refreshToken) {
-          // need some way to store this???
-          this.log.warn('New refresh token:', result.refresh_token);
-        }
       } catch (e) {
         this.log.error('Failed to exchange refresh token for an access token.', e.message);
         throw e;
       }
+    }
+
+    this.config.credentials.accessToken = result.access_token;
+    this.debug('Got access token:', this.config.credentials.accessToken);
+
+    // check if the refresh token has changed
+    if (result.refresh_token !== this.config.credentials.refreshToken) {
+      // need some way to store this???
+      this.log.warn('New refresh token:', result.refresh_token);
     }
   }
 
@@ -132,7 +146,7 @@ class HoneywellHomePlatform {
     try {
       await this.getAccessToken();
     } catch (e) {
-      this.log.error('Could not discover devices.')
+      this.log.error('Could not discover devices.', e.message);
       return;
     }
 
@@ -352,7 +366,7 @@ class HoneywellHomePlatformThermostat {
       this.updateHomeKitCharacteristics();
 
     } catch (e) {
-      this.log.error(`Failed to update status of ${this.device.name}`, e);
+      this.log.error(`Failed to update status of ${this.device.name}`, e.message);
     }
   }
 
