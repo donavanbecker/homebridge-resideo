@@ -24,7 +24,11 @@
 * Your account is now linked.
 * Restart Homebridge for the changes to take effect.
 
+<span align="center">
+  
 <img src='https://raw.githubusercontent.com/donavanbecker/homebridge-honeywell-home/beta/honeywell/honeywellsetup.mov' />
+
+</span>
 
 ## Manual Setup
 
