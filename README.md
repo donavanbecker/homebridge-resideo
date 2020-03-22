@@ -2,7 +2,6 @@
 
 [![npm](https://badgen.net/npm/v/homebridge-honeywell-home)](https://www.npmjs.com/package/homebridge-honeywell-home)
 [![npm](https://badgen.net/npm/dt/homebridge-honeywell-home)](https://www.npmjs.com/package/homebridge-honeywell-home)
-[![Discord](https://img.shields.io/discord/432663330281226270?color=728ED5&logo=discord&label=discord)](https://discord.gg/8fpZA4S)
 
 
 This [Honeywell Home](https://honeywellhome.com) plugin for [Homebridge](https://homebridge.io/) allows you to control your T5, T6 and T9 Honeywell Home thermostats from HomeKit.
