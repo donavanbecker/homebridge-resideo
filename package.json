@@ -29,10 +29,12 @@
   },
   "files": [
      "README.md",
-     "config-sample.json",
+     "CHANGELOG.md",
+     "config.schema.json",
+     "config.schema.json",
+     "nodemon.json",
      "LICENSE",
-     "server",
-     "CHANGELOG.md"
+     "server"
    ],
   "dependencies": {
     "request": "^2.88.0",
