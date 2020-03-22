@@ -2,7 +2,7 @@ name: Update-Changelog
 on:
   push:
     branches:
-      - beta
+      - master
 
 jobs:
   changelog:
