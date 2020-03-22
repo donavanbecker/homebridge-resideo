@@ -190,7 +190,7 @@ All notable changes to this project will be documented in this file. This projec
 
 * Updated Platform Name to HoneywellHome
 
-## >2.3.0
+## Before 2.3.0
 
 ### No Changelog
 
