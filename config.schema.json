@@ -44,8 +44,8 @@
           "ttl": {
             "title": "TTL",
             "type": "number",
-            "minimum": 1800,
-            "description": "To better support everyone that uses this Plugin please refrain from setting this lower then 1800. Thanks!"
+            "minimum": 600,
+            "description": "Indicates the number of seconds between polls of the Honeywell Home service."
           },
           "debug": {
             "title": "Debug Mode",
