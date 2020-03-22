@@ -82,7 +82,7 @@ class HoneywellHomePlatform {
 
     if (!this.config.credentials.consumerSecret && this.config.options.ttl < 1800) {
       this.log.debug('TTL must be set to 1800 or higher unless you setup your own consumerSecret.')
-      this.config.options.ttl;
+      this.config.options.ttl = 1800;
     }
 
     if (!this.config.credentials) {
