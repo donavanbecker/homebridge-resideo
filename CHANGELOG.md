@@ -2,23 +2,26 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/).
 
-## 4.4.4 (2020-03-20)
+## 5.0.0 (2020-03-22)
 
-### [4.4.5](https://github.com/donavanbecker/homebridge-honeywell-home/tree/4.4.5) (2020-03-22)
+### [Version 5.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.4...4.4.5)
 
-[Full Changelog](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.4...4.4.5)
+#### Features
 
-**Merged pull requests:**
-
-- Update dependency ts-node to v8.8.1 [\#114](https://github.com/donavanbecker/homebridge-honeywell-home/pull/114) ([renovate[bot]](https://github.com/apps/renovate))
 - workflow to beta [\#113](https://github.com/donavanbecker/homebridge-honeywell-home/pull/113) ([donavanbecker](https://github.com/donavanbecker))
 - Secrets, Minimum TTL, Logging, Update Readme, and Changelog.md [\#112](https://github.com/donavanbecker/homebridge-honeywell-home/pull/112) ([donavanbecker](https://github.com/donavanbecker))
-- Update dependency ts-node to v8.8.0 [\#111](https://github.com/donavanbecker/homebridge-honeywell-home/pull/111) ([renovate[bot]](https://github.com/apps/renovate))
 - Secrets, Minimum TTL and Logging [\#110](https://github.com/donavanbecker/homebridge-honeywell-home/pull/110) ([oznu](https://github.com/oznu))
 
-## [Version 4.4.4](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.3...v4.4.4)
+#### Dependency Updates
 
-### Dependency Updates
+- Update dependency ts-node to v8.8.1 [\#114](https://github.com/donavanbecker/homebridge-honeywell-home/pull/114) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency ts-node to v8.8.0 [\#111](https://github.com/donavanbecker/homebridge-honeywell-home/pull/111) ([renovate[bot]](https://github.com/apps/renovate))
+
+## 4.4.4 (2020-03-20)
+
+### [Version 4.4.4](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.3...v4.4.4)
+
+#### Dependency Updates
 * Update angularcli monorepo [#109](https://github.com/donavanbecker/homebridge-honeywell-home/pull/109)
 * Update dependency ts-node to v8.7.0 [#108](https://github.com/donavanbecker/homebridge-honeywell-home/pull/108)
 * Update angular monorepo to v9.0.7 [#107](https://github.com/donavanbecker/homebridge-honeywell-home/pull/107)
