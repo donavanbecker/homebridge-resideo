@@ -1,0 +1,20 @@
+# Add 'server' to any changes within 'server' folder or any subfolders
+label1:
+  - server/**/*
+
+# Add 'branding' to any file changes within 'honeywell' folder
+label2: honeywell/*
+
+# Add 'repo' label to any root file changes
+repo:
+  - ./*
+
+# Add 'enhancement' label to any change to index.js file
+enhance:
+  - ./index.js
+  - ./package.json
+  - ./pakcage-lock.json
+  
+# Add 'workflow' to any changes within 'workflow' folder or any subfolders
+label3:
+  - .github/workflows/*
