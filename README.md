@@ -1,7 +1,7 @@
 <span align="center">
+
 <a href="https://github.com/homebridge/verified/blob/master/verified-plugins.json"><img title="homebridge-verified" src="https://raw.githubusercontent.com/donavanbecker/homebridge-honeywell-home/master/honeywell/Homebridge_x_Honeywell.svg?sanitize=true" width="500px"></a>
 
-#
 # Homebridge Honeywell Home
 
 <a href="https://www.npmjs.com/package/homebridge-honeywell-home"><img title="npm version" src="https://badgen.net/npm/v/homebridge-honeywell-home" ></a>
