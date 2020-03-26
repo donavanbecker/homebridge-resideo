@@ -2,9 +2,34 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/).
 
+## 5.0.1 (2020-03-26)
+
+## [Version 5.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.0...5.0.1)
+
+**Closed issues:**
+
+- Honeywell - "rate limit has been exhausted" [\#106](https://github.com/donavanbecker/homebridge-honeywell-home/issues/106)
+
+**Merged pull requests:**
+
+- 5.0.1 [\#131](https://github.com/donavanbecker/homebridge-honeywell-home/pull/131) ([donavanbecker](https://github.com/donavanbecker))
+- Update angularcli monorepo [\#130](https://github.com/donavanbecker/homebridge-honeywell-home/pull/130) ([renovate[bot]](https://github.com/apps/renovate))
+- Update angularcli monorepo [\#129](https://github.com/donavanbecker/homebridge-honeywell-home/pull/129) ([renovate[bot]](https://github.com/apps/renovate))
+- Update angularcli monorepo [\#128](https://github.com/donavanbecker/homebridge-honeywell-home/pull/128) ([renovate[bot]](https://github.com/apps/renovate))
+- Update angularcli monorepo [\#127](https://github.com/donavanbecker/homebridge-honeywell-home/pull/127) ([renovate[bot]](https://github.com/apps/renovate))
+- Update angularcli monorepo [\#126](https://github.com/donavanbecker/homebridge-honeywell-home/pull/126) ([renovate[bot]](https://github.com/apps/renovate))
+- Labeler - Workflow [\#125](https://github.com/donavanbecker/homebridge-honeywell-home/pull/125) ([donavanbecker](https://github.com/donavanbecker))
+- Stale - Workflow [\#124](https://github.com/donavanbecker/homebridge-honeywell-home/pull/124) ([donavanbecker](https://github.com/donavanbecker))
+- Update angular monorepo to v9.1.0 [\#123](https://github.com/donavanbecker/homebridge-honeywell-home/pull/123) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency @types/node to v12.12.31 [\#122](https://github.com/donavanbecker/homebridge-honeywell-home/pull/122) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency helmet to v3.22.0 [\#121](https://github.com/donavanbecker/homebridge-honeywell-home/pull/121) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency @types/jasmine to v3.5.10 [\#120](https://github.com/donavanbecker/homebridge-honeywell-home/pull/120) ([renovate[bot]](https://github.com/apps/renovate))
+- Merge from Master [\#119](https://github.com/donavanbecker/homebridge-honeywell-home/pull/119) ([donavanbecker](https://github.com/donavanbecker))
+- Merge From Master [\#118](https://github.com/donavanbecker/homebridge-honeywell-home/pull/118) ([donavanbecker](https://github.com/donavanbecker))
+
 ## 5.0.0 (2020-03-22)
 
-### [Version 5.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.4...4.4.5)
+## [Version 5.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.4...5.0.0)
 
 #### Features
 
