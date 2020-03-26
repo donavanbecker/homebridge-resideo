@@ -30,13 +30,13 @@
     "cors": "2.8.5",
     "dotenv": "8.2.0",
     "express": "4.17.1",
-    "helmet": "3.21.3",
+    "helmet": "3.22.0",
     "request": "2.88.2",
     "request-promise-native": "1.0.8",
     "source-map-support": "0.5.16"
   },
   "devDependencies": {
-    "@types/node": "12.12.30",
+    "@types/node": "12.12.31",
     "concurrently": "5.1.0",
     "nodemon": "2.0.2",
     "rimraf": "3.0.2",
