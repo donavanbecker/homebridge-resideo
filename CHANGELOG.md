@@ -2,11 +2,9 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/).
 
-## 5.0.0 (2020-03-22)
+## 5.0.1 (2020-03-26)
 
-### [5.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/tree/5.0.1) (2020-03-26)
-
-[Full Changelog](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.0...5.0.1)
+## [Version 5.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.0...5.0.1)
 
 **Closed issues:**
 
@@ -29,7 +27,9 @@ All notable changes to this project will be documented in this file. This projec
 - Merge from Master [\#119](https://github.com/donavanbecker/homebridge-honeywell-home/pull/119) ([donavanbecker](https://github.com/donavanbecker))
 - Merge From Master [\#118](https://github.com/donavanbecker/homebridge-honeywell-home/pull/118) ([donavanbecker](https://github.com/donavanbecker))
 
-## [Version 5.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.4...4.4.5)
+## 5.0.0 (2020-03-22)
+
+## [Version 5.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.4...5.0.0)
 
 #### Features
 
