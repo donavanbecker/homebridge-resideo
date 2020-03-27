@@ -1,4 +1,4 @@
-name: Mark-Stale
+name: Stale
 
 on:
   schedule:
