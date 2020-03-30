@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file. This projec
 
 ## 5.0.2 (2020-03-30)
 
+## [unknown](https://github.com/donavanbecker/homebridge-honeywell-home/tree/unknown) (2020-03-30)
+
+[Full Changelog](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.1...unknown)
+
+**Merged pull requests:**
+
+- 5.0.2 [\#142](https://github.com/donavanbecker/homebridge-honeywell-home/pull/142) ([donavanbecker](https://github.com/donavanbecker))
+- \[RELEASE\] 5.0.2 [\#141](https://github.com/donavanbecker/homebridge-honeywell-home/pull/141) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Pin dependencies [\#140](https://github.com/donavanbecker/homebridge-honeywell-home/pull/140) ([renovate[bot]](https://github.com/apps/renovate))
+- Pin dependencies [\#139](https://github.com/donavanbecker/homebridge-honeywell-home/pull/139) ([renovate[bot]](https://github.com/apps/renovate))
+- Update dependency @types/node to v12.12.32 [\#138](https://github.com/donavanbecker/homebridge-honeywell-home/pull/138) ([renovate[bot]](https://github.com/apps/renovate))
+- update workflow [\#137](https://github.com/donavanbecker/homebridge-honeywell-home/pull/137) ([donavanbecker](https://github.com/donavanbecker))
+- Update dependency codelyzer to v5.2.2 [\#136](https://github.com/donavanbecker/homebridge-honeywell-home/pull/136) ([renovate[bot]](https://github.com/apps/renovate))
+- merge from Master [\#134](https://github.com/donavanbecker/homebridge-honeywell-home/pull/134) ([donavanbecker](https://github.com/donavanbecker))
+
 ## [Version 5.0.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.1...v5.0.2)
 
 **Merged pull requests:**
