@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file. This projec
 
 ## 5.0.1 (2020-03-26)
 
+## [unknown](https://github.com/donavanbecker/homebridge-honeywell-home/tree/unknown) (2020-03-30)
+
+[Full Changelog](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.1...unknown)
+
+**Merged pull requests:**
+
+- Pin dependencies [\#140](https://github.com/donavanbecker/homebridge-honeywell-home/pull/140) ([renovate[bot]](https://github.com/apps/renovate))
+
 ## [Version 5.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.0...5.0.1)
 
 **Closed issues:**
