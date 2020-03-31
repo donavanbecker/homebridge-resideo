@@ -42,7 +42,7 @@
     "rxjs": "^6.5.4"
   },
   "devDependencies": {
-    "homebridge-config-ui-x": "4.13.2",
+    "homebridge-config-ui-x": "4.13.3",
     "homebridge": "0.4.53",
     "nodemon": "2.0.2"
   }
