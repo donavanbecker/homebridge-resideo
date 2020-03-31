@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file. This projec
 
 ## 5.0.2 (2020-03-30)
 
+## [unknown](https://github.com/donavanbecker/homebridge-honeywell-home/tree/unknown) (2020-03-31)
+
+[Full Changelog](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.2...unknown)
+
+**Implemented enhancements:**
+
+- Version 5.0.3 [\#148](https://github.com/donavanbecker/homebridge-honeywell-home/pull/148) ([donavanbecker](https://github.com/donavanbecker))
+
+**Merged pull requests:**
+
+- Bump homebridge-config-ui-x from 4.13.2 to 4.13.3 [\#147](https://github.com/donavanbecker/homebridge-honeywell-home/pull/147) ([dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
+- Update dependency @types/node to v12.12.34 [\#145](https://github.com/donavanbecker/homebridge-honeywell-home/pull/145) ([renovate[bot]](https://github.com/apps/renovate))
+
 ## [Version 5.0.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.1...v5.0.2)
 
 **Merged pull requests:**
