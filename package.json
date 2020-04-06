@@ -31,7 +31,6 @@
     "README.md",
     "CHANGELOG.md",
     "config.schema.json",
-    "config.schema.json",
     "nodemon.json",
     "LICENSE",
     "server"
