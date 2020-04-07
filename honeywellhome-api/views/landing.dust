@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<title>{title}</title>
+	<link rel='stylesheet' href='/stylesheets/style.css' />
+	<script src="/javascripts/jquery-3.2.1.min.js"></script>
+	<script src="/javascripts/lodash.min.js"></script>
+	<script src="/javascripts/async.js"></script>
+	<script src="/javascripts/app.js"></script>
+	</head>
+	<body>
+		<h1>{title}</h1>
+		<p>Welcome to {title}</p>
+		<p>You are logged in.</p>
+		<p>Please record this information:<pre>{credentials}</pre></p>
+		<div id="locations">
+
+		</div>
+		<p><a href="/auth/logout">Logout</a>
+	</body>
+</html>
