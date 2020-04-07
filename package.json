@@ -2,7 +2,7 @@
   "name": "homebridge-honeywell-home",
   "version": "5.0.3",
   "description": "A Honeywell Home https://honeywellhome.com plugin for Homebridge: https://github.com/homebridge/homebridge",
-  "author": "d0n4v4nb3ck3r",
+  "author": "donavanbecker",
   "main": "index.js",
   "scripts": {
     "developer": "DEBUG=honeywell-home homebridge -D -U `pwd` -P `pwd`",
