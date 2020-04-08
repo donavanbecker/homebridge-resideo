@@ -1,12 +1,19 @@
 # Change Log
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/).
+## 5.1.0 (2020-03-30)
+
+## [Version 5.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.2...v5.1.0)
+
+#### Changes
+
+- include honeywellhome-api into pacakge.
 
 ## 5.0.2 (2020-03-30)
 
 ## [Version 5.0.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.1...v5.0.2)
 
-**Merged pull requests:**
+#### Changes
 
 - Pin dependencies [\#140](https://github.com/donavanbecker/homebridge-honeywell-home/pull/140) ([renovate[bot]](https://github.com/apps/renovate))
 
@@ -14,12 +21,9 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Version 5.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.0...5.0.1)
 
-**Closed issues:**
+#### Changes
 
 - Honeywell - "rate limit has been exhausted" [\#106](https://github.com/donavanbecker/homebridge-honeywell-home/issues/106)
-
-**Merged pull requests:**
-
 - 5.0.1 [\#131](https://github.com/donavanbecker/homebridge-honeywell-home/pull/131) ([donavanbecker](https://github.com/donavanbecker))
 - Update angularcli monorepo [\#130](https://github.com/donavanbecker/homebridge-honeywell-home/pull/130) ([renovate[bot]](https://github.com/apps/renovate))
 - Update angularcli monorepo [\#129](https://github.com/donavanbecker/homebridge-honeywell-home/pull/129) ([renovate[bot]](https://github.com/apps/renovate))
@@ -141,9 +145,9 @@ All notable changes to this project will be documented in this file. This projec
 ### [Version 4.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.1.1...v4.2.0)
 
 #### Major Dependency Updates
-- Update dependency @types/jasmine to v3.5.3 [#70](https://github.com/donavanbecker/homebridge-honeywell-home/pull/70) 
-- Update dependency @angular-devkit/build-angular to v0.900.1 [#71](https://github.com/donavanbecker/homebridge-honeywell-home/pull/71) 
-- Update dependency @angular/cli to v9 [#72](https://github.com/donavanbecker/homebridge-honeywell-home/pull/72) 
+- Update dependency @types/jasmine to v3.5.3 [#70](https://github.com/donavanbecker/homebridge-honeywell-home/pull/70)
+- Update dependency @angular-devkit/build-angular to v0.900.1 [#71](https://github.com/donavanbecker/homebridge-honeywell-home/pull/71)
+- Update dependency @angular/cli to v9 [#72](https://github.com/donavanbecker/homebridge-honeywell-home/pull/72)
 - Update angular monorepo to v9 (major) [#73](https://github.com/donavanbecker/homebridge-honeywell-home/pull/73)
 
 ## 4.1.1 (2020-01-23)
@@ -151,7 +155,7 @@ All notable changes to this project will be documented in this file. This projec
 ### [Version 4.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.1.0...v4.1.1)
 
 - Update API Refresh to 10 minute minimum so that all users don't get refresh token errors.
-- Updated Dependencies 
+- Updated Dependencies
 
 ## 4.1.0 (2020-01-18)
 
@@ -188,7 +192,7 @@ All notable changes to this project will be documented in this file. This projec
 ### [Version 4.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v3.0.5...v4.0.0)
 
 - Updated Readme
-- Adds the capability to write to the Honeywell Home API 
+- Adds the capability to write to the Honeywell Home API
 
 ## 3.0.5 (2020-01-04)
 
