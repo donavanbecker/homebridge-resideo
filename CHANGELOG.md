@@ -1,13 +1,13 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/).
-## 5.1.0 (2020-03-30)
+## 5.0.3 (2020-04-08)
 
-## [Version 5.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.2...v5.1.0)
+## [Version 5.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.2...v5.0.3)
 
 #### Changes
 
-- include honeywellhome-api into pacakge.
+- Update devDependencies for homebridge-config-ui-x and homebridge
 
 ## 5.0.2 (2020-03-30)
 
