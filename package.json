@@ -1,6 +1,6 @@
 {
   "name": "homebridge-honeywell-home",
-  "version": "5.0.3",
+  "version": "5.0.4",
   "description": "A Honeywell Home https://honeywellhome.com plugin for Homebridge: https://github.com/homebridge/homebridge",
   "author": "donavanbecker",
   "main": "index.js",
@@ -24,7 +24,7 @@
     "url": "https://github.com/donavanbecker/homebridge-honeywell-home/issues"
   },
   "engines": {
-    "node": ">=8.15.1",
+    "node": ">=12.16.2",
     "homebridge": ">=0.4.53"
   },
   "files": [
@@ -41,8 +41,6 @@
     "rxjs": ">=6.5.4"
   },
   "devDependencies": {
-    "homebridge-config-ui-x": ">=4.14.0",
-    "homebridge": ">=0.4.53",
     "nodemon": ">=2.0.2"
   }
 }

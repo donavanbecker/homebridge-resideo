@@ -1,9 +1,19 @@
 # Changelog
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/).
+
+## 5.0.4 (2020-04-11)
+
+## [Version 5.0.4](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.3...v5.0.4)
+
+#### Changes
+
+- remove devDependencies for homebridge-config-ui-x and homebridge
+- update node engine dependencies
+
 ## 5.0.3 (2020-04-08)
 
-## [Version 5.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.2...v5.0.3)
+## [Version 5.0.3](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.2...v5.0.3)
 
 #### Changes
 
