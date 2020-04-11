@@ -2,9 +2,9 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/).
 
-## 5.0.3 (2020-04-08)
+## 5.0.4 (2020-04-11)
 
-## [Version 5.0.3](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.3...v5.0.4)
+## [Version 5.0.4](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.3...v5.0.4)
 
 #### Changes
 
