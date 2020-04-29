@@ -28,7 +28,7 @@
 
 <span align="center">
   
-<img src='https://raw.githubusercontent.com/donavanbecker/homebridge-honeywell-home/beta/honeywell/honeywellsetup.mov' />
+<img src='https://raw.githubusercontent.com/donavanbecker/homebridge-honeywell-home/master/honeywell/honeywellsetup.mov' />
 
 </span>
 
