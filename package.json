@@ -1,8 +1,8 @@
 {
   "name": "homebridge-honeywell-home",
-  "version": "5.0.5",
+  "version": "5.0.6",
   "description": "A Honeywell Home https://honeywellhome.com plugin for Homebridge: https://github.com/homebridge/homebridge",
-  "author": "donavanbecker",
+  "author": "homebridge-plugins",
   "main": "index.js",
   "scripts": {
     "developer": "DEBUG=honeywell-home homebridge -D -U `pwd` -P `pwd`",
@@ -18,10 +18,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/donavanbecker/homebridge-honeywell-home.git"
+    "url": "git+https://github.com/homebridge-plugins/homebridge-honeywell-home.git"
   },
   "bugs": {
-    "url": "https://github.com/donavanbecker/homebridge-honeywell-home/issues"
+    "url": "https://github.com/homebridge-plugins/homebridge-honeywell-home/issues"
   },
   "engines": {
     "node": ">=8.15.1",
