@@ -18,13 +18,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/homebridge-plugins/homebridge-honeywell-home.git"
+    "url": "git+https://github.com/homebridge-plugins/homebridge-honeywell-home.git"
   },
   "bugs": {
     "url": "https://github.com/homebridge-plugins/homebridge-honeywell-home/issues"
-  },
-   "publishConfig": {
-    "registry":"https://npm.pkg.github.com/"
   },
   "engines": {
     "node": ">=8.15.1",
