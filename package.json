@@ -1,6 +1,6 @@
 {
   "name": "homebridge-honeywell-home",
-  "version": "5.0.7",
+  "version": "5.1.0",
   "description": "A Honeywell Home https://honeywellhome.com plugin for Homebridge: https://github.com/homebridge/homebridge",
   "author": "homebridge-plugins",
   "main": "index.js",
