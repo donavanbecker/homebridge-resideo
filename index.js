@@ -503,7 +503,7 @@ class HoneywellHomePlatformThermostat {
    * Create Fan Accessory for Thermostat
    */
 module.exports = (api) => {
-  api.registerAccessory('homebridge-honeywell-home', 'HoneywellHome', ExampleFanv2Accessory);
+  api.registerAccessory('homebridge-honeywell-home', HoneywellHomePlatform , HoneywellFanAccessory);
 };
 
 class HoneywellFanAccessory {
