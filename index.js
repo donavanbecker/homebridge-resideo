@@ -499,19 +499,23 @@ class HoneywellHomePlatformThermostat {
 }
 
 
+
+
  /**
    * Create Fan Accessory for Thermostat
    */
-module.exports = (api) => {
-  api.registerAccessory('HoneywellHomePlatform', 'HoneywellHomePlatformThermostat' , HoneywellFanAccessory);
-};
+  startAccessory(accessory, device, locationId) {
+    return new HoneywellHomeFanAccessory(this.log, this, accessory, device, locationId);
+  }
 
 class HoneywellFanAccessory {
 
   constructor(log, config, api) {
-      this.log = log;
-      this.config = config;
-      this.api = api;
+    this.log = log;
+    this.platform = platform;
+    this.accessory = accessory;
+    this.device = device;
+    this.locationId = locationId;
 
       this.Service = this.api.hap.Service;
       this.Characteristic = this.api.hap.Characteristic;
