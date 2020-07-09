@@ -503,7 +503,7 @@ class HoneywellHomePlatformThermostat {
    * Create Fan Accessory for Thermostat
    */
 module.exports = (api) => {
-  api.registerAccessory('homebridge-honeywell-home', HoneywellHomePlatform , HoneywellFanAccessory);
+  api.registerAccessory('HoneywellHomePlatform', 'HoneywellHomePlatformThermostat' , HoneywellFanAccessory);
 };
 
 class HoneywellFanAccessory {
@@ -550,7 +550,7 @@ class HoneywellFanAccessory {
    * Handle requests to set the "Active" characteristic
    */
   handleActiveSet(value, callback) {
-    this.log.debug('Triggered SET Active:' value);
+    this.log.debug('Triggered SET Active:', value);
 
     callback(null);
   }
@@ -571,7 +571,7 @@ class HoneywellFanAccessory {
    * Handle requests to set the "Active" characteristic
    */
   handleTargetFanStateSet(value, callback) {
-    this.log.debug('Triggered SET Active:' value);
+    this.log.debug('Triggered SET Active:', value);
 
     callback(null);
   }
