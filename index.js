@@ -504,7 +504,7 @@ class HoneywellHomePlatformThermostat {
  /**
    * Create Fan Accessory for Thermostat
    */
-  startAccessory(accessory, device, locationId) {
+  startAccessory(accessory, device, locationId); {
     return new HoneywellHomeFanAccessory(this.log, this, accessory, device, locationId);
   }
 
