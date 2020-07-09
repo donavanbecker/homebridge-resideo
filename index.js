@@ -200,6 +200,7 @@ class HoneywellHomePlatform {
    */
   startAccessory(accessory, device, locationId) {
     return new HoneywellHomePlatformThermostat(this.log, this, accessory, device, locationId);
+    return new HoneywellHomeFanAccessory(this.log, this, accessory, device, locationId);
   }
 
   /**
@@ -504,10 +505,6 @@ class HoneywellHomePlatformThermostat {
  /**
    * Create Fan Accessory for Thermostat
    */
-  startAccessory(accessory, device, locationId); {
-    return new HoneywellHomeFanAccessory(this.log, this, accessory, device, locationId);
-  }
-
 class HoneywellFanAccessory {
 
   constructor(log, config, api) {
