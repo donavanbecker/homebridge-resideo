@@ -3,6 +3,7 @@
 const rp = require('request-promise-native')
 const { Subject, interval } = require('rxjs');
 const { debounceTime, skipWhile, tap } = require('rxjs/operators');
+const honeywellFan = require('.HoneywellFanAccessory.js');
 
 let Accessory, Service, Characteristic, UUIDGen;
 
