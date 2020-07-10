@@ -3,7 +3,6 @@
 const rp = require('request-promise-native')
 const { Subject, interval } = require('rxjs');
 const { debounceTime, skipWhile, tap } = require('rxjs/operators');
-const honeywellFan = require('.HoneywellFanAccessory.js');
 
 let Accessory, Service, Characteristic, UUIDGen;
 
@@ -297,7 +296,7 @@ class HoneywellHomePlatformThermostat {
 
 
     // Fan Controls
-    this.accessory.addService(Service.Fanv2, this.device.name + ' Fan');
+    this.accessory.addService(Service.Fanv2, `${this.device.name} Fan`);
 
       this.accessory
         .getService(Service.Fanv2)
