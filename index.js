@@ -367,13 +367,14 @@ class HoneywellHomePlatformThermostat {
           locationId: this.locationId,
         }
       })
-      const device = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/fan`, {
+      const deviceFan = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/fan`, {
         qs: {
           locationId: this.locationId,
         }
       });
 
       this.device = device;
+      this.fanRequest = deviceFan;
       this.parseStatus();
       this.updateHomeKitCharacteristics();
 
@@ -489,7 +490,7 @@ class HoneywellHomePlatformThermostat {
 
     setSwingMode(value, callback) {
     this.platform.debug('Set SwingMode(:', value);
-    this.SwingMode( = value;
+    this.SwingMode.fanRequest = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
