@@ -169,7 +169,7 @@ class HoneywellHomePlatform {
 
       // check each device to see if it's a new accessory or an existing one
       for (const device of devices) {
-        if (device.isAlive && device.isProvisioned && device.deviceClass === 'HeaterCooler') {
+        if (device.isAlive && device.isProvisioned && device.deviceClass === 'Thermostat') {
           const UUID = UUIDGen.generate(device.deviceID);
 
           // Mark the accessory as found so it will not be removed
@@ -199,7 +199,7 @@ class HoneywellHomePlatform {
    * Starts the accessory
    */
   startAccessory(accessory, device, locationId) {
-    return new HoneywellHomePlatformHeaterCooler(this.log, this, accessory, device, locationId);
+    return new HoneywellHomePlatformThermostat(this.log, this, accessory, device, locationId);
   }
 
   /**
@@ -216,9 +216,9 @@ class HoneywellHomePlatform {
 }
 
 /**
- * An instance of this class is created for each HeaterCooler discovered
+ * An instance of this class is created for each thermostat discovered
  */
-class HoneywellHomePlatformHeaterCooler {
+class HoneywellHomePlatformThermostat {
   constructor(log, platform, accessory, device, locationId) {
     this.log = log;
     this.platform = platform;
@@ -249,14 +249,14 @@ class HoneywellHomePlatformHeaterCooler {
     this.TemperatureDisplayUnits;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
-    this.doHeaterCoolerUpdate = new Subject();
-    this.HeaterCoolerUpdateInProgress = false;
+    this.doThermostatUpdate = new Subject();
+    this.thermostatUpdateInProgress = false;
 
     // setup or get the base service
     this.service = accessory.getService(Service.HeaterCooler) ?
       accessory.getService(Service.HeaterCooler) : accessory.addService(Service.HeaterCooler, this.device.name);
 
-    // HeaterCooler Accessory Information
+    // Thermostat Accessory Information
     this.accessory.getService(Service.AccessoryInformation)
       .setCharacteristic(Characteristic.Name, device.name)
       .setCharacteristic(Characteristic.Manufacturer, 'Honeywell')
@@ -294,21 +294,21 @@ class HoneywellHomePlatformHeaterCooler {
       .on('set', this.setTemperatureDisplayUnits.bind(this));
 
     this.service.getCharacteristic(Characteristic.SwingMode)
-      .on('set', this.setSwingMode.bind(this));  
+      .on('set', this.setSwingMode.bind(this));    
 
     // Push the values to Homekit
     this.updateHomeKitCharacteristics();
 
     // Start an update interval
-    interval(this.platform.config.options.ttl * 1000).pipe(skipWhile(() => this.HeaterCoolerUpdateInProgress)).subscribe(() => {
+    interval(this.platform.config.options.ttl * 1000).pipe(skipWhile(() => this.thermostatUpdateInProgress)).subscribe(() => {
       this.refreshStatus();
     })
 
-    // Watch for HeaterCooler change events
+    // Watch for thermostat change events
     // We put in a debounce of 100ms so we don't make duplicate calls
-    this.doHeaterCoolerUpdate.pipe(tap(() => {this.HeaterCoolerUpdateInProgress = true}), debounceTime(100)).subscribe(async () => {
+    this.doThermostatUpdate.pipe(tap(() => {this.thermostatUpdateInProgress = true}), debounceTime(100)).subscribe(async () => {
       await this.pushChanges();
-      this.HeaterCoolerUpdateInProgress = false;
+      this.thermostatUpdateInProgress = false;
     })
   }
 
@@ -440,37 +440,36 @@ class HoneywellHomePlatformHeaterCooler {
     }
     this.service.updateCharacteristic(Characteristic.TargetTemperature, this.TargetTemperature);
 
-    this.doHeaterCoolerUpdate.next();
+    this.doThermostatUpdate.next();
     callback(null);
   }
 
   setHeatingThresholdTemperature(value, callback) {
     this.platform.debug('Set HeatingThresholdTemperature:', value);
     this.HeatingThresholdTemperature = value;
-    this.doHeaterCoolerUpdate.next();
+    this.doThermostatUpdate.next();
     callback(null);
   }
 
   setCoolingThresholdTemperature(value, callback) {
     this.platform.debug('Set CoolingThresholdTemperature:', value);
     this.CoolingThresholdTemperature = value;
-    this.doHeaterCoolerUpdate.next();
+    this.doThermostatUpdate.next();
     callback(null);
   }
 
   setTargetTemperature(value, callback) {
     this.platform.debug('Set TargetTemperature:', value);
     this.TargetTemperature = value;
-    this.doHeaterCoolerUpdate.next();
+    this.doThermostatUpdate.next();
     callback(null);
   }
 
   setTemperatureDisplayUnits(value, callback) {
     this.platform.debug('Set TemperatureDisplayUnits', value);
     this.log.warn('Changing the Hardware Display Units from HomeKit is not supported.');
-  
 
-    // change the temp units back to the one the Honeywell API said the HeaterCooler was set to
+    // change the temp units back to the one the Honeywell API said the thermostat was set to
     setTimeout(() => {
       this.service.updateCharacteristic(Characteristic.TemperatureDisplayUnits, this.TemperatureDisplayUnits);
     }, 100);
@@ -478,10 +477,10 @@ class HoneywellHomePlatformHeaterCooler {
     callback(null);
   }
 
-  setSwingMode(value, callback) {
-    this.platform.debug('Set SwingMode:', value);
+    setSwingMode(value, callback) {
+    this.platform.debug('Set TargetTemperature:', value);
     this.TargetTemperature = value;
-    this.doHeaterCoolerUpdate.next();
+    this.doThermostatUpdate.next();
     callback(null);
   }
 
