@@ -169,7 +169,7 @@ class HoneywellHomePlatform {
 
       // check each device to see if it's a new accessory or an existing one
       for (const device of devices) {
-        if (device.isAlive && device.isProvisioned && device.deviceClass === 'Thermostat') {
+        if (device.isAlive && device.isProvisioned && device.deviceClass === 'HeaterCooler') {
           const UUID = UUIDGen.generate(device.deviceID);
 
           // Mark the accessory as found so it will not be removed
@@ -199,8 +199,7 @@ class HoneywellHomePlatform {
    * Starts the accessory
    */
   startAccessory(accessory, device, locationId) {
-    return new HoneywellHomePlatformThermostat(this.log, this, accessory, device, locationId);
-    return new HoneywellHomeFanAccessory(this.log, this, accessory, device, locationId);
+    return new HoneywellHomePlatformHeaterCooler(this.log, this, accessory, device, locationId);
   }
 
   /**
@@ -217,9 +216,9 @@ class HoneywellHomePlatform {
 }
 
 /**
- * An instance of this class is created for each thermostat discovered
+ * An instance of this class is created for each HeaterCooler discovered
  */
-class HoneywellHomePlatformThermostat {
+class HoneywellHomePlatformHeaterCooler {
   constructor(log, platform, accessory, device, locationId) {
     this.log = log;
     this.platform = platform;
@@ -250,14 +249,14 @@ class HoneywellHomePlatformThermostat {
     this.TemperatureDisplayUnits;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
-    this.doThermostatUpdate = new Subject();
-    this.thermostatUpdateInProgress = false;
+    this.doHeaterCoolerUpdate = new Subject();
+    this.HeaterCoolerUpdateInProgress = false;
 
     // setup or get the base service
-    this.service = accessory.getService(Service.Thermostat) ?
-      accessory.getService(Service.Thermostat) : accessory.addService(Service.Thermostat, this.device.name);
+    this.service = accessory.getService(Service.HeaterCooler) ?
+      accessory.getService(Service.HeaterCooler) : accessory.addService(Service.HeaterCooler, this.device.name);
 
-    // Thermostat Accessory Information
+    // HeaterCooler Accessory Information
     this.accessory.getService(Service.AccessoryInformation)
       .setCharacteristic(Characteristic.Name, device.name)
       .setCharacteristic(Characteristic.Manufacturer, 'Honeywell')
@@ -298,15 +297,15 @@ class HoneywellHomePlatformThermostat {
     this.updateHomeKitCharacteristics();
 
     // Start an update interval
-    interval(this.platform.config.options.ttl * 1000).pipe(skipWhile(() => this.thermostatUpdateInProgress)).subscribe(() => {
+    interval(this.platform.config.options.ttl * 1000).pipe(skipWhile(() => this.HeaterCoolerUpdateInProgress)).subscribe(() => {
       this.refreshStatus();
     })
 
-    // Watch for thermostat change events
+    // Watch for HeaterCooler change events
     // We put in a debounce of 100ms so we don't make duplicate calls
-    this.doThermostatUpdate.pipe(tap(() => {this.thermostatUpdateInProgress = true}), debounceTime(100)).subscribe(async () => {
+    this.doHeaterCoolerUpdate.pipe(tap(() => {this.HeaterCoolerUpdateInProgress = true}), debounceTime(100)).subscribe(async () => {
       await this.pushChanges();
-      this.thermostatUpdateInProgress = false;
+      this.HeaterCoolerUpdateInProgress = false;
     })
   }
 
@@ -438,28 +437,28 @@ class HoneywellHomePlatformThermostat {
     }
     this.service.updateCharacteristic(Characteristic.TargetTemperature, this.TargetTemperature);
 
-    this.doThermostatUpdate.next();
+    this.doHeaterCoolerUpdate.next();
     callback(null);
   }
 
   setHeatingThresholdTemperature(value, callback) {
     this.platform.debug('Set HeatingThresholdTemperature:', value);
     this.HeatingThresholdTemperature = value;
-    this.doThermostatUpdate.next();
+    this.doHeaterCoolerUpdate.next();
     callback(null);
   }
 
   setCoolingThresholdTemperature(value, callback) {
     this.platform.debug('Set CoolingThresholdTemperature:', value);
     this.CoolingThresholdTemperature = value;
-    this.doThermostatUpdate.next();
+    this.doHeaterCoolerUpdate.next();
     callback(null);
   }
 
   setTargetTemperature(value, callback) {
     this.platform.debug('Set TargetTemperature:', value);
     this.TargetTemperature = value;
-    this.doThermostatUpdate.next();
+    this.doHeaterCoolerUpdate.next();
     callback(null);
   }
 
@@ -467,7 +466,7 @@ class HoneywellHomePlatformThermostat {
     this.platform.debug('Set TemperatureDisplayUnits', value);
     this.log.warn('Changing the Hardware Display Units from HomeKit is not supported.');
 
-    // change the temp units back to the one the Honeywell API said the thermostat was set to
+    // change the temp units back to the one the Honeywell API said the HeaterCooler was set to
     setTimeout(() => {
       this.service.updateCharacteristic(Characteristic.TemperatureDisplayUnits, this.TemperatureDisplayUnits);
     }, 100);
@@ -497,84 +496,4 @@ class HoneywellHomePlatformThermostat {
 
     return Math.round((value * 9 / 5) + 32);
   }
-}
-
-
-
-
- /**
-   * Create Fan Accessory for Thermostat
-   */
-class HoneywellFanAccessory {
-
-  constructor(log, config, api) {
-    this.log = log;
-    this.platform = platform;
-    this.accessory = accessory;
-    this.device = device;
-    this.locationId = locationId;
-
-      this.Service = this.api.hap.Service;
-      this.Characteristic = this.api.hap.Characteristic;
-
-      // extract name from config
-      this.name = config.name;
-
-      // create a new Fanv2 service
-      this.service = new this.Service(this.Service.Fanv2);
-
-      // create handlers for required characteristics
-      this.service.getCharacteristic(this.Characteristic.Active)
-        .on('get', this.handleActiveGet.bind(this))
-        .on('set', this.handleActiveSet.bind(this));
-
-      // create handlers for optional characteristics
-      this.service.getCharacteristic(this.Characteristic.TargetFanState)
-        .on('get', this.handleTargetFanStateGet.bind(this))
-        .on('set', this.handleTargetFanStateSet.bind(this));
-
-  }
-
-  /**
-   * Handle requests to get the current value of the "Active" characteristic
-   */
-  handleActiveGet(callback) {
-    this.log.debug('Triggered GET Active');
-
-    // set this to a valid value for Active
-    const currentValue = 1;
-
-    callback(null, currentValue);
-  }
-
-  /**
-   * Handle requests to set the "Active" characteristic
-   */
-  handleActiveSet(value, callback) {
-    this.log.debug('Triggered SET Active:', value);
-
-    callback(null);
-  }
-
-  /**
-   * Handle requests to get the current value of the "Active" characteristic
-   */
-  handleTargetFanStateGet(callback) {
-    this.log.debug('Triggered GET Active');
-
-    // set this to a valid value for Active
-    const currentValue = 1;
-
-    callback(null, currentValue);
-  }
-
-  /**
-   * Handle requests to set the "Active" characteristic
-   */
-  handleTargetFanStateSet(value, callback) {
-    this.log.debug('Triggered SET Active:', value);
-
-    callback(null);
-  }
-
 }
