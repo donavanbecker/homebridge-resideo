@@ -233,6 +233,11 @@ class HoneywellHomePlatformThermostat {
       'Cool': Characteristic.TargetHeatingCoolingState.COOL,
       'Auto': Characteristic.TargetHeatingCoolingState.AUTO,
     }
+    this.fanModes = {
+      'On': Characteristic.SwingMode.OFF,
+      'Auto': Characteristic.SwingMode.SWING_DISABLED,
+      'Circulate': Characteristic.SwingMode.SWING_ENABLED,
+    }
 
     // Map HomeKit Modes to Honeywell Modes
     // Don't change the order of these!
@@ -324,7 +329,7 @@ class HoneywellHomePlatformThermostat {
 
     this.CurrentTemperature = this.toCelsius(this.device.indoorTemperature);
     this.CurrentRelativeHumidity = this.device.indoorHumidity;
-    this.SwingMode = this.device.operationStatus.fanRequest;
+    this.SwingMode = this.fanModes[this.device.operationStatus.fanRequest];
 
     if (this.device.changeableValues.heatSetpoint > 0) {
       this.HeatingThresholdTemperature = this.toCelsius(this.device.changeableValues.heatSetpoint);
