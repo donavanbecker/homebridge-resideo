@@ -468,16 +468,20 @@ class HoneywellHomePlatformHeaterCooler {
   setTemperatureDisplayUnits(value, callback) {
     this.platform.debug('Set TemperatureDisplayUnits', value);
     this.log.warn('Changing the Hardware Display Units from HomeKit is not supported.');
-
-  setSwingMode(value, callback) {
-    this.platform.debug('Set SwingMode', value);
-    this.log.warn('Changing the Hardware Display Units from HomeKit is not supported.');  
+  
 
     // change the temp units back to the one the Honeywell API said the HeaterCooler was set to
     setTimeout(() => {
       this.service.updateCharacteristic(Characteristic.TemperatureDisplayUnits, this.TemperatureDisplayUnits);
     }, 100);
     
+    callback(null);
+  }
+
+  setSwingMode(value, callback) {
+    this.platform.debug('Set SwingMode:', value);
+    this.TargetTemperature = value;
+    this.doHeaterCoolerUpdate.next();
     callback(null);
   }
 
