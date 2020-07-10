@@ -294,25 +294,25 @@ class HoneywellHomePlatformThermostat {
     this.service.getCharacteristic(Characteristic.TemperatureDisplayUnits)
       .on('set', this.setTemperatureDisplayUnits.bind(this));
 
+
     // Fan Controls
-
-    this.accessory.addService(Service.Fanv2, this.name);
-
-    this.accessory
-     .getService(Service.Fanv2)
-     .getCharacteristic(Characteristic.TargetFanState)
-     .on('set', function(value, callback) {
-       this.log.debug('Triggered SET Active:', value);
-       callback(null);
-     }.bind(this));
-
-    this.accessory
-     .getService(Service.Fanv2)
-     .addCharacteristic(Characteristic.CurrentFanState);
+    this.accessory.addService(Service.Fanv2, this.device.name + ' Fan');
 
       this.accessory
-       .getService(Service.Fanv2)
-       .getCharacteristic(Characteristic.CurrentFanState).updateValue(1);      
+        .getService(Service.Fanv2)
+        .getCharacteristic(Characteristic.TargetFanState)// .updateValue(1)
+        .on('set', function(value, callback) {
+          this.log.debug('Triggered SET Active:', value);
+          callback(null);
+        }.bind(this));     
+
+      this.accessory
+        .getService(Service.Fanv2)
+        .getCharacteristic(Characteristic.SwingMode).updateValue(1);
+
+      this.accessory
+        .getService(Service.Fanv2)
+        .getCharacteristic(Characteristic.CurrentFanState).updateValue(1);
 
 
     // Push the values to Homekit
