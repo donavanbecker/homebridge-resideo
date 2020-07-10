@@ -371,15 +371,9 @@ class HoneywellHomePlatformThermostat {
         qs: {
           locationId: this.locationId,
         }
-      })
-      const deviceFan = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/fan`, {
-        qs: {
-          locationId: this.locationId,
-        }
       });
 
       this.device = device;
-      this.fanRequest = deviceFan;
       this.parseStatus();
       this.updateHomeKitCharacteristics();
 
@@ -403,18 +397,22 @@ class HoneywellHomePlatformThermostat {
     if (this.TargetHeatingCoolingState === Characteristic.TargetHeatingCoolingState.HEAT) {
       payload.heatSetpoint = this.toFahrenheit(this.TargetTemperature);
       payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
+      payload.fanRequest = this.SwingMode;
     } else if (this.TargetHeatingCoolingState === Characteristic.TargetHeatingCoolingState.COOL) {
       payload.coolSetpoint = this.toFahrenheit(this.TargetTemperature);
       payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
+      payload.fanRequest = this.SwingMode;
     } else if (this.TargetHeatingCoolingState === Characteristic.TargetHeatingCoolingState.AUTO) {
       payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
       payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
+      payload.fanRequest = this.SwingMode;
     } else {
       payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
       payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
+      payload.fanRequest = this.SwingMode;
     }
 
-    this.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}`);
+    this.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}, fanRequest: ${payload.fanRequest}`);
     this.platform.debug(JSON.stringify(payload));
 
     // Make the API request
