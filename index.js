@@ -324,6 +324,7 @@ class HoneywellHomePlatformThermostat {
 
     this.CurrentTemperature = this.toCelsius(this.device.indoorTemperature);
     this.CurrentRelativeHumidity = this.device.indoorHumidity;
+    this.SwingMode = this.device.operationStatus.fanRequest;
 
     if (this.device.changeableValues.heatSetpoint > 0) {
       this.HeatingThresholdTemperature = this.toCelsius(this.device.changeableValues.heatSetpoint);
@@ -362,6 +363,11 @@ class HoneywellHomePlatformThermostat {
 
     try {
       const device = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}`, {
+        qs: {
+          locationId: this.locationId,
+        }
+      })
+      const device = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/fan`, {
         qs: {
           locationId: this.locationId,
         }
@@ -428,6 +434,7 @@ class HoneywellHomePlatformThermostat {
     this.service.updateCharacteristic(Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
     this.service.updateCharacteristic(Characteristic.TargetHeatingCoolingState, this.TargetHeatingCoolingState);
     this.service.updateCharacteristic(Characteristic.CurrentHeatingCoolingState, this.CurrentHeatingCoolingState);
+    this.service.updateCharacteristic(Characteristic.SwingMode, this.SwingMode);
   }
 
   setTargetHeatingCoolingState(value, callback) {
@@ -481,8 +488,8 @@ class HoneywellHomePlatformThermostat {
   }
 
     setSwingMode(value, callback) {
-    this.platform.debug('Set TargetTemperature:', value);
-    this.TargetTemperature = value;
+    this.platform.debug('Set SwingMode(:', value);
+    this.SwingMode( = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
