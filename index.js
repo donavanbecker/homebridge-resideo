@@ -389,6 +389,7 @@ class HoneywellHomePlatformThermostat {
   async pushChanges() {
     const payload = {
       mode: this.honeywellMode[this.TargetHeatingCoolingState],
+      mode: this.honeywellFanMode[this.SwingMode],
       thermostatSetpointStatus: 'TemporaryHold',
       autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
     }
