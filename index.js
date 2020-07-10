@@ -233,16 +233,10 @@ class HoneywellHomePlatformThermostat {
       'Cool': Characteristic.TargetHeatingCoolingState.COOL,
       'Auto': Characteristic.TargetHeatingCoolingState.AUTO,
     }
-    this.fanModes = {
-      'On': Characteristic.SwingMode.OFF,
-      'Auto': Characteristic.SwingMode.SWING_DISABLED,
-      'Circulate': Characteristic.SwingMode.SWING_ENABLED,
-    }
 
     // Map HomeKit Modes to Honeywell Modes
     // Don't change the order of these!
     this.honeywellMode = ['Off', 'Heat', 'Cool', 'Auto']
-    this.honeywellFanMode = ['On', 'Auto', 'Circulate']
 
     // default placeholders
     this.CurrentTemperature;
@@ -253,15 +247,14 @@ class HoneywellHomePlatformThermostat {
     this.HeatingThresholdTemperature;
     this.CurrentRelativeHumidity;
     this.TemperatureDisplayUnits;
-    this.SwingMode;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doThermostatUpdate = new Subject();
     this.thermostatUpdateInProgress = false;
 
     // setup or get the base service
-    this.service = accessory.getService(Service.HeaterCooler) ?
-      accessory.getService(Service.HeaterCooler) : accessory.addService(Service.HeaterCooler, this.device.name);
+    this.service = accessory.getService(Service.Thermostat) ?
+      accessory.getService(Service.Thermostat) : accessory.addService(Service.Thermostat, this.device.name);
 
     // Thermostat Accessory Information
     this.accessory.getService(Service.AccessoryInformation)
@@ -301,8 +294,27 @@ class HoneywellHomePlatformThermostat {
     this.service.getCharacteristic(Characteristic.TemperatureDisplayUnits)
       .on('set', this.setTemperatureDisplayUnits.bind(this));
 
-    this.service.getCharacteristic(Characteristic.SwingMode)
-      .on('set', this.setSwingMode.bind(this));    
+    // Fan Controls
+
+    this.accessory.addService(Service.Fanv2, this.name);
+
+    this.accessory
+     .getService(Service.Fanv2)
+     .getCharacteristic(Characteristic.Active)
+     .getCharacteristic(Characteristic.TargetFanState)
+     .on('set', function(value, callback) {
+       this.log.debug('Triggered SET Active:', value);
+       callback(null);
+     }.bind(this));
+
+    this.accessory
+     .getService(Service.Fanv2)
+     .addCharacteristic(Characteristic.CurrentFanState);
+
+      this.accessory
+       .getService(Service.Fanv2)
+       .getCharacteristic(Characteristic.CurrentFanState).updateValue(1);      
+
 
     // Push the values to Homekit
     this.updateHomeKitCharacteristics();
@@ -329,7 +341,6 @@ class HoneywellHomePlatformThermostat {
 
     this.CurrentTemperature = this.toCelsius(this.device.indoorTemperature);
     this.CurrentRelativeHumidity = this.device.indoorHumidity;
-    this.SwingMode = this.fanModes[this.device.operationStatus.mode];
 
     if (this.device.changeableValues.heatSetpoint > 0) {
       this.HeatingThresholdTemperature = this.toCelsius(this.device.changeableValues.heatSetpoint);
@@ -388,7 +399,6 @@ class HoneywellHomePlatformThermostat {
   async pushChanges() {
     const payload = {
       mode: this.honeywellMode[this.TargetHeatingCoolingState],
-      fanModes: this.honeywellFanMode[this.SwingMode],
       thermostatSetpointStatus: 'TemporaryHold',
       autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
     }
@@ -397,22 +407,18 @@ class HoneywellHomePlatformThermostat {
     if (this.TargetHeatingCoolingState === Characteristic.TargetHeatingCoolingState.HEAT) {
       payload.heatSetpoint = this.toFahrenheit(this.TargetTemperature);
       payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
-      payload.honeywellFanMode = this.fanModes;
     } else if (this.TargetHeatingCoolingState === Characteristic.TargetHeatingCoolingState.COOL) {
       payload.coolSetpoint = this.toFahrenheit(this.TargetTemperature);
       payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
-      payload.honeywellFanMode = this.fanModes;
     } else if (this.TargetHeatingCoolingState === Characteristic.TargetHeatingCoolingState.AUTO) {
       payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
       payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
-      payload.honeywellFanMode = this.fanModes;
     } else {
       payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
       payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
-      payload.honeywellFanMode = this.fanModes;
     }
 
-    this.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}, fanModes: ${payload.honeywellFanMode}`);
+    this.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}`);
     this.platform.debug(JSON.stringify(payload));
 
     // Make the API request
@@ -439,7 +445,6 @@ class HoneywellHomePlatformThermostat {
     this.service.updateCharacteristic(Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
     this.service.updateCharacteristic(Characteristic.TargetHeatingCoolingState, this.TargetHeatingCoolingState);
     this.service.updateCharacteristic(Characteristic.CurrentHeatingCoolingState, this.CurrentHeatingCoolingState);
-    this.service.updateCharacteristic(Characteristic.SwingMode, this.fanModes);
   }
 
   setTargetHeatingCoolingState(value, callback) {
@@ -489,13 +494,6 @@ class HoneywellHomePlatformThermostat {
       this.service.updateCharacteristic(Characteristic.TemperatureDisplayUnits, this.TemperatureDisplayUnits);
     }, 100);
     
-    callback(null);
-  }
-
-    setSwingMode(value, callback) {
-    this.platform.debug('Set FanMode(:', value);
-    this.fanModes = value;
-    this.doThermostatUpdate.next();
     callback(null);
   }
 

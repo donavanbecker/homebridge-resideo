@@ -13,6 +13,17 @@ class HoneywellFanAccessory {
     this.Service = this.api.hap.Service;
     this.Characteristic = this.api.hap.Characteristic;
 
+    // Honeywell Fan Modes
+    this.fanModes = {
+      'On': Characteristic.SwingMode.OFF,
+      'Auto': Characteristic.SwingMode.SWING_DISABLED,
+      'Circulate': Characteristic.SwingMode.SWING_ENABLED,
+    }
+
+    // Map HomeKit Modes to Honeywell Fan Modes
+    // Don't change the order of these!
+    this.honeywellFanMode = ['On', 'Auto', 'Circulate']
+
     // extract name from config
     this.name = config.name;
 
