@@ -234,9 +234,18 @@ class HoneywellHomePlatformThermostat {
       'Auto': Characteristic.TargetHeatingCoolingState.AUTO,
     }
 
+    // Map Honeywell Fan Modes to HomeKit Modes
+    this.fanModes = {
+      'Off': Characteristic.TargetHeatingCoolingState.OFF,
+      'Heat': Characteristic.TargetHeatingCoolingState.HEAT,
+      'Cool': Characteristic.TargetHeatingCoolingState.COOL,
+      'Auto': Characteristic.TargetHeatingCoolingState.AUTO,
+    }
+
     // Map HomeKit Modes to Honeywell Modes
     // Don't change the order of these!
     this.honeywellMode = ['Off', 'Heat', 'Cool', 'Auto']
+    this.honeywellFanMode = ['Off', 'Heat', 'Cool', 'Auto']
 
     // default placeholders
     this.CurrentTemperature;
@@ -296,7 +305,7 @@ class HoneywellHomePlatformThermostat {
 
 
     // Fan Controls
-    this.accessory.getService(Service.Fanv2, `${this.device.name} Fan`);
+    this.accessory.addService(Service.Fanv2, `${this.device.name} Fan`);
 
       this.accessory
         .getService(Service.Fanv2)
