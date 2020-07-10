@@ -296,7 +296,7 @@ class HoneywellHomePlatformThermostat {
 
 
     // Fan Controls
-    this.accessory.addService(Service.Fanv2, `${this.device.name} Fan`);
+    this.accessory.getService(Service.Fanv2, `${this.device.name} Fan`);
 
       this.accessory
         .getService(Service.Fanv2)
