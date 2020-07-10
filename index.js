@@ -300,7 +300,6 @@ class HoneywellHomePlatformThermostat {
 
     this.accessory
      .getService(Service.Fanv2)
-     .getCharacteristic(Characteristic.Active)
      .getCharacteristic(Characteristic.TargetFanState)
      .on('set', function(value, callback) {
        this.log.debug('Triggered SET Active:', value);
