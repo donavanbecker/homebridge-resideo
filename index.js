@@ -296,7 +296,13 @@ class HoneywellHomePlatformThermostat {
     this.service.getCharacteristic(Characteristic.SwingMode)
       .on('set', this.setSwingMode.bind(this));
     
-     this.accessory.addService(Service.Fanv2, this.name);
+    this.service = accessory.getService(Service.HeaterCooler) ?
+      accessory.getService(Service.HeaterCooler) : accessory.addService(Service.HeaterCooler, this.device.name);
+    
+    this.service = accessory.getService(Service.Fanv2) ?
+      accessory.getService(Service.Fanv2) : accessory.addService(Service.Fanv2, this.device.name)
+    
+   // this.accessory.addService(Service.Fanv2, this.name);
 
       this.accessory
        .getService(Service.Fanv2)
