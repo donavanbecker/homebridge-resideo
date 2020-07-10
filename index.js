@@ -237,6 +237,7 @@ class HoneywellHomePlatformThermostat {
     // Map HomeKit Modes to Honeywell Modes
     // Don't change the order of these!
     this.honeywellMode = ['Off', 'Heat', 'Cool', 'Auto']
+    this.honeywellFanMode = ['On', 'Auto', 'Circulate']
 
     // default placeholders
     this.CurrentTemperature;
@@ -247,6 +248,7 @@ class HoneywellHomePlatformThermostat {
     this.HeatingThresholdTemperature;
     this.CurrentRelativeHumidity;
     this.TemperatureDisplayUnits;
+    this.SwingMode;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doThermostatUpdate = new Subject();
@@ -261,7 +263,8 @@ class HoneywellHomePlatformThermostat {
       .setCharacteristic(Characteristic.Name, device.name)
       .setCharacteristic(Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(Characteristic.Model, device.deviceModel)
-      .setCharacteristic(Characteristic.SerialNumber, device.deviceID);
+      .setCharacteristic(Characteristic.SerialNumber, device.deviceID)
+      .setCharacteristic(Characteristic.FirmwareRevision, device.softwareRevision);
 
     // Set Name
     this.service.setCharacteristic(Characteristic.Name, this.device.name);
