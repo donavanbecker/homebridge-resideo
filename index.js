@@ -494,7 +494,7 @@ class HoneywellHomePlatformThermostat {
 
     setSwingMode(value, callback) {
     this.platform.debug('Set SwingMode(:', value);
-    this.SwingMode.fanRequest = value;
+    this.SwingMode.fanRequest = fanRequest;
     this.doThermostatUpdate.next();
     callback(null);
   }
