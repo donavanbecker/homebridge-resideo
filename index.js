@@ -305,22 +305,20 @@ class HoneywellHomePlatformThermostat {
 
 
     // Fan Controls
-    this.accessory.addService(Service.Fanv2, `${this.device.name} Fan`);
+    this.fanService = accessory.getService(Service.Fanv2) ?
+      accessory.getService(Service.Fanv2) : accessory.addService(Service.Fanv2, `${this.device.name} Fan`);
 
-      this.accessory
-        .getService(Service.Fanv2)
+      this.fanService
         .getCharacteristic(Characteristic.TargetFanState)// .updateValue(1)
         .on('set', function(value, callback) {
           this.log.debug('Triggered SET Active:', value);
           callback(null);
         }.bind(this));     
 
-      this.accessory
-        .getService(Service.Fanv2)
+      this.fanService
         .getCharacteristic(Characteristic.SwingMode).updateValue(1);
 
-      this.accessory
-        .getService(Service.Fanv2)
+      this.fanService
         .getCharacteristic(Characteristic.CurrentFanState).updateValue(1);
 
 
