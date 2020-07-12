@@ -236,16 +236,15 @@ class HoneywellHomePlatformThermostat {
 
     // Map Honeywell Fan Modes to HomeKit Modes
     this.fanModes = {
-      'Off': Characteristic.TargetHeatingCoolingState.OFF,
-      'Heat': Characteristic.TargetHeatingCoolingState.HEAT,
-      'Cool': Characteristic.TargetHeatingCoolingState.COOL,
-      'Auto': Characteristic.TargetHeatingCoolingState.AUTO,
+      'On': Characteristic.Active.ACTIVE, // Characteristic.SwingMode.SWING_DISABLED, Characteristic.SwingMode.SWING_ENABLED
+      'Auto': Characteristic.TargetFanState.AUTO,
+      'Circulate': Characteristic.TargetFanState.MANUAL,
     }
 
     // Map HomeKit Modes to Honeywell Modes
     // Don't change the order of these!
     this.honeywellMode = ['Off', 'Heat', 'Cool', 'Auto']
-    this.honeywellFanMode = ['Off', 'Heat', 'Cool', 'Auto']
+    this.honeywellFanMode = ['On', 'Auto', 'Circulate']
 
     // default placeholders
     this.CurrentTemperature;
@@ -256,6 +255,10 @@ class HoneywellHomePlatformThermostat {
     this.HeatingThresholdTemperature;
     this.CurrentRelativeHumidity;
     this.TemperatureDisplayUnits;
+    this.TargetFanState;
+    this.CurrentFanState;
+    this.SwingMode;
+    this.Active;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doThermostatUpdate = new Subject();
@@ -309,17 +312,16 @@ class HoneywellHomePlatformThermostat {
       accessory.getService(Service.Fanv2) : accessory.addService(Service.Fanv2, `${this.device.name} Fan`);
 
       this.fanService
-        .getCharacteristic(Characteristic.TargetFanState)// .updateValue(1)
-        .on('set', function(value, callback) {
-          this.log.debug('Triggered SET Active:', value);
-          callback(null);
-        }.bind(this));     
+        .getCharacteristic(Characteristic.TargetFanState)
+        .on('set', this.setTargetFanState.bind(this));     
 
       this.fanService
-        .getCharacteristic(Characteristic.SwingMode).updateValue(1);
+        .getCharacteristic(Characteristic.SwingMode)
+        .on('set', this.setSwingMode.bind(this));
 
       this.fanService
-        .getCharacteristic(Characteristic.CurrentFanState).updateValue(1);
+        .getCharacteristic(Characteristic.CurrentFanState)
+        .on('set', this.setCurrentFanState.bind(this));
 
 
     // Push the values to Homekit
@@ -524,5 +526,81 @@ class HoneywellHomePlatformThermostat {
     }
 
     return Math.round((value * 9 / 5) + 32);
+  }
+
+/**
+   * Asks the Honeywell Home API for the latest fan information
+   */
+  async refreshStatus() {
+    this.platform.debug(`Getting update for ${this.device.name} Fan from Honeywell API`);
+
+    try {
+      const devicefan = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/fan`, {
+        qs: {
+          locationId: this.locationId,
+        }
+      });
+
+      this.fanService = devicefan;
+      this.parseStatus();
+      this.updateHomeKitCharacteristics();
+
+    } catch (e) {
+      this.log.error(`Failed to update status of ${this.device.name} Fan`, e.message);
+    }
+  }
+
+  /**
+   * Pushes the requested changes to the Honeywell API
+   */
+  async pushChanges() {
+    const payload = {
+      mode: this.honeywellFanMode[this.TargetFanState],
+    }
+
+    this.log.info(`Sending request to Honeywell API. mode: ${payload.mode}`);
+    this.platform.debug(JSON.stringify(payload));
+
+    // Make the API request
+    await this.platform.rp.post(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/fan`, {
+      qs: {
+        locationId: this.locationId,
+      },
+      json: payload,
+    });
+
+    // Refresh the status from the API
+    await this.refreshStatus();
+  }
+
+  /**
+   * Updates the status for each of the HomeKit Characteristics
+   */
+  updateHomeKitCharacteristics() {
+    this.fanService.updateCharacteristic(Characteristic.TargetFanState, this.TargetFanState);
+    this.fanService.updateCharacteristic(Characteristic.CurrentFanState, this.CurrentFanState);
+    this.fanService.updateCharacteristic(Characteristic.SwingMode, this.SwingMode);
+    this.fanService.updateCharacteristic(Characteristic.Active, this.Active);
+  }
+
+  setTargetFanState(value, callback) {
+    this.platform.debug('Set Target Fan State:', value);
+    this.TargetFanState = value;
+    this.doThermostatUpdate.next();
+    callback(null);
+  }
+
+  setCurrentFanState(value, callback) {
+    this.platform.debug('Set Current Fan State:', value);
+    this.CurrentFanState = value;
+    this.doThermostatUpdate.next();
+    callback(null);
+  }
+
+  setSwingMode(value, callback) {
+    this.platform.debug('Set Swing Mode:', value);
+    this.SwingMode = value;
+    this.doThermostatUpdate.next();
+    callback(null);
   }
 }
