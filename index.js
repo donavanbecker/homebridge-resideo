@@ -263,6 +263,8 @@ class HoneywellHomePlatformThermostat {
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doThermostatUpdate = new Subject();
     this.thermostatUpdateInProgress = false;
+    this.doFanUpdate = new Subject();
+    this.fanUpdateInProgress = false;
 
     // setup or get the base service
     this.service = accessory.getService(Service.Thermostat) ?
@@ -339,6 +341,11 @@ class HoneywellHomePlatformThermostat {
     this.doThermostatUpdate.pipe(tap(() => {this.thermostatUpdateInProgress = true}), debounceTime(100)).subscribe(async () => {
       await this.pushChanges();
       this.thermostatUpdateInProgress = false;
+    })
+    
+    this.doFanUpdate.pipe(tap(() => {this.fanUpdateInProgress = true}), debounceTime(100)).subscribe(async () => {
+      await this.pushFanChanges();
+      this.fanUpdateInProgress = false;
     })
   }
 
@@ -543,7 +550,7 @@ class HoneywellHomePlatformThermostat {
         }
       });
 
-      this.fanService = devicefan;
+      this.devicefan = devicefan;
       this.parseStatus();
       this.updateHomeKitFanCharacteristics();
 
@@ -555,7 +562,7 @@ class HoneywellHomePlatformThermostat {
   /**
    * Pushes the requested changes to the Honeywell API
    */
-  async pushChanges() {
+  async pushFanChanges() {
     const payload = {
       mode: this.honeywellFanMode[this.TargetFanState],
     }
@@ -579,30 +586,30 @@ class HoneywellHomePlatformThermostat {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitFanCharacteristics() {
-    this.fanService.updateFanCharacteristic(Characteristic.TargetFanState, this.TargetFanState);
-    this.fanService.updateFanCharacteristic(Characteristic.CurrentFanState, this.CurrentFanState);
-    this.fanService.updateFanCharacteristic(Characteristic.SwingMode, this.SwingMode);
-    this.fanService.updateFanCharacteristic(Characteristic.Active, this.Active);
+    this.fanService.updateCharacteristic(Characteristic.TargetFanState, this.TargetFanState);
+    this.fanService.updateCharacteristic(Characteristic.CurrentFanState, this.CurrentFanState);
+    this.fanService.updateCharacteristic(Characteristic.SwingMode, this.SwingMode);
+    this.fanService.updateCharacteristic(Characteristic.Active, this.Active);
   }
 
   setTargetFanState(value, callback) {
     this.platform.debug('Set Target Fan State:', value);
     this.TargetFanState = value;
-    this.doThermostatUpdate.next();
+    this.doFanUpdate.next();
     callback(null);
   }
 
   setCurrentFanState(value, callback) {
     this.platform.debug('Set Current Fan State:', value);
     this.CurrentFanState = value;
-    this.doThermostatUpdate.next();
+    this.doFanUpdate.next();
     callback(null);
   }
 
   setSwingMode(value, callback) {
     this.platform.debug('Set Swing Mode:', value);
     this.SwingMode = value;
-    this.doThermostatUpdate.next();
+    this.doFanUpdate.next();
     callback(null);
   }
 }
