@@ -326,10 +326,12 @@ class HoneywellHomePlatformThermostat {
 
     // Push the values to Homekit
     this.updateHomeKitCharacteristics();
+    this.updateHomeKitFanCharacteristics();
 
     // Start an update interval
     interval(this.platform.config.options.ttl * 1000).pipe(skipWhile(() => this.thermostatUpdateInProgress)).subscribe(() => {
-      this.refreshStatus();
+      this.refreshStatus()
+      this.refreshFanStatus();
     })
 
     // Watch for thermostat change events
@@ -531,7 +533,7 @@ class HoneywellHomePlatformThermostat {
 /**
    * Asks the Honeywell Home API for the latest fan information
    */
-  async refreshStatus() {
+  async refreshFanStatus() {
     this.platform.debug(`Getting update for ${this.device.name} Fan from Honeywell API`);
 
     try {
@@ -543,7 +545,7 @@ class HoneywellHomePlatformThermostat {
 
       this.fanService = devicefan;
       this.parseStatus();
-      this.updateHomeKitCharacteristics();
+      this.updateHomeKitFanCharacteristics();
 
     } catch (e) {
       this.log.error(`Failed to update status of ${this.device.name} Fan`, e.message);
@@ -570,13 +572,13 @@ class HoneywellHomePlatformThermostat {
     });
 
     // Refresh the status from the API
-    await this.refreshStatus();
+    await this.refreshFanStatus();
   }
 
   /**
    * Updates the status for each of the HomeKit Characteristics
    */
-  updateHomeKitCharacteristics() {
+  updateHomeKitFanCharacteristics() {
     this.fanService.updateCharacteristic(Characteristic.TargetFanState, this.TargetFanState);
     this.fanService.updateCharacteristic(Characteristic.CurrentFanState, this.CurrentFanState);
     this.fanService.updateCharacteristic(Characteristic.SwingMode, this.SwingMode);
