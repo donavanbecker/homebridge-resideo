@@ -579,10 +579,10 @@ class HoneywellHomePlatformThermostat {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitFanCharacteristics() {
-    this.fanService.updateCharacteristic(Characteristic.TargetFanState, this.TargetFanState);
-    this.fanService.updateCharacteristic(Characteristic.CurrentFanState, this.CurrentFanState);
-    this.fanService.updateCharacteristic(Characteristic.SwingMode, this.SwingMode);
-    this.fanService.updateCharacteristic(Characteristic.Active, this.Active);
+    this.fanService.updateFanCharacteristic(Characteristic.TargetFanState, this.TargetFanState);
+    this.fanService.updateFanCharacteristic(Characteristic.CurrentFanState, this.CurrentFanState);
+    this.fanService.updateFanCharacteristic(Characteristic.SwingMode, this.SwingMode);
+    this.fanService.updateFanCharacteristic(Characteristic.Active, this.Active);
   }
 
   setTargetFanState(value, callback) {
