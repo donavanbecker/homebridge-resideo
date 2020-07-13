@@ -406,9 +406,8 @@ class HoneywellHomePlatformThermostat {
           locationId: this.locationId,
         }
       });
-
+      this.platform.debug(`Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(device)}`);
       this.device = device;
-      this.platform.debug(`Fetched update for ${this.device.deviceID} from Honeywell API: ${device.name}`);
       this.parseStatus();
       this.updateHomeKitCharacteristics();
 
@@ -556,9 +555,8 @@ class HoneywellHomePlatformThermostat {
           locationId: this.locationId,
         }
       });
-
+      this.platform.debug(`Fetched update for ${this.device.name} Fan from Honeywell API: ${JSON.stringify(devicefan)}`);
       this.devicefan = devicefan;
-      this.platform.debug(`Fetched update for ${this.device.deviceID} from Honeywell Fan API: ${devicefan.name}`);
       this.parseStatus();
       this.updateHomeKitFanCharacteristics();
 
