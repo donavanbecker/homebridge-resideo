@@ -257,8 +257,6 @@ class HoneywellHomePlatformThermostat {
     this.TemperatureDisplayUnits;
     this.Active;
     this.TargetFanState;
-    //this.CurrentFanState;
-    //this.SwingMode;
     this.fanMode;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
@@ -321,16 +319,6 @@ class HoneywellHomePlatformThermostat {
       this.fanService
         .getCharacteristic(Characteristic.TargetFanState)
         .on('set', this.setTargetFanState.bind(this));
-
-    //this.fanService
-    //  .getCharacteristic(Characteristic.SwingMode)
-    //  .on('set', this.setSwingMode.bind(this));
-    //  this.log.debug('Get Swing Mode Status');
-
-    //this.fanService
-    //  .getCharacteristic(Characteristic.CurrentFanState)
-    //  .on('set', this.setCurrentFanState.bind(this));
-    //  this.log.debug('Get Current Fan State Status');
 
     // Push the values to Homekit
     this.updateHomeKitCharacteristics();
@@ -593,8 +581,6 @@ class HoneywellHomePlatformThermostat {
    */
   updateHomeKitFanCharacteristics() {
     this.fanService.updateCharacteristic(Characteristic.TargetFanState, this.TargetFanState);
-    //this.fanService.updateCharacteristic(Characteristic.CurrentFanState, this.CurrentFanState);
-    //this.fanService.updateCharacteristic(Characteristic.SwingMode, this.SwingMode);
     this.fanService.updateCharacteristic(Characteristic.Active, this.Active);
   }
 
@@ -611,18 +597,4 @@ class HoneywellHomePlatformThermostat {
     this.doFanUpdate.next();
     callback(null);
   }
-
-//setCurrentFanState(value, callback) {
-//  this.platform.debug('Set Current Fan State:', value);
-//  this.CurrentFanState = value;
-//  this.doFanUpdate.next();
-//  callback(null);
-//}
-
-//setSwingMode(value, callback) {
-//  this.platform.debug('Set Swing Mode:', value);
-//  this.SwingMode = value;
-//  this.doFanUpdate.next();
-//  callback(null);
-//}
 }
