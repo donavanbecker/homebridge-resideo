@@ -238,7 +238,7 @@ class HoneywellHomePlatformThermostat {
     this.fanModes = {
       'On': Characteristic.TargetFanState.MANUAL && Characteristic.Active.ACTIVE,
       'Auto': Characteristic.TargetFanState.AUTO,
-      'Circulate': Characteristic.Active.INACTIVE,
+      'Circulate': Characteristic.TargetFanState.MANUAL && Characteristic.Active.INACTIVE,
     }
 
     // Map HomeKit Modes to Honeywell Modes
@@ -255,10 +255,9 @@ class HoneywellHomePlatformThermostat {
     this.HeatingThresholdTemperature;
     this.CurrentRelativeHumidity;
     this.TemperatureDisplayUnits;
-    this.TargetFanState;
-    //this.CurrentFanState;
-    //this.SwingMode;
     this.Active;
+    this.TargetFanState;
+    this.fanMode;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doThermostatUpdate = new Subject();
@@ -321,24 +320,13 @@ class HoneywellHomePlatformThermostat {
         .getCharacteristic(Characteristic.TargetFanState)
         .on('set', this.setTargetFanState.bind(this));
 
-    //this.fanService
-    //  .getCharacteristic(Characteristic.SwingMode)
-    //  .on('set', this.setSwingMode.bind(this));
-    //  this.log.debug('Get Swing Mode Status');
-
-    //this.fanService
-    //  .getCharacteristic(Characteristic.CurrentFanState)
-    //  .on('set', this.setCurrentFanState.bind(this));
-    //  this.log.debug('Get Current Fan State Status');
-
     // Push the values to Homekit
     this.updateHomeKitCharacteristics();
     this.updateHomeKitFanCharacteristics();
 
     // Start an update interval
     interval(this.platform.config.options.ttl * 1000).pipe(skipWhile(() => this.thermostatUpdateInProgress)).subscribe(() => {
-      this.refreshStatus()
-      this.refreshFanStatus();
+      this.refreshStatus();
     })
 
     // Watch for thermostat change events
@@ -347,7 +335,7 @@ class HoneywellHomePlatformThermostat {
       await this.pushChanges();
       this.thermostatUpdateInProgress = false;
     })
-    
+
     this.doFanUpdate.pipe(tap(() => {this.fanUpdateInProgress = true}), debounceTime(100)).subscribe(async () => {
       await this.pushFanChanges();
       this.fanUpdateInProgress = false;
@@ -391,27 +379,55 @@ class HoneywellHomePlatformThermostat {
         this.TargetTemperature = this.toCelsius(this.device.changeableValues.coolSetpoint)
       }
     }
+
+    // Set the Target Fan State
+    //if (this.devicefan.mode == '"Auto"') {
+    //  this.TargetFanState = this.fanModes['Auto'];
+    //}
+    //this.platform.debug(`Test`);
+    //if (this.devicefan.mode == '"On"') {
+    //  this.TargetFanState = this.fanModes['On'];
+    //}
+    //this.platform.debug(`${JSON.stringify(this.devicefan)}`);
+    //if (this.devicefan.mode == '"Circulate"') {
+    //  this.TargetFanState = this.fanModes['Circulate'];
+    //}
+    //this.platform.debug(`${JSON.stringify(this.devicefan)}`);
   }
 
   /**
    * Asks the Honeywell Home API for the latest device information
    */
   async refreshStatus() {
-    this.platform.debug(`Getting update for ${this.device.name} from Honeywell API`);
-
     try {
       const device = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}`, {
         qs: {
           locationId: this.locationId,
         }
       });
-
+      this.platform.debug(`Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(device)}`);
       this.device = device;
+      this.platform.debug(JSON.stringify(this.device.changeableValues.mode));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
 
     } catch (e) {
       this.log.error(`Failed to update status of ${this.device.name}`, e.message);
+    }
+    try {
+      const devicefan = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/fan`, {
+        qs: {
+          locationId: this.locationId,
+        }
+      });
+      this.platform.debug(`Fetched update for ${this.device.name} Fan from Honeywell API: ${JSON.stringify(devicefan)}`);
+      this.devicefan = devicefan;
+      this.platform.debug(JSON.stringify(this.devicefan.mode));
+      this.parseStatus();
+      this.updateHomeKitFanCharacteristics();
+
+    } catch (e) {
+      this.log.error(`Failed to update status of ${this.device.name} Fan`, e.message);
     }
   }
 
@@ -473,7 +489,7 @@ class HoneywellHomePlatformThermostat {
     this.platform.debug('Set TargetHeatingCoolingState:', value);
 
     this.TargetHeatingCoolingState = value;
-    
+
     // Set the TargetTemperature value based on the selected mode
     if (this.TargetHeatingCoolingState === Characteristic.TargetHeatingCoolingState.HEAT) {
       this.TargetTemperature = this.toCelsius(this.device.changeableValues.heatSetpoint)
@@ -515,7 +531,7 @@ class HoneywellHomePlatformThermostat {
     setTimeout(() => {
       this.service.updateCharacteristic(Characteristic.TemperatureDisplayUnits, this.TemperatureDisplayUnits);
     }, 100);
-    
+
     callback(null);
   }
 
@@ -542,28 +558,6 @@ class HoneywellHomePlatformThermostat {
     return Math.round((value * 9 / 5) + 32);
   }
 
-/**
-   * Asks the Honeywell Home API for the latest fan information
-   */
-  async refreshFanStatus() {
-    this.platform.debug(`Getting update for ${this.device.name} Fan from Honeywell API`);
-
-    try {
-      const devicefan = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/fan`, {
-        qs: {
-          locationId: this.locationId,
-        }
-      });
-
-      this.devicefan = devicefan;
-      this.parseStatus();
-      this.updateHomeKitFanCharacteristics();
-
-    } catch (e) {
-      this.log.error(`Failed to update status of ${this.device.name} Fan`, e.message);
-    }
-  }
-
   /**
    * Pushes the requested changes to the Honeywell API
    */
@@ -584,7 +578,7 @@ class HoneywellHomePlatformThermostat {
     });
 
     // Refresh the status from the API
-    await this.refreshFanStatus();
+    await this.refreshStatus();
   }
 
   /**
@@ -592,8 +586,6 @@ class HoneywellHomePlatformThermostat {
    */
   updateHomeKitFanCharacteristics() {
     this.fanService.updateCharacteristic(Characteristic.TargetFanState, this.TargetFanState);
-    //this.fanService.updateCharacteristic(Characteristic.CurrentFanState, this.CurrentFanState);
-    //this.fanService.updateCharacteristic(Characteristic.SwingMode, this.SwingMode);
     this.fanService.updateCharacteristic(Characteristic.Active, this.Active);
   }
 
@@ -610,18 +602,4 @@ class HoneywellHomePlatformThermostat {
     this.doFanUpdate.next();
     callback(null);
   }
-
-//setCurrentFanState(value, callback) {
-//  this.platform.debug('Set Current Fan State:', value);
-//  this.CurrentFanState = value;
-//  this.doFanUpdate.next();
-//  callback(null);
-//}
-
-//setSwingMode(value, callback) {
-//  this.platform.debug('Set Swing Mode:', value);
-//  this.SwingMode = value;
-//  this.doFanUpdate.next();
-//  callback(null);
-//}
 }
