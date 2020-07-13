@@ -238,7 +238,7 @@ class HoneywellHomePlatformThermostat {
     this.fanModes = {
       'On': Characteristic.TargetFanState.MANUAL && Characteristic.Active.ACTIVE,
       'Auto': Characteristic.TargetFanState.AUTO,
-      'Circulate': Characteristic.Active.INACTIVE,
+      'Circulate': Characteristic.TargetFanState.MANUAL && Characteristic.Active.INACTIVE,
     }
 
     // Map HomeKit Modes to Honeywell Modes
@@ -255,10 +255,11 @@ class HoneywellHomePlatformThermostat {
     this.HeatingThresholdTemperature;
     this.CurrentRelativeHumidity;
     this.TemperatureDisplayUnits;
+    this.Active;
     this.TargetFanState;
     //this.CurrentFanState;
     //this.SwingMode;
-    this.Active;
+    this.fanMode;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doThermostatUpdate = new Subject();
@@ -407,6 +408,7 @@ class HoneywellHomePlatformThermostat {
       });
 
       this.device = device;
+      this.platform.debug(`Fetched update for ${this.device.deviceID} from Honeywell API: ${device.name}`);
       this.parseStatus();
       this.updateHomeKitCharacteristics();
 
@@ -556,6 +558,7 @@ class HoneywellHomePlatformThermostat {
       });
 
       this.devicefan = devicefan;
+      this.platform.debug(`Fetched update for ${this.device.deviceID} from Honeywell Fan API: ${devicefan.name}`);
       this.parseStatus();
       this.updateHomeKitFanCharacteristics();
 
