@@ -380,14 +380,26 @@ class HoneywellHomePlatformThermostat {
         this.TargetTemperature = this.toCelsius(this.device.changeableValues.coolSetpoint)
       }
     }
+
+    // Set the Target Fan State
+    if (this.devicefan.mode == 'Auto') {
+      this.TargetFanState = this.fanModes[this.devicefan];
+    }
+    this.platform.debug(`Test`);
+    if (this.devicefan.mode == 'On') {
+      this.TargetFanState = this.fanModes[this.devicefan];
+    }
+    this.platform.debug(`${JSON.stringify(this.devicefan)}`);
+    if (this.devicefan.mode == 'Circulate') {
+      this.TargetFanState = this.fanModes[this.devicefan];
+    }
+    this.platform.debug(`${JSON.stringify(this.devicefan)}`);
   }
 
   /**
    * Asks the Honeywell Home API for the latest device information
    */
   async refreshStatus() {
-    this.platform.debug(`Getting update for ${this.device.name} from Honeywell API`);
-
     try {
       const device = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}`, {
         qs: {
@@ -535,8 +547,6 @@ class HoneywellHomePlatformThermostat {
    * Asks the Honeywell Home API for the latest fan information
    */
   async refreshFanStatus() {
-    this.platform.debug(`Getting update for ${this.device.name} Fan from Honeywell API`);
-
     try {
       const devicefan = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/fan`, {
         qs: {
