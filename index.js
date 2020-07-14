@@ -164,6 +164,7 @@ class HoneywellHomePlatform {
           locationId: location.locationID,
         }
       });
+      this.log.debug(devices);
 
       this.log.info(`Found ${devices.length} devices at ${location.name}.`)
 
@@ -266,8 +267,9 @@ class HoneywellHomePlatformThermostat {
       .setCharacteristic(Characteristic.Name, device.name)
       .setCharacteristic(Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(Characteristic.Model, device.deviceModel)
-      .setCharacteristic(Characteristic.SerialNumber, device.deviceID)
-      .setCharacteristic(Characteristic.FirmwareRevision, this.FirmwareRevision);
+      .setCharacteristic(Characteristic.SerialNumber, device.deviceID);
+      
+    this.updateFirmwareInfo();
 
     // Set Name
     this.service.setCharacteristic(Characteristic.Name, this.device.name);
@@ -404,13 +406,6 @@ class HoneywellHomePlatformThermostat {
           locationId: this.locationId
         }
       });
-      const FirmwareRevision = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/group/0/rooms`, {
-        qs: {
-          locationId: this.locationId
-        }
-      });
-      this.FirmwareRevision = FirmwareRevision;
-      this.platform.debug(JSON.stringify(this.FirmwareRevision.rooms[0].accessories[0].accessoryAttribute.softwareRevision));
       this.platform.debug(`Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)} and Fan: ${JSON.stringify(devicefan)}`);
       this.device = device;
       this.deviceFan = devicefan;
@@ -420,6 +415,20 @@ class HoneywellHomePlatformThermostat {
     } catch (e) {
       this.log.error(`Failed to update status of ${this.device.name}`, e.message);
     }
+  }
+  
+  /**
+   * Asks the Honeywell Home API for the firmware version information
+   */
+  async updateFirmwareInfo() {
+    const rooms = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/group/0/rooms`, {
+      qs: {
+        locationId: this.locationId
+      }
+    });
+    
+    this.accessory.getService(Service.AccessoryInformation)
+      .setCharacteristic(Characteristic.FirmwareRevision, rooms.rooms[0].accessories[0].accessoryAttribute.softwareRevision);
   }
 
   /**
