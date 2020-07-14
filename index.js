@@ -437,6 +437,7 @@ class HoneywellHomePlatformThermostat {
         locationId: this.locationId
       }
     });
+    this.log.debug(rooms);
     this.rooms = rooms;
     this.accessory.context.firmwareRevision = this.rooms.rooms[0].accessories[0].accessoryAttribute.softwareRevision
     this.platform.debug(`Fetched Thermostat FirmwareRevision: ${this.accessory.context.firmwareRevision}`);
@@ -673,7 +674,7 @@ class HoneywellHomePlatformRoomSensor {
     this.updateFirmwareInfo();
 
       // Set Name
-      this.service.setCharacteristic(Characteristic.Name, `${this.device.name} Room Sensor`);
+      this.service.setCharacteristic(Characteristic.Name, this.rooms.rooms[1].name);
 
       // Do initial device parse
       this.parseStatus();
