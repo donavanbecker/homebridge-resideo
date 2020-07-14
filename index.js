@@ -436,7 +436,6 @@ class HoneywellHomePlatformThermostat {
         locationId: this.locationId
       }
     });
-    
     this.accessory.getService(Service.AccessoryInformation)
       .setCharacteristic(Characteristic.FirmwareRevision, rooms.rooms[0].accessories[0].accessoryAttribute.softwareRevision);
   }
@@ -647,6 +646,8 @@ class HoneywellHomePlatformRoomSensor {
     this.OccupancyActive;
     this.HumidityActive;
     this.CurrentRelativeHumidity;
+    this.MotionDetected
+    this.MotionActive
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doSenosrUpdate = new Subject();
@@ -747,9 +748,6 @@ class HoneywellHomePlatformRoomSensor {
    * Parse the device status from the honeywell api
    */
   parseStatus() {
-    this.TemperatureDisplayUnits = this.device.units === 'Fahrenheit' ? Characteristic.TemperatureDisplayUnits.FAHRENHEIT : Characteristic.TemperatureDisplayUnits.CELSIUS;
-    this.TemperatureDisplayUnits = this.device.units === 'Fahrenheit' ? Characteristic.TemperatureDisplayUnits.FAHRENHEIT : Characteristic.TemperatureDisplayUnits.CELSIUS;
-
     this.CurrentTemperature = this.toCelsius(this.device.indoorTemperature);
     this.CurrentRelativeHumidity = this.device.indoorHumidity;
 
@@ -804,20 +802,21 @@ class HoneywellHomePlatformRoomSensor {
    */
   async refreshSensorStatus() {
     try {
-      const device = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}`, {
+      const rooms = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/group/0/rooms`, {
         qs: {
           locationId: this.locationId
         }
       });
-      const devicefan = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/fan`, {
-        qs: {
-          locationId: this.locationId
-        }
-      });
-      this.platform.debug(`Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)} and Fan: ${JSON.stringify(devicefan)}`);
-      this.device = device;
-      this.deviceFan = devicefan;
-      this.platform.debug(JSON.stringify(this.device.changeableValues.mode));
+      this.platform.debug(JSON.stringify(rooms.rooms[0].accessories[0].accessoryValue));
+      this.CurrentTemperature = rooms.rooms[0].accessories[0].accessoryValue.indoorTemperature;
+      this.CurrentRelativeHumidity = rooms.rooms[0].accessories[0].accessoryValue.indoorHumidity;
+      this.MotionDetected = rooms.rooms[0].accessories[0].accessoryValue.motionDet;
+      this.OccupancyDetected = rooms.rooms[0].accessories[0].accessoryValue.occupancyDet;
+      this.TemperatureActive = rooms.rooms[0].accessories[0].accessoryValue.status;
+      this.OccupancyActive = rooms.rooms[0].accessories[0].accessoryValue.status;
+      this.HumidityActive = rooms.rooms[0].accessories[0].accessoryValue.status;
+      this.MotionActive = rooms.rooms[0].accessories[0].accessoryValue.status;
+      this.device = rooms.deviceId;
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
@@ -837,46 +836,6 @@ class HoneywellHomePlatformRoomSensor {
     
     this.accessory.getService(Service.AccessoryInformation)
       .setCharacteristic(Characteristic.FirmwareRevision, rooms.rooms[0].accessories[0].accessoryAttribute.softwareRevision);
-  }
-
-  /**
-   * Pushes the requested changes to the Honeywell API
-   */
-  async pushChanges() {
-    const payload = {
-      mode: this.honeywellMode[this.TargetHeatingCoolingState],
-      thermostatSetpointStatus: 'TemporaryHold',
-      autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
-    }
-
-    // Set the heat and cool set point value based on the selected mode
-    if (this.TargetHeatingCoolingState === Characteristic.TargetHeatingCoolingState.HEAT) {
-      payload.heatSetpoint = this.toFahrenheit(this.TargetTemperature);
-      payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
-    } else if (this.TargetHeatingCoolingState === Characteristic.TargetHeatingCoolingState.COOL) {
-      payload.coolSetpoint = this.toFahrenheit(this.TargetTemperature);
-      payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
-    } else if (this.TargetHeatingCoolingState === Characteristic.TargetHeatingCoolingState.AUTO) {
-      payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
-      payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
-    } else {
-      payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
-      payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
-    }
-
-    this.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}`);
-    this.platform.debug(JSON.stringify(payload));
-
-    // Make the API request
-    await this.platform.rp.post(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}`, {
-      qs: {
-        locationId: this.locationId,
-      },
-      json: payload,
-    });
-
-    // Refresh the status from the API
-    await this.refreshSensorStatus();
   }
 
   /**
