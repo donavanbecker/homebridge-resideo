@@ -261,6 +261,7 @@ class HoneywellHomePlatformThermostat {
     this.Active;
     this.TargetFanState;
     this.fanMode;
+    this.rooms;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doThermostatUpdate = new Subject();
@@ -436,8 +437,11 @@ class HoneywellHomePlatformThermostat {
         locationId: this.locationId
       }
     });
+    this.rooms = rooms;
+    this.accessory.context.firmwareRevision = this.rooms.rooms[0].accessories[0].accessoryAttribute.softwareRevision
+    this.platform.debug(`Fetched FirmwareRevision: ${this.accessory.context.FirmwareRevision}`);
     this.accessory.getService(Service.AccessoryInformation)
-      .setCharacteristic(Characteristic.FirmwareRevision, rooms.rooms[0].accessories[0].accessoryAttribute.softwareRevision);
+      .setCharacteristic(Characteristic.FirmwareRevision, this.accessory.context.firmwareRevision);
   }
 
   /**
@@ -648,6 +652,8 @@ class HoneywellHomePlatformRoomSensor {
     this.CurrentRelativeHumidity;
     this.MotionDetected
     this.MotionActive
+    this.TemperatureStatusLowBattery;
+    this.rooms;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doSenosrUpdate = new Subject();
@@ -748,53 +754,23 @@ class HoneywellHomePlatformRoomSensor {
    * Parse the device status from the honeywell api
    */
   parseStatus() {
-    this.CurrentTemperature = this.toCelsius(this.device.indoorTemperature);
-    this.CurrentRelativeHumidity = this.device.indoorHumidity;
-
-    if (this.device.changeableValues.heatSetpoint > 0) {
-      this.HeatingThresholdTemperature = this.toCelsius(this.device.changeableValues.heatSetpoint);
-    }
-
-    if (this.device.changeableValues.coolSetpoint > 0) {
-      this.CoolingThresholdTemperature = this.toCelsius(this.device.changeableValues.coolSetpoint);
-    }
-
-    this.TargetHeatingCoolingState = this.modes[this.device.changeableValues.mode];
-
-    // If auto the CurrentHeatingCoolingState is either 'Heat' or 'Cool'
-    if (this.device.changeableValues.mode === 'Auto') {
-      this.CurrentHeatingCoolingState = this.modes[this.device.changeableValues.heatCoolMode];
-    } else {
-      this.CurrentHeatingCoolingState = this.modes[this.device.changeableValues.mode];
-    }
-
-    // Set the TargetTemperature value based on the current mode
-    if (this.TargetHeatingCoolingState === Characteristic.TargetHeatingCoolingState.HEAT) {
-      if (this.device.changeableValues.heatSetpoint > 0) {
-        this.TargetTemperature = this.toCelsius(this.device.changeableValues.heatSetpoint);
-      }
-    } else {
-      if (this.device.changeableValues.coolSetpoint > 0) {
-        this.TargetTemperature = this.toCelsius(this.device.changeableValues.coolSetpoint);
-      }
-    }
-
-    // Set the Target Fan State
-
-    if (this.deviceFan) {
-      this.platform.debug(`${JSON.stringify(this.deviceFan)}`);
-
-      if (this.deviceFan.mode === 'Auto') {
-        this.TargetFanState = Characteristic.TargetFanState.AUTO;
-        this.Active = Characteristic.Active.INACTIVE;
-      } else if (this.deviceFan.mode === 'On') {
-        this.TargetFanState = Characteristic.TargetFanState.MANUAL;
-        this.Active = Characteristic.Active.ACTIVE;
-      } else if (this.deviceFan.mode === 'Circulate') {
-        this.TargetFanState = Characteristic.TargetFanState.MANUAL;
-        this.Active = Characteristic.Active.INACTIVE;
-      }
-    }
+    // Set Temperature Sensor State
+    this.TemperatureActive = this.rooms.rooms[0].accessories[0].accessoryValue.status;
+    this.CurrentTemperature = this.rooms.rooms[0].accessories[0].accessoryValue.indoorTemperature;
+    this.TemperatureStatusLowBattery = this.rooms.rooms[0].accessories[0].accessoryValue.batteryStatus;
+    
+    // Set Occupancy Sensor State
+    this.OccupancyActive = this.rooms.rooms[0].accessories[0].accessoryValue.status;
+    this.OccupancyDetected = this.rooms.rooms[0].accessories[0].accessoryValue.occupancyDet;
+    
+    // Set Humidity Sensor State
+    this.HumidityActive = this.rooms.rooms[0].accessories[0].accessoryValue.status;
+    this.CurrentRelativeHumidity = this.rooms.rooms[0].accessories[0].accessoryValue.indoorHumidity;
+    
+    // Set Motion Sensor State
+    this.MotionActive = this.rooms.rooms[0].accessories[0].accessoryValue.status;
+    this.MotionDetected = this.rooms.rooms[0].accessories[0].accessoryValue.motionDet;
+    
   }
 
   /**
@@ -807,15 +783,8 @@ class HoneywellHomePlatformRoomSensor {
           locationId: this.locationId
         }
       });
-      this.platform.debug(JSON.stringify(rooms.rooms[0].accessories[0].accessoryValue));
-      this.CurrentTemperature = rooms.rooms[0].accessories[0].accessoryValue.indoorTemperature;
-      this.CurrentRelativeHumidity = rooms.rooms[0].accessories[0].accessoryValue.indoorHumidity;
-      this.MotionDetected = rooms.rooms[0].accessories[0].accessoryValue.motionDet;
-      this.OccupancyDetected = rooms.rooms[0].accessories[0].accessoryValue.occupancyDet;
-      this.TemperatureActive = rooms.rooms[0].accessories[0].accessoryValue.status;
-      this.OccupancyActive = rooms.rooms[0].accessories[0].accessoryValue.status;
-      this.HumidityActive = rooms.rooms[0].accessories[0].accessoryValue.status;
-      this.MotionActive = rooms.rooms[0].accessories[0].accessoryValue.status;
+      this.rooms = rooms;
+      this.platform.debug(JSON.stringify(this.rooms.rooms[0].accessories[0].accessoryValue));
       this.device = rooms.deviceId;
       this.parseStatus();
       this.updateHomeKitCharacteristics();
@@ -833,9 +802,11 @@ class HoneywellHomePlatformRoomSensor {
         locationId: this.locationId
       }
     });
-    
+    this.rooms = rooms;
+    this.accessory.context.firmwareRevision = this.rooms.rooms[0].accessories[0].accessoryAttribute.softwareRevision;
+    this.platform.debug(`Fetched FirmwareRevision: ${this.accessory.context.FirmwareRevision}`);
     this.accessory.getService(Service.AccessoryInformation)
-      .setCharacteristic(Characteristic.FirmwareRevision, rooms.rooms[0].accessories[0].accessoryAttribute.softwareRevision);
+      .setCharacteristic(Characteristic.FirmwareRevision, this.accessory.context.firmwareRevision);
   }
 
   /**
@@ -860,7 +831,7 @@ class HoneywellHomePlatformRoomSensor {
     this.platform.debug('Triggered GET CurrentTemperature');
 
     // set this to a valid value for CurrentTemperature
-    const currentValue = 1;
+    const currentValue = this.CurrentTemperature;
 
     callback(null, currentValue);
   }
@@ -869,7 +840,7 @@ class HoneywellHomePlatformRoomSensor {
     this.platform.debug('Triggered GET Status Low Battery');
 
     // set this to a valid value for StatusLowBattery
-    const currentValue = 1;
+    const currentValue = this.TemperatureStatusLowBattery;
 
     callback(null, currentValue);
   }
@@ -878,7 +849,7 @@ class HoneywellHomePlatformRoomSensor {
     this.platform.debug('Triggered GET Status Active');
 
     // set this to a valid value for StatusLowBattery
-    const currentValue = 1;
+    const currentValue = this.TemperatureActive;
 
     callback(null, currentValue);
   }
@@ -890,7 +861,7 @@ class HoneywellHomePlatformRoomSensor {
     this.platform.debug('Triggered GET OccupancyDetected');
 
     // set this to a valid value for OccupancyDetected
-    const currentValue = 1;
+    const currentValue = this.OccupancyDetected;
 
     callback(null, currentValue);
   }
@@ -899,7 +870,7 @@ class HoneywellHomePlatformRoomSensor {
     this.platform.debug('Triggered GET Occupancy Status Active');
 
     // set this to a valid value for Occupancy Active
-    const currentValue = 1;
+    const currentValue = this.OccupancyActive;
 
     callback(null, currentValue);
   }
@@ -911,7 +882,7 @@ class HoneywellHomePlatformRoomSensor {
     this.platform.debug('Triggered GET CurrentRelativeHumidity');
 
     // set this to a valid value for CurrentRelativeHumidity
-    const currentValue = 1;
+    const currentValue = this.CurrentRelativeHumidity;
 
     callback(null, currentValue);
   }
@@ -920,7 +891,7 @@ class HoneywellHomePlatformRoomSensor {
     this.platform.debug('Triggered GET CurrentRelativeHumidity');
 
     // set this to a valid value for CurrentRelativeHumidity
-    const currentValue = 1;
+    const currentValue = this.HumidityActive;
 
     callback(null, currentValue);
   }
@@ -932,7 +903,7 @@ class HoneywellHomePlatformRoomSensor {
     this.platform.debug('Triggered GET Motion Detected');
 
     // set this to a valid value for Motion Detected
-    const currentValue = 1;
+    const currentValue = this.MotionDetected;
 
     callback(null, currentValue);
   }
@@ -941,7 +912,7 @@ class HoneywellHomePlatformRoomSensor {
     this.platform.debug('Triggered GET Motion Active Status');
 
     // set this to a valid value for Motion Active Status
-    const currentValue = 1;
+    const currentValue = this.MotionActive;
 
     callback(null, currentValue);
   }
