@@ -439,9 +439,9 @@ class HoneywellHomePlatformThermostat {
     });
     this.rooms = rooms;
     this.accessory.context.firmwareRevision = this.rooms.rooms[0].accessories[0].accessoryAttribute.softwareRevision
-    this.platform.debug(`Fetched firmwareRevision: ${this.accessory.context.firmwareRevision}`);
+    this.platform.debug(`Fetched Thermostat FirmwareRevision: ${this.accessory.context.firmwareRevision}`);
     this.accessory.getService(Service.AccessoryInformation)
-      .setCharacteristic(Characteristic.firmwareRevision, this.accessory.context.firmwareRevision);
+      .setCharacteristic(Characteristic.FirmwareRevision, this.accessory.context.firmwareRevision);
   }
 
   /**
@@ -641,6 +641,7 @@ class HoneywellHomePlatformRoomSensor {
     this.accessory = accessory;
     this.device = device;
     this.locationId = locationId;
+    this.rooms = rooms;
 
     // default placeholders
     this.CurrentTemperature;
@@ -653,7 +654,6 @@ class HoneywellHomePlatformRoomSensor {
     this.MotionDetected
     this.MotionActive
     this.TemperatureStatusLowBattery;
-    this.rooms;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doSenosrUpdate = new Subject();
@@ -783,6 +783,7 @@ class HoneywellHomePlatformRoomSensor {
         }
       });
       this.rooms = rooms;
+      this.platform.debug(`Found ${this.rooms.length} Rooms`);
       this.platform.debug(JSON.stringify(this.rooms.rooms[0].accessories[0].accessoryValue));
       this.device = rooms.deviceId;
       this.parseStatus();
@@ -802,10 +803,10 @@ class HoneywellHomePlatformRoomSensor {
       }
     });
     this.rooms = rooms;
-    this.accessory.context.firmwareRevision = this.rooms.rooms[0].accessories[0].accessoryAttribute.softwareRevision;
-    this.platform.debug(`Fetched firmwareRevision: ${this.accessory.context.firmwareRevision}`);
+    this.accessory.context.firmwareRevision = this.rooms.rooms[1].accessories[0].accessoryAttribute.softwareRevision;
+    this.platform.debug(`Fetched Room Sensor FirmwareRevision: ${this.accessory.context.firmwareRevision}`);
     this.accessory.getService(Service.AccessoryInformation)
-      .setCharacteristic(Characteristic.firmwareRevision, this.accessory.context.firmwareRevision);
+      .setCharacteristic(Characteristic.FirmwareRevision, this.accessory.context.firmwareRevision);
   }
 
   /**
