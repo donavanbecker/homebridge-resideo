@@ -267,7 +267,7 @@ class HoneywellHomePlatformThermostat {
       .setCharacteristic(Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(Characteristic.Model, device.deviceModel)
       .setCharacteristic(Characteristic.SerialNumber, device.deviceID)
-      .setCharacteristic(Characteristic.FirmwareRevision, device.softwareRevision);
+      .setCharacteristic(Characteristic.FirmwareRevision, this.FirmwareRevision);
 
     // Set Name
     this.service.setCharacteristic(Characteristic.Name, this.device.name);
@@ -404,6 +404,13 @@ class HoneywellHomePlatformThermostat {
           locationId: this.locationId
         }
       });
+      //const FirmwareRevision = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/group/0/rooms`, {
+      //  qs: {
+      //    locationId: this.locationId
+      //  }
+      //});
+      //this.FirmwareRevision = FirmwareRevision;
+      //this.platform.debug(JSON.stringify(this.FirmwareRevision.rooms[0].accessories[0].accessoryAttribute.softwareRevision));
       this.platform.debug(`Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(device)} and Fan: ${JSON.stringify(devicefan)}`);
       this.device = device;
       this.deviceFan = devicefan;
