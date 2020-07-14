@@ -784,7 +784,7 @@ class HoneywellHomePlatformRoomSensor {
         }
       });
       this.rooms = rooms;
-      this.platform.debug(`Found ${this.rooms.length} Rooms`);
+      this.platform.debug(`Found ${this.rooms.rooms.length} Rooms`);
       this.platform.debug(JSON.stringify(this.rooms.rooms[0].accessories[0].accessoryValue));
       this.device = rooms.deviceId;
       this.parseStatus();
