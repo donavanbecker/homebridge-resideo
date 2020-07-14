@@ -439,9 +439,9 @@ class HoneywellHomePlatformThermostat {
     });
     this.rooms = rooms;
     this.accessory.context.firmwareRevision = this.rooms.rooms[0].accessories[0].accessoryAttribute.softwareRevision
-    this.platform.debug(`Fetched FirmwareRevision: ${this.accessory.context.FirmwareRevision}`);
+    this.platform.debug(`Fetched firmwareRevision: ${this.accessory.context.firmwareRevision}`);
     this.accessory.getService(Service.AccessoryInformation)
-      .setCharacteristic(Characteristic.FirmwareRevision, this.accessory.context.firmwareRevision);
+      .setCharacteristic(Characteristic.firmwareRevision, this.accessory.context.firmwareRevision);
   }
 
   /**
@@ -632,7 +632,7 @@ class HoneywellHomePlatformThermostat {
 }
 
 /**
- * An instance of this class is created for each thermostat discovered
+ * An instance of this class is created for each Room Sensor discovered
  */
 class HoneywellHomePlatformRoomSensor {
   constructor(log, platform, accessory, device, locationId) {
@@ -669,7 +669,6 @@ class HoneywellHomePlatformRoomSensor {
       .setCharacteristic(Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(Characteristic.Model, device.deviceModel)
       .setCharacteristic(Characteristic.SerialNumber, device.deviceID)
-      .setCharacteristic(Characteristic.FirmwareRevision, device.softwareRevision);
  
     this.updateFirmwareInfo();
 
@@ -804,9 +803,9 @@ class HoneywellHomePlatformRoomSensor {
     });
     this.rooms = rooms;
     this.accessory.context.firmwareRevision = this.rooms.rooms[0].accessories[0].accessoryAttribute.softwareRevision;
-    this.platform.debug(`Fetched FirmwareRevision: ${this.accessory.context.FirmwareRevision}`);
+    this.platform.debug(`Fetched firmwareRevision: ${this.accessory.context.firmwareRevision}`);
     this.accessory.getService(Service.AccessoryInformation)
-      .setCharacteristic(Characteristic.FirmwareRevision, this.accessory.context.firmwareRevision);
+      .setCharacteristic(Characteristic.firmwareRevision, this.accessory.context.firmwareRevision);
   }
 
   /**
