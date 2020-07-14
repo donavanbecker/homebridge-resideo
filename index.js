@@ -164,6 +164,7 @@ class HoneywellHomePlatform {
           locationId: location.locationID,
         }
       });
+      this.log.debug(devices);
 
       this.log.info(`Found ${devices.length} devices at ${location.name}.`)
 
@@ -236,7 +237,7 @@ class HoneywellHomePlatformThermostat {
 
     // Map HomeKit Modes to Honeywell Modes
     // Don't change the order of these!
-    this.honeywellMode = ['Off', 'Heat', 'Cool', 'Auto']
+    this.honeywellMode = ['Off', 'Heat', 'Cool', 'Auto'];
 
     // default placeholders
     this.CurrentTemperature;
@@ -247,10 +248,15 @@ class HoneywellHomePlatformThermostat {
     this.HeatingThresholdTemperature;
     this.CurrentRelativeHumidity;
     this.TemperatureDisplayUnits;
+    this.Active;
+    this.TargetFanState;
+    this.fanMode;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doThermostatUpdate = new Subject();
     this.thermostatUpdateInProgress = false;
+    this.doFanUpdate = new Subject();
+    this.fanUpdateInProgress = false;
 
     // setup or get the base service
     this.service = accessory.getService(Service.Thermostat) ?
@@ -262,6 +268,8 @@ class HoneywellHomePlatformThermostat {
       .setCharacteristic(Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(Characteristic.Model, device.deviceModel)
       .setCharacteristic(Characteristic.SerialNumber, device.deviceID);
+      
+    this.updateFirmwareInfo();
 
     // Set Name
     this.service.setCharacteristic(Characteristic.Name, this.device.name);
@@ -293,8 +301,21 @@ class HoneywellHomePlatformThermostat {
     this.service.getCharacteristic(Characteristic.TemperatureDisplayUnits)
       .on('set', this.setTemperatureDisplayUnits.bind(this));
 
-    // Push the values to Homekit
-    this.updateHomeKitCharacteristics();
+
+    // Fan Controls
+    this.fanService = accessory.getService(Service.Fanv2) ?
+      accessory.getService(Service.Fanv2) : accessory.addService(Service.Fanv2, `${this.device.name} Fan`);
+
+      this.fanService
+        .getCharacteristic(Characteristic.Active)
+        .on('set', this.setActive.bind(this));
+
+      this.fanService
+        .getCharacteristic(Characteristic.TargetFanState)
+        .on('set', this.setTargetFanState.bind(this));
+
+    // Retrieve initial values and updateHomekit
+    this.refreshStatus();
 
     // Start an update interval
     interval(this.platform.config.options.ttl * 1000).pipe(skipWhile(() => this.thermostatUpdateInProgress)).subscribe(() => {
@@ -306,6 +327,11 @@ class HoneywellHomePlatformThermostat {
     this.doThermostatUpdate.pipe(tap(() => {this.thermostatUpdateInProgress = true}), debounceTime(100)).subscribe(async () => {
       await this.pushChanges();
       this.thermostatUpdateInProgress = false;
+    })
+
+    this.doFanUpdate.pipe(tap(() => {this.fanUpdateInProgress = true}), debounceTime(100)).subscribe(async () => {
+      await this.pushFanChanges();
+      this.fanUpdateInProgress = false;
     })
   }
 
@@ -339,11 +365,28 @@ class HoneywellHomePlatformThermostat {
     // Set the TargetTemperature value based on the current mode
     if (this.TargetHeatingCoolingState === Characteristic.TargetHeatingCoolingState.HEAT) {
       if (this.device.changeableValues.heatSetpoint > 0) {
-        this.TargetTemperature = this.toCelsius(this.device.changeableValues.heatSetpoint)
+        this.TargetTemperature = this.toCelsius(this.device.changeableValues.heatSetpoint);
       }
     } else {
       if (this.device.changeableValues.coolSetpoint > 0) {
-        this.TargetTemperature = this.toCelsius(this.device.changeableValues.coolSetpoint)
+        this.TargetTemperature = this.toCelsius(this.device.changeableValues.coolSetpoint);
+      }
+    }
+
+    // Set the Target Fan State
+
+    if (this.deviceFan) {
+      this.platform.debug(`${JSON.stringify(this.deviceFan)}`);
+
+      if (this.deviceFan.mode === 'Auto') {
+        this.TargetFanState = Characteristic.TargetFanState.AUTO;
+        this.Active = Characteristic.Active.INACTIVE;
+      } else if (this.deviceFan.mode === 'On') {
+        this.TargetFanState = Characteristic.TargetFanState.MANUAL;
+        this.Active = Characteristic.Active.ACTIVE;
+      } else if (this.deviceFan.mode === 'Circulate') {
+        this.TargetFanState = Characteristic.TargetFanState.MANUAL;
+        this.Active = Characteristic.Active.INACTIVE;
       }
     }
   }
@@ -352,22 +395,40 @@ class HoneywellHomePlatformThermostat {
    * Asks the Honeywell Home API for the latest device information
    */
   async refreshStatus() {
-    this.platform.debug(`Getting update for ${this.device.name} from Honeywell API`);
-
     try {
       const device = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}`, {
         qs: {
-          locationId: this.locationId,
+          locationId: this.locationId
         }
       });
-
+      const devicefan = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/fan`, {
+        qs: {
+          locationId: this.locationId
+        }
+      });
+      this.platform.debug(`Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)} and Fan: ${JSON.stringify(devicefan)}`);
       this.device = device;
+      this.deviceFan = devicefan;
+      this.platform.debug(JSON.stringify(this.device.changeableValues.mode));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
-
     } catch (e) {
       this.log.error(`Failed to update status of ${this.device.name}`, e.message);
     }
+  }
+  
+  /**
+   * Asks the Honeywell Home API for the firmware version information
+   */
+  async updateFirmwareInfo() {
+    const rooms = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/group/0/rooms`, {
+      qs: {
+        locationId: this.locationId
+      }
+    });
+    
+    this.accessory.getService(Service.AccessoryInformation)
+      .setCharacteristic(Characteristic.FirmwareRevision, rooms.rooms[0].accessories[0].accessoryAttribute.softwareRevision);
   }
 
   /**
@@ -422,13 +483,15 @@ class HoneywellHomePlatformThermostat {
     this.service.updateCharacteristic(Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
     this.service.updateCharacteristic(Characteristic.TargetHeatingCoolingState, this.TargetHeatingCoolingState);
     this.service.updateCharacteristic(Characteristic.CurrentHeatingCoolingState, this.CurrentHeatingCoolingState);
+    this.fanService.updateCharacteristic(Characteristic.TargetFanState, this.TargetFanState);
+    this.fanService.updateCharacteristic(Characteristic.Active, this.Active);
   }
 
   setTargetHeatingCoolingState(value, callback) {
     this.platform.debug('Set TargetHeatingCoolingState:', value);
 
     this.TargetHeatingCoolingState = value;
-    
+
     // Set the TargetTemperature value based on the selected mode
     if (this.TargetHeatingCoolingState === Characteristic.TargetHeatingCoolingState.HEAT) {
       this.TargetTemperature = this.toCelsius(this.device.changeableValues.heatSetpoint)
@@ -470,7 +533,7 @@ class HoneywellHomePlatformThermostat {
     setTimeout(() => {
       this.service.updateCharacteristic(Characteristic.TemperatureDisplayUnits, this.TemperatureDisplayUnits);
     }, 100);
-    
+
     callback(null);
   }
 
@@ -496,4 +559,62 @@ class HoneywellHomePlatformThermostat {
 
     return Math.round((value * 9 / 5) + 32);
   }
+
+  /**
+   * Pushes the requested changes to the Honeywell API
+   */
+  async pushFanChanges() {
+    var payload = {
+      mode: 'Auto'
+    }; // default to Auto
+
+    this.platform.debug("TargetFanState", this.TargetFanState, "Active", this.Active);
+
+    if (this.TargetFanState === Characteristic.TargetFanState.AUTO) {
+      payload = {
+        mode: 'Auto'
+      };
+    } else if (this.TargetFanState === Characteristic.TargetFanState.MANUAL && this.Active === Characteristic.Active.ACTIVE) {
+      payload = {
+        mode: 'On'
+      };
+    } else if (this.TargetFanState === Characteristic.TargetFanState.MANUAL && this.Active === Characteristic.Active.INACTIVE) {
+      payload = {
+        mode: 'Circulate'
+      };
+    }
+
+    this.log.info(`Sending request to Honeywell API. Fan Mode: ${payload.mode}`);
+    this.platform.debug(JSON.stringify(payload));
+
+    // Make the API request
+    await this.platform.rp.post(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/fan`, {
+      qs: {
+        locationId: this.locationId
+      },
+      json: payload
+    });
+
+    // Refresh the status from the API
+    await this.refreshStatus();
+  }
+
+  /**
+   * Updates the status for each of the HomeKit Characteristics
+   */
+
+  setActive(value, callback) {
+    this.platform.debug('Set Active State:', value);
+    this.Active = value;
+    this.doFanUpdate.next();
+    callback(null);
+  }
+
+  setTargetFanState(value, callback) {
+    this.platform.debug('Set Target Fan State:', value);
+    this.TargetFanState = value;
+    this.doFanUpdate.next();
+    callback(null);
+  }
 }
+

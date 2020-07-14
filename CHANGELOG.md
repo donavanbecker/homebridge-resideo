@@ -6,6 +6,18 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Version 5.0.7](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.6...v5.0.7)
 
+#### Feature Change
+
+- Added Support for Fan Control: `Auto`, `Circulate`, and `On`.
+  - If Target Fan Mode is `MANUAL` and Active is `ACTIVE` in Homekit, then the fan will be set to Honywell Mode `On`.
+  - If Target Fan Mode is `MANUAL` and Active is `INACTIVE` in Homekit, then the fan will be set to Honywell Mode `Circulate`.
+  - If Target Fan Mode is `AUTO` and Active is `INACTIVE` in Homekit, then the fan will be set to Honywell Mode `Auto`.
+  - If Target Fan Mode is `AUTO` and Active is `ACTIVE` in Homekit, then the fan will be set to Honywell Mode `Auto`.
+
+## 5.0.7 (2020-07-07)
+
+## [Version 5.0.7](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.6...v5.0.7)
+
 #### Changes
 
 - update dependencies
