@@ -7,10 +7,10 @@ const { debounceTime, skipWhile, tap } = require('rxjs/operators');
 let Accessory, Service, Characteristic, UUIDGen;
 
 module.exports = function (homebridge) {
-  Accessory      = homebridge.platformAccessory
-  Service        = homebridge.hap.Service
+  Accessory = homebridge.platformAccessory
+  Service = homebridge.hap.Service
   Characteristic = homebridge.hap.Characteristic
-  UUIDGen        = homebridge.hap.uuid
+  UUIDGen = homebridge.hap.uuid
 
   homebridge.registerPlatform('homebridge-honeywell-home', 'HoneywellHome', HoneywellHomePlatform)
 }
@@ -27,8 +27,12 @@ class HoneywellHomePlatform {
     this.config = config;
     this.api = api;
 
+    this.locations = [];
+    this.devices = [];
     this.accessories = {};
     this.activeAccessories = [];
+    this.rooms = [];
+    this.group = [];
 
     // verify the config
     try {
@@ -52,7 +56,7 @@ class HoneywellHomePlatform {
 
     // start accessory discovery
     this.discoverDevices();
-    this.discoverRooms();
+    //    this.discoverRooms(); 
 
     // start access token interval (default access token expiry is 1800 seconds)
     interval((1800 / 3) * 1000).subscribe(async () => {
@@ -155,112 +159,73 @@ class HoneywellHomePlatform {
     // get the locations
     const locations = await this.rp.get('https://api.honeywell.com/v2/locations');
 
-    this.debug(`Found ${locations.length} location(s)`);
-
-    // get the devices at each location
+    this.log.debug(locations);
+    this.debug(`Found ${locations.length} locations`);
     for (const location of locations) {
-      this.debug(`Getting devices for ${location.name}...`);
+      this.log.debug(location);
+      this.debug(`Found ${location.devices.length} location.devices`);
+      for (const device of location.devices) {
+        this.log.debug(device);
+        this.log.debug(device.deviceID);
+        for (const group of device.groups) {
+          this.log.debug(`Found ${device.groups.length} device.groups`);
+          this.log.debug(device.groups);
+          this.log.debug(group);
+          this.log.debug(group.id);
+          for (const room of group.rooms) {
+            this.log.debug(`Found ${group.rooms.length} group.rooms`);
+            this.log.debug(group.rooms);
+            this.log.debug(room);
+            {
+              const accessory = await this.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
+                qs: {
+                  locationId: location.locationID,
+                }
+              });
+              for (const roomaccessories of group.rooms) {
+                this.log.debug(`Found ${accessory.rooms.length} accessory.rooms`);
+                this.log.debug(group.rooms);
+                this.log.debug(roomaccessories);
+                for (const accessories of accessory.rooms) {
+                  this.log.debug(accessory.rooms);
+                  this.log.debug(accessories);
+                  for (const findaccessories of accessories.accessories) {
+                    this.log.debug(`Found ${accessories.accessories.length} accessories.accessories`);
+                    this.log.debug(accessories.accessories);
+                    this.log.debug(findaccessories);
+                    this.log.debug(findaccessories.accessoryAttribute.softwareRevision);
+                    if (findaccessories.accessoryAttribute.type === 'Thermostat' || 'IndoorAirSensor') {
+                      this.log.debug(device.deviceID);
+                      const UUID = UUIDGen.generate(device.deviceID);
 
-      const devices = await this.rp.get('https://api.honeywell.com/v2/devices', {
-        qs: {
-          locationId: location.locationID,
-        }
-      });
-      this.log.debug(devices);
+                      // Mark the accessory as found so it will not be removed
+                      if (!this.activeAccessories.includes(UUID)) {
+                        this.activeAccessories.push(UUID);
+                      }
 
-      this.log.info(`Found ${devices.length} devices at ${location.name}.`)
-
-      // check each device to see if it's a new accessory or an existing one
-      for (const device of devices) {
-        if (device.isAlive && device.isProvisioned && device.deviceClass === 'Thermostat') {
-          const UUID = UUIDGen.generate(device.deviceID);
-
-          // Mark the accessory as found so it will not be removed
-          if (!this.activeAccessories.includes(UUID)) {
-            this.activeAccessories.push(UUID);
+                      if (!this.accessories[UUID]) {
+                        // this is a new accessory we haven't seen before
+                        this.log.info(`Registering new device: ${device.name} - ${device.deviceID}`);
+                        this.accessories[UUID] = new Accessory(device.name, UUID);
+                        this.startAccessory(this.accessories[UUID], device, location.locationID);
+                        this.startSensorAccessory(this.accessories[UUID], device, location.locationID, group.rooms);
+                        this.api.registerPlatformAccessories('homebridge-honeywell-home', 'HoneywellHome', [this.accessories[UUID]]);
+                      } else {
+                        // this is an existing accessory
+                        this.log.info(`Loading existing device: ${device.name} - ${device.deviceID}`);
+                        this.startAccessory(this.accessories[UUID], device, location.locationID);
+                        this.startSensorAccessory(this.accessories[UUID], device, location.locationID, group.rooms);
+                      }
+                    } else {
+                      this.debug(`Ignoring device named ${device.name} as it is offline.`)
+                    }
+                  }
+                }
+              }
+            }
           }
-
-          if (!this.accessories[UUID]) {
-            // this is a new accessory we haven't seen before
-            this.log.info(`Registering new device: ${device.name} - ${device.deviceID}`);
-            this.accessories[UUID] = new Accessory(device.name, UUID);
-            this.startAccessory(this.accessories[UUID], device, location.locationID);
-            this.api.registerPlatformAccessories('homebridge-honeywell-home', 'HoneywellHome', [this.accessories[UUID]]);
-          } else {
-            // this is an existing accessory
-            this.log.info(`Loading existing device: ${device.name} - ${device.deviceID}`);
-            this.startAccessory(this.accessories[UUID], device, location.locationID);
-          }
-        } else {
-          this.debug(`Ignoring device named ${device.name} as it is offline.`)
         }
       }
-      
-    }
-  }
-
-  /**
-   * Discoveres the users devices and registers them on the platform
-   */
-  async discoverRooms() {
-    // try and get the access token. If it fails stop here.
-    try {
-      await this.getAccessToken();
-    } catch (e) {
-      this.log.error('Could not discover devices.', e.message);
-      return;
-    }
-
-    // get the locations
-    const locations = await this.rp.get('https://api.honeywell.com/v2/locations');
-
-    this.log.debug(`Found ${locations.length} location(s) for Rooms`);
-
-    // get the rooms at each location
-    for (const location of locations) {
-      this.debug(`Getting rooms for ${location.name}...`);
-
-      const device = await this.rp.get('https://api.honeywell.com/v2/devices', {
-        qs: {
-          locationId: location.locationID,
-        }
-      });
-
-      const rooms = await this.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${device.deviceID}/group/0/rooms`, {
-        qs: {
-          locationId: location.locationID,
-        }
-      });
-      this.log.debug(rooms.rooms[1].id);
-
-      this.log.debug(`Found ${rooms.rooms.length} Room(s) at ${location.name}.`) 
-
-      // check each device to see if it's a new accessory or an existing one
-      for (const room of rooms) {
-        if (room.rooms[1].id != 0) {
-          const UUID = UUIDGen.generate(room.rooms[1].id);
-
-          // Mark the accessory as found so it will not be removed
-          if (!this.activeAccessories.includes(UUID)) {
-            this.activeAccessories.push(UUID);
-          }
-
-          if (!this.accessories[UUID]) {
-            // this is a new accessory we haven't seen before
-            this.log.info(`Registering new room: ${room.rooms[1].name} - ${room.rooms[1].id}`);
-            this.accessories[UUID] = new Accessory(room.rooms[1].name, UUID);
-            this.startSensorAccessory(this.accessories[UUID], device, location.locationID, room);
-            this.api.registerPlatformAccessories('homebridge-honeywell-home', 'HoneywellHome', [this.accessories[UUID]]);
-          } else {
-            // this is an existing accessory
-            this.log.info(`Loading existing device: ${room.rooms[1].name} - ${device.deviceID}`);
-            this.startSensorAccessory(this.accessories[UUID], device, location.locationID, room);
-          }
-        } else {
-          this.debug(`Ignoring device named ${room.rooms[1].name} as it is offline.`)
-        }
-      }
-      
     }
   }
 
@@ -275,7 +240,7 @@ class HoneywellHomePlatform {
    * Starts the accessory
    */
   startSensorAccessory(accessory, device, locationId) {
-    return new HoneywellHomePlatformRoomSensor(this.log, this, accessory, device, locationId, room);
+    return new HoneywellHomePlatformRoomSensor(this.log, this, accessory, device, locationId, this.group);
   }
 
   /**
@@ -285,7 +250,7 @@ class HoneywellHomePlatform {
   debug(...log) {
     if (this.config.options.debug) {
       this.log.info('[DEBUG]', ...log);
-    } else{
+    } else {
       this.log.debug(...log)
     }
   }
@@ -345,7 +310,7 @@ class HoneywellHomePlatformThermostat {
       .setCharacteristic(Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(Characteristic.Model, device.deviceModel)
       .setCharacteristic(Characteristic.SerialNumber, device.deviceID);
-      
+
     this.updateFirmwareInfo();
 
     // Set Name
@@ -383,13 +348,13 @@ class HoneywellHomePlatformThermostat {
     this.fanService = accessory.getService(Service.Fanv2) ?
       accessory.getService(Service.Fanv2) : accessory.addService(Service.Fanv2, `${this.device.name} Fan`);
 
-      this.fanService
-        .getCharacteristic(Characteristic.Active)
-        .on('set', this.setActive.bind(this));
+    this.fanService
+      .getCharacteristic(Characteristic.Active)
+      .on('set', this.setActive.bind(this));
 
-      this.fanService
-        .getCharacteristic(Characteristic.TargetFanState)
-        .on('set', this.setTargetFanState.bind(this));
+    this.fanService
+      .getCharacteristic(Characteristic.TargetFanState)
+      .on('set', this.setTargetFanState.bind(this));
 
     // Retrieve initial values and updateHomekit
     this.refreshStatus();
@@ -401,12 +366,12 @@ class HoneywellHomePlatformThermostat {
 
     // Watch for thermostat change events
     // We put in a debounce of 100ms so we don't make duplicate calls
-    this.doThermostatUpdate.pipe(tap(() => {this.thermostatUpdateInProgress = true}), debounceTime(100)).subscribe(async () => {
+    this.doThermostatUpdate.pipe(tap(() => { this.thermostatUpdateInProgress = true }), debounceTime(100)).subscribe(async () => {
       await this.pushChanges();
       this.thermostatUpdateInProgress = false;
     })
 
-    this.doFanUpdate.pipe(tap(() => {this.fanUpdateInProgress = true}), debounceTime(100)).subscribe(async () => {
+    this.doFanUpdate.pipe(tap(() => { this.fanUpdateInProgress = true }), debounceTime(100)).subscribe(async () => {
       await this.pushFanChanges();
       this.fanUpdateInProgress = false;
     })
@@ -493,7 +458,7 @@ class HoneywellHomePlatformThermostat {
       this.log.error(`Failed to update status of ${this.device.name}`, e.message);
     }
   }
-  
+
   /**
    * Asks the Honeywell Home API for the firmware version information
    */
@@ -702,13 +667,14 @@ class HoneywellHomePlatformThermostat {
  * An instance of this class is created for each Room Sensor discovered
  */
 class HoneywellHomePlatformRoomSensor {
-  constructor(log, platform, accessory, device, locationId, room) {
+  constructor(log, platform, accessory, device, locationId) {
     this.log = log;
     this.platform = platform;
     this.accessory = accessory;
     this.device = device;
     this.locationId = locationId;
-    this.room = room;
+    this.findaccessories;
+    this.group;
 
     // default placeholders
     this.CurrentTemperature;
@@ -736,68 +702,68 @@ class HoneywellHomePlatformRoomSensor {
       .setCharacteristic(Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(Characteristic.Model, device.deviceModel)
       .setCharacteristic(Characteristic.SerialNumber, device.deviceID)
- 
+
     this.updateFirmwareInfo();
 
-      // Set Name
-      this.service.setCharacteristic(Characteristic.Name, this.room.rooms[1].name);
+    // Set Name
+    this.service.setCharacteristic(Characteristic.Name, this.findaccessories.accessoryAttribute.name);
 
-      // Do initial device parse
-      this.parseStatus();
+    // Do initial device parse
+    this.parseStatus();
 
-      // Set Active
-      this.service.getCharacteristic(Characteristic.Active)
+    // Set Active
+    this.service.getCharacteristic(Characteristic.Active)
       .on('get', this.handleTemperatureActiveGet.bind(this));
 
-      // Set Low Battery
-      this.service.getCharacteristic(Characteristic.StatusLowBattery)
-        .on('get', this.handeTemperatureStatusLowBatteryGet.bind(this));
+    // Set Low Battery
+    this.service.getCharacteristic(Characteristic.StatusLowBattery)
+      .on('get', this.handeTemperatureStatusLowBatteryGet.bind(this));
 
-      // Set Current Temperature
-      this.service.getCharacteristic(Characteristic.CurrentTemperature)
-        .on('get', this.handleCurrentTemperatureGet.bind(this));
+    // Set Current Temperature
+    this.service.getCharacteristic(Characteristic.CurrentTemperature)
+      .on('get', this.handleCurrentTemperatureGet.bind(this));
 
     // Occupancy Sensor
     this.occupancyService = accessory.getService(Service.OccupancySensor) ?
       accessory.getService(Service.OccupancySensor) : accessory.addService(Service.OccupancySensor, `${this.device.name} Fan`);
 
-      // Set Occupancy Sensor Active
-      this.occupancyService
-        .getCharacteristic(Characteristic.Active)
-        .on('get', this.handleOccupancyActiveGet.bind(this));
+    // Set Occupancy Sensor Active
+    this.occupancyService
+      .getCharacteristic(Characteristic.Active)
+      .on('get', this.handleOccupancyActiveGet.bind(this));
 
-      // Set Occupancy Sensor  
-      this.occupancyService
-        .getCharacteristic(Characteristic.OccupancyDetected)
-        .on('get', this.handleOccupancyDetectedGet.bind(this));
+    // Set Occupancy Sensor  
+    this.occupancyService
+      .getCharacteristic(Characteristic.OccupancyDetected)
+      .on('get', this.handleOccupancyDetectedGet.bind(this));
 
     // Humidity Sensor
     this.humidityService = accessory.getService(Service.HumiditySensor) ?
       accessory.getService(Service.HumiditySensor) : accessory.addService(Service.HumiditySensor, `${this.device.name} Fan`);
 
-      // Set Humidity Sensor Active
-      this.humidityService
-        .getCharacteristic(Characteristic.Active)
-        .on('get', this.handleHumidityActiveGet.bind(this));
+    // Set Humidity Sensor Active
+    this.humidityService
+      .getCharacteristic(Characteristic.Active)
+      .on('get', this.handleHumidityActiveGet.bind(this));
 
-      // Set Humidity Sensor Current Relative Humidity
-      this.humidityService
-        .getCharacteristic(Characteristic.CurrentRelativeHumidity)
-        .on('get', this.handleCurrentRelativeHumidityGet.bind(this));
+    // Set Humidity Sensor Current Relative Humidity
+    this.humidityService
+      .getCharacteristic(Characteristic.CurrentRelativeHumidity)
+      .on('get', this.handleCurrentRelativeHumidityGet.bind(this));
 
     // Motion Sensor
     this.motionService = accessory.getService(Service.HumiditySensor) ?
       accessory.getService(Service.HumiditySensor) : accessory.addService(Service.HumiditySensor, `${this.device.name} Fan`);
 
-      // Set Motion Sensor Active
-      this.motionService
-        .getCharacteristic(Characteristic.StatusActive)
-        .on('get', this.handleMotionStatusActiveGet.bind(this));
+    // Set Motion Sensor Active
+    this.motionService
+      .getCharacteristic(Characteristic.StatusActive)
+      .on('get', this.handleMotionStatusActiveGet.bind(this));
 
-      // Set Motion Sensor Detected
-      this.motionService
-        .getCharacteristic(Characteristic.MotionDetected)
-        .on('get', this.handleMotionDetectedGet.bind(this));
+    // Set Motion Sensor Detected
+    this.motionService
+      .getCharacteristic(Characteristic.MotionDetected)
+      .on('get', this.handleMotionDetectedGet.bind(this));
 
     // Retrieve initial values and updateHomekit
     this.refreshSensorStatus();
@@ -809,7 +775,7 @@ class HoneywellHomePlatformRoomSensor {
 
     // Watch for thermostat change events
     // We put in a debounce of 100ms so we don't make duplicate calls
-    this.doSenosrUpdate.pipe(tap(() => {this.SensorUpdateInProgress = true}), debounceTime(100)).subscribe(async () => {
+    this.doSenosrUpdate.pipe(tap(() => { this.SensorUpdateInProgress = true }), debounceTime(100)).subscribe(async () => {
       await this.pushChanges();
       this.SensorUpdateInProgress = false;
     })
@@ -821,22 +787,22 @@ class HoneywellHomePlatformRoomSensor {
    */
   parseStatus() {
     // Set Temperature Sensor State
-    this.TemperatureActive = this.room.rooms[1].accessories[0].accessoryValue.status;
-    this.CurrentTemperature = this.room.rooms[1].accessories[0].accessoryValue.indoorTemperature;
-    this.TemperatureStatusLowBattery = this.room.rooms[1].accessories[0].accessoryValue.batteryStatus;
-    
+    this.TemperatureActive = this.findaccessories.accessoryValue.status;
+    this.CurrentTemperature = this.findaccessories.accessoryValue.indoorTemperature;
+    this.TemperatureStatusLowBattery = this.findaccessories.accessoryValue.batteryStatus;
+
     // Set Occupancy Sensor State
-    this.OccupancyActive = this.room.rooms[1].accessories[0].accessoryValue.status;
-    this.OccupancyDetected = this.room.rooms[1].accessories[0].accessoryValue.occupancyDet;
-    
+    this.OccupancyActive = this.findaccessories.accessoryValue.status;
+    this.OccupancyDetected = this.findaccessories.accessoryValue.occupancyDet;
+
     // Set Humidity Sensor State
-    this.HumidityActive = this.room.rooms[1].accessories[0].accessoryValue.status;
-    this.CurrentRelativeHumidity = this.room.rooms[1].accessories[0].accessoryValue.indoorHumidity;
-    
+    this.HumidityActive = this.findaccessories.accessoryValue.status;
+    this.CurrentRelativeHumidity = this.findaccessories.accessoryValue.indoorHumidity;
+
     // Set Motion Sensor State
-    this.MotionActive = this.room.rooms[1].accessories[0].accessoryValue.status;
-    this.MotionDetected = this.room.rooms[1].accessories[0].accessoryValue.motionDet;
-    
+    this.MotionActive = this.findaccessories.accessoryValue.status;
+    this.MotionDetected = this.findaccessories.accessoryValue.motionDet;
+
   }
 
   /**
@@ -844,33 +810,22 @@ class HoneywellHomePlatformRoomSensor {
    */
   async refreshSensorStatus() {
     try {
-      const room = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/group/0/rooms`, {
-        qs: {
-          locationId: this.locationId
-        }
-      });
-      this.room = room;
-      this.platform.debug(`Found ${this.room.rooms.length} Rooms`);
-      this.platform.debug(JSON.stringify(this.room.rooms[1].accessories[0].accessoryValue));
-      this.device = this.room.rooms[0].deviceId;
+      this.findaccessories;
+      this.platform.debug(this.findaccessories)
+      this.platform.debug(JSON.stringify(this.findaccessories.accessoryValue));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
       this.log.error(`Failed to update status of ${this.device.name}`, e.message);
     }
   }
-  
+
   /**
    * Asks the Honeywell Home API for the firmware version information
    */
   async updateFirmwareInfo() {
-    const room = await this.platform.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/group/0/rooms`, {
-      qs: {
-        locationId: this.locationId
-      }
-    });
     this.room = room;
-    this.accessory.context.firmwareRevision = this.room.rooms[1].accessories[0].accessoryAttribute.softwareRevision;
+    this.accessory.context.firmwareRevision = this.findaccessories.accessoryAttribute.softwareRevision;
     this.platform.debug(`Fetched Room Sensor FirmwareRevision: ${this.accessory.context.firmwareRevision}`);
     this.accessory.getService(Service.AccessoryInformation)
       .setCharacteristic(Characteristic.FirmwareRevision, this.accessory.context.firmwareRevision);
