@@ -168,6 +168,16 @@ class HoneywellHomePlatform {
 
       this.log.info(`Found ${devices.length} devices at ${location.name}.`)
 
+      // get the rooms at each location
+      const rooms = await this.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${devices.deviceID}/group/0/rooms`, {
+        qs: {
+          locationId: location.locationID,
+        }
+      });
+      this.log.debug(rooms);
+
+      this.log.info(`Found ${rooms.length} Rooms at ${location.name}.`)
+
       // check each device to see if it's a new accessory or an existing one
       for (const device of devices) {
         if (device.isAlive && device.isProvisioned && device.deviceClass === 'Thermostat') {
@@ -183,13 +193,13 @@ class HoneywellHomePlatform {
             this.log.info(`Registering new device: ${device.name} - ${device.deviceID}`);
             this.accessories[UUID] = new Accessory(device.name, UUID);
             this.startAccessory(this.accessories[UUID], device, location.locationID);
-            this.startSensorAccessory(this.accessories[UUID], device, location.locationID);
+            this.startSensorAccessory(this.accessories[UUID], device, location.locationID, rooms);
             this.api.registerPlatformAccessories('homebridge-honeywell-home', 'HoneywellHome', [this.accessories[UUID]]);
           } else {
             // this is an existing accessory
             this.log.info(`Loading existing device: ${device.name} - ${device.deviceID}`);
             this.startAccessory(this.accessories[UUID], device, location.locationID);
-            this.startSensorAccessory(this.accessories[UUID], device, location.locationID);
+            this.startSensorAccessory(this.accessories[UUID], device, location.locationID, rooms);
           }
         } else {
           this.debug(`Ignoring device named ${device.name} as it is offline.`)
@@ -209,7 +219,7 @@ class HoneywellHomePlatform {
    * Starts the accessory
    */
   startSensorAccessory(accessory, device, locationId) {
-    return new HoneywellHomePlatformRoomSensor(this.log, this, accessory, device, locationId);
+    return new HoneywellHomePlatformRoomSensor(this.log, this, accessory, device, locationId, rooms);
   }
 
   /**
@@ -236,6 +246,7 @@ class HoneywellHomePlatformThermostat {
     this.accessory = accessory;
     this.device = device;
     this.locationId = locationId;
+    this.rooms = this.rooms;
 
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
@@ -261,7 +272,6 @@ class HoneywellHomePlatformThermostat {
     this.Active;
     this.TargetFanState;
     this.fanMode;
-    this.rooms;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doThermostatUpdate = new Subject();
