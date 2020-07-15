@@ -636,7 +636,7 @@ class HoneywellHomePlatformThermostat {
  * An instance of this class is created for each Room Sensor discovered
  */
 class HoneywellHomePlatformRoomSensor {
-  constructor(log, platform, accessory, device, locationId) {
+  constructor(log, platform, accessory, device, locationId, rooms) {
     this.log = log;
     this.platform = platform;
     this.accessory = accessory;
@@ -786,7 +786,7 @@ class HoneywellHomePlatformRoomSensor {
       this.rooms = rooms;
       this.platform.debug(`Found ${this.rooms.rooms.length} Rooms`);
       this.platform.debug(JSON.stringify(this.rooms.rooms[0].accessories[0].accessoryValue));
-      this.device = rooms.deviceId;
+      this.device = this.rooms.rooms[0].deviceId;
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
