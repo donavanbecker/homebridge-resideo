@@ -78,6 +78,7 @@ class HoneywellHomePlatform {
       this.config.options = {};
     }
 
+    this.config.options.rooms = this.config.options.rooms || 0; // default 0
     this.config.options.ttl = this.config.options.ttl || 1800; // default 1800 seconds
     this.config.options.debug = this.config.options.debug || false; // default false
 
@@ -236,8 +237,8 @@ class HoneywellHomePlatform {
 
       // check each device to see if it's a new accessory or an existing one
       for (const room of rooms) {
-        if (room.rooms.id != 0) {
-          const UUID = UUIDGen.generate(room.rooms.id);
+        if (room.rooms[1].id != 0) {
+          const UUID = UUIDGen.generate(room.rooms[1].id);
 
           // Mark the accessory as found so it will not be removed
           if (!this.activeAccessories.includes(UUID)) {
@@ -246,17 +247,17 @@ class HoneywellHomePlatform {
 
           if (!this.accessories[UUID]) {
             // this is a new accessory we haven't seen before
-            this.log.info(`Registering new room: ${room.rooms.name} - ${room.id}`);
-            this.accessories[UUID] = new Accessory(room.rooms.namename, UUID);
+            this.log.info(`Registering new room: ${room.rooms[1].name} - ${room.rooms[1].id}`);
+            this.accessories[UUID] = new Accessory(room.rooms[1].name, UUID);
             this.startSensorAccessory(this.accessories[UUID], device, location.locationID, room);
             this.api.registerPlatformAccessories('homebridge-honeywell-home', 'HoneywellHome', [this.accessories[UUID]]);
           } else {
             // this is an existing accessory
-            this.log.info(`Loading existing device: ${room.rooms.namename} - ${device.deviceID}`);
+            this.log.info(`Loading existing device: ${room.rooms[1].name} - ${device.deviceID}`);
             this.startSensorAccessory(this.accessories[UUID], device, location.locationID, room);
           }
         } else {
-          this.debug(`Ignoring device named ${room.name} as it is offline.`)
+          this.debug(`Ignoring device named ${room.rooms[1].name} as it is offline.`)
         }
       }
       
@@ -301,7 +302,7 @@ class HoneywellHomePlatformThermostat {
     this.accessory = accessory;
     this.device = device;
     this.locationId = locationId;
-    this.room = room;
+    this.room;
 
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
@@ -820,21 +821,21 @@ class HoneywellHomePlatformRoomSensor {
    */
   parseStatus() {
     // Set Temperature Sensor State
-    this.TemperatureActive = this.room.rooms[0].accessories[0].accessoryValue.status;
-    this.CurrentTemperature = this.room.rooms[0].accessories[0].accessoryValue.indoorTemperature;
-    this.TemperatureStatusLowBattery = this.room.rooms[0].accessories[0].accessoryValue.batteryStatus;
+    this.TemperatureActive = this.room.rooms[1].accessories[0].accessoryValue.status;
+    this.CurrentTemperature = this.room.rooms[1].accessories[0].accessoryValue.indoorTemperature;
+    this.TemperatureStatusLowBattery = this.room.rooms[1].accessories[0].accessoryValue.batteryStatus;
     
     // Set Occupancy Sensor State
-    this.OccupancyActive = this.room.rooms[0].accessories[0].accessoryValue.status;
-    this.OccupancyDetected = this.room.rooms[0].accessories[0].accessoryValue.occupancyDet;
+    this.OccupancyActive = this.room.rooms[1].accessories[0].accessoryValue.status;
+    this.OccupancyDetected = this.room.rooms[1].accessories[0].accessoryValue.occupancyDet;
     
     // Set Humidity Sensor State
-    this.HumidityActive = this.room.rooms[0].accessories[0].accessoryValue.status;
-    this.CurrentRelativeHumidity = this.room.rooms[0].accessories[0].accessoryValue.indoorHumidity;
+    this.HumidityActive = this.room.rooms[1].accessories[0].accessoryValue.status;
+    this.CurrentRelativeHumidity = this.room.rooms[1].accessories[0].accessoryValue.indoorHumidity;
     
     // Set Motion Sensor State
-    this.MotionActive = this.room.rooms[0].accessories[0].accessoryValue.status;
-    this.MotionDetected = this.room.rooms[0].accessories[0].accessoryValue.motionDet;
+    this.MotionActive = this.room.rooms[1].accessories[0].accessoryValue.status;
+    this.MotionDetected = this.room.rooms[1].accessories[0].accessoryValue.motionDet;
     
   }
 
@@ -850,7 +851,7 @@ class HoneywellHomePlatformRoomSensor {
       });
       this.room = room;
       this.platform.debug(`Found ${this.room.rooms.length} Rooms`);
-      this.platform.debug(JSON.stringify(this.room.rooms[0].accessories[0].accessoryValue));
+      this.platform.debug(JSON.stringify(this.room.rooms[1].accessories[0].accessoryValue));
       this.device = this.room.rooms[0].deviceId;
       this.parseStatus();
       this.updateHomeKitCharacteristics();
