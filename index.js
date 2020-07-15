@@ -190,7 +190,7 @@ class HoneywellHomePlatform {
             this.startAccessory(this.accessories[UUID], device, location.locationID);
           }
         } else {
-          this.debug(`Ignoring device named ${device.name} - ${device.deviceID}  as it is offline.`)
+          this.debug(`Ignoring device named ${device.name} - ${device.deviceID}  as it is offline. Alive: ${device.isAlive}, Provisioned: ${device.isProvisioned}, Class: ${device.deviceClass}`)
         }
       }
     }
