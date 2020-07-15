@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/).
 
+## 5.1.1 (2020-07-15)
+
+## [Version 5.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.1.0...v5.1.1)
+
+### Changes
+
+- Added more logging for offline devices
+  - now displays deviceID.
+  - now displays if device is Alive,  Provisioned, and Class `Thermostat`.
+  
 ## 5.1.0 (2020-07-14)
 
 ## [Version 5.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.7...v5.1.0)
