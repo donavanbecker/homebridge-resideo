@@ -205,8 +205,8 @@ class HoneywellHomePlatform {
 
                       if (!this.accessories[UUID]) {
                         // this is a new accessory we haven't seen before
-                        this.log.info(`Registering new device: ${device.name} - ${device.deviceID}`);
-                        this.accessories[UUID] = new Accessory(device.name, UUID);
+                        this.log.info(`Registering new device: ${findaccessories.accessoryAttribute.name} - ${findaccessories.accessoryAttribute.serialNumber}`);
+                        this.accessories[UUID] = new Accessory(findaccessories.accessoryAttribute.name, UUID);
                         if (findaccessories.accessoryAttribute.type === 'Thermostat') {
                           this.startAccessory(this.accessories[UUID], device, location.locationID);
                         } else if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor') {
@@ -215,7 +215,7 @@ class HoneywellHomePlatform {
                         this.api.registerPlatformAccessories('homebridge-honeywell-home', 'HoneywellHome', [this.accessories[UUID]]);
                       } else {
                         // this is an existing accessory
-                        this.log.info(`Loading existing device: ${device.name} - ${device.deviceID}`);
+                        this.log.info(`Loading existing device: ${findaccessories.accessoryAttribute.name} - ${findaccessories.accessoryAttribute.serialNumber}`);
                         if (findaccessories.accessoryAttribute.type === 'Thermostat') {
                           this.startAccessory(this.accessories[UUID], device, location.locationID);
                         } else if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor') {
@@ -223,7 +223,7 @@ class HoneywellHomePlatform {
                         }
                       }
                     } else {
-                      this.debug(`Ignoring device named ${device.name} as it is offline.`)
+                      this.debug(`Ignoring device named ${findaccessories.accessoryAttribute.name} as it is offline.`)
                     }
                   }
                 }
