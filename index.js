@@ -207,14 +207,20 @@ class HoneywellHomePlatform {
                         // this is a new accessory we haven't seen before
                         this.log.info(`Registering new device: ${device.name} - ${device.deviceID}`);
                         this.accessories[UUID] = new Accessory(device.name, UUID);
-                        this.startAccessory(this.accessories[UUID], device, location.locationID);
-                        this.startSensorAccessory(this.accessories[UUID], device, location.locationID, group.rooms);
+                        if (findaccessories.accessoryAttribute.type === 'Thermostat') {
+                          this.startAccessory(this.accessories[UUID], device, location.locationID);
+                        } else if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor') {
+                          this.startSensorAccessory(this.accessories[UUID], device, findaccessories);
+                        }
                         this.api.registerPlatformAccessories('homebridge-honeywell-home', 'HoneywellHome', [this.accessories[UUID]]);
                       } else {
                         // this is an existing accessory
                         this.log.info(`Loading existing device: ${device.name} - ${device.deviceID}`);
-                        this.startAccessory(this.accessories[UUID], device, location.locationID);
-                        this.startSensorAccessory(this.accessories[UUID], device, location.locationID, group.rooms);
+                        if (findaccessories.accessoryAttribute.type === 'Thermostat') {
+                          this.startAccessory(this.accessories[UUID], device, location.locationID);
+                        } else if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor') {
+                          this.startSensorAccessory(this.accessories[UUID], device, findaccessories);
+                        }
                       }
                     } else {
                       this.debug(`Ignoring device named ${device.name} as it is offline.`)
@@ -239,8 +245,8 @@ class HoneywellHomePlatform {
   /**
    * Starts the accessory
    */
-  startSensorAccessory(accessory, device, locationId) {
-    return new HoneywellHomePlatformRoomSensor(this.log, this, accessory, device, locationId, this.group);
+  startSensorAccessory(accessory, device, findaccessories) {
+    return new HoneywellHomePlatformRoomSensor(this.log, this, accessory, device, findaccessories);
   }
 
   /**
@@ -667,14 +673,12 @@ class HoneywellHomePlatformThermostat {
  * An instance of this class is created for each Room Sensor discovered
  */
 class HoneywellHomePlatformRoomSensor {
-  constructor(log, platform, accessory, device, locationId) {
+  constructor(log, platform, accessory, device, findaccessories) {
     this.log = log;
     this.platform = platform;
     this.accessory = accessory;
     this.device = device;
-    this.locationId = locationId;
-    this.findaccessories;
-    this.group;
+    this.findaccessories = findaccessories;
 
     // default placeholders
     this.CurrentTemperature;
@@ -689,7 +693,7 @@ class HoneywellHomePlatformRoomSensor {
     this.TemperatureStatusLowBattery;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
-    this.doSenosrUpdate = new Subject();
+    this.doSensorUpdate = new Subject();
     this.SensorUpdateInProgress = false;
 
     // setup or get the base service
@@ -775,7 +779,7 @@ class HoneywellHomePlatformRoomSensor {
 
     // Watch for thermostat change events
     // We put in a debounce of 100ms so we don't make duplicate calls
-    this.doSenosrUpdate.pipe(tap(() => { this.SensorUpdateInProgress = true }), debounceTime(100)).subscribe(async () => {
+    this.doSensorUpdate.pipe(tap(() => { this.SensorUpdateInProgress = true }), debounceTime(100)).subscribe(async () => {
       await this.pushChanges();
       this.SensorUpdateInProgress = false;
     })
@@ -824,7 +828,6 @@ class HoneywellHomePlatformRoomSensor {
    * Asks the Honeywell Home API for the firmware version information
    */
   async updateFirmwareInfo() {
-    this.room = room;
     this.accessory.context.firmwareRevision = this.findaccessories.accessoryAttribute.softwareRevision;
     this.platform.debug(`Fetched Room Sensor FirmwareRevision: ${this.accessory.context.firmwareRevision}`);
     this.accessory.getService(Service.AccessoryInformation)
