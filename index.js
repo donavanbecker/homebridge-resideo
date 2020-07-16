@@ -195,7 +195,7 @@ class HoneywellHomePlatform {
                     this.log.debug(`Found ${accessories.accessories.length} accessories.accessories`);
                     this.log.debug(accessories.accessories);
                     this.log.debug(findaccessories);
-                    this.log.info(findaccessories.accessoryAttribute.type);
+                    this.log.debug(findaccessories.accessoryAttribute.type);
                     if (findaccessories.accessoryAttribute.type === 'Thermostat' || 'IndoorAirSensor' && device.isAlive && device.isProvisioned && device.deviceClass === 'Thermostat') {
                       this.log.debug(`UDID: ${accessories.name}${findaccessories.accessoryAttribute.type}${findaccessories.accessoryAttribute.serialNumber}`);
                       const UUID = UUIDGen.generate(`${accessories.name}${findaccessories.accessoryAttribute.type}${findaccessories.accessoryAttribute.serialNumber}`);
@@ -225,7 +225,7 @@ class HoneywellHomePlatform {
                         }
                       }
                     } else {
-                      this.debug(`Ignoring device named ${device.name} - ${device.deviceID}  as it is offline. Alive: ${device.isAlive}, Provisioned: ${device.isProvisioned}, Class: ${device.deviceClass}`)
+                      this.log.info(`Ignoring device named ${device.name} - ${device.deviceID}  as it is offline. Alive: ${device.isAlive}, Provisioned: ${device.isProvisioned}, Class: ${device.deviceClass}`)
                     }
                   }
                 }
