@@ -240,15 +240,15 @@ class HoneywellHomePlatform {
   /**
    * Starts the accessory
    */
-  startAccessory(accessory, device, locationId, findaccessories) {
-    return new HoneywellHomePlatformThermostat(this.log, this, accessory, device, locationId, findaccessories);
+  startAccessory(accessory, device, locationId, findaccessories, accessories) {
+    return new HoneywellHomePlatformThermostat(this.log, this, accessory, device, locationId, findaccessories, accessories);
   }
 
   /**
    * Starts the accessory
    */
-  startSensorAccessory(accessory, device, findaccessories) {
-    return new HoneywellHomePlatformRoomSensor(this.log, this, accessory, device, findaccessories);
+  startSensorAccessory(accessory, device, findaccessories, accessories) {
+    return new HoneywellHomePlatformRoomSensor(this.log, this, accessory, device, findaccessories, accessories);
   }
 
   /**
@@ -269,13 +269,14 @@ class HoneywellHomePlatform {
  * An instance of this class is created for each thermostat discovered
  */
 class HoneywellHomePlatformThermostat {
-  constructor(log, platform, accessory, device, locationId, findaccessories) {
+  constructor(log, platform, accessory, device, locationId, findaccessories, accessories) {
     this.log = log;
     this.platform = platform;
     this.accessory = accessory;
     this.device = device;
     this.locationId = locationId;
     this.findaccessories = findaccessories;
+    this.accessories = accessories;
 
 
     // Map Honeywell Modes to HomeKit Modes
@@ -312,7 +313,7 @@ class HoneywellHomePlatformThermostat {
 
     // setup or get the base service
     this.service = accessory.getService(Service.Thermostat) ?
-      accessory.getService(Service.Thermostat) : accessory.addService(Service.Thermostat, this.device.name);
+      accessory.getService(Service.Thermostat) : accessory.addService(Service.Thermostat, `${this.device.name} ${this.findaccessories.accessoryAttribute.type}`);
 
     // Thermostat Accessory Information
     this.accessory.getService(Service.AccessoryInformation)
@@ -356,7 +357,7 @@ class HoneywellHomePlatformThermostat {
 
     // Fan Controls
     this.fanService = accessory.getService(Service.Fanv2) ?
-      accessory.getService(Service.Fanv2) : accessory.addService(Service.Fanv2, `${this.device.name} Fan`);
+      accessory.getService(Service.Fanv2) : accessory.addService(Service.Fanv2, `${this.findaccessories.accessoryAttribute.name} ${this.findaccessories.accessoryAttribute.type} Fan`);
 
     this.fanService
       .getCharacteristic(Characteristic.Active)
@@ -465,7 +466,7 @@ class HoneywellHomePlatformThermostat {
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
-      this.log.error(`Failed to update status of ${this.device.name}`, e.message);
+      this.log.error(`Failed to update status of ${this.device.name} Thermostat`, e.message);
     }
   }
 
@@ -670,12 +671,13 @@ class HoneywellHomePlatformThermostat {
  * An instance of this class is created for each Room Sensor discovered
  */
 class HoneywellHomePlatformRoomSensor {
-  constructor(log, platform, accessory, device, findaccessories) {
+  constructor(log, platform, accessory, device, findaccessories, accessories) {
     this.log = log;
     this.platform = platform;
     this.accessory = accessory;
     this.device = device;
     this.findaccessories = findaccessories;
+    this.accessories = accessories;
 
     // default placeholders
     this.CurrentTemperature;
@@ -695,7 +697,7 @@ class HoneywellHomePlatformRoomSensor {
 
     // setup or get the base service
     this.service = accessory.getService(Service.TemperatureSensor) ?
-      accessory.getService(Service.TemperatureSensor) : accessory.addService(Service.TemperatureSensor, `${this.device.name} Room Sensor`);
+      accessory.getService(Service.TemperatureSensor) : accessory.addService(Service.TemperatureSensor, `${this.findaccessories.accessoryAttribute.name} Temperature Sensor`);
 
     // Temperature Sensor Accessory Information
     this.accessory.getService(Service.AccessoryInformation)
@@ -774,7 +776,7 @@ class HoneywellHomePlatformRoomSensor {
       this.refreshSensorStatus();
     })
 
-    // Watch for thermostat change events
+    // Watch for Senor change events
     // We put in a debounce of 100ms so we don't make duplicate calls
     this.doSensorUpdate.pipe(tap(() => { this.SensorUpdateInProgress = true }), debounceTime(100)).subscribe(async () => {
       await this.pushChanges();
@@ -817,7 +819,7 @@ class HoneywellHomePlatformRoomSensor {
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
-      this.log.error(`Failed to update status of ${this.device.name}`, e.message);
+      this.log.error(`Failed to update status of ${this.findaccessories.accessoryAttribute.name} Room Sensor`, e.message);
     }
   }
 
@@ -855,6 +857,7 @@ class HoneywellHomePlatformRoomSensor {
     // set this to a valid value for CurrentTemperature
     const currentValue = this.CurrentTemperature;
 
+    this.doSensorUpdate.next();
     callback(null, currentValue);
   }
 
@@ -864,6 +867,7 @@ class HoneywellHomePlatformRoomSensor {
     // set this to a valid value for StatusLowBattery
     const currentValue = this.TemperatureStatusLowBattery;
 
+    this.doSensorUpdate.next();
     callback(null, currentValue);
   }
 
@@ -873,6 +877,7 @@ class HoneywellHomePlatformRoomSensor {
     // set this to a valid value for StatusLowBattery
     const currentValue = this.TemperatureActive;
 
+    this.doSensorUpdate.next();
     callback(null, currentValue);
   }
 
@@ -885,6 +890,7 @@ class HoneywellHomePlatformRoomSensor {
     // set this to a valid value for OccupancyDetected
     const currentValue = this.OccupancyDetected;
 
+    this.doSensorUpdate.next();
     callback(null, currentValue);
   }
 
@@ -894,6 +900,7 @@ class HoneywellHomePlatformRoomSensor {
     // set this to a valid value for Occupancy Active
     const currentValue = this.OccupancyActive;
 
+    this.doSensorUpdate.next();
     callback(null, currentValue);
   }
 
@@ -906,6 +913,7 @@ class HoneywellHomePlatformRoomSensor {
     // set this to a valid value for CurrentRelativeHumidity
     const currentValue = this.CurrentRelativeHumidity;
 
+    this.doSensorUpdate.next();
     callback(null, currentValue);
   }
 
@@ -915,6 +923,7 @@ class HoneywellHomePlatformRoomSensor {
     // set this to a valid value for CurrentRelativeHumidity
     const currentValue = this.HumidityActive;
 
+    this.doSensorUpdate.next();
     callback(null, currentValue);
   }
 
@@ -927,6 +936,7 @@ class HoneywellHomePlatformRoomSensor {
     // set this to a valid value for Motion Detected
     const currentValue = this.MotionDetected;
 
+    this.doSensorUpdate.next();
     callback(null, currentValue);
   }
 
@@ -936,6 +946,7 @@ class HoneywellHomePlatformRoomSensor {
     // set this to a valid value for Motion Active Status
     const currentValue = this.MotionActive;
 
+    this.doSensorUpdate.next();
     callback(null, currentValue);
   }
 }
