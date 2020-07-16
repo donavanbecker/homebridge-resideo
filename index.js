@@ -779,7 +779,6 @@ class HoneywellHomePlatformRoomSensor {
     // Watch for Senor change events
     // We put in a debounce of 100ms so we don't make duplicate calls
     this.doSensorUpdate.pipe(tap(() => { this.SensorUpdateInProgress = true }), debounceTime(100)).subscribe(async () => {
-      await this.pushChanges();
       this.SensorUpdateInProgress = false;
     })
 
@@ -852,7 +851,7 @@ class HoneywellHomePlatformRoomSensor {
    * Handle requests to get the current value of the "Tempeture Sensor" characteristics
    */
   handleCurrentTemperatureGet(callback) {
-    this.platform.debug('Triggered GET CurrentTemperature');
+    this.log.info('Triggered GET CurrentTemperature');
 
     // set this to a valid value for CurrentTemperature
     const currentValue = this.CurrentTemperature;
@@ -862,7 +861,7 @@ class HoneywellHomePlatformRoomSensor {
   }
 
   handeTemperatureStatusLowBatteryGet(callback) {
-    this.platform.debug('Triggered GET Status Low Battery');
+    this.log.info('Triggered GET Status Low Battery');
 
     // set this to a valid value for StatusLowBattery
     const currentValue = this.TemperatureStatusLowBattery;
@@ -872,7 +871,7 @@ class HoneywellHomePlatformRoomSensor {
   }
 
   handleTemperatureActiveGet(callback) {
-    this.platform.debug('Triggered GET Status Active');
+    this.log.info('Triggered GET Status Active');
 
     // set this to a valid value for StatusLowBattery
     const currentValue = this.TemperatureActive;
@@ -885,7 +884,7 @@ class HoneywellHomePlatformRoomSensor {
    * Handle requests to get the current value of the "Occupancy Sensor" characteristics
    */
   handleOccupancyDetectedGet(callback) {
-    this.platform.debug('Triggered GET OccupancyDetected');
+    this.log.info('Triggered GET OccupancyDetected');
 
     // set this to a valid value for OccupancyDetected
     const currentValue = this.OccupancyDetected;
@@ -895,7 +894,7 @@ class HoneywellHomePlatformRoomSensor {
   }
 
   handleOccupancyActiveGet(callback) {
-    this.platform.debug('Triggered GET Occupancy Status Active');
+    this.log.info('Triggered GET Occupancy Status Active');
 
     // set this to a valid value for Occupancy Active
     const currentValue = this.OccupancyActive;
@@ -908,7 +907,7 @@ class HoneywellHomePlatformRoomSensor {
    * Handle requests to get the current value of the "Humidity Sensor" characteristics
    */
   handleCurrentRelativeHumidityGet(callback) {
-    this.platform.debug('Triggered GET CurrentRelativeHumidity');
+    this.log.info('Triggered GET CurrentRelativeHumidity');
 
     // set this to a valid value for CurrentRelativeHumidity
     const currentValue = this.CurrentRelativeHumidity;
@@ -918,7 +917,7 @@ class HoneywellHomePlatformRoomSensor {
   }
 
   handleHumidityActiveGet(callback) {
-    this.platform.debug('Triggered GET CurrentRelativeHumidity');
+    this.log.info('Triggered GET CurrentRelativeHumidity');
 
     // set this to a valid value for CurrentRelativeHumidity
     const currentValue = this.HumidityActive;
@@ -931,7 +930,7 @@ class HoneywellHomePlatformRoomSensor {
    * Handle requests to get the current value of the "Motion Sensor" characteristics
    */
   handleMotionDetectedGet(callback) {
-    this.platform.debug('Triggered GET Motion Detected');
+    this.log.info('Triggered GET Motion Detected');
 
     // set this to a valid value for Motion Detected
     const currentValue = this.MotionDetected;
@@ -941,7 +940,7 @@ class HoneywellHomePlatformRoomSensor {
   }
 
   handleMotionStatusActiveGet(callback) {
-    this.platform.debug('Triggered GET Motion Active Status');
+    this.log.info('Triggered GET Motion Active Status');
 
     // set this to a valid value for Motion Active Status
     const currentValue = this.MotionActive;
