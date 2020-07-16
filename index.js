@@ -176,6 +176,7 @@ class HoneywellHomePlatform {
             this.log.debug(`Found ${group.rooms.length} group.rooms`);
             this.log.debug(group.rooms);
             this.log.debug(room);
+          }
             {
               const accessory = await this.rp.get(`https://api.honeywell.com/v2/devices/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
                 qs: {
@@ -186,6 +187,7 @@ class HoneywellHomePlatform {
                 this.log.debug(`Found ${accessory.rooms.length} accessory.rooms`);
                 this.log.debug(group.rooms);
                 this.log.debug(roomaccessories);
+              }
                 for (const accessories of accessory.rooms) {
                   this.log.debug(accessory.rooms);
                   this.log.debug(accessories);
@@ -194,8 +196,8 @@ class HoneywellHomePlatform {
                     this.log.debug(accessories.accessories);
                     this.log.debug(findaccessories);
                     if (findaccessories.accessoryAttribute.type === 'Thermostat' || 'IndoorAirSensor') {
-                      this.log.info(`${room}+${accessories.id}+${findaccessories.accessoryId}`);
-                      const UUID = UUIDGen.generate(`${room}+${accessories.id}+${findaccessories.accessoryId}`);
+                      this.log.debug(`UDID: ${accessories.name}${findaccessories.accessoryAttribute.type}${findaccessories.accessoryAttribute.serialNumber}`);
+                      const UUID = UUIDGen.generate(`${accessories.name}${findaccessories.accessoryAttribute.type}${findaccessories.accessoryAttribute.serialNumber}`);
 
                       // Mark the accessory as found so it will not be removed
                       if (!this.activeAccessories.includes(UUID)) {
@@ -205,7 +207,7 @@ class HoneywellHomePlatform {
                       if (!this.accessories[UUID]) {
                         // this is a new accessory we haven't seen before
                         this.log.info(`Registering new device: ${accessories.name} ${findaccessories.accessoryAttribute.type}`);
-                        this.accessories[UUID] = new Accessory(accessories.name, UUID);
+                        this.accessories[UUID] = new Accessory(`${accessories.name} ${findaccessories.accessoryAttribute.type}`, UUID);
                         if (findaccessories.accessoryAttribute.type === 'Thermostat') {
                           this.startAccessory(this.accessories[UUID], device, location.locationID);
                         } else if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor') {
@@ -231,8 +233,8 @@ class HoneywellHomePlatform {
           }
         }
       }
-    }
-  }
+    
+  
 
   /**
    * Starts the accessory
@@ -709,7 +711,7 @@ class HoneywellHomePlatformRoomSensor {
     this.updateFirmwareInfo();
 
     // Set Name
-    this.service.setCharacteristic(Characteristic.Name, this.findaccessories.accessoryAttribute.name);
+    this.service.setCharacteristic(Characteristic.Name, `${this.findaccessories.accessoryAttribute.name} Temperature Sensor`);
 
     // Do initial device parse
     this.parseStatus();
@@ -728,7 +730,7 @@ class HoneywellHomePlatformRoomSensor {
 
     // Occupancy Sensor
     this.occupancyService = accessory.getService(Service.OccupancySensor) ?
-      accessory.getService(Service.OccupancySensor) : accessory.addService(Service.OccupancySensor, `${this.device.name} Fan`);
+      accessory.getService(Service.OccupancySensor) : accessory.addService(Service.OccupancySensor, `${this.findaccessories.accessoryAttribute.name} Occupancy Sensor`);
 
     // Set Occupancy Sensor Active
     this.occupancyService
@@ -742,7 +744,7 @@ class HoneywellHomePlatformRoomSensor {
 
     // Humidity Sensor
     this.humidityService = accessory.getService(Service.HumiditySensor) ?
-      accessory.getService(Service.HumiditySensor) : accessory.addService(Service.HumiditySensor, `${this.device.name} Fan`);
+      accessory.getService(Service.HumiditySensor) : accessory.addService(Service.HumiditySensor, `${this.findaccessories.accessoryAttribute.name} Humidity Sensor`);
 
     // Set Humidity Sensor Active
     this.humidityService
@@ -756,7 +758,7 @@ class HoneywellHomePlatformRoomSensor {
 
     // Motion Sensor
     this.motionService = accessory.getService(Service.HumiditySensor) ?
-      accessory.getService(Service.HumiditySensor) : accessory.addService(Service.HumiditySensor, `${this.device.name} Fan`);
+      accessory.getService(Service.HumiditySensor) : accessory.addService(Service.HumiditySensor, `${this.findaccessories.accessoryAttribute.name} Motion Sensor`);
 
     // Set Motion Sensor Active
     this.motionService
