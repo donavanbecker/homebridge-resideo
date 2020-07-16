@@ -193,10 +193,9 @@ class HoneywellHomePlatform {
                     this.log.debug(`Found ${accessories.accessories.length} accessories.accessories`);
                     this.log.debug(accessories.accessories);
                     this.log.debug(findaccessories);
-                    this.log.debug(findaccessories.accessoryAttribute.softwareRevision);
                     if (findaccessories.accessoryAttribute.type === 'Thermostat' || 'IndoorAirSensor') {
-                      this.log.debug(device.deviceID);
-                      const UUID = UUIDGen.generate(device.deviceID);
+                      this.log.info(`${room}+${accessories.id}+${findaccessories.accessoryId}`);
+                      const UUID = UUIDGen.generate(`${room}+${accessories.id}+${findaccessories.accessoryId}`);
 
                       // Mark the accessory as found so it will not be removed
                       if (!this.activeAccessories.includes(UUID)) {
@@ -205,8 +204,8 @@ class HoneywellHomePlatform {
 
                       if (!this.accessories[UUID]) {
                         // this is a new accessory we haven't seen before
-                        this.log.info(`Registering new device: ${findaccessories.accessoryAttribute.name} - ${findaccessories.accessoryAttribute.serialNumber}`);
-                        this.accessories[UUID] = new Accessory(findaccessories.accessoryAttribute.name, UUID);
+                        this.log.info(`Registering new device: ${accessories.name} ${findaccessories.accessoryAttribute.type}`);
+                        this.accessories[UUID] = new Accessory(accessories.name, UUID);
                         if (findaccessories.accessoryAttribute.type === 'Thermostat') {
                           this.startAccessory(this.accessories[UUID], device, location.locationID);
                         } else if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor') {
@@ -215,7 +214,7 @@ class HoneywellHomePlatform {
                         this.api.registerPlatformAccessories('homebridge-honeywell-home', 'HoneywellHome', [this.accessories[UUID]]);
                       } else {
                         // this is an existing accessory
-                        this.log.info(`Loading existing device: ${findaccessories.accessoryAttribute.name} - ${findaccessories.accessoryAttribute.serialNumber}`);
+                        this.log.info(`Loading existing device: ${accessories.name} ${findaccessories.accessoryAttribute.type}`);
                         if (findaccessories.accessoryAttribute.type === 'Thermostat') {
                           this.startAccessory(this.accessories[UUID], device, location.locationID);
                         } else if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor') {
@@ -223,7 +222,7 @@ class HoneywellHomePlatform {
                         }
                       }
                     } else {
-                      this.debug(`Ignoring device named ${findaccessories.accessoryAttribute.name} as it is offline.`)
+                      this.debug(`Ignoring device named ${accessories.name} ${findaccessories.accessoryAttribute.type} as it is offline.`)
                     }
                   }
                 }
