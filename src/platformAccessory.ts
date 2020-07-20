@@ -1,8 +1,9 @@
-import { Service, PlatformAccessory, CharacteristicValue, CharacteristicSetCallback, CharacteristicGetCallback } from 'homebridge';
+import { Service, PlatformAccessory } from 'homebridge';
 
 import { HoneywellThermostatPlatform } from './platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
+import { HoneywellUrl } from './settings';
 
 /**
  * Platform Accessory
@@ -11,8 +12,6 @@ import { debounceTime, skipWhile, tap } from 'rxjs/operators';
  */
 export class ThermostatPlatformAccessory {
   private service: Service;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private fanService: Service | any;
 
   /**
    * These are just used to create a working example
@@ -58,6 +57,10 @@ export class ThermostatPlatformAccessory {
   deviceFan!: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   log!: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fanService: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  honeywellMode: any;
   
 
   constructor(
@@ -96,6 +99,12 @@ export class ThermostatPlatformAccessory {
     this.Active;
     this.TargetFanState;
     this.fanMode;
+
+    // this is subject we use to track when we need to POST changes to the Honeywell API
+    this.doThermostatUpdate = new Subject();
+    this.thermostatUpdateInProgress = false;
+    this.doFanUpdate = new Subject();
+    this.fanUpdateInProgress = false;
 
     // set accessory information
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
@@ -152,7 +161,8 @@ export class ThermostatPlatformAccessory {
 
 
     // Fan Controls
-    this.fanService = accessory.getService(this.platform.Service.Fanv2) ?
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const fanService = accessory.getService(this.platform.Service.Fanv2) ?
       accessory.getService(this.platform.Service.Fanv2) : accessory.addService(this.platform.Service.Fanv2, `${this.device.name} Fan`);
 
     this.fanService
@@ -251,16 +261,17 @@ export class ThermostatPlatformAccessory {
    */
   async refreshStatus() {
     try {
-      const device = await this.platform.axios.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}`, {
+      const device = await this.platform.axios.get(`${HoneywellUrl}/v2/devices/thermostats/${this.device.deviceID}`, {
         qs: {
           locationId: this.locationId,
         },
       });
-      const devicefan = await this.platform.axios.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/fan`, {
+      const devicefan = await this.platform.axios.get(`${HoneywellUrl}/v2/devices/thermostats/${this.device.deviceID}/fan`, {
         qs: {
           locationId: this.locationId,
         },
       });
+      // eslint-disable-next-line max-len
       this.platform.debug(`Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)} and Fan: ${JSON.stringify(devicefan)}`);
       this.device = device;
       this.deviceFan = devicefan;
@@ -276,7 +287,7 @@ export class ThermostatPlatformAccessory {
    * Asks the Honeywell Home API for the firmware version information
    */
   async updateFirmwareInfo() {
-    const rooms = await this.platform.axios.get(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/group/0/rooms`, {
+    const rooms = await this.platform.axios.get(`${HoneywellUrl}/v2/devices/thermostats/${this.device.deviceID}/group/0/rooms`, {
       qs: {
         locationId: this.locationId,
       },
@@ -296,23 +307,26 @@ export class ThermostatPlatformAccessory {
       thermostatSetpointStatus: 'TemporaryHold',
       autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
     };
+    this.log.warn(payload);
+    
 
     // Set the heat and cool set point value based on the selected mode
     if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
-      payload.heatSetpoint = this.toFahrenheit(this.TargetTemperature);
-      payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
+      payload.mode.heatSetpoint = this.toFahrenheit(this.TargetTemperature);
+      payload.mode.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
     } else if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.COOL) {
-      payload.coolSetpoint = this.toFahrenheit(this.TargetTemperature);
-      payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
+      payload.mode.coolSetpoint = this.toFahrenheit(this.TargetTemperature);
+      payload.mode.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
     } else if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.AUTO) {
-      payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
-      payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
+      payload.mode.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
+      payload.mode.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
     } else {
-      payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
-      payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
+      payload.mode.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
+      payload.mode.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
     }
 
-    this.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}`);
+    // eslint-disable-next-line max-len
+    this.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.mode.coolSetpoint}, heatSetpoint: ${payload.mode.heatSetpoint}`);
     this.platform.debug(JSON.stringify(payload));
 
     // Make the API request
