@@ -3,7 +3,7 @@ import { Service, PlatformAccessory } from 'homebridge';
 import { HoneywellThermostatPlatform } from './platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
-import { HoneywellUrl } from './settings';
+import { DeviceURL } from './settings';
 
 /**
  * Platform Accessory
@@ -261,12 +261,12 @@ export class ThermostatPlatformAccessory {
    */
   async refreshStatus() {
     try {
-      const device = await this.platform.axios.get(`${HoneywellUrl}/v2/devices/thermostats/${this.device.deviceID}`, {
+      const device = await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
         qs: {
           locationId: this.locationId,
         },
       });
-      const devicefan = await this.platform.axios.get(`${HoneywellUrl}/v2/devices/thermostats/${this.device.deviceID}/fan`, {
+      const devicefan = await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
         qs: {
           locationId: this.locationId,
         },
@@ -287,7 +287,7 @@ export class ThermostatPlatformAccessory {
    * Asks the Honeywell Home API for the firmware version information
    */
   async updateFirmwareInfo() {
-    const rooms = await this.platform.axios.get(`${HoneywellUrl}/v2/devices/thermostats/${this.device.deviceID}/group/0/rooms`, {
+    const rooms = await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/group/0/rooms`, {
       qs: {
         locationId: this.locationId,
       },
@@ -330,7 +330,7 @@ export class ThermostatPlatformAccessory {
     this.platform.debug(JSON.stringify(payload));
 
     // Make the API request
-    await this.platform.axios.post(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}`, {
+    await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
       qs: {
         locationId: this.locationId,
       },
@@ -464,7 +464,7 @@ export class ThermostatPlatformAccessory {
     this.platform.debug(JSON.stringify(payload));
 
     // Make the API request
-    await this.platform.axios.post(`https://api.honeywell.com/v2/devices/thermostats/${this.device.deviceID}/fan`, {
+    await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
       qs: {
         locationId: this.locationId,
       },

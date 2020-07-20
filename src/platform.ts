@@ -1,6 +1,6 @@
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
 
-import { PLATFORM_NAME, PLUGIN_NAME, HoneywellUrl, UIurl } from './settings';
+import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl } from './settings';
 import { ThermostatPlatformAccessory } from './platformAccessory';
 import { interval } from 'rxjs';
 import axios from 'axios';
@@ -123,7 +123,7 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let result: any;
     if (this.config.credentials.consumerSecret) {
-      result = await axios.get(`${HoneywellUrl}/oauth2/token`, {
+      result = await axios.get(AuthURL, {
         auth: {
           username: this.config.credentials.consumerKey,
           password: this.config.credentials.consumerSecret,
@@ -174,7 +174,7 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
     }
     
     // get the locations
-    const locations = await this.instance.get(`${HoneywellUrl}/v2/locations`);
+    const locations = await this.instance.get(LocationURL);
 
     this.log.warn(`Found ${locations.length} locations`);
 
@@ -186,7 +186,7 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
       const locationId = location.locationID;
       this.log.warn(locationId);
       this.log.warn(location);  
-      const devices = await this.instance.get(`${HoneywellUrl}/v2/devices`, {
+      const devices = await this.instance.get(DeviceURL, {
         qs: {
           locationId: location.locationID,
         },

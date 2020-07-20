@@ -11,7 +11,17 @@ export const PLUGIN_NAME = 'homebridge-honeywell-home';
 /**
  * This is the main url used to access honeywell API
  */
-export const HoneywellUrl = 'https://api.honeywell.com/';
+export const AuthURL = 'https://api.honeywell.com/oauth2/token';
+
+/**
+ * This is the main url used to access honeywell API
+ */
+export const DeviceURL = 'https://api.honeywell.com/v2/devices';
+
+/**
+ * This is the main url used to access honeywell API
+ */
+export const LocationURL = 'https://api.honeywell.com/v2/locations';
 
 /**
  * This is the url used to access UI Login to honeywell API
