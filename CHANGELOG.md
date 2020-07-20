@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/).
+All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
 ## 5.1.1 (2020-07-15)
 
@@ -9,9 +9,10 @@ All notable changes to this project will be documented in this file. This projec
 ### Changes
 
 - Added more logging for offline devices
+
   - now displays deviceID.
-  - now displays if device is Alive,  Provisioned, and Class `Thermostat`.
-  
+  - now displays if device is Alive, Provisioned, and Class `Thermostat`.
+
 ## 5.1.0 (2020-07-14)
 
 ## [Version 5.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.7...v5.1.0)
@@ -115,6 +116,7 @@ All notable changes to this project will be documented in this file. This projec
 ### [Version 4.4.4](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.3...v4.4.4)
 
 #### Dependency Updates
+
 - Update angularcli monorepo [#109](https://github.com/donavanbecker/homebridge-honeywell-home/pull/109)
 - Update dependency ts-node to v8.7.0 [#108](https://github.com/donavanbecker/homebridge-honeywell-home/pull/108)
 - Update angular monorepo to v9.0.7 [#107](https://github.com/donavanbecker/homebridge-honeywell-home/pull/107)
@@ -133,6 +135,7 @@ All notable changes to this project will be documented in this file. This projec
 ### [Version 4.4.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.1...v4.4.2)
 
 #### Dependency Updates
+
 - Security Bump - minimist from 1.2.0 to 1.2.5 [#104](https://github.com/donavanbecker/homebridge-honeywell-home/pull/104)
 - Update dependency @types/node to v12.12.30 [#103](https://github.com/donavanbecker/homebridge-honeywell-home/pull/103)
 - Update dependency tslint to v6 [#101](https://github.com/donavanbecker/homebridge-honeywell-home/pull/101)
@@ -145,6 +148,7 @@ All notable changes to this project will be documented in this file. This projec
 ### [Version 4.4.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.0...v4.4.1)
 
 #### Update to Config Schema to Support [Version 4.4.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.4.0) Rate limit Update
+
 - Please refrain from setting your optional `ttl` config lower then 1800, to better support everyone that uses this plugin.
 
 ## 4.4.0 (2020-03-06)
@@ -152,7 +156,9 @@ All notable changes to this project will be documented in this file. This projec
 ### [Version 4.4.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.3.2...v4.4.0)
 
 #### Honeywell Rate Limit
+
 ##### Made a [change](https://github.com/donavanbecker/homebridge-honeywell-home/blob/0ab08b50288b84faf40263952a85f3f5727f8e0e/index.js#L80) to the rate limit to better serve all users of this plugin that use it with [Config UI X](https://github.com/oznu/homebridge-config-ui-x)
+
 - Hopefully this will help lower the `rate limit has been exhausted` log you may be getting.
 - Please change your configs and `ttl` setting to be 1800 or more if you are setting it in options.
 
@@ -161,6 +167,7 @@ All notable changes to this project will be documented in this file. This projec
 ### [Version 4.3.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.3.1...v4.3.2)
 
 #### Dependency Updates
+
 - Update dependency @types/jasmine to v3.5.8 [#97](https://github.com/donavanbecker/homebridge-honeywell-home/pull/97)
 - Update angularcli monorepo [#96](https://github.com/donavanbecker/homebridge-honeywell-home/pull/96)
 - Update angular monorepo to v9.0.5 [#95](https://github.com/donavanbecker/homebridge-honeywell-home/pull/95)
@@ -176,6 +183,7 @@ All notable changes to this project will be documented in this file. This projec
 ### [Version 4.3.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.3.0...v4.3.1)
 
 #### Dependency Updates
+
 - Update dependency typescript to v3.8.2 [#87](https://github.com/donavanbecker/homebridge-honeywell-home/pull/87)
 - Update angularcli monorepo [#86](https://github.com/donavanbecker/homebridge-honeywell-home/pull/86)
 - Update angular monorepo to v9.0.2 [#85](https://github.com/donavanbecker/homebridge-honeywell-home/pull/85)
@@ -187,6 +195,7 @@ All notable changes to this project will be documented in this file. This projec
 ### [Version 4.3.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.2.0...v4.3.0)
 
 #### Major Dependency Updates
+
 - Update dependency @types/jasmine to v3.5.4 [#81](https://github.com/donavanbecker/homebridge-honeywell-home/pull/81)
 - Update angularcli monorepo [#80](https://github.com/donavanbecker/homebridge-honeywell-home/pull/80)
 - Update angular monorepo to v9.0.1 [79](https://github.com/donavanbecker/homebridge-honeywell-home/pull/79)
@@ -201,6 +210,7 @@ All notable changes to this project will be documented in this file. This projec
 ### [Version 4.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.1.1...v4.2.0)
 
 #### Major Dependency Updates
+
 - Update dependency @types/jasmine to v3.5.3 [#70](https://github.com/donavanbecker/homebridge-honeywell-home/pull/70)
 - Update dependency @angular-devkit/build-angular to v0.900.1 [#71](https://github.com/donavanbecker/homebridge-honeywell-home/pull/71)
 - Update dependency @angular/cli to v9 [#72](https://github.com/donavanbecker/homebridge-honeywell-home/pull/72)
