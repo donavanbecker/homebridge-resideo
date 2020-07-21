@@ -24,50 +24,31 @@ export class ThermostatPlatformAccessory {
 
   private modes: { Off: number; Heat: number; Cool: number; Auto: number; };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   CurrentTemperature: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TargetTemperature: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   CurrentHeatingCoolingState: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TargetHeatingCoolingState: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   CoolingThresholdTemperature: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   HeatingThresholdTemperature!: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   CurrentRelativeHumidity!: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TemperatureDisplayUnits!: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Active!: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TargetFanState!: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fanMode: any;
   thermostatUpdateInProgress!: boolean;
   
   fanUpdateInProgress!: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   doThermostatUpdate!: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   doFanUpdate!: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   deviceFan!: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   log!: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fanService: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   honeywellMode: any;
-  
 
   constructor(
     private readonly platform: HoneywellThermostatPlatform,
     private accessory: PlatformAccessory,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public device: any,
+      public device: any,
     public readonly locationId: string,
   ) {
     this.platform = platform;
@@ -161,8 +142,7 @@ export class ThermostatPlatformAccessory {
 
 
     // Fan Controls
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const fanService = accessory.getService(this.platform.Service.Fanv2) ?
+    this.fanService = accessory.getService(this.platform.Service.Fanv2) ?
       accessory.getService(this.platform.Service.Fanv2) : accessory.addService(this.platform.Service.Fanv2, `${this.device.name} Fan`);
 
     this.fanService
@@ -261,16 +241,16 @@ export class ThermostatPlatformAccessory {
    */
   async refreshStatus() {
     try {
-      const device = await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
-        qs: {
+      const device = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
+        params: {
           locationId: this.locationId,
         },
-      });
-      const devicefan = await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
-        qs: {
+      })).data;
+      const devicefan = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
+        params: {
           locationId: this.locationId,
         },
-      });
+      })).config;
       // eslint-disable-next-line max-len
       this.platform.debug(`Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)} and Fan: ${JSON.stringify(devicefan)}`);
       this.device = device;
@@ -287,11 +267,11 @@ export class ThermostatPlatformAccessory {
    * Asks the Honeywell Home API for the firmware version information
    */
   async updateFirmwareInfo() {
-    const rooms = await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/group/0/rooms`, {
-      qs: {
+    const rooms = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/group/0/rooms`, {
+      params: {
         locationId: this.locationId,
       },
-    });
+    })).data;
     this.accessory.context.firmwareRevision = rooms.rooms[0].accessories[0].accessoryAttribute.softwareRevision;
     this.platform.debug(`Fetched Thermostat FirmwareRevision: ${this.accessory.context.firmwareRevision}`); 
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
@@ -330,11 +310,10 @@ export class ThermostatPlatformAccessory {
     this.platform.debug(JSON.stringify(payload));
 
     // Make the API request
-    await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
-      qs: {
+    await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
+      params: {
         locationId: this.locationId,
       },
-      json: payload,
     });
 
     // Refresh the status from the API
@@ -357,7 +336,6 @@ export class ThermostatPlatformAccessory {
     this.fanService.updateCharacteristic(this.platform.Characteristic.Active, this.Active);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setTargetHeatingCoolingState(value: any, callback: (arg0: null) => void) {
     this.platform.debug(`Set TargetHeatingCoolingState: ${value}`);
 
@@ -375,7 +353,6 @@ export class ThermostatPlatformAccessory {
     callback(null);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setHeatingThresholdTemperature(value: any, callback: (arg0: null) => void) {
     this.platform.debug(`Set HeatingThresholdTemperature: ${value}`);
     this.HeatingThresholdTemperature = value;
@@ -383,7 +360,6 @@ export class ThermostatPlatformAccessory {
     callback(null);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setCoolingThresholdTemperature(value: any, callback: (arg0: null) => void) {
     this.platform.debug(`Set CoolingThresholdTemperature: ${value}`);
     this.CoolingThresholdTemperature = value;
@@ -391,7 +367,6 @@ export class ThermostatPlatformAccessory {
     callback(null);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setTargetTemperature(value: any, callback: (arg0: null) => void) {
     this.platform.debug(`Set TargetTemperature:': ${value}`);
     this.TargetTemperature = value;
@@ -399,7 +374,6 @@ export class ThermostatPlatformAccessory {
     callback(null);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setTemperatureDisplayUnits(value: any, callback: (arg0: null) => void) {
     this.platform.debug(`Set TemperatureDisplayUnits: ${value}`);
     this.log.warn('Changing the Hardware Display Units from HomeKit is not supported.');
@@ -464,11 +438,10 @@ export class ThermostatPlatformAccessory {
     this.platform.debug(JSON.stringify(payload));
 
     // Make the API request
-    await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
-      qs: {
+    await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, payload, {
+      params: {
         locationId: this.locationId,
       },
-      json: payload,
     });
 
     // Refresh the status from the API
@@ -478,7 +451,6 @@ export class ThermostatPlatformAccessory {
   /**
    * Updates the status for each of the HomeKit Characteristics
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setActive(value: any, callback: (arg0: null) => void) {
     this.platform.debug(`Set Active State: ${value}`);
     this.Active = value;
@@ -486,7 +458,6 @@ export class ThermostatPlatformAccessory {
     callback(null);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setTargetFanState(value: any, callback: (arg0: null) => void) {
     this.platform.debug(`Set Target Fan State: ${value}`);
     this.TargetFanState = value;
