@@ -1,9 +1,9 @@
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
+import { interval } from 'rxjs';
+import axios, { AxiosInstance } from 'axios';
 
 import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl } from './settings';
 import { ThermostatPlatformAccessory } from './platformAccessory';
-import { interval } from 'rxjs';
-import axios from 'axios';
 
 /**
  * HomebridgePlatform
@@ -16,10 +16,10 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
 
   // this is used to track restored cached accessories
   public readonly accessories: PlatformAccessory[] = [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  axios: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  instance: any;
+
+  public axios: AxiosInstance = axios.create({
+    responseType: 'json',
+  });
 
   constructor(
     public readonly log: Logger,
@@ -46,18 +46,13 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
       this.log.error(e.message);
       return;
     }
- 
-    const instance = axios.create({
-      headers: {
-        auth: {
-          bearer: () => this.config.credentials.accessToken,
-        },
-        qs: {
-          apikey: this.config.credentials.consumerKey,
-        },
-        json: true,
-      }});
-    this.instance = instance;
+
+    // setup axios interceptor to add headers / api key to each request
+    this.axios.interceptors.request.use((config) => {
+      config.headers.Authorization = 'Bearer ' + this.config.credentials.accessToken;
+      config.params.apiKey = this.config.credentials.consumerKey;
+      return config;
+    });
 
     // When this event is fired it means Homebridge has restored all cached accessories from disk.
     // Dynamic Platform plugins should only register new accessories after this event was fired,
@@ -120,29 +115,31 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
    * Exchange the refresh token for an access token
    */
   async getAccessToken() {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let result: any;
+
     if (this.config.credentials.consumerSecret) {
-      result = await axios.get(AuthURL, {
-        auth: {
-          username: this.config.credentials.consumerKey,
-          password: this.config.credentials.consumerSecret,
-        },
-        data: {
+      result = (await axios.post(AuthURL, 
+        {
           grant_type: 'refresh_token',
           refresh_token: this.config.credentials.refreshToken,
         },
-        responseType: 'json',
-      });
+        {
+          auth: {
+            username: this.config.credentials.consumerKey,
+            password: this.config.credentials.consumerSecret,
+          },
+          responseType: 'json',
+        },
+      )).data;
     } else {
       // if no consumerSecret is defined, attempt to use the shared consumerSecret
       try {
-        result = await axios.post(UIurl, {
-          json: {
+        result = (await axios.post(UIurl, 
+          {
             consumerKey: this.config.credentials.consumerKey,
             refresh_token: this.config.credentials.refreshToken,
           },
-        });
+        )).data;
       } catch (e) {
         this.log.error('Failed to exchange refresh token for an access token.', e.message);
         throw e;
@@ -174,7 +171,7 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
     }
     
     // get the locations
-    const locations = await this.instance.get(LocationURL);
+    const locations = (await this.axios.get(LocationURL)).data;
 
     this.log.warn(`Found ${locations.length} locations`);
 
@@ -182,15 +179,16 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
     for (const location of locations) {
       this.log.warn(`Getting devices for ${location.name}...`);
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const locationId = location.locationID;
       this.log.warn(locationId);
       this.log.warn(location);  
-      const devices = await this.instance.get(DeviceURL, {
-        qs: {
+
+      const devices = (await this.axios.get(DeviceURL, {
+        params: {
           locationId: location.locationID,
         },
-      });
+      })).data;
+
       this.log.warn(devices);
       this.log.warn(`Found ${devices.length} devices at ${location.name}.`);
 
@@ -239,8 +237,8 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
           }
 
         } else {
-          // eslint-disable-next-line max-len
-          this.log.warn(`Ignoring device named ${device.name} - ${device.deviceID}  as it is offline. Alive: ${device.isAlive}, Provisioned: ${device.isProvisioned}, Class: ${device.deviceClass}`);
+          this.log.warn(`Ignoring device named ${device.name} - ${device.deviceID}  as it is offline. ` + 
+          `Alive: ${device.isAlive}, Provisioned: ${device.isProvisioned}, Class: ${device.deviceClass}`);
         }
       }
     }
@@ -250,7 +248,6 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
    * If debug level logging is turned on, log to log.info
    * Otherwise send debug logs to log.debug
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   debug(log: any) {
     if (this.config.options.debug) {
       this.log.info('[HONEYWELL DEBUG]', ...log);
