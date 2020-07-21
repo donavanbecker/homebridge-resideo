@@ -13,15 +13,6 @@ import { DeviceURL } from './settings';
 export class ThermostatPlatformAccessory {
   private service: Service;
 
-  /**
-   * These are just used to create a working example
-   * You should implement your own code to track the state of your accessory
-   */
-  private exampleStates = {
-    On: false,
-    Brightness: 100,
-  }
-
   private modes: { Off: number; Heat: number; Cool: number; Auto: number; };
 
   CurrentTemperature: any;
