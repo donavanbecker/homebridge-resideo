@@ -2,7 +2,7 @@
     "pluginAlias": "HoneywellHome",
     "pluginType": "platform",
     "singular": true,
-    "headerDisplay": "<p align='center'><img width='250px' src='https://user-images.githubusercontent.com/3979615/71876008-d99d7400-3179-11ea-909b-9d2a3d1e670f.png'></p>\n\nThe **Homebridge Honeywell Home** plugin allows you to control your T5, T6 and T9 Honeywell Home thermostats from HomeKit. To get started link your Honeywell Home account using the button below.",
+    "headerDisplay": "<p align='center'><img width='250px' src='https://user-images.githubusercontent.com/3979615/71876008-d99d7400-3179-11ea-909b-9d2a3d1e670f.png'></p>\n\nThe **Homebridge Honeywell Home** plugin allows you to control your T5, T6 and T9 Honeywell Home thermostats from HomeKit. \n\nIf you have room sensors for your T9 thermostat, checkout my other plugin **homebridge-honeywell-home-roomsensors** To be able to access your Room Sensor data in HomeKit.  To get started link your Honeywell Home account using the button below.",
     "footerDisplay": "Your Honeywell Home account has been linked. Please raise any issues on our [project page](https://github.com/homebridge-plugins/homebridge-honeywell-home/issues).",
     "schema": {
       "type": "object",
@@ -62,6 +62,21 @@
           "expandable": true,
           "expanded": false,
           "items": [
+            {
+              "type": "fieldset",
+              "title": "Manual Setup",
+              "expandable": true,
+              "expanded": false,
+              "items": [
+                {
+                  "type": "help",
+                  "helpvalue": "<h5></h5><em class='primary-text'>This is for Manual Setup Only.</em>"
+                },
+                "credentials.consumerKey",
+                "credentials.consumerSecret",
+                "credentials.refreshToken"
+              ]
+            },
             {
               "type": "help",
               "helpvalue": "<h5>TTL</h5><em class='primary-text'>TTL indicates the number of seconds between polls of the Honeywell Home service.</em>"
