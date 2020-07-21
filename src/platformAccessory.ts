@@ -1,6 +1,6 @@
 import { Service, PlatformAccessory } from 'homebridge';
 
-import { HoneywellThermostatPlatform } from './platform';
+import { HoneywellHomeThermostatPlatform } from './platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
 import { DeviceURL } from './settings';
@@ -37,7 +37,7 @@ export class ThermostatPlatformAccessory {
   honeywellMode: any;
 
   constructor(
-    private readonly platform: HoneywellThermostatPlatform,
+    private readonly platform: HoneywellHomeThermostatPlatform,
     private accessory: PlatformAccessory,
       public device: any,
     public readonly locationId: string,
