@@ -226,7 +226,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
 
           } else {
             // the accessory does not yet exist, so we need to create it
-            this.log.info('Adding new accessory:', device.name);
+            this.log.info('Adding new accessory: ', device.name);
             this.log.debug(`Registering new device: ${device.name} - ${device.deviceID}`);
 
             // create a new accessory
