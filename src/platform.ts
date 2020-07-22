@@ -49,6 +49,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
       request.params.apikey = this.config.credentials.consumerKey;
       request.headers['Content-Type'] = 'application/json';
       return request;
+    });
 
     // When this event is fired it means Homebridge has restored all cached accessories from disk.
     // Dynamic Platform plugins should only register new accessories after this event was fired,
