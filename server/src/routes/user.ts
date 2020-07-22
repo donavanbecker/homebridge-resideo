@@ -8,8 +8,8 @@ router.post('/token', async (req: any, res, next) => {
   try {
     const token = await rp.post('https://api.honeywell.com/oauth2/token', {
       auth: {
-        user: process.env.HONEYWELL_OAUTH_KEY,
-        pass: process.env.HONEYWELL_OAUTH_SECRET,
+        user: req.body.consumerKey,
+        pass: req.body.consumerSecret,
       },
       form: {
         grant_type: 'authorization_code',
