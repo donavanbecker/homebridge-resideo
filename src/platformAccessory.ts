@@ -246,8 +246,8 @@ export class ThermostatPlatformAccessory {
       })).data;
       this.device = device;
       this.deviceFan = deviceFan;
-      this.platform.log.warn(this.device.settings.fan.allowedModes);
-      this.platform.log.warn(deviceFan);
+      this.platform.log.debug(this.device.settings.fan.allowedModes);
+      this.platform.log.debug(deviceFan);
       // eslint-disable-next-line max-len
       this.platform.log.debug(`Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)} and Fan: ${JSON.stringify(this.deviceFan)}`);
       this.platform.log.debug(JSON.stringify(this.device.changeableValues.mode));
