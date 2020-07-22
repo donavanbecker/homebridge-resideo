@@ -36,7 +36,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
     this.log = log;
     this.config = config;
     this.api = api;
-    
+
 
     // verify the config
     try {
@@ -46,7 +46,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
       this.log.error(e.message);
       return;
     }
-
+    
     // setup axios interceptor to add headers / api key to each request
     this.axios.interceptors.request.use((config) => {
       config.headers.Authorization = 'Bearer ' + this.config.credentials.accessToken;
