@@ -200,6 +200,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
       for (const device of devices) {
 
         this.log.debug(device);
+        this.log.debug(device.operationStatus.fanRequest);
 
         // generate a unique id for the accessory this should be generated from
         // something globally unique, but constant, for example, the device serial
