@@ -243,7 +243,7 @@ export class ThermostatPlatformAccessory {
         params: {
           locationId: this.locationId,
         },
-      })).config;
+      })).data;
       this.platform.log.warn(this.deviceFan.changeableValues);
       this.platform.log.warn(this.device);
       this.platform.log.warn(this.deviceFan);
