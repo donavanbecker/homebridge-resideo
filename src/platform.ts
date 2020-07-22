@@ -130,6 +130,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
           },
           responseType: 'json',
         },
+        
       )).data;
     } else {
       // if no consumerSecret is defined, attempt to use the shared consumerSecret
@@ -147,7 +148,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
     }
 
     this.config.credentials.accessToken = result.access_token;
-    this.config.warn('Got access token:', this.config.credentials.accessToken);
+    this.log.warn('Got access token:', this.config.credentials.accessToken);
 
     // check if the refresh token has changed
     if (result.refresh_token !== this.config.credentials.refreshToken) {
