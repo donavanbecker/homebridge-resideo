@@ -239,17 +239,17 @@ export class ThermostatPlatformAccessory {
           locationId: this.locationId,
         },
       })).data;
-      const devicefan = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
+      const deviceFan = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
         params: {
           locationId: this.locationId,
         },
       })).data;
+      this.device = device;
+      this.deviceFan = deviceFan;
       this.platform.log.warn(this.device.settings.fan.allowedModes);
-      this.platform.log.warn(this.deviceFan);
+      this.platform.log.warn(deviceFan);
       // eslint-disable-next-line max-len
       this.platform.log.debug(`Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)} and Fan: ${JSON.stringify(this.deviceFan)}`);
-      this.device = device;
-      this.deviceFan = devicefan;
       this.platform.log.debug(JSON.stringify(this.device.changeableValues.mode));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
