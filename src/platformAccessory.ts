@@ -299,7 +299,7 @@ export class ThermostatPlatformAccessory {
     }
 
     // eslint-disable-next-line max-len
-    this.platform.log.debug(`Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}`);
+    this.platform.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}`);
     this.platform.log.debug(JSON.stringify(payload));
 
     // Make the API request
