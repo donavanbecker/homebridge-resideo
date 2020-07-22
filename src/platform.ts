@@ -11,7 +11,7 @@ import { ThermostatPlatformAccessory } from './platformAccessory';
  * This class is the main constructor for your plugin, this is where you should
  * parse the user config and discover/register accessories with Homebridge.
  */
-export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
+export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service = this.api.hap.Service;
   public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
 
@@ -32,7 +32,7 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
     if (!this.config) {
       return;
     }
-
+      
     // verify the config
     try {
       this.verifyConfig();
@@ -49,7 +49,6 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
       request.params.apikey = this.config.credentials.consumerKey;
       request.headers['Content-Type'] = 'application/json';
       return request;
-    });
 
     // When this event is fired it means Homebridge has restored all cached accessories from disk.
     // Dynamic Platform plugins should only register new accessories after this event was fired,
@@ -249,5 +248,4 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
       }
     }
   }
-
 }
