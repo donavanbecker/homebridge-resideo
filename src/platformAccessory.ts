@@ -244,7 +244,6 @@ export class ThermostatPlatformAccessory {
           locationId: this.locationId,
         },
       })).data;
-      this.platform.log.warn(this.deviceFan.changeableValues);
       this.platform.log.warn(this.device);
       this.platform.log.warn(this.deviceFan);
       // eslint-disable-next-line max-len
