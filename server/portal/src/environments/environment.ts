@@ -8,8 +8,7 @@ export const environment = {
     base: `http://${document.location.hostname}:3000`,
   },
   honeywell: {
-    redirectUrl: 'http://localhost:4500/link-account',
-    consumerKey: 'pw23WBOkvsBABsHPVXTkA9ryRiPAX2OX'
+    redirectUrl: 'http://localhost:4500/link-account'
   }
 };
 

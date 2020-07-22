@@ -1,6 +1,7 @@
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
 import { interval } from 'rxjs';
 import axios, { AxiosInstance } from 'axios';
+import * as qs from 'querystring';
 
 import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl } from './settings';
 import { ThermostatPlatformAccessory } from './platformAccessory';
@@ -28,15 +29,9 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
   ) {
     this.log.debug('Finished initializing platform:', this.config.name);
     // only load if configured
-    if (!config) {
+    if (!this.config) {
       return;
     }
-
-    // set the class properties
-    this.log = log;
-    this.config = config;
-    this.api = api;
-    
 
     // verify the config
     try {
@@ -48,20 +43,26 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
     }
 
     // setup axios interceptor to add headers / api key to each request
-    this.axios.interceptors.request.use((config) => {
-      config.headers.Authorization = 'Bearer ' + this.config.credentials.accessToken;
-      config.params.apiKey = this.config.credentials.consumerKey;
-      return config;
+    this.axios.interceptors.request.use((request) => {
+      request.headers.Authorization = 'Bearer ' + this.config.credentials.accessToken;
+      request.params = request.params || {};
+      request.params.apikey = this.config.credentials.consumerKey;
+      request.headers['Content-Type'] = 'application/json';
+      return request;
     });
 
     // When this event is fired it means Homebridge has restored all cached accessories from disk.
     // Dynamic Platform plugins should only register new accessories after this event was fired,
     // in order to ensure they weren't added to homebridge already. This event can also be used
     // to start discovery of new accessories.
-    this.api.on('didFinishLaunching', () => {
+    this.api.on('didFinishLaunching', async () => {
       log.debug('Executed didFinishLaunching callback');
       // run the method to discover / register your devices as accessories
-      this.discoverDevices();
+      try {
+        await this.discoverDevices();
+      } catch (e) {
+        this.log.error('Failed to refresh access token.', e.message);
+      }
 
       interval((1800 / 3) * 1000).subscribe(async () => {
         try {
@@ -93,7 +94,6 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
     }
 
     this.config.options.ttl = this.config.options.ttl || 1800; // default 1800 seconds
-    this.config.options.debug = this.config.options.debug || false; // default false
 
     if (!this.config.credentials.consumerSecret && this.config.options.ttl < 1800) {
       this.log.debug('TTL must be set to 1800 or higher unless you setup your own consumerSecret.');
@@ -118,20 +118,24 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
     let result: any;
 
     if (this.config.credentials.consumerSecret) {
-      result = (await axios.post(AuthURL, 
-        {
+      result = (await axios({
+        url: AuthURL,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        auth: {
+          username: this.config.credentials.consumerKey,
+          password: this.config.credentials.consumerSecret,
+        },
+        data: qs.stringify({
           grant_type: 'refresh_token',
           refresh_token: this.config.credentials.refreshToken,
-        },
-        {
-          auth: {
-            username: this.config.credentials.consumerKey,
-            password: this.config.credentials.consumerSecret,
-          },
-          responseType: 'json',
-        },
-      )).data;
+        }),
+        responseType: 'json',
+      })).data;
     } else {
+      this.log.warn('Please re-link your account in the Homebridge UI.');
       // if no consumerSecret is defined, attempt to use the shared consumerSecret
       try {
         result = (await axios.post(UIurl, 
@@ -147,12 +151,12 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
     }
 
     this.config.credentials.accessToken = result.access_token;
-    this.config.warn('Got access token:', this.config.credentials.accessToken);
+    this.log.debug('Got access token:', this.config.credentials.accessToken);
 
     // check if the refresh token has changed
     if (result.refresh_token !== this.config.credentials.refreshToken) {
       // need some way to store this???
-      this.log.warn('New refresh token:', result.refresh_token);
+      this.log.debug('New refresh token:', result.refresh_token);
     }
   }
 
@@ -180,8 +184,8 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
       this.log.warn(`Getting devices for ${location.name}...`);
 
       const locationId = location.locationID;
-      this.log.warn(locationId);
-      this.log.warn(location);  
+      this.log.debug(locationId);
+      this.log.debug(location);  
 
       const devices = (await this.axios.get(DeviceURL, {
         params: {
@@ -189,11 +193,13 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
         },
       })).data;
 
-      this.log.warn(devices);
+      this.log.debug(devices);
       this.log.warn(`Found ${devices.length} devices at ${location.name}.`);
 
       // loop over the discovered devices and register each one if it has not already been registered
       for (const device of devices) {
+
+        this.log.debug(device);
 
         // generate a unique id for the accessory this should be generated from
         // something globally unique, but constant, for example, the device serial
@@ -208,7 +214,7 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
           if (existingAccessory) {
             // the accessory already exists
             this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
-            this.log.warn(`Registering new device: ${device.name} - ${device.deviceID}`);
+            this.log.info(`Registering new device: ${device.name} - ${device.deviceID}`);
             // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
             //existingAccessory.context.device = device;
             //this.api.updatePlatformAccessories([existingAccessory]);
@@ -219,10 +225,10 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
 
           } else {
             // the accessory does not yet exist, so we need to create it
-            this.log.info('Adding new accessory:', device.exampleDisplayName);
+            this.log.info('Adding new accessory:', device.name);
 
             // create a new accessory
-            const accessory = new this.api.platformAccessory(device.exampleDisplayName, uuid);
+            const accessory = new this.api.platformAccessory(device.name, uuid);
 
             // store a copy of the device object in the `accessory.context`
             // the `context` property can be used to store any data about the accessory you may need
@@ -244,15 +250,4 @@ export class HoneywellThermostatPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  /**
-   * If debug level logging is turned on, log to log.info
-   * Otherwise send debug logs to log.debug
-   */
-  debug(log: any) {
-    if (this.config.options.debug) {
-      this.log.info('[HONEYWELL DEBUG]', ...log);
-    } else{
-      this.log.debug('[DEBUG]', ...log);
-    }
-  }
 }

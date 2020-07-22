@@ -46,10 +46,6 @@
               "type": "number",
               "minimum": 600,
               "description": "Indicates the number of seconds between polls of the Honeywell Home service."
-            },
-            "debug": {
-              "title": "Debug Mode",
-              "type": "boolean"
             }
           }
         }
@@ -69,12 +65,7 @@
             {
               "key": "options.ttl",
               "notitle": true
-            },
-            {
-              "type": "help",
-              "helpvalue": "<h5>Debug Mode</h5><em class='primary-text'>Indicate if debug level logging should be enabled.</em>"
-            },
-            "options.debug"
+            }
           ]
         }
       ]
