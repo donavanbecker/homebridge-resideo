@@ -78,10 +78,8 @@ export class ThermostatPlatformAccessory {
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(this.platform.Characteristic.Model, this.device.deviceModel)
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID);
-
-    // set accessory firmware
-    this.updateFirmwareInfo();  
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID)
+      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
 
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
@@ -258,21 +256,6 @@ export class ThermostatPlatformAccessory {
     } catch (e) {
       this.platform.log.error(`Failed to update status of ${this.device.name}`, e.message);
     }
-  }
-  
-  /**
-   * Asks the Honeywell Home API for the firmware version information
-   */
-  async updateFirmwareInfo() {
-    const rooms = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/group/0/rooms`, {
-      params: {
-        locationId: this.locationId,
-      },
-    })).data;
-    this.accessory.context.firmwareRevision = rooms.rooms[0].accessories[0].accessoryAttribute.softwareRevision;
-    this.platform.log.warn(`Fetched Thermostat FirmwareRevision: ${this.accessory.context.firmwareRevision}`); 
-    this.accessory.getService(this.platform.Service.AccessoryInformation)!
-      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.accessory.context.firmwareRevision);
   }
 
   /**

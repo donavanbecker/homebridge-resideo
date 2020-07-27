@@ -188,10 +188,12 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
       const locationId = location.locationID;
       this.log.debug(locationId);
       this.log.debug(location);
-      this.log.debug(`# of Thermostats Found: ${location.devices.length}.`);  
+      this.log.debug(`# of Thermostats Found at ${location.name}: ${location.devices.length}.`);  
       for (const device of location.devices) {
         this.log.debug(device);
         this.log.debug(device.deviceID);
+        this.log.warn(`Allowed Fan Modes: ${device.settings.fan.allowedModes}`);
+        this.log.warn(`Fan Mode: ${device.settings.fan.changeableValues.mode}`);
         for (const group of device.groups) {
           this.log.debug(`Found ${device.groups.length} Group(s)`);
           this.log.debug(device.groups);
