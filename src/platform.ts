@@ -201,7 +201,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
           locationId: location.locationID,
         },
       })).data;
-      this.log.debug(`Fetched Thermostat FirmwareRevision: ${firmware}`);
+      this.log.warn(`Fetched Thermostat FirmwareRevision: ${firmware}`);
 
       // loop over the discovered devices and register each one if it has not already been registered
       for (const device of devices) {
