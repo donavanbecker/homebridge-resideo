@@ -22,6 +22,8 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
     responseType: 'json',
   });
 
+  firmware: any;
+
   constructor(
     public readonly log: Logger,
     public readonly config: PlatformConfig,
@@ -165,10 +167,87 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
    * Accessories must only be registered once, previously created accessories
    * must not be registered again to prevent "duplicate UUID" errors.
    */
-  async discoverDevices() {
+  async discoverFirmware() {
     // try and get the access token. If it fails stop here.
     try {
       await this.getAccessToken();
+    } catch (e) {
+      this.log.error('Could not discover devices.', e.message);
+      return;
+    }
+    
+    // get the locations
+    const locations = (await this.axios.get(LocationURL)).data;
+
+    this.log.warn(`# of Locations Found: ${locations.length}.`);
+
+    // get the devices at each location
+    for (const location of locations) {
+      this.log.warn(`Getting devices for ${location.name}...`);
+
+      const locationId = location.locationID;
+      this.log.debug(locationId);
+      this.log.debug(location);
+      this.log.debug(`# of Thermostats Found: ${location.devices.length}.`);  
+      for (const device of location.devices) {
+        this.log.debug(device);
+        this.log.debug(device.deviceID);
+        for (const group of device.groups) {
+          this.log.debug(`Found ${device.groups.length} Group(s)`);
+          this.log.debug(device.groups);
+          this.log.debug(group);
+          this.log.debug(group.id);
+          for (const room of group.rooms) {
+            this.log.debug(`Found Room ${room}`);
+            this.log.debug(group.rooms);
+            this.log.debug(room);
+          }
+          {
+            const accessory = (await this.axios.get(`${DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
+              params: {
+                locationId: location.locationID,
+              },
+            })).data;
+            for (const roomaccessories of group.rooms) {
+              this.log.debug(`Found ${accessory.rooms.length} accessory.rooms`);
+              this.log.debug(group.rooms);
+              this.log.debug(roomaccessories);
+            }
+            for (const accessories of accessory.rooms) {
+              this.log.debug(accessory.rooms);
+              this.log.debug(accessories);
+              for (const findaccessories of accessories.accessories) {
+                this.log.debug(`Found ${accessories.accessories.length} accessories.accessories`);
+                this.log.debug(accessories.accessories);
+                this.log.debug(findaccessories);
+                this.log.debug(findaccessories.accessoryAttribute.type);
+
+                // generate a unique id for the accessory this should be generated from
+                // something globally unique, but constant, for example, the device serial
+                // number or MAC address
+                if (findaccessories.accessoryAttribute.type === 'Thermostat') {
+                  findaccessories.accessoryAttribute.softwareRevision = this.firmware;
+                  this.log.warn(`Fetched Thermostat FirmwareRevision: ${findaccessories.accessoryAttribute.softwareRevision}`);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+
+
+  /**
+   * This is an example method showing how to register discovered accessories.
+   * Accessories must only be registered once, previously created accessories
+   * must not be registered again to prevent "duplicate UUID" errors.
+   */
+  async discoverDevices() {
+    // try and get the access token. If it fails stop here.
+    try {
+      await this.discoverFirmware();
     } catch (e) {
       this.log.error('Could not discover devices.', e.message);
       return;
@@ -201,7 +280,6 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
 
         this.log.warn(device);
         this.log.warn(`Groups: ${device.groups.id}`);
-        this.log.warn(device.settings.fan);
         this.log.warn(device.settings.fan.allowedModes);
         this.log.warn(device.settings.fan.changeableValues);
 
