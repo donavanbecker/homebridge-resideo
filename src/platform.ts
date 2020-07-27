@@ -196,18 +196,18 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
       this.log.debug(devices);
       this.log.warn(`Found ${devices.length} devices at ${location.name}.`);
 
-      const firmware = (await this.axios.get(`${DeviceURL}/thermostats/${devices.deviceID}/group/0/rooms`, {
-        params: {
-          locationId: location.locationID,
-        },
-      })).data;
-      this.log.warn(`Fetched Thermostat FirmwareRevision: ${firmware}`);
-
       // loop over the discovered devices and register each one if it has not already been registered
       for (const device of devices) {
 
-        this.log.debug(device);
-        this.log.debug(device.operationStatus.fanRequest);
+        this.log.warn(device);
+        this.log.warn(device.operationStatus.fanRequest);
+
+        const firmware = (await this.axios.get(`${DeviceURL}/thermostats/${device.deviceID}/group/0/rooms`, {
+          params: {
+            locationId: location.locationID,
+          },
+        })).data;
+        this.log.warn(`Fetched Thermostat FirmwareRevision: ${firmware}`);
 
         // generate a unique id for the accessory this should be generated from
         // something globally unique, but constant, for example, the device serial
