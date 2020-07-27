@@ -40,6 +40,8 @@ export class ThermostatPlatformAccessory {
     private accessory: PlatformAccessory,
     public readonly locationId: string,
     public device: any,
+    public findaccessories: any,
+    public readonly group: any,
   ) {
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
