@@ -218,16 +218,12 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
               this.log.debug(accessories);
               for (const findaccessories of accessories.accessories) {
                 this.log.debug(`Found ${accessories.accessories.length} accessories.accessories`);
-                this.log.warn(accessories.accessories);
+                this.log.debug(accessories.accessories);
                 this.log.warn(findaccessories);
-                this.log.warn(findaccessories.accessoryAttribute.type);
+                this.log.debug(findaccessories.accessoryAttribute.type);
 
-                // generate a unique id for the accessory this should be generated from
-                // something globally unique, but constant, for example, the device serial
-                // number or MAC address
                 if (findaccessories.accessoryAttribute.type === 'Thermostat') {
-                  findaccessories.accessoryAttribute.softwareRevision = this.firmware;
-                  this.log.warn(`Fetched Thermostat FirmwareRevision: ${this.firmware}`);
+                  this.log.warn(`Fetched Thermostat FirmwareRevision: ${findaccessories.accessoryAttribute.softwareRevision}`);
                 }
               }
             }
@@ -282,13 +278,6 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
         this.log.warn(`Groups: ${device.groups.id}`);
         this.log.warn(device.settings.fan.allowedModes);
         this.log.warn(device.settings.fan.changeableValues);
-
-        const firmware = (await this.axios.get(`${DeviceURL}/thermostats/${device.deviceID}/group/0/rooms`, {
-          params: {
-            locationId: location.locationID,
-          },
-        })).data;
-        this.log.warn(`Fetched Thermostat FirmwareRevision: ${firmware.room}`);
 
         // generate a unique id for the accessory this should be generated from
         // something globally unique, but constant, for example, the device serial
