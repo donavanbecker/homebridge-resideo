@@ -268,7 +268,7 @@ export class ThermostatPlatformAccessory {
       },
     })).data;
     this.accessory.context.firmwareRevision = rooms.rooms[0].accessories[0].accessoryAttribute.softwareRevision;
-    this.platform.log.debug(`Fetched Thermostat FirmwareRevision: ${this.accessory.context.firmwareRevision}`); 
+    this.platform.log.warn(`Fetched Thermostat FirmwareRevision: ${this.accessory.context.firmwareRevision}`); 
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.accessory.context.firmwareRevision);
   }

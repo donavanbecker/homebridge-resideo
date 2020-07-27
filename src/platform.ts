@@ -203,6 +203,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
 
         this.log.debug(device);
         this.log.warn(`Allowed Fan Modes: ${device.settings.fan.allowedModes}`);
+        this.log.warn(device.settings.fan.changeableValues);
         this.log.warn(`Changeable Fan Values: ${device.settings.fan.changeableValues}`);
 
         // generate a unique id for the accessory this should be generated from
