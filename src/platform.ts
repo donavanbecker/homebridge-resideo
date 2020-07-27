@@ -167,7 +167,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
    * Accessories must only be registered once, previously created accessories
    * must not be registered again to prevent "duplicate UUID" errors.
    */
-  async discoverFirmware() {
+  async discoverDevices() {
     // try and get the access token. If it fails stop here.
     try {
       await this.getAccessToken();
@@ -178,55 +178,8 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
     
     // get the locations
     const locations = (await this.axios.get(LocationURL)).data;
-    for (const location of locations) { 
-      for (const device of location.devices) {
-        for (const group of device.groups) {
-          for (const room of group.rooms) {
-            this.log.debug(room);
-          }
-          {
-            const accessory = (await this.axios.get(`${DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
-              params: {
-                locationId: location.locationID,
-              },
-            })).data;
-            for (const roomaccessories of group.rooms) {
-              this.log.debug(roomaccessories);
-            }
-            for (const accessories of accessory.rooms) {
-              this.log.debug(accessories);
-              for (const findaccessories of accessories.accessories) {
-                if (findaccessories.accessoryAttribute.type === 'Thermostat') {
-                  this.log.debug(`Fetched Thermostat FirmwareRevision: ${findaccessories.accessoryAttribute.softwareRevision}`);
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
 
-
-
-  /**
-   * This is an example method showing how to register discovered accessories.
-   * Accessories must only be registered once, previously created accessories
-   * must not be registered again to prevent "duplicate UUID" errors.
-   */
-  async discoverDevices() {
-    // try and get the access token. If it fails stop here.
-    try {
-      await this.discoverFirmware();
-    } catch (e) {
-      this.log.error('Could not discover devices.', e.message);
-      return;
-    }
-    
-    // get the locations
-    const locations = (await this.axios.get(LocationURL)).data;
-
-    this.log.warn(`Found ${locations.length} locations`);
+    this.log.warn(`# of Locations Found: ${locations.length}.`);
 
     // get the devices at each location
     for (const location of locations) {
@@ -243,7 +196,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
       })).data;
 
       this.log.debug(devices);
-      this.log.warn(`Found ${devices.length} devices at ${location.name}.`);
+      this.log.warn(`# of Thermostats Found: ${devices.length} @ ${location.name}.`);
 
       // loop over the discovered devices and register each one if it has not already been registered
       for (const device of devices) {
@@ -269,8 +222,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
             
             // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
             //existingAccessory.context.device = device;
-            existingAccessory.context.firmwareRevision = this.findaccessories.accessoryAttribute.softwareRevision;
-            this.api.updatePlatformAccessories([existingAccessory]);
+            //this.api.updatePlatformAccessories([existingAccessory]);
 
             // create the accessory handler for the restored accessory
             // this is imported from `platformAccessory.ts`
@@ -287,7 +239,6 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
             // store a copy of the device object in the `accessory.context`
             // the `context` property can be used to store any data about the accessory you may need
             accessory.context.device = device;
-            accessory.context.firmwareRevision = this.findaccessories.accessoryAttribute.softwareRevision;
 
             // create the accessory handler for the newly create accessory
             // this is imported from `platformAccessory.ts`
