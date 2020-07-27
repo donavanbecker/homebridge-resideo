@@ -196,6 +196,13 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
       this.log.debug(devices);
       this.log.warn(`Found ${devices.length} devices at ${location.name}.`);
 
+      const firmware = (await this.axios.get(`${DeviceURL}/thermostats/${devices.deviceID}/group/0/rooms`, {
+        params: {
+          locationId: location.locationID,
+        },
+      })).data;
+      this.log.debug(`Fetched Thermostat FirmwareRevision: ${firmware}`);
+
       // loop over the discovered devices and register each one if it has not already been registered
       for (const device of devices) {
 
@@ -218,7 +225,8 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
             
             // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
             //existingAccessory.context.device = device;
-            //this.api.updatePlatformAccessories([existingAccessory]);
+            //      existingAccessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
+            //      this.api.updatePlatformAccessories([existingAccessory]);
 
             // create the accessory handler for the restored accessory
             // this is imported from `platformAccessory.ts`
@@ -235,6 +243,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
             // store a copy of the device object in the `accessory.context`
             // the `context` property can be used to store any data about the accessory you may need
             accessory.context.device = device;
+            //      accessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
 
             // create the accessory handler for the newly create accessory
             // this is imported from `platformAccessory.ts`
