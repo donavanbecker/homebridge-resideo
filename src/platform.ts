@@ -217,10 +217,10 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
               this.log.debug(accessory.rooms);
               this.log.debug(accessories);
               for (const findaccessories of accessories.accessories) {
-                this.log.debug(`Found ${accessories.accessories.length} accessories.accessories`);
+                this.log.warn(`Found ${accessories.accessories.length} accessories.accessories`);
                 this.log.debug(accessories.accessories);
                 this.log.debug(findaccessories);
-                this.log.debug(findaccessories.accessoryAttribute.type);
+                this.log.warn(findaccessories.accessoryAttribute.type);
 
                 // generate a unique id for the accessory this should be generated from
                 // something globally unique, but constant, for example, the device serial
@@ -278,7 +278,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
       // loop over the discovered devices and register each one if it has not already been registered
       for (const device of devices) {
 
-        this.log.warn(device);
+        this.log.debug(device);
         this.log.warn(`Groups: ${device.groups.id}`);
         this.log.warn(device.settings.fan.allowedModes);
         this.log.warn(device.settings.fan.changeableValues);
