@@ -200,8 +200,10 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
       for (const device of devices) {
 
         this.log.warn(device);
-        this.log.warn(`Groups: ${device.groups}`);
-        this.log.warn(device.operationStatus.fanRequest);
+        this.log.warn(`Groups: ${device.groups.id}`);
+        this.log.warn(device.settings.fan);
+        this.log.warn(device.settings.fan.allowedModes);
+        this.log.warn(device.settings.fan.changeableValues);
 
         const firmware = (await this.axios.get(`${DeviceURL}/thermostats/${device.deviceID}/group/0/rooms`, {
           params: {
