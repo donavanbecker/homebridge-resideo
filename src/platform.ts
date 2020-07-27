@@ -22,7 +22,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
     responseType: 'json',
   });
 
-  firmware: any;
+  findaccessories: any;
 
   constructor(
     public readonly log: Logger,
@@ -178,28 +178,10 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
     
     // get the locations
     const locations = (await this.axios.get(LocationURL)).data;
-
-    this.log.warn(`# of Locations Found: ${locations.length}.`);
-
-    // get the devices at each location
-    for (const location of locations) {
-      this.log.warn(`Getting devices for ${location.name}...`);
-
-      const locationId = location.locationID;
-      this.log.debug(locationId);
-      this.log.debug(location);
-      this.log.debug(`# of Thermostats Found: ${location.devices.length}.`);  
+    for (const location of locations) { 
       for (const device of location.devices) {
-        this.log.debug(device);
-        this.log.debug(device.deviceID);
         for (const group of device.groups) {
-          this.log.debug(`Found ${device.groups.length} Group(s)`);
-          this.log.debug(device.groups);
-          this.log.debug(group);
-          this.log.debug(group.id);
           for (const room of group.rooms) {
-            this.log.debug(`Found Room ${room}`);
-            this.log.debug(group.rooms);
             this.log.debug(room);
           }
           {
@@ -209,21 +191,13 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
               },
             })).data;
             for (const roomaccessories of group.rooms) {
-              this.log.debug(`Found ${accessory.rooms.length} accessory.rooms`);
-              this.log.debug(group.rooms);
               this.log.debug(roomaccessories);
             }
             for (const accessories of accessory.rooms) {
-              this.log.debug(accessory.rooms);
               this.log.debug(accessories);
               for (const findaccessories of accessories.accessories) {
-                this.log.debug(`Found ${accessories.accessories.length} accessories.accessories`);
-                this.log.debug(accessories.accessories);
-                this.log.warn(findaccessories);
-                this.log.debug(findaccessories.accessoryAttribute.type);
-
                 if (findaccessories.accessoryAttribute.type === 'Thermostat') {
-                  this.log.warn(`Fetched Thermostat FirmwareRevision: ${findaccessories.accessoryAttribute.softwareRevision}`);
+                  this.log.debug(`Fetched Thermostat FirmwareRevision: ${findaccessories.accessoryAttribute.softwareRevision}`);
                 }
               }
             }
@@ -295,8 +269,8 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
             
             // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
             //existingAccessory.context.device = device;
-            //      existingAccessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
-            //      this.api.updatePlatformAccessories([existingAccessory]);
+            existingAccessory.context.firmwareRevision = this.findaccessories.accessoryAttribute.softwareRevision;
+            this.api.updatePlatformAccessories([existingAccessory]);
 
             // create the accessory handler for the restored accessory
             // this is imported from `platformAccessory.ts`
@@ -313,7 +287,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
             // store a copy of the device object in the `accessory.context`
             // the `context` property can be used to store any data about the accessory you may need
             accessory.context.device = device;
-            //      accessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
+            accessory.context.firmwareRevision = this.findaccessories.accessoryAttribute.softwareRevision;
 
             // create the accessory handler for the newly create accessory
             // this is imported from `platformAccessory.ts`
