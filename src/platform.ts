@@ -227,7 +227,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
                 // number or MAC address
                 if (findaccessories.accessoryAttribute.type === 'Thermostat') {
                   findaccessories.accessoryAttribute.softwareRevision = this.firmware;
-                  this.log.warn(`Fetched Thermostat FirmwareRevision: ${findaccessories.accessoryAttribute.softwareRevision}`);
+                  this.log.warn(`Fetched Thermostat FirmwareRevision: ${this.firmware}`);
                 }
               }
             }
