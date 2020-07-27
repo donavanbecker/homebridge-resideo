@@ -270,7 +270,9 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
                     // link the accessory to your platform
                     this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
                   }
-
+                } else if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor') {
+                  // eslint-disable-next-line max-len
+                  this.log.warn(`You have an ${findaccessories.accessoryAttribute.type}, checkout the homebridge-honeywell-home-roomesensors plugin to be able to view this room sensor inside HomeKit.`);
                 } else {
                   // eslint-disable-next-line max-len
                   this.log.warn(`Ignoring device named ${accessories.name} - ${findaccessories.accessoryAttribute.type}, Alive Status: ${device.isAlive}`);
