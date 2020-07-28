@@ -153,12 +153,12 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
     }
 
     this.config.credentials.accessToken = result.access_token;
-    this.log.debug('Got access token:', this.config.credentials.accessToken);
+    this.log.warn('Got access token:', this.config.credentials.accessToken);
 
     // check if the refresh token has changed
     if (result.refresh_token !== this.config.credentials.refreshToken) {
       // need some way to store this???
-      this.log.debug('New refresh token:', result.refresh_token);
+      this.log.warn('New refresh token:', result.refresh_token);
     }
   }
 
