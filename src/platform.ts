@@ -178,7 +178,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
     
     // get the locations
     const locations = (await this.axios.get(LocationURL)).data;
-    this.log.debug(locations);
+    
     this.log.warn(`# of Locations Found: ${locations.length}.`);
 
     // get the devices at each location
@@ -196,7 +196,6 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
         this.log.warn(`Fan Mode: ${device.settings.fan.changeableValues.mode}`);
         for (const group of device.groups) {
           this.log.debug(`Found ${device.groups.length} Group(s)`);
-          this.log.debug(device.groups);
           this.log.debug(group);
           this.log.debug(group.id);
           for (const room of group.rooms) {
