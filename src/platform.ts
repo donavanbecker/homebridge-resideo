@@ -179,6 +179,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
     // get the locations
     const locations = (await this.axios.get(LocationURL)).data;
 
+    this.log.warn(`# of Locations Found: ${locations.length}`);
 
     // get the devices at each location
     for (const location of locations) {
