@@ -1,6 +1,6 @@
 <span align="center">
 
-<a href="https://github.com/homebridge/verified/blob/master/verified-plugins.json"><img alt="homebridge-verified" src="https://raw.githubusercontent.com/homebridge-plugins/homebridge-honeywell-home/master/honeywell/Homebridge_x_Honeywell.svg?sanitize=true" width="500px"></a>
+<a href="https://github.com/homebridge/verified/blob/master/verified-plugins.json"><img alt="homebridge-verified" src="https://raw.githubusercontent.com/donavanbecker/homebridge-honeywell-home/master/honeywell/Homebridge_x_Honeywell.svg?sanitize=true" width="500px"></a>
 
 # Homebridge Honeywell Home
 
@@ -28,10 +28,10 @@
 
 <span align="center">
   
-<img src='https://raw.githubusercontent.com/homebridge-plugins/homebridge-honeywell-home/master/honeywell/honeywellsetup.mov' />
+<img src='https://raw.githubusercontent.com/donavanbecker/homebridge-honeywell-home/master/honeywell/honeywellsetup.mov' />
 
 </span>
 
 ## Manual Setup
 
-  Visit Manual Setup [Wiki](https://github.com/homebridge-plugins/homebridge-honeywell-home/wiki/Manual-Setup).
+  Visit Manual Setup [Wiki](https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Manual-Setup).

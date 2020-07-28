@@ -14,6 +14,8 @@ export class LinkAccountComponent implements OnInit {
   public authError = false;
 
   private code?: string;
+  private consumerKey?: string;
+  private consumerSecret?: string;
 
   constructor(
     private $api: ApiService,
@@ -21,10 +23,17 @@ export class LinkAccountComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.consumerKey = sessionStorage.consumerKey;
+    this.consumerSecret = sessionStorage.consumerSecret;
+
     this.$route.queryParams.subscribe(params => {
-      if (!params.code) {
+      if (params.consumerKey && params.consumerSecret) {
+        sessionStorage.consumerKey = params.consumerKey;
+        sessionStorage.consumerSecret = params.consumerSecret;
+        this.consumerKey = params.consumerKey;
+        this.consumerSecret = params.consumerSecret;
         this.startOAuthFlow();
-      } else {
+      } else if (params.code) {
         this.code = params.code;
         this.getToken();
       }
@@ -35,7 +44,7 @@ export class LinkAccountComponent implements OnInit {
     window.location.href =
       `https://api.honeywell.com/oauth2/authorize` +
         `?response_type=code` +
-        `&client_id=${environment.honeywell.consumerKey}` +
+        `&client_id=${this.consumerKey}` +
         `&redirect_uri=${encodeURIComponent(environment.honeywell.redirectUrl)}`;
   }
 
@@ -43,10 +52,13 @@ export class LinkAccountComponent implements OnInit {
     this.$api.post('/user/token', {
       code: this.code,
       redirect_uri: environment.honeywell.redirectUrl,
+      consumerKey: this.consumerKey,
+      consumerSecret: this.consumerSecret,
     }).subscribe(
       (response) => {
         this.authData = {
-          consumerKey: environment.honeywell.consumerKey,
+          consumerKey: this.consumerKey,
+          consumerSecret: this.consumerSecret,
           accessToken: response.access_token,
           refreshToken: response.refresh_token,
         };
