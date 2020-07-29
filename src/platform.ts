@@ -163,6 +163,8 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
       });
       this.log.warn('New refresh token:', result.refresh_token);
     }
+    
+    this.config.credentials.refreshToken = result.refresh_token;
 
     function updateHomebridgeConfig(
       homebridge: any,
