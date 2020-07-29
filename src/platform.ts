@@ -2,6 +2,7 @@ import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, 
 import { interval } from 'rxjs';
 import axios, { AxiosInstance } from 'axios';
 import * as qs from 'querystring';
+import { readFileSync, writeFileSync } from 'fs';
 
 import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl } from './settings';
 import { ThermostatPlatformAccessory } from './platformAccessory';
@@ -157,8 +158,24 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
 
     // check if the refresh token has changed
     if (result.refresh_token !== this.config.credentials.refreshToken) {
-      // need some way to store this???
+      updateHomebridgeConfig(this.api, (configContents) => {
+        return configContents.replace(this.config.credentials.refreshToken, result.refresh_token);
+      });
       this.log.warn('New refresh token:', result.refresh_token);
+    }
+
+    function updateHomebridgeConfig(
+      homebridge: any,
+      update: (config: string) => string,
+    ) {
+      const configPath = homebridge.user.configPath(),
+        config = readFileSync(configPath).toString(),
+        updatedConfig = update(config);
+  
+      if (config !== updatedConfig) {
+        writeFileSync(configPath, updatedConfig);
+        return true;
+      }
     }
   }
 
