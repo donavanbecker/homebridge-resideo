@@ -33,8 +33,3 @@
 <img src="https://user-images.githubusercontent.com/3979615/88920827-d5b97680-d2b0-11ea-9002-15209eebd995.png" width="600px">
 
 </p>
-
-
-## Manual Setup
-
-  Visit Manual Setup [Wiki](https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Manual-Setup).
