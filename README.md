@@ -16,21 +16,24 @@
 </span>
 
 ## Installation
-* Use [homebridge-config-ui-x](https://github.com/oznu/homebridge-config-ui-x) for zero configuration UI.
-* Search for "Honeywell Home" on the plugin ccreen of [config-ui-x](https://github.com/oznu/homebridge-config-ui-x) .
-* Click install.
+
+1. Search for "Honeywell Home" on the plugin screen of [Homebridge Config UI X](https://github.com/oznu/homebridge-config-ui-x).
+2. Click **Install**.
 
 ## Configuration
-* After install [config-ui-x](https://github.com/oznu/homebridge-config-ui-x) will ask for Honeywell Home credentials.
-* [Config-ui-x](https://github.com/oznu/homebridge-config-ui-x) will walk you through the rest.
-* Your account is now linked.
-* Restart Homebridge for the changes to take effect.
 
-<span align="center">
-  
-<img src='https://raw.githubusercontent.com/donavanbecker/homebridge-honeywell-home/master/honeywell/honeywellsetup.mov' />
+1. Login / create an account at https://developer.honeywellhome.com/user
+2. Click **Create New App**
+3. Give your application a name, and enter the Callback URL as `https://homebridge-honeywell.iot.oz.nu/link-account`
+4. Enter the generated consumer key and secret into the plugin settings screen of [Homebridge Config UI X](https://github.com/oznu/homebridge-config-ui-x)
+4. Click **Link Account**
 
-</span>
+<p align="center">
+
+<img src="https://user-images.githubusercontent.com/3979615/88920827-d5b97680-d2b0-11ea-9002-15209eebd995.png" width="600px">
+
+</p>
+
 
 ## Manual Setup
 
