@@ -2,6 +2,7 @@ import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, 
 import { interval } from 'rxjs';
 import axios, { AxiosInstance } from 'axios';
 import * as qs from 'querystring';
+import { readFileSync, writeFileSync } from 'fs';
 
 import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl } from './settings';
 import { ThermostatPlatformAccessory } from './platformAccessory';
@@ -157,8 +158,55 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
 
     // check if the refresh token has changed
     if (result.refresh_token !== this.config.credentials.refreshToken) {
-      // need some way to store this???
       this.log.warn('New refresh token:', result.refresh_token);
+      await this.updateRefreshToken(result.refresh_token);
+    }
+    
+    this.config.credentials.refreshToken = result.refresh_token;
+  }
+
+  /**
+   * The refresh token will periodically change.
+   * This method saves the updated refresh token in the config.json file
+   * @param newRefreshToken 
+   */
+  async updateRefreshToken(newRefreshToken: string) {
+    try {
+      // check the new token was provided
+      if (!newRefreshToken) {
+        throw new Error('New token not provided');
+      }
+
+      // load in the current config
+      const currentConfig = JSON.parse(readFileSync(this.api.user.configPath(), 'utf8'));
+
+      // check the platforms section is an array before we do array things on it
+      if (!Array.isArray(currentConfig.platforms)) {
+        throw new Error('Cannot find platforms array in config');
+      }
+
+      // find this plugins current config
+      const pluginConfig = currentConfig.platforms.find(x => x.platform === PLATFORM_NAME);
+
+      if (!pluginConfig) {
+        throw new Error(`Cannot find config for ${PLATFORM_NAME} in platforms array`);
+      }
+
+      // check the .credentials is an object before doing object things with it
+      if (typeof pluginConfig.credentials !== 'object') {
+        throw new Error('pluginConfig.credentials is not an object');
+      }
+
+      // set the refresh token
+      pluginConfig.credentials.refreshToken = newRefreshToken;
+
+      // save the config, ensuring we maintain pretty json
+      writeFileSync(this.api.user.configPath(), JSON.stringify(currentConfig, null, 4));
+
+      this.log.warn('Homebridge config.json has been updated with new refresh token.');
+
+    } catch (e) {
+      this.log.error(`Failed to update refresh token in config: ${e.message}`);
     }
   }
 
@@ -179,11 +227,11 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
     // get the locations
     const locations = (await this.axios.get(LocationURL)).data;
     
-    this.log.warn(`# of Locations Found: ${locations.length}.`);
+    this.log.info(`# of Locations Found: ${locations.length}.`);
 
     // get the devices at each location
     for (const location of locations) {
-      this.log.warn(`Getting devices for ${location.name}...`);
+      this.log.info(`Getting devices for ${location.name}...`);
 
       const locationId = location.locationID;
       this.log.debug(locationId);
@@ -192,8 +240,8 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
       for (const device of location.devices) {
         this.log.debug(device);
         this.log.debug(device.deviceID);
-        this.log.warn(`Allowed Fan Modes: ${device.settings.fan.allowedModes}`);
-        this.log.warn(`Fan Mode: ${device.settings.fan.changeableValues.mode}`);
+        this.log.debug(`Allowed Fan Modes: ${device.settings.fan.allowedModes}`);
+        this.log.debug(`Fan Mode: ${device.settings.fan.changeableValues.mode}`);
         for (const group of device.groups) {
           this.log.debug(`Found ${device.groups.length} Group(s)`);
           this.log.debug(group);
@@ -271,10 +319,10 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
                   }
                 } else if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor') {
                   // eslint-disable-next-line max-len
-                  this.log.warn(`An ${findaccessories.accessoryAttribute.type} was found. If you haven't already installed homebridge-honeywell-home-roomesensors plugin, install it to be able to view this room sensor inside HomeKit.`);
+                  this.log.info(`An ${findaccessories.accessoryAttribute.type} was found. If you haven't already installed homebridge-honeywell-home-roomesensors plugin, install it to be able to view this room sensor inside HomeKit.`);
                 } else {
                   // eslint-disable-next-line max-len
-                  this.log.warn(`Ignoring device named ${accessories.name} - ${findaccessories.accessoryAttribute.type}, Alive Status: ${device.isAlive}`);
+                  this.log.info(`Ignoring device named ${accessories.name} - ${findaccessories.accessoryAttribute.type}, Alive Status: ${device.isAlive}`);
                 }
               }
             }

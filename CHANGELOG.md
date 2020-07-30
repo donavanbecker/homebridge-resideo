@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 6.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v6.0.0...v6.1.0) (2020-07-30)
+
+### Changes
+
+- If refresh token expires, the new refresh token that is fetched will now be saved to `config.json`.
+
 ## [Version 6.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.1.1...v6.0.0) (2020-07-28)
 
 ### Major Changes
