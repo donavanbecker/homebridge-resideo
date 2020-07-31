@@ -36,7 +36,10 @@ Remove any sensitive information, such as your homebridge-gsh / google-smarthome
 **Screenshots:**
 <!-- If applicable, add screenshots to help explain your problem. -->
 
-**Environment:**
+**Thermostat Model:**
+<!-- Provide your Thermostat Model. -->
+
+# **Environment:**
 
 * **Node.js Version**: <!-- node -v -->
 * **NPM Version**: <!-- npm -v -->
