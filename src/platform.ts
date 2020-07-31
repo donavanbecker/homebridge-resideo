@@ -242,7 +242,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
         this.log.debug(`Fan Mode: ${device.settings.fan.changeableValues.mode}`);
 
         // LLC Devices
-        if ((device.deviceID.includes('LCC')) === true) {
+        if ((device.deviceID.startsWith('LCC')) === true) {
           for (const group of device.groups) {
             this.log.debug(`Found ${device.groups.length} Group(s)`);
             this.log.debug(group);
@@ -329,7 +329,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
               }
             }
           } //TCC Devices
-        } else if ((device.deviceID.includes('TCC')) === true) {
+        } else if ((device.deviceID.startsWith('TCC')) === true) {
           // generate a unique id for the accessory this should be generated from
           // something globally unique, but constant, for example, the device serial
           // number or MAC address
