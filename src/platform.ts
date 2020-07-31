@@ -23,8 +23,6 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
     responseType: 'json',
   });
 
-  findaccessories: any;
-
   constructor(
     public readonly log: Logger,
     public readonly config: PlatformConfig,
@@ -298,7 +296,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
 
                       // create the accessory handler for the restored accessory
                       // this is imported from `platformAccessory.ts`
-                      new ThermostatPlatformAccessory(this, existingAccessory, locationId, device, findaccessories);
+                      new ThermostatPlatformAccessory(this, existingAccessory, locationId, device);
 
                     } else {
                     // the accessory does not yet exist, so we need to create it
@@ -315,7 +313,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
 
                       // create the accessory handler for the newly create accessory
                       // this is imported from `platformAccessory.ts`
-                      new ThermostatPlatformAccessory(this, accessory, locationId, device, findaccessories);
+                      new ThermostatPlatformAccessory(this, accessory, locationId, device);
 
                       // link the accessory to your platform
                       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
@@ -355,7 +353,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
 
               // create the accessory handler for the restored accessory
               // this is imported from `platformAccessory.ts`
-              new ThermostatPlatformAccessory(this, existingAccessory, locationId, device, this.findaccessories);
+              new ThermostatPlatformAccessory(this, existingAccessory, locationId, device);
 
             } else {
               // the accessory does not yet exist, so we need to create it
@@ -372,7 +370,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
 
               // create the accessory handler for the newly create accessory
               // this is imported from `platformAccessory.ts`
-              new ThermostatPlatformAccessory(this, accessory, locationId, device, this.findaccessories);
+              new ThermostatPlatformAccessory(this, accessory, locationId, device);
 
               // link the accessory to your platform
               this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
