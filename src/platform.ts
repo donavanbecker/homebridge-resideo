@@ -333,7 +333,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
           // generate a unique id for the accessory this should be generated from
           // something globally unique, but constant, for example, the device serial
           // number or MAC address
-          if (device.isAlive && device.isProvisioned && device.deviceClass === 'Thermostat') {
+          if (device.isAlive && device.deviceClass === 'Thermostat') {
             // eslint-disable-next-line max-len
             this.log.debug(`UDID: ${device.name}${device.deviceID}`);
             // eslint-disable-next-line max-len
@@ -380,7 +380,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
             this.log.info(`Ignoring device named ${device.name} - ${device.deviceID}, Alive Status: ${device.isAlive}`);
           }
         } else {
-          this.log.info('No Device ID that starts with LCC or TCC found.');
+          this.log.info('No Thermostat was found with a Device ID that starts with LCC or TCC.');
         }
 
       }
