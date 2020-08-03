@@ -6,6 +6,7 @@ import { readFileSync, writeFileSync } from 'fs';
 
 import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl } from './settings';
 import { ThermostatPlatformAccessory } from './platformAccessory';
+import { ThermostatTCCPlatformAccessory } from './platformAccessoryTCC';
 
 /**
  * HomebridgePlatform
@@ -278,7 +279,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
                   if (findaccessories.accessoryAttribute.type === 'Thermostat' 
                       && device.isAlive && device.deviceClass === 'Thermostat') {
                   // eslint-disable-next-line max-len
-                    this.log.debug(`UDID: ${accessories.name}${findaccessories.accessoryAttribute.type}${findaccessories.accessoryAttribute.serialNumber}${device.deviceID}`);
+                    this.log.debug(`LLC UDID: ${accessories.name}${findaccessories.accessoryAttribute.type}${findaccessories.accessoryAttribute.serialNumber}${device.deviceID}`);
                     // eslint-disable-next-line max-len
                     const uuid = this.api.hap.uuid.generate(`${accessories.name}${findaccessories.accessoryAttribute.type}${findaccessories.accessoryAttribute.serialNumber}${device.deviceID}`);
 
@@ -335,7 +336,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
           // number or MAC address
           if (device.isAlive && device.deviceClass === 'Thermostat') {
             // eslint-disable-next-line max-len
-            this.log.debug(`UDID: ${device.name}${device.deviceID}`);
+            this.log.debug(`TCC UDID: ${device.name}${device.deviceID}`);
             // eslint-disable-next-line max-len
             const uuid = this.api.hap.uuid.generate(`${device.name}${device.deviceID}`);
 
@@ -353,7 +354,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
 
               // create the accessory handler for the restored accessory
               // this is imported from `platformAccessory.ts`
-              new ThermostatPlatformAccessory(this, existingAccessory, locationId, device);
+              new ThermostatTCCPlatformAccessory(this, existingAccessory, locationId, device);
 
             } else {
               // the accessory does not yet exist, so we need to create it
@@ -370,7 +371,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
 
               // create the accessory handler for the newly create accessory
               // this is imported from `platformAccessory.ts`
-              new ThermostatPlatformAccessory(this, accessory, locationId, device);
+              new ThermostatTCCPlatformAccessory(this, accessory, locationId, device);
 
               // link the accessory to your platform
               this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
