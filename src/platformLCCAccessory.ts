@@ -10,7 +10,7 @@ import { DeviceURL } from './settings';
  * An instance of this class is created for each accessory your platform registers
  * Each accessory may expose multiple services of different service types.
  */
-export class ThermostatPlatformAccessory {
+export class ThermostatLCCPlatformAccessory {
   private service: Service;
 
   private modes: { Off: number; Heat: number; Cool: number; Auto: number; };

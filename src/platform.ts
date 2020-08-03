@@ -5,8 +5,8 @@ import * as qs from 'querystring';
 import { readFileSync, writeFileSync } from 'fs';
 
 import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl } from './settings';
-import { ThermostatPlatformAccessory } from './platformAccessory';
-import { ThermostatTCCPlatformAccessory } from './platformAccessoryTCC';
+import { ThermostatLCCPlatformAccessory } from './platformLCCAccessory';
+import { ThermostatTCCPlatformAccessory } from './platformTCCAccessory';
 
 /**
  * HomebridgePlatform
@@ -297,7 +297,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
 
                       // create the accessory handler for the restored accessory
                       // this is imported from `platformAccessory.ts`
-                      new ThermostatPlatformAccessory(this, existingAccessory, locationId, device);
+                      new ThermostatLCCPlatformAccessory(this, existingAccessory, locationId, device);
 
                     } else {
                     // the accessory does not yet exist, so we need to create it
@@ -314,7 +314,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
 
                       // create the accessory handler for the newly create accessory
                       // this is imported from `platformAccessory.ts`
-                      new ThermostatPlatformAccessory(this, accessory, locationId, device);
+                      new ThermostatLCCPlatformAccessory(this, accessory, locationId, device);
 
                       // link the accessory to your platform
                       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
