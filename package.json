@@ -24,6 +24,16 @@
     "build": "rimraf ./dist && tsc",
     "prepublishOnly": "npm run lint && npm run build"
   },
+  "funding": [
+    {
+      "type": "paypal",
+      "url": "https://www.paypal.me/donavanbecker"
+    },
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/donavanbecker"
+    }
+  ],
   "keywords": [
     "homebridge-plugin",
     "honeywell",
