@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge Honeywell Home",
   "name": "homebridge-honeywell-home",
-  "version": "6.1.1",
+  "version": "6.1.2",
   "description": "A Honeywell Home https://honeywellhome.com plugin for Homebridge: https://github.com/homebridge/homebridge.",
   "author": "donavanbecker",
   "license": "Apache-2.0",
@@ -30,8 +30,12 @@
       "url": "https://www.paypal.me/donavanbecker"
     },
     {
-      "type": "github",
-      "url": "https://github.com/sponsors/donavanbecker"
+      "type": "venmo",
+      "url": "https://venmo.com/code?user_id=2050254564229120198"
+    },
+    {
+      "type": "cash",
+      "url": "https://cash.app/$donavanbecker"
     }
   ],
   "keywords": [
