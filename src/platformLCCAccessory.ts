@@ -123,17 +123,18 @@ export class ThermostatLCCPlatformAccessory {
     this.service.getCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits)
       .on('set', this.setTemperatureDisplayUnits.bind(this));
 
-    // Fan Controls
-    this.fanService = accessory.getService(this.platform.Service.Fanv2) ?
-      accessory.getService(this.platform.Service.Fanv2) : accessory.addService(this.platform.Service.Fanv2, `${this.device.name} Fan`);
+    if (this.device.scheduleCapabilities.schedulableFan === true) {// Fan Controls
+      this.fanService = accessory.getService(this.platform.Service.Fanv2) ?
+        accessory.getService(this.platform.Service.Fanv2) : accessory.addService(this.platform.Service.Fanv2, `${this.device.name} Fan`);
 
-    this.fanService
-      .getCharacteristic(this.platform.Characteristic.Active)
-      .on('set', this.setActive.bind(this));
+      this.fanService
+        .getCharacteristic(this.platform.Characteristic.Active)
+        .on('set', this.setActive.bind(this));
 
-    this.fanService
-      .getCharacteristic(this.platform.Characteristic.TargetFanState)
-      .on('set', this.setTargetFanState.bind(this));
+      this.fanService
+        .getCharacteristic(this.platform.Characteristic.TargetFanState)
+        .on('set', this.setTargetFanState.bind(this));
+    }
     
 
     // Retrieve initial values and updateHomekit
@@ -210,19 +211,21 @@ export class ThermostatLCCPlatformAccessory {
       }
     }
 
-    // Set the Target Fan State
-    if (this.deviceFan) {
-      this.platform.log.debug(`${JSON.stringify(this.deviceFan)}`);
+    if (this.device.scheduleCapabilities.schedulableFan === true) {
+      // Set the Target Fan State
+      if (this.deviceFan) {
+        this.platform.log.debug(`${JSON.stringify(this.deviceFan)}`);
 
-      if (this.deviceFan.mode === 'Auto') {
-        this.TargetFanState = this.platform.Characteristic.TargetFanState.AUTO;
-        this.Active = this.platform.Characteristic.Active.INACTIVE;
-      } else if (this.deviceFan.mode === 'On') {
-        this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
-        this.Active = this.platform.Characteristic.Active.ACTIVE;
-      } else if (this.deviceFan.mode === 'Circulate') {
-        this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
-        this.Active = this.platform.Characteristic.Active.INACTIVE;
+        if (this.deviceFan.mode === 'Auto') {
+          this.TargetFanState = this.platform.Characteristic.TargetFanState.AUTO;
+          this.Active = this.platform.Characteristic.Active.INACTIVE;
+        } else if (this.deviceFan.mode === 'On') {
+          this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
+          this.Active = this.platform.Characteristic.Active.ACTIVE;
+        } else if (this.deviceFan.mode === 'Circulate') {
+          this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
+          this.Active = this.platform.Characteristic.Active.INACTIVE;
+        }
       }
     }
   }
