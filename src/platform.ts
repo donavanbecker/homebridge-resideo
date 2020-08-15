@@ -236,7 +236,12 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
       this.log.debug(locationId);
       this.log.debug(location);
       this.log.debug(`# of Thermostats Found at ${location.name}: ${location.devices.length}.`);  
-      for (const device of location.devices) {
+      const devices = (await this.axios.get(DeviceURL, {
+        params: {
+          locationId: location.locationID,
+        },
+      })).data;
+      for (const device of devices) {
         this.log.debug(device);
         this.log.debug(device.deviceID);
         if (device.scheduleCapabilities.schedulableFan === true) {
