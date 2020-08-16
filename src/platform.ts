@@ -244,7 +244,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
       for (const device of devices) {
         this.log.debug(device);
         this.log.debug(device.deviceID);
-        if (device.scheduleCapabilities.schedulableFan === true) {
+        if (device.scheduleCapabilities.schedulableFan) {
           this.log.debug(`Allowed Fan Modes: ${device.settings.fan.allowedModes}`);
           this.log.debug(`Fan Mode: ${device.settings.fan.changeableValues.mode}`);
         }
