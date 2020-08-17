@@ -388,7 +388,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
             }
           } 
         } else {
-          this.log.info('No Thermostat was found with a Device ID that starts with LCC or TCC.');
+          this.log.info('A Device was found with a Device ID that didn\'t starts with LCC or TCC.');
         }
       }
     }
