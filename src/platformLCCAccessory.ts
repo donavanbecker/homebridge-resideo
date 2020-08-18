@@ -27,7 +27,7 @@ export class ThermostatLCCPlatformAccessory {
   TargetFanState!: any;
   fanMode: any;
   thermostatUpdateInProgress!: boolean;
-  
+
   fanUpdateInProgress!: boolean;
   doThermostatUpdate!: any;
   doFanUpdate!: any;
@@ -48,7 +48,7 @@ export class ThermostatLCCPlatformAccessory {
       'Cool': platform.Characteristic.TargetHeatingCoolingState.COOL,
       'Auto': platform.Characteristic.TargetHeatingCoolingState.AUTO,
     };
-      
+
     // Map HomeKit Modes to Honeywell Modes
     // Don't change the order of these!
     this.honeywellMode = ['Off', 'Heat', 'Cool', 'Auto'];
@@ -82,8 +82,8 @@ export class ThermostatLCCPlatformAccessory {
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
-    this.service = this.accessory.getService(this.platform.Service.Thermostat) || 
-    this.accessory.addService(this.platform.Service.Thermostat), this.device.name;
+    this.service = this.accessory.getService(this.platform.Service.Thermostat) ||
+      this.accessory.addService(this.platform.Service.Thermostat), this.device.name;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -135,7 +135,7 @@ export class ThermostatLCCPlatformAccessory {
         .getCharacteristic(this.platform.Characteristic.TargetFanState)
         .on('set', this.setTargetFanState.bind(this));
     }
-    
+
 
     // Retrieve initial values and updateHomekit
     this.refreshStatus();
@@ -169,16 +169,16 @@ export class ThermostatLCCPlatformAccessory {
         this.fanUpdateInProgress = false;
       });
     }
-    
+
   }
 
   /**
    * Parse the device status from the honeywell api
    */
   parseStatus() {
-    this.TemperatureDisplayUnits = this.device.units === 'Fahrenheit' ? this.platform.Characteristic.TemperatureDisplayUnits.FAHRENHEIT : 
+    this.TemperatureDisplayUnits = this.device.units === 'Fahrenheit' ? this.platform.Characteristic.TemperatureDisplayUnits.FAHRENHEIT :
       this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS;
-    this.TemperatureDisplayUnits = this.device.units === 'Fahrenheit' ? this.platform.Characteristic.TemperatureDisplayUnits.FAHRENHEIT : 
+    this.TemperatureDisplayUnits = this.device.units === 'Fahrenheit' ? this.platform.Characteristic.TemperatureDisplayUnits.FAHRENHEIT :
       this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS;
 
     this.CurrentTemperature = this.toCelsius(this.device.indoorTemperature);
@@ -270,8 +270,8 @@ export class ThermostatLCCPlatformAccessory {
       mode: this.honeywellMode[this.TargetHeatingCoolingState],
       thermostatSetpointStatus: 'TemporaryHold',
       autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
-    } as any; 
-    
+    } as any;
+
     // Set the heat and cool set point value based on the selected mode
     if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
       payload.heatSetpoint = this.toFahrenheit(this.TargetTemperature);
@@ -399,7 +399,7 @@ export class ThermostatLCCPlatformAccessory {
   async pushFanChanges() {
     let payload = {
       mode: 'Auto', // default to Auto
-    }; 
+    };
 
     this.platform.log.debug(`TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`);
 
@@ -407,12 +407,12 @@ export class ThermostatLCCPlatformAccessory {
       payload = {
         mode: 'Auto',
       };
-    } else if (this.TargetFanState === this.platform.Characteristic.TargetFanState.MANUAL && 
+    } else if (this.TargetFanState === this.platform.Characteristic.TargetFanState.MANUAL &&
       this.Active === this.platform.Characteristic.Active.ACTIVE) {
       payload = {
         mode: 'On',
       };
-    } else if (this.TargetFanState === this.platform.Characteristic.TargetFanState.MANUAL && 
+    } else if (this.TargetFanState === this.platform.Characteristic.TargetFanState.MANUAL &&
       this.Active === this.platform.Characteristic.Active.INACTIVE) {
       payload = {
         mode: 'Circulate',

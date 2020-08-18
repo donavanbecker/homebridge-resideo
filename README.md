@@ -26,7 +26,7 @@
 2. Click **Create New App**
 3. Give your application a name, and enter the Callback URL as `https://homebridge-honeywell.iot.oz.nu/link-account`
 4. Enter the generated consumer key and secret into the plugin settings screen of [Homebridge Config UI X](https://github.com/oznu/homebridge-config-ui-x)
-4. Click **Link Account**
+5. Click **Link Account**
 
 <p align="center">
 
