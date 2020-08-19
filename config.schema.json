@@ -68,6 +68,7 @@
               "type": "help",
               "helpvalue": "<h5></h5><em class='primary-text'>This is for Manual Setup Only.</em>"
             },
+            "name",
             "credentials.consumerKey",
             "credentials.consumerSecret",
             "credentials.refreshToken"
