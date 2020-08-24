@@ -125,7 +125,7 @@ export class ThermostatLCCPlatformAccessory {
 
     // Fan Controls
     this.fanService = accessory.getService(this.platform.Service.Fanv2);
-    if (this.device.scheduleCapabilities.schedulableFan === true) {
+    if (this.device.scheduleCapabilities.schedulableFan) {
       this.fanService = accessory.addService(this.platform.Service.Fanv2, `${this.device.name} Fan`);
 
       this.fanService
@@ -135,7 +135,7 @@ export class ThermostatLCCPlatformAccessory {
       this.fanService
         .getCharacteristic(this.platform.Characteristic.TargetFanState)
         .on('set', this.setTargetFanState.bind(this));
-    } else if (this.device.scheduleCapabilities.schedulableFan !== true) {
+    } else if (!this.device.scheduleCapabilities.schedulableFan) {
       accessory.removeService(this.fanService);
     }
 
