@@ -123,9 +123,10 @@ export class ThermostatLCCPlatformAccessory {
     this.service.getCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits)
       .on('set', this.setTemperatureDisplayUnits.bind(this));
 
-    if (this.device.scheduleCapabilities.schedulableFan === true) {// Fan Controls
-      this.fanService = accessory.getService(this.platform.Service.Fanv2) ?
-        accessory.getService(this.platform.Service.Fanv2) : accessory.addService(this.platform.Service.Fanv2, `${this.device.name} Fan`);
+    // Fan Controls
+    this.fanService = accessory.getService(this.platform.Service.Fanv2);
+    if (this.device.scheduleCapabilities.schedulableFan === true) {
+      this.fanService = accessory.addService(this.platform.Service.Fanv2, `${this.device.name} Fan`);
 
       this.fanService
         .getCharacteristic(this.platform.Characteristic.Active)
@@ -134,8 +135,9 @@ export class ThermostatLCCPlatformAccessory {
       this.fanService
         .getCharacteristic(this.platform.Characteristic.TargetFanState)
         .on('set', this.setTargetFanState.bind(this));
+    } else if (this.device.scheduleCapabilities.schedulableFan !== true) {
+      accessory.removeService(this.fanService);
     }
-
 
     // Retrieve initial values and updateHomekit
     this.refreshStatus();

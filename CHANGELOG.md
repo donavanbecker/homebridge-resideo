@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 6.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v6.1.0...v6.2.0) (2020-08-24)
+
+### Changes
+
+- Added support for plugin to recognize if fan is present or not.
+- Added support to know between LCC and TCC devices.
+
 ## [Version 6.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v6.0.0...v6.1.0) (2020-07-30)
 
 ### Changes
