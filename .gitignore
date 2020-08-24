@@ -121,3 +121,4 @@ dist
 
 # Homebridge Testing
 persist/
+.DS_Store
