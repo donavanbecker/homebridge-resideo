@@ -57,17 +57,17 @@
                 "requried": false
               },
               "hide_leak": {
-                "title": "Hide Leak Sensor",
+                "title": "Hide Leak Service",
                 "type": "boolean",
                 "required": false
               },
               "hide_temperature": {
-                "title": "Hide Temperature Sensor",
+                "title": "Hide Temperature Service",
                 "type": "boolean",
                 "required": false
               },
               "hide_humidity": {
-                "title": "Hide Humidity Sensor",
+                "title": "Hide Humidity Service",
                 "type": "boolean",
                 "required": false
               }
@@ -83,22 +83,22 @@
                 "requried": false
               },
               "hide_temperature": {
-                "title": "Hide Temperature Sensor(s)",
+                "title": "Hide Temperature Service",
                 "type": "boolean",
                 "requried": false
               },
               "hide_humidity": {
-                "title": "Hide Humidity Sensor(s)",
+                "title": "Hide Humidity Service",
                 "type": "boolean",
                 "requried": false
               },
               "hide_occupancy": {
-                "title": "Hide Occupancy Sensor(s)",
+                "title": "Hide Occupancy Service",
                 "type": "boolean",
                 "requried": false
               },
               "hide_motion": {
-                "title": "Hide Motion Sensor(s)",
+                "title": "Hide Motion Service",
                 "type": "boolean",
                 "requried": false
               }
