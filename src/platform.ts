@@ -315,8 +315,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
                         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
                         existingAccessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
-                        this.api.updatePlatformAccessories([existingAccessory]);
-
+                        if (!this.config.options.thermostat.hide_thermostat) {
+                          this.api.updatePlatformAccessories([existingAccessory]);
+                        } else if (this.config.options.thermostat.hide_thermostat) {
+                          this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
+                        }
                         // create the accessory handler for the restored accessory
                         // this is imported from `platformAccessory.ts`
                         new ThermostatLCC(this, existingAccessory, locationId, device);
