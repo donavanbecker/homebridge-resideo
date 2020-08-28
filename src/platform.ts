@@ -8,7 +8,7 @@ import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl } fr
 import { ThermostatLCC } from './thermostatLCC';
 import { ThermostatTCC } from './thermostatTCC';
 import { LeakSensor } from './leakSensors';
-// import { RoomSensors } from './roomSensors';
+import { RoomSensors } from './roomSensors';
 
 /**
  * HomebridgePlatform
@@ -410,7 +410,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               this.log.info(`Ignoring device named ${device.name} - ${device.deviceID}, Alive Status: ${device.isAlive}`);
             }
           }
-        } else if (this.config.options.leak.hide_leaksensor && device.isAlive && device.deviceClass === 'LeakDetector') {
+        } else if (!this.config.options.leak.hide_leaksensor && device.isAlive && device.deviceClass === 'LeakDetector') {
           this.log.debug(`Leak Sensor UDID: ${device.userDefinedDeviceName}${device.deviceID}`);
           const uuid = this.api.hap.uuid.generate(`${device.userDefinedDeviceName}${device.deviceID}`);
 
@@ -424,8 +424,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
             // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
             existingAccessory.context.firmwareRevision = device.firmwareVer;
-            this.api.updatePlatformAccessories([existingAccessory]);
             if (!this.config.options.leak.hide_leaksensor) {
+              this.api.updatePlatformAccessories([existingAccessory]);
+            } else if (this.config.options.leak.hide_leaksensor) {
               this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
             }
 
@@ -453,6 +454,100 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
             // link the accessory to your platform
             this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
           }
+        } else if ((!this.config.options.leak.hide_roomsensor && device.deviceID.startsWith('LCC')) === true) {
+          for (const group of device.groups) {
+            this.log.debug(`Found ${device.groups.length} Group(s)`);
+            this.log.debug(group);
+            this.log.debug(group.id);
+            for (const room of group.rooms) {
+              this.log.debug(`Found Room ${room}`);
+              this.log.debug(group.rooms);
+              this.log.debug(room);
+            }
+            {
+              const accessory = (await this.axios.get(`${DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
+                params: {
+                  locationId: location.locationID,
+                },
+              })).data;
+              for (const roomaccessories of group.rooms) {
+                this.log.debug(`Found ${accessory.rooms.length} accessory.rooms`);
+                this.log.debug(group.rooms);
+                this.log.debug(roomaccessories);
+              }
+              for (const accessories of accessory.rooms) {
+                this.log.debug(accessory.rooms);
+                this.log.debug(accessories);
+                for (const findaccessories of accessories.accessories) {
+                  this.log.debug(`Found ${accessories.accessories.length} accessories.accessories`);
+                  this.log.debug(accessories.accessories);
+                  this.log.debug(findaccessories);
+                  this.log.debug(findaccessories.accessoryAttribute.type);
+
+                  
+                  // generate a unique id for the accessory this should be generated from
+                  // something globally unique, but constant, for example, the device serial
+                  // number or MAC address
+                  if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor'
+                  && device.isAlive && device.deviceClass === 'Thermostat') {
+                    // eslint-disable-next-line max-len
+                    this.log.debug(`Room Sensor UDID: ${accessories.name}${findaccessories.accessoryAttribute.type}${findaccessories.accessoryAttribute.serialNumber}${device.deviceID}`);
+                    // eslint-disable-next-line max-len
+                    const uuid = this.api.hap.uuid.generate(`${accessories.name}${findaccessories.accessoryAttribute.type}${findaccessories.accessoryAttribute.serialNumber}${device.deviceID}`);
+
+                    // see if an accessory with the same uuid has already been registered and restored from
+                    // the cached devices we stored in the `configureAccessory` method above
+                    const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
+
+                    if (existingAccessory) {
+                      // the accessory already exists
+                      this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+
+                      // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
+                      existingAccessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
+                      if (!this.config.options.leak.hide_leaksensor) {
+                        this.api.updatePlatformAccessories([existingAccessory]);
+                      } else if (this.config.options.leak.hide_leaksensor) {
+                        this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
+                      }
+                      // create the accessory handler for the restored accessory
+                      // this is imported from `platformAccessory.ts`
+                      new RoomSensors(this, existingAccessory, locationId, device, findaccessories, group);
+
+                    } else {
+                      // the accessory does not yet exist, so we need to create it
+                      this.log.info('Adding new accessory:', accessories.name);
+                      this.log.debug(`Registering new device: ${accessories.name} - ${device.deviceID}`);
+
+                      // create a new accessory
+                      const accessory = new this.api.platformAccessory(accessories.name, uuid);
+
+                      // store a copy of the device object in the `accessory.context`
+                      // the `context` property can be used to store any data about the accessory you may need
+                      accessory.context.device = device;
+                      accessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
+
+                      // create the accessory handler for the newly create accessory
+                      // this is imported from `platformAccessory.ts`
+                      new RoomSensors(this, accessory, locationId, device, findaccessories, group);
+
+                      // link the accessory to your platform
+                      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+                    }
+                  } else if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor') {
+                    // eslint-disable-next-line max-len
+                    if (this.config.options.roomsensor.hide_roomsensor) {
+                      // eslint-disable-next-line max-len
+                      this.log.info(`An ${findaccessories.accessoryAttribute.type} was found. If you haven't already installed homebridge-honeywell-home-roomesensors plugin, install it to be able to view this room sensor inside HomeKit.`);
+                    }
+                  } else {
+                    // eslint-disable-next-line max-len
+                    this.log.info(`Ignoring device named ${accessories.name} - ${findaccessories.accessoryAttribute.type}, Alive Status: ${device.isAlive}`);
+                  }
+                }
+              }
+            }
+          } //TCC Devices
         } else {
           this.log.info('A Device was found with a Device ID that didn\'t starts with LCC or TCC.');
         }
