@@ -53,9 +53,8 @@
             "properties": {
               "hide_leaksensor": {
                 "title": "Hide Leak Sensor Device(s)",
-                "type": "number",
-                "minimum": 600,
-                "description": "Indicates the number of seconds between polls of the Honeywell Home service."
+                "type": "boolean",
+                "requried": false
               },
               "hide_leak": {
                 "title": "Hide Leak Sensor",
