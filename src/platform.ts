@@ -99,8 +99,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     if (!this.config.options.thermostat || typeof this.config.options.thermostat !== 'object') {
       this.config.options.thermostat = {};
     }
-    if (!this.config.options.leak || typeof this.config.options.leak !== 'object') {
-      this.config.options.leak = {};
+    if (!this.config.options.leaksensor || typeof this.config.options.leaksensor !== 'object') {
+      this.config.options.leaksensor = {};
     }
     if (!this.config.options.roomsensor || typeof this.config.options.roomsensor !== 'object') {
       this.config.options.roomsensor = {};
@@ -109,10 +109,10 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     this.config.options.thermostat.hide_thermostat;
 
     // Leak Sensor Config Options
-    this.config.options.leak.hide_humidity;
-    this.config.options.leak.hide_temperature;
-    this.config.options.leak.hide_leak;
-    this.config.options.leak.hide_leaksensor;
+    this.config.options.leaksensor.hide_humidity;
+    this.config.options.leaksensor.hide_temperature;
+    this.config.options.leaksensor.hide_leak;
+    this.config.options.leaksensor.hide_leaksensor;
 
     // Room Sensor Config Options
     this.config.options.roomsensor.hide_roomsensor;
@@ -427,7 +427,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
             }
           }
         // Leak Sensors
-        } else if (!this.config.options.leak.hide_leaksensor && device.isAlive && device.deviceClass === 'LeakDetector') {
+        } else if (!this.config.options.leaksensor.hide_leaksensor && device.isAlive && device.deviceClass === 'LeakDetector') {
           this.log.debug(`Leak Sensor UDID: ${device.userDefinedDeviceName}${device.deviceID}`);
           const uuid = this.api.hap.uuid.generate(`${device.userDefinedDeviceName}${device.deviceID}`);
 
@@ -441,9 +441,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
             // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
             existingAccessory.context.firmwareRevision = device.firmwareVer;
-            if (!this.config.options.leak.hide_leaksensor) {
+            if (!this.config.options.leaksensor.hide_leaksensor) {
               this.api.updatePlatformAccessories([existingAccessory]);
-            } else if (this.config.options.leak.hide_leaksensor) {
+            } else if (this.config.options.leaksensor.hide_leaksensor) {
               this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
             }
 

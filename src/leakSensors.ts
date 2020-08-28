@@ -96,7 +96,7 @@ export class LeakSensor {
 
     // Leak Sensor
     this.leakService = accessory.getService(this.platform.Service.LeakSensor);
-    if (!this.leakService && !this.platform.config.options.leak.hide_leak) {
+    if (!this.leakService && !this.platform.config.options.leaksensor.hide_leak) {
       this.leakService = accessory.addService(this.platform.Service.LeakSensor,
         `${this.device.userDefinedDeviceName} Leak Sensor`);
 
@@ -109,13 +109,13 @@ export class LeakSensor {
       this.leakService
         .getCharacteristic(this.platform.Characteristic.StatusActive)
         .on('get', this.handleLeakStatusActiveGet.bind(this));
-    } else if (this.leakService && this.platform.config.options.leak.hide_leak) {
+    } else if (this.leakService && this.platform.config.options.leaksensor.hide_leak) {
       accessory.removeService(this.leakService);
     }
 
     // Temperature Sensor
     this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor);
-    if (!this.temperatureService && !this.platform.config.options.leak.hide_temperature) {
+    if (!this.temperatureService && !this.platform.config.options.leaksensor.hide_temperature) {
       this.temperatureService = accessory.addService(this.platform.Service.TemperatureSensor,
         `${this.device.userDefinedDeviceName} Temperature Sensor`);
 
@@ -128,13 +128,13 @@ export class LeakSensor {
       this.temperatureService
         .getCharacteristic(this.platform.Characteristic.StatusActive)
         .on('get', this.handleTempStatusActiveGet.bind(this));
-    } else if (this.temperatureService && this.platform.config.options.leak.hide_temperature) {
+    } else if (this.temperatureService && this.platform.config.options.leaksensor.hide_temperature) {
       accessory.removeService(this.temperatureService);
     }
 
     // Humidity Sensor
     this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
-    if (!this.humidityService && !this.platform.config.options.leak.hide_humidity) {
+    if (!this.humidityService && !this.platform.config.options.leaksensor.hide_humidity) {
       this.humidityService = accessory.addService(this.platform.Service.HumiditySensor,
         `${this.device.userDefinedDeviceName} Humidity Sensor`);
 
@@ -147,7 +147,7 @@ export class LeakSensor {
       this.humidityService
         .getCharacteristic(this.platform.Characteristic.StatusActive)
         .on('get', this.handleHumidityStatusActiveGet.bind(this));
-    } else if (this.humidityService && this.platform.config.options.leak.hide_humidity) {
+    } else if (this.humidityService && this.platform.config.options.leaksensor.hide_humidity) {
       accessory.removeService(this.humidityService);
     }
 
@@ -182,13 +182,13 @@ export class LeakSensor {
     }
 
     // Temperature Sensor
-    if (!this.platform.config.options.leak.hide_temperature) {
+    if (!this.platform.config.options.leaksensor.hide_temperature) {
       this.CurrentTemperature = this.device.currentSensorReadings.temperature;
       this.TempStatusActive = this.device.hasDeviceCheckedIn;
     }
 
     // HumiditySensor
-    if (!this.platform.config.options.leak.hide_humidity) {
+    if (!this.platform.config.options.leaksensor.hide_humidity) {
       this.CurrentRelativeHumidity = this.device.currentSensorReadings.humidity;
       this.HumidityStatusActive = this.device.hasDeviceCheckedIn;
     }
@@ -230,15 +230,15 @@ export class LeakSensor {
   updateHomeKitCharacteristics() {
     this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
     this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
-    if (!this.platform.config.options.leak.hide_leak) {
+    if (!this.platform.config.options.leaksensor.hide_leak) {
       this.leakService.updateCharacteristic(this.platform.Characteristic.StatusActive, this.StatusActive);
       this.leakService.updateCharacteristic(this.platform.Characteristic.LeakDetected, this.LeakDetected);
     }
-    if (!this.platform.config.options.leak.hide_temperature) {
+    if (!this.platform.config.options.leaksensor.hide_temperature) {
       this.temperatureService.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
       this.temperatureService.updateCharacteristic(this.platform.Characteristic.StatusActive, this.TempStatusActive);
     }
-    if (!this.platform.config.options.leak.hide_humidity) {
+    if (!this.platform.config.options.leaksensor.hide_humidity) {
       this.humidityService.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
       this.humidityService.updateCharacteristic(this.platform.Characteristic.StatusActive, this.HumidityStatusActive);
     }
