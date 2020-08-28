@@ -47,6 +47,17 @@
             "minimum": 600,
             "description": "Indicates the number of seconds between polls of the Honeywell Home service."
           },
+          "thermostat": {
+            "title": "Thermostat",
+            "type": "object",
+            "properties": {
+              "hide_thermosat": {
+                "title": "Hide Thermosat Device(s)",
+                "type": "boolean",
+                "requried": false
+              }
+            }
+          },
           "leak": {
             "title": "Leak Sensor",
             "type": "object",
