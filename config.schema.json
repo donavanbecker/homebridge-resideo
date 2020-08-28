@@ -158,7 +158,7 @@
           "items": [
             {
               "type": "help",
-              "helpvalue": "<h5>Leak Sensors</h5><em class='primary-text'>Allows you to hide your Leak Sensor(s).</em>"
+              "helpvalue": "<h5>Thermostat</h5><em class='primary-text'>Allows you to hide your Thermostat(s).</em>"
             },
             "options.thermostat.hide_thermostat"
           ]
