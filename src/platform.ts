@@ -96,6 +96,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     if (!this.config.options || typeof this.config.options !== 'object') {
       this.config.options = {};
     }
+    if (!this.config.options.thermostat || typeof this.config.options.thermostat !== 'object') {
+      this.config.options.thermostat = {};
+    }
     if (!this.config.options.leak || typeof this.config.options.leak !== 'object') {
       this.config.options.leak = {};
     }
