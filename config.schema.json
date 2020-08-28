@@ -58,7 +58,7 @@
               }
             }
           },
-          "leak": {
+          "leaksensor": {
             "title": "Leak Sensor",
             "type": "object",
             "properties": {
@@ -173,14 +173,14 @@
               "type": "help",
               "helpvalue": "<h5>Leak Sensors</h5><em class='primary-text'>Allows you to hide your Leak Sensor(s).</em>"
             },
-            "options.leak.hide_leaksensor",
+            "options.leaksensor.hide_leaksensor",
             {
               "type": "help",
               "helpvalue": "<h5>Hide Leak Sensor Services</h5><em class='primary-text'>Allows you to hide your Leak Sensor's tempeture sensor, leak sensor, or humidity sensor.</em>"
             },
-            "options.leak.hide_temperature",
-            "options.leak.hide_leak",
-            "options.leak.hide_humidity"
+            "options.leaksensor.hide_temperature",
+            "options.leaksensor.hide_leak",
+            "options.leaksensor.hide_humidity"
           ]
         },   
         {

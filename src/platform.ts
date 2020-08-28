@@ -106,16 +106,16 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       this.config.options.roomsensor = {};
     }
     // Thermostat Config Options
-    this.config.options.thermostat.hide_thermostat;
+    this.config.options.thermostat.hide_thermostat = this.config.options.thermostat.hide_thermostat || false;
 
     // Leak Sensor Config Options
+    this.config.options.leaksensor.hide_leaksensor = this.config.options.leaksensor.hide_leaksensor || false;
     this.config.options.leaksensor.hide_humidity;
     this.config.options.leaksensor.hide_temperature;
     this.config.options.leaksensor.hide_leak;
-    this.config.options.leaksensor.hide_leaksensor;
 
     // Room Sensor Config Options
-    this.config.options.roomsensor.hide_roomsensor;
+    this.config.options.roomsensor.hide_roomsensor = this.config.options.roomsensor.hide_roomsensor || false;
     this.config.options.roomsensor.hide_temperature;
     this.config.options.roomsensor.hide_occupancy;
     this.config.options.roomsensor.hide_motion;
@@ -473,7 +473,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
           }
         // Room Sensors  
         } else if (!this.config.options.roomsensor.hide_roomsensor) {
-          this.log.warn('Room Sensors Not Hidden');
           if ((device.deviceID.startsWith('LCC')) === true) {
             for (const group of device.groups) {
               this.log.debug(`Found ${device.groups.length} Group(s)`);
