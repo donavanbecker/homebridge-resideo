@@ -423,7 +423,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               }
             }
           }
-        // Leak Sensor
+        // Leak Sensors
         } else if (!this.config.options.leak.hide_leaksensor && device.isAlive && device.deviceClass === 'LeakDetector') {
           this.log.debug(`Leak Sensor UDID: ${device.userDefinedDeviceName}${device.deviceID}`);
           const uuid = this.api.hap.uuid.generate(`${device.userDefinedDeviceName}${device.deviceID}`);
