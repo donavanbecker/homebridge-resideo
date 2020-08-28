@@ -96,6 +96,12 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     if (!this.config.options || typeof this.config.options !== 'object') {
       this.config.options = {};
     }
+    if (!this.config.options.leak || typeof this.config.options.leak !== 'object') {
+      this.config.options.leak = {};
+    }
+    if (!this.config.options.roomsensor || typeof this.config.options.roomsensor !== 'object') {
+      this.config.options.roomsensor = {};
+    }
     // Leak Sensor Config Options
     this.config.options.leak.hide_humidity;
     this.config.options.leak.hide_temperature;
