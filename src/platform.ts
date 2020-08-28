@@ -473,6 +473,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
           }
         // Room Sensors  
         } else if (!this.config.options.roomsensor.hide_roomsensor) {
+          this.log.warn('Room Sensors Not Hidden');
           if ((device.deviceID.startsWith('LCC')) === true) {
             for (const group of device.groups) {
               this.log.debug(`Found ${device.groups.length} Group(s)`);
