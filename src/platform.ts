@@ -339,10 +339,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                     }
                   } else if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor') {
                     // eslint-disable-next-line max-len
-                    if (!this.config.options.roomsensor.hide_roomsensor) {
-                      this.log.info(`An ${findaccessories.accessoryAttribute.type} was found. 
-                      If you haven't already installed homebridge-honeywell-home-roomesensors plugin, 
-                      install it to be able to view this room sensor inside HomeKit.`);
+                    if (this.config.options.roomsensor.hide_roomsensor) {
+                      // eslint-disable-next-line max-len
+                      this.log.info(`An ${findaccessories.accessoryAttribute.type} was found. If you haven't already installed homebridge-honeywell-home-roomesensors plugin, install it to be able to view this room sensor inside HomeKit.`);
                     }
                   } else {
                     // eslint-disable-next-line max-len
