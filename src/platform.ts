@@ -5,15 +5,17 @@ import * as qs from 'querystring';
 import { readFileSync, writeFileSync } from 'fs';
 
 import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl } from './settings';
-import { ThermostatLCCPlatformAccessory } from './platformLCCAccessory';
-import { ThermostatTCCPlatformAccessory } from './platformTCCAccessory';
+import { ThermostatLCC } from './thermostatLCC';
+import { ThermostatTCC } from './thermostatTCC';
+import { LeakSensor } from './leakSensors';
+// import { RoomSensors } from './roomSensors';
 
 /**
  * HomebridgePlatform
  * This class is the main constructor for your plugin, this is where you should
  * parse the user config and discover/register accessories with Homebridge.
  */
-export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
+export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service = this.api.hap.Service;
   public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
 
@@ -94,7 +96,8 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
     if (!this.config.options || typeof this.config.options !== 'object') {
       this.config.options = {};
     }
-
+    this.config.options.hide_leak;
+    this.config.options.hide_roomsensor;
     this.config.options.ttl = this.config.options.ttl || 1800; // default 1800 seconds
 
     if (!this.config.credentials.consumerSecret && this.config.options.ttl < 1800) {
@@ -295,7 +298,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
 
                       // create the accessory handler for the restored accessory
                       // this is imported from `platformAccessory.ts`
-                      new ThermostatLCCPlatformAccessory(this, existingAccessory, locationId, device);
+                      new ThermostatLCC(this, existingAccessory, locationId, device);
 
                     } else {
                       // the accessory does not yet exist, so we need to create it
@@ -312,7 +315,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
 
                       // create the accessory handler for the newly create accessory
                       // this is imported from `platformAccessory.ts`
-                      new ThermostatLCCPlatformAccessory(this, accessory, locationId, device);
+                      new ThermostatLCC(this, accessory, locationId, device);
 
                       // link the accessory to your platform
                       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
@@ -360,7 +363,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
 
                 // create the accessory handler for the restored accessory
                 // this is imported from `platformAccessory.ts`
-                new ThermostatTCCPlatformAccessory(this, existingAccessory, locationId, device);
+                new ThermostatTCC(this, existingAccessory, locationId, device);
 
               } else {
                 // the accessory does not yet exist, so we need to create it
@@ -377,7 +380,7 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
 
                 // create the accessory handler for the newly create accessory
                 // this is imported from `platformAccessory.ts`
-                new ThermostatTCCPlatformAccessory(this, accessory, locationId, device);
+                new ThermostatTCC(this, accessory, locationId, device);
 
                 // link the accessory to your platform
                 this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
@@ -386,6 +389,46 @@ export class HoneywellHomeThermostatPlatform implements DynamicPlatformPlugin {
               // eslint-disable-next-line max-len
               this.log.info(`Ignoring device named ${device.name} - ${device.deviceID}, Alive Status: ${device.isAlive}`);
             }
+          }
+        } else if (device.isAlive && device.deviceClass === 'LeakDetector') {
+          this.log.debug(`Leak Sensor UDID: ${device.userDefinedDeviceName}${device.deviceID}`);
+          const uuid = this.api.hap.uuid.generate(`${device.userDefinedDeviceName}${device.deviceID}`);
+
+          // see if an accessory with the same uuid has already been registered and restored from
+          // the cached devices we stored in the `configureAccessory` method above
+          const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
+
+          if (existingAccessory) {
+            // the accessory already exists
+            this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+
+            // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
+            existingAccessory.context.firmwareRevision = device.firmwareVer;
+            this.api.updatePlatformAccessories([existingAccessory]);
+
+            // create the accessory handler for the restored accessory
+            // this is imported from `platformAccessory.ts`
+            new LeakSensor(this, existingAccessory, locationId, device);
+
+          } else {
+            // the accessory does not yet exist, so we need to create it
+            this.log.info('Adding new accessory:', device.userDefinedDeviceName);
+            this.log.debug(`Registering new device: ${device.userDefinedDeviceName} - ${device.deviceID}`);
+
+            // create a new accessory
+            const accessory = new this.api.platformAccessory(device.userDefinedDeviceName, uuid);
+
+            // store a copy of the device object in the `accessory.context`
+            // the `context` property can be used to store any data about the accessory you may need
+            accessory.context.device = device;
+            accessory.context.firmwareRevision = device.firmwareVer;
+
+            // create the accessory handler for the newly create accessory
+            // this is imported from `platformAccessory.ts`
+            new LeakSensor(this, accessory, locationId, device);
+
+            // link the accessory to your platform
+            this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
           }
         } else {
           this.log.info('A Device was found with a Device ID that didn\'t starts with LCC or TCC.');

@@ -46,6 +46,16 @@
             "type": "number",
             "minimum": 600,
             "description": "Indicates the number of seconds between polls of the Honeywell Home service."
+          },
+          "hide_leak": {
+            "title": "Hide Leak Sensor",
+            "type": "boolean",
+            "required": false
+          },
+          "hide_roomsensor": {
+            "title": "Hide Room Sensor",
+            "type": "boolean",
+            "required": false
           }
         }
       }
@@ -81,7 +91,9 @@
         {
           "key": "options.ttl",
           "notitle": true
-        }
+        },
+        "options.hide_leak",
+        "options.hide_roomsensor"
       ]
     }
   ]
