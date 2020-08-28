@@ -96,8 +96,19 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     if (!this.config.options || typeof this.config.options !== 'object') {
       this.config.options = {};
     }
-    this.config.options.hide_leak;
-    this.config.options.hide_roomsensor;
+    // Leak Sensor Config Options
+    this.config.options.leak.hide_humidity;
+    this.config.options.leak.hide_temperature;
+    this.config.options.leak.hide_leak;
+    this.config.options.leak.hide_leaksensor;
+
+    // Room Sensor Config Options
+    this.config.options.roomsensor.hide_roomsensor;
+    this.config.options.roomsensor.hide_temperature;
+    this.config.options.roomsensor.hide_occupancy;
+    this.config.options.roomsensor.hide_motion;
+    this.config.options.roomsensor.hide_humidity;
+
     this.config.options.ttl = this.config.options.ttl || 1800; // default 1800 seconds
 
     if (!this.config.credentials.consumerSecret && this.config.options.ttl < 1800) {
@@ -322,7 +333,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                     }
                   } else if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor') {
                     // eslint-disable-next-line max-len
-                    this.log.info(`An ${findaccessories.accessoryAttribute.type} was found. If you haven't already installed homebridge-honeywell-home-roomesensors plugin, install it to be able to view this room sensor inside HomeKit.`);
+                    if (!this.config.options.roomsensor.hide_roomsensor) {
+                      this.log.info(`An ${findaccessories.accessoryAttribute.type} was found. 
+                      If you haven't already installed homebridge-honeywell-home-roomesensors plugin, 
+                      install it to be able to view this room sensor inside HomeKit.`);
+                    }
                   } else {
                     // eslint-disable-next-line max-len
                     this.log.info(`Ignoring device named ${accessories.name} - ${findaccessories.accessoryAttribute.type}, Alive Status: ${device.isAlive}`);

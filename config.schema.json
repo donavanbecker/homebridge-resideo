@@ -47,15 +47,63 @@
             "minimum": 600,
             "description": "Indicates the number of seconds between polls of the Honeywell Home service."
           },
-          "hide_leak": {
-            "title": "Hide Leak Sensor",
-            "type": "boolean",
-            "required": false
+          "leak": {
+            "title": "Leak Sensor",
+            "type": "object",
+            "properties": {
+              "hide_leaksensor": {
+                "title": "Hide Leak Sensor Device(s)",
+                "type": "number",
+                "minimum": 600,
+                "description": "Indicates the number of seconds between polls of the Honeywell Home service."
+              },
+              "hide_leak": {
+                "title": "Hide Leak Sensor",
+                "type": "boolean",
+                "required": false
+              },
+              "hide_temperature": {
+                "title": "Hide Temperature Sensor",
+                "type": "boolean",
+                "required": false
+              },
+              "hide_humidity": {
+                "title": "Hide Humidity Sensor",
+                "type": "boolean",
+                "required": false
+              }
+            }
           },
-          "hide_roomsensor": {
-            "title": "Hide Room Sensor",
-            "type": "boolean",
-            "required": false
+          "roomsensor": {
+            "title": "Room Sensor",
+            "type": "object",
+            "properties": {
+              "hide_roomsensor": {
+                "title": "Hide Room Sensor(s)",
+                "type": "boolean",
+                "requried": false
+              },
+              "hide_temperature": {
+                "title": "Hide Temperature Sensor(s)",
+                "type": "boolean",
+                "requried": false
+              },
+              "hide_humidity": {
+                "title": "Hide Humidity Sensor(s)",
+                "type": "boolean",
+                "requried": false
+              },
+              "hide_occupancy": {
+                "title": "Hide Occupancy Sensor(s)",
+                "type": "boolean",
+                "requried": false
+              },
+              "hide_motion": {
+                "title": "Hide Motion Sensor(s)",
+                "type": "boolean",
+                "requried": false
+              }
+            }
           }
         }
       }
@@ -92,8 +140,15 @@
           "key": "options.ttl",
           "notitle": true
         },
-        "options.hide_leak",
-        "options.hide_roomsensor"
+        "options.leak.hide_leaksensor",
+        "options.leak.hide_temperature",
+        "options.leak.hide_leak",
+        "options.leak.hide_humidity",
+        "options.roomsensor.hide_roomsensor",
+        "options.roomsensor.hide_temperature",
+        "options.roomsensor.hide_occupancy",
+        "options.roomsensor.hide_motion",
+        "options.roomsensor.hide_humidity"
       ]
     }
   ]
