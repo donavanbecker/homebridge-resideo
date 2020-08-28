@@ -152,6 +152,19 @@
         },
         {
           "type": "fieldset",
+          "title": "Thermosat Options",
+          "expandable": true,
+          "expanded": false,
+          "items": [
+            {
+              "type": "help",
+              "helpvalue": "<h5>Leak Sensors</h5><em class='primary-text'>Allows you to hide your Leak Sensor(s).</em>"
+            },
+            "options.thermosat.hide_thermostat"
+          ]
+        },
+        {
+          "type": "fieldset",
           "title": "Leak Sensor Options",
           "expandable": true,
           "expanded": false,
