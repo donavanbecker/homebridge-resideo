@@ -454,7 +454,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
             // link the accessory to your platform
             this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
           }
-        } else if (!this.config.options.leak.hide_roomsensor) {
+        } else if (!this.config.options.leak.hide_leaksensor) {
           if ((device.deviceID.startsWith('LCC')) === true) {
             for (const group of device.groups) {
               this.log.debug(`Found ${device.groups.length} Group(s)`);
