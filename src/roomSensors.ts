@@ -189,7 +189,7 @@ export class RoomSensors {
     }
 
     // Set Motion Sensor State
-    if (!this.platform.config.options.roomsensor.roomsensor.hide_motion) {
+    if (!this.platform.config.options.roomsensor.hide_motion) {
       this.MotionDetected = this.findaccessories.accessoryValue.motionDet;
       if (this.findaccessories.accessoryValue.motionDet === false) {
         this.MotionDetected = true;
