@@ -107,10 +107,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       this.config.options.roomsensor = {};
     }
     // Thermostat Config Options
-    if (this.config.options.thermostat.hide) {
-      this.config.options.thermostat.hide_lcc = true;
-      this.config.options.thermostat.hide_lcc = true;
-    }
+    this.config.options.thermostat.hide;
 
     // Leak Sensor Config Options
     this.config.options.leaksensor.hide;
