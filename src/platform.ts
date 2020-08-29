@@ -303,8 +303,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 // generate a unique id for the accessory this should be generated from
                 // something globally unique, but constant, for example, the device serial
                 // number or MAC address
-                if (!this.config.options.thermostat.hide && findaccessories.accessoryAttribute.type === 'Thermostat'
-                  && device.isAlive && device.deviceClass === 'Thermostat') {
+                if (findaccessories.accessoryAttribute.type === 'Thermostat' && device.isAlive && device.deviceClass === 'Thermostat') {
                   this.log.debug(`LLC UDID: ${accessories.name}${findaccessories.accessoryAttribute.type}${findaccessories.accessoryAttribute.serialNumber}${device.deviceID}`);
                   const uuid = this.api.hap.uuid.generate(`${accessories.name}${findaccessories.accessoryAttribute.type}${findaccessories.accessoryAttribute.serialNumber}${device.deviceID}`);
 
@@ -329,7 +328,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                       this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
                       this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
                     }
-                  } else {
+                  } else if (!this.config.options.thermostat.hide) {
                     // the accessory does not yet exist, so we need to create it
                     this.log.info('Adding new accessory:', accessories.name);
                     this.log.debug(`Registering new device: ${accessories.name} - ${device.deviceID}`);
