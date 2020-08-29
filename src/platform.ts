@@ -327,6 +327,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                     } else if (this.config.options.thermostat.hide || !device.isAlive) {
                       // remove platform accessories when no longer present
                       this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
+                      this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
                     }
                   } else {
                     // the accessory does not yet exist, so we need to create it
@@ -372,6 +373,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                     } else if (this.config.options.roomsensor.hide || !device.isAlive) {
                       // remove platform accessories when no longer present
                       this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
+                      this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
                     }
                   } else {
                     // the accessory does not yet exist, so we need to create it
@@ -435,6 +437,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 } else if (this.config.options.thermostat.hide || !device.isAlive) {
                   // remove platform accessories when no longer present
                   this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
+                  this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
                 }
               } else {
                 // the accessory does not yet exist, so we need to create it
@@ -496,6 +499,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 } else if (this.config.options.leaksensor.hide || !device.isAlive) {
                   // remove platform accessories when no longer present
                   this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
+                  this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
                 }
               } else {
                 // the accessory does not yet exist, so we need to create it
