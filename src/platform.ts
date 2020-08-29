@@ -330,7 +330,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                     this.log.debug(`Registering new device: ${accessories.name} - ${device.deviceID}`);
 
                     // create a new accessory
-                    const accessory = new this.api.platformAccessory(accessories.name, uuid);
+                    const accessory = new this.api.platformAccessory(`${accessories.name} ${findaccessories.accessoryAttribute.type}`, uuid);
 
                     // store a copy of the device object in the `accessory.context`
                     // the `context` property can be used to store any data about the accessory you may need
@@ -371,7 +371,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                     this.log.debug(`Registering new device: ${accessories.name} - ${device.deviceID}`);
 
                     // create a new accessory
-                    const accessory = new this.api.platformAccessory(accessories.name, uuid);
+                    const accessory = new this.api.platformAccessory(`${accessories.name} ${findaccessories.accessoryAttribute.type}`, uuid);
 
                     // store a copy of the device object in the `accessory.context`
                     // the `context` property can be used to store any data about the accessory you may need
@@ -430,7 +430,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 this.log.debug(`Registering new device: ${device.name} - ${device.deviceID}`);
 
                 // create a new accessory
-                const accessory = new this.api.platformAccessory(device.name, uuid);
+                const accessory = new this.api.platformAccessory(`${device.name} ${device.deviceClass}`, uuid);
 
                 // store a copy of the device object in the `accessory.context`
                 // the `context` property can be used to store any data about the accessory you may need
@@ -483,11 +483,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
               } else {
                 // the accessory does not yet exist, so we need to create it
-                this.log.info('Adding new accessory:', device.userDefinedDeviceName);
+                this.log.info('Adding new accessory:', `${device.userDefinedDeviceName} ${device.deviceClass}`);
                 this.log.debug(`Registering new device: ${device.userDefinedDeviceName} - ${device.deviceID}`);
 
                 // create a new accessory
-                const accessory = new this.api.platformAccessory(device.userDefinedDeviceName, uuid);
+                const accessory = new this.api.platformAccessory(`${device.userDefinedDeviceName} ${device.deviceClass}`, uuid);
 
                 // store a copy of the device object in the `accessory.context`
                 // the `context` property can be used to store any data about the accessory you may need
