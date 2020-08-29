@@ -324,7 +324,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                       // create the accessory handler for the restored accessory
                       // this is imported from `platformAccessory.ts`
                       new ThermostatLCC(this, existingAccessory, locationId, device);
-                    } else {
+                    } else if (this.config.options.thermostat.hide || !device.isAlive) {
                       // remove platform accessories when no longer present
                       this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
                     }
@@ -359,7 +359,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
                   if (existingAccessory) {
                     // the accessory already exists
-                    if (!this.config.options.thermostat.hide && device.isAlive) {
+                    if (!this.config.options.roomsensor.hide && device.isAlive) {
                       // the accessory already exists
                       this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
@@ -369,7 +369,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                       // create the accessory handler for the restored accessory
                       // this is imported from `platformAccessory.ts`
                       new RoomSensors(this, existingAccessory, locationId, device, findaccessories, group);
-                    } else {
+                    } else if (this.config.options.roomsensor.hide || !device.isAlive) {
                       // remove platform accessories when no longer present
                       this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
                     }
@@ -432,7 +432,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                   // create the accessory handler for the restored accessory
                   // this is imported from `platformAccessory.ts`
                   new ThermostatTCC(this, existingAccessory, locationId, device);
-                } else {
+                } else if (this.config.options.thermostat.hide || !device.isAlive) {
                   // remove platform accessories when no longer present
                   this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
                 }
@@ -493,7 +493,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                   // create the accessory handler for the restored accessory
                   // this is imported from `platformAccessory.ts`
                   new LeakSensor(this, existingAccessory, locationId, device);
-                } else {
+                } else if (this.config.options.leaksensor.hide || !device.isAlive) {
                   // remove platform accessories when no longer present
                   this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
                 }
