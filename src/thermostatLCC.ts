@@ -136,7 +136,7 @@ export class ThermostatLCC {
       this.fanService
         .getCharacteristic(this.platform.Characteristic.TargetFanState)
         .on('set', this.setTargetFanState.bind(this));
-    } else if (this.fanService && this.platform.config.options.hide_motion) {
+    } else if (this.fanService && this.platform.config.options.thermostat.hide_fan) {
       accessory.removeService(this.fanService);
     }
 
