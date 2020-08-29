@@ -5,7 +5,7 @@ import axios, { AxiosInstance } from 'axios';
 import * as qs from 'querystring';
 import { readFileSync, writeFileSync } from 'fs';
 
-import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl, Feature_Request } from './settings';
+import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl } from './settings';
 import { ThermostatLCC } from './thermostatLCC';
 import { ThermostatTCC } from './thermostatTCC';
 import { LeakSensor } from './leakSensors';
@@ -521,7 +521,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
           }
         } else {
           this.log.info(`The following Device: ${device.deviceID} ${device.deviceClass} was not added. The device is either hidden or not supported.}`);
-          this.log.info(`Request Support Here: ${Feature_Request}`);
         }
       }
     }

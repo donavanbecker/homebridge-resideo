@@ -28,8 +28,3 @@ export const LocationURL = 'https://api.honeywell.com/v2/locations';
  * This is the url used to access UI Login to honeywell API
  */
 export const UIurl = 'https://homebridge-honeywell.iot.oz.nu/user/refresh';
-
-/**
- * This is the url to add Features to Homebridge Honeywell Home plugin.
- */
-export const Feature_Request = 'https://github.com/donavanbecker/homebridge-honeywell-home/issues/new?assignees=&labels=&template=feature_request.md';
