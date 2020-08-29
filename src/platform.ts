@@ -330,7 +330,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                     this.log.debug(`Registering new device: ${accessories.name} - ${device.deviceID}`);
 
                     // create a new accessory
-                    const accessory = new this.api.platformAccessory(`${accessories.name} ${findaccessories.accessoryAttribute.type}`, uuid);
+                    const accessory = new this.api.platformAccessory(`${accessories.name} Thermostat}`, uuid);
 
                     // store a copy of the device object in the `accessory.context`
                     // the `context` property can be used to store any data about the accessory you may need
@@ -367,11 +367,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
                   } else {
                     // the accessory does not yet exist, so we need to create it
-                    this.log.info('Adding new accessory:', accessories.name);
-                    this.log.debug(`Registering new device: ${accessories.name} - ${device.deviceID}`);
+                    this.log.info('Adding new accessory:', `${accessories.name} Room Sensor`);
+                    this.log.debug(`Registering new device: ${accessories.name} Room Sensor - ${device.deviceID}`);
 
                     // create a new accessory
-                    const accessory = new this.api.platformAccessory(`${accessories.name} ${findaccessories.accessoryAttribute.type}`, uuid);
+                    const accessory = new this.api.platformAccessory(`${accessories.name} Room Sensor`, uuid);
 
                     // store a copy of the device object in the `accessory.context`
                     // the `context` property can be used to store any data about the accessory you may need
@@ -426,11 +426,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
               } else {
                 // the accessory does not yet exist, so we need to create it
-                this.log.info('Adding new accessory:', device.name);
-                this.log.debug(`Registering new device: ${device.name} - ${device.deviceID}`);
+                this.log.info('Adding new accessory:', `${device.name} Thermostat`);
+                this.log.debug(`Registering new device: ${device.name} Thermostat - ${device.deviceID}`);
 
                 // create a new accessory
-                const accessory = new this.api.platformAccessory(`${device.name} ${device.deviceClass}`, uuid);
+                const accessory = new this.api.platformAccessory(`${device.name} Thermostat`, uuid);
 
                 // store a copy of the device object in the `accessory.context`
                 // the `context` property can be used to store any data about the accessory you may need
@@ -445,7 +445,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
               }
             } else {
-              this.log.info(`Ignoring device named ${device.name} - ${device.deviceID}, Alive Status: ${device.isAlive}`);
+              this.log.info(`Ignoring device named ${device.name} ${device.deviceClass} - ${device.deviceID}, Alive Status: ${device.isAlive}`);
             }
           } // Leak Sensors
         } else if (!this.config.options.leaksensor.hide && device.deviceClass === 'LeakDetector') {
@@ -483,11 +483,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
               } else {
                 // the accessory does not yet exist, so we need to create it
-                this.log.info('Adding new accessory:', `${device.userDefinedDeviceName} ${device.deviceClass}`);
-                this.log.debug(`Registering new device: ${device.userDefinedDeviceName} - ${device.deviceID}`);
+                this.log.info('Adding new accessory:', `${device.userDefinedDeviceName} Leak Sensor`);
+                this.log.debug(`Registering new device: ${device.userDefinedDeviceName} Leak Sensor - ${device.deviceID}`);
 
                 // create a new accessory
-                const accessory = new this.api.platformAccessory(`${device.userDefinedDeviceName} ${device.deviceClass}`, uuid);
+                const accessory = new this.api.platformAccessory(`${device.userDefinedDeviceName} Leak Sensor`, uuid);
 
                 // store a copy of the device object in the `accessory.context`
                 // the `context` property can be used to store any data about the accessory you may need
@@ -508,7 +508,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
             }*/
           }
         } else {
-          this.log.info(`The following Device with a Device ID of ${device.deviceID} & Device Class of ${device.deviceClass}, it was not added because it is either hidden or not supported.`);
+          this.log.info(`The following Device: ${device.deviceID} ${device.deviceClass} was not added. The device is either hidden or not supported.}`);
+          this.log.info(`Request Support for unsupported Devices Here: ${'https://github.com/donavanbecker/homebridge-honeywell-home/issues/new?assignees=&labels=&template=feature_request.md&title='}`);
         }
       }
     }
