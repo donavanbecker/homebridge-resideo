@@ -546,7 +546,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                         this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
                       }
                       // remove platform accessories when no longer present
-                      this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+                      // this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
                       
                     } else if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor') {
                       // eslint-disable-next-line max-len
