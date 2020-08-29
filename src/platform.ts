@@ -348,7 +348,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                     // link the accessory to your platform
                     this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
                   }
-                } else if (!this.config.options.thermostat.hide && !this.config.options.roomsensor.hide && findaccessories.accessoryAttribute.type === 'IndoorAirSensor'
+                } else if (!this.config.options.thermostat.hide && findaccessories.accessoryAttribute.type === 'IndoorAirSensor'
                   && device.isAlive && device.deviceClass === 'Thermostat') {
                   this.log.debug(`Room Sensor UDID: ${accessories.name}${findaccessories.accessoryAttribute.type}${findaccessories.accessoryAttribute.serialNumber}${device.deviceID}`);
                   const uuid = this.api.hap.uuid.generate(`${accessories.name}${findaccessories.accessoryAttribute.type}${findaccessories.accessoryAttribute.serialNumber}${device.deviceID}`);
@@ -374,7 +374,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                       this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
                       this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
                     }
-                  } else {
+                  } else if (!this.config.options.roomsensor.hide) {
                     // the accessory does not yet exist, so we need to create it
                     this.log.info('Adding new accessory:', `${accessories.name} Room Sensor`);
                     this.log.debug(`Registering new device: ${accessories.name} Room Sensor - ${device.deviceID}`);
@@ -413,7 +413,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
           for (const device of devices) {
             this.log.debug(device);
             this.log.debug(device.deviceID);
-            if (!this.config.options.thermostat.hide && device.isAlive && device.deviceClass === 'Thermostat') {
+            if (device.isAlive && device.deviceClass === 'Thermostat') {
               this.log.debug(`TCC UDID: ${device.name}${device.deviceID}`);
               const uuid = this.api.hap.uuid.generate(`${device.name}${device.deviceID}`);
 
@@ -438,7 +438,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                   this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
                   this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
                 }
-              } else {
+              } else if (!this.config.options.thermostat.hide) {
                 // the accessory does not yet exist, so we need to create it
                 this.log.info('Adding new accessory:', `${device.name} Thermostat`);
                 this.log.debug(`Registering new device: ${device.name} Thermostat - ${device.deviceID}`);
@@ -462,7 +462,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               this.log.info(`Ignoring device named ${device.name} ${device.deviceClass} - ${device.deviceID}, Alive Status: ${device.isAlive}`);
             }
           } // Leak Sensors
-        } else if (!this.config.options.leaksensor.hide && device.deviceClass === 'LeakDetector') {
+        } else if (device.deviceClass === 'LeakDetector') {
           // generate a unique id for the accessory this should be generated from
           // something globally unique, but constant, for example, the device serial
           // number or MAC address
@@ -500,7 +500,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                   this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
                   this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
                 }
-              } else {
+              } else if (!this.config.options.leaksensor.hide) {
                 // the accessory does not yet exist, so we need to create it
                 this.log.info('Adding new accessory:', `${device.userDefinedDeviceName} Leak Sensor`);
                 this.log.debug(`Registering new device: ${device.userDefinedDeviceName} Leak Sensor - ${device.deviceID}`);
