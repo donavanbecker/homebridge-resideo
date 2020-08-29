@@ -5,7 +5,7 @@ import axios, { AxiosInstance } from 'axios';
 import * as qs from 'querystring';
 import { readFileSync, writeFileSync } from 'fs';
 
-import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl, Feature} from './settings';
+import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl, Feature_Request } from './settings';
 import { ThermostatLCC } from './thermostatLCC';
 import { ThermostatTCC } from './thermostatTCC';
 import { LeakSensor } from './leakSensors';
@@ -314,16 +314,20 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
                   if (existingAccessory) {
                     // the accessory already exists
-                    this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+                    if (!this.config.options.thermostat.hide && device.isAlive) {
+                      this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
-                    // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-                    existingAccessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
-                    this.api.updatePlatformAccessories([existingAccessory]);
+                      // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
+                      existingAccessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
+                      this.api.updatePlatformAccessories([existingAccessory]);
 
-                    // create the accessory handler for the restored accessory
-                    // this is imported from `platformAccessory.ts`
-                    new ThermostatLCC(this, existingAccessory, locationId, device);
-
+                      // create the accessory handler for the restored accessory
+                      // this is imported from `platformAccessory.ts`
+                      new ThermostatLCC(this, existingAccessory, locationId, device);
+                    } else {
+                      // remove platform accessories when no longer present
+                      this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
+                    }
                   } else {
                     // the accessory does not yet exist, so we need to create it
                     this.log.info('Adding new accessory:', accessories.name);
@@ -355,16 +359,20 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
                   if (existingAccessory) {
                     // the accessory already exists
-                    this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+                    if (!this.config.options.thermostat.hide && device.isAlive) {
+                      // the accessory already exists
+                      this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
-                    // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-                    existingAccessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
-                    this.api.updatePlatformAccessories([existingAccessory]);
-
-                    // create the accessory handler for the restored accessory
-                    // this is imported from `platformAccessory.ts`
-                    new RoomSensors(this, existingAccessory, locationId, device, findaccessories, group);
-
+                      // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
+                      existingAccessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
+                      this.api.updatePlatformAccessories([existingAccessory]);
+                      // create the accessory handler for the restored accessory
+                      // this is imported from `platformAccessory.ts`
+                      new RoomSensors(this, existingAccessory, locationId, device, findaccessories, group);
+                    } else {
+                      // remove platform accessories when no longer present
+                      this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
+                    }
                   } else {
                     // the accessory does not yet exist, so we need to create it
                     this.log.info('Adding new accessory:', `${accessories.name} Room Sensor`);
@@ -414,16 +422,20 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
               if (existingAccessory) {
                 // the accessory already exists
-                this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+                if (!this.config.options.thermostat.hide && device.isAlive) {
+                  this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
-                // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-                existingAccessory.context.firmwareRevision = device.thermostatVersion;
-                this.api.updatePlatformAccessories([existingAccessory]);
+                  // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
+                  existingAccessory.context.firmwareRevision = device.thermostatVersion;
+                  this.api.updatePlatformAccessories([existingAccessory]);
 
-                // create the accessory handler for the restored accessory
-                // this is imported from `platformAccessory.ts`
-                new ThermostatTCC(this, existingAccessory, locationId, device);
-
+                  // create the accessory handler for the restored accessory
+                  // this is imported from `platformAccessory.ts`
+                  new ThermostatTCC(this, existingAccessory, locationId, device);
+                } else {
+                  // remove platform accessories when no longer present
+                  this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
+                }
               } else {
                 // the accessory does not yet exist, so we need to create it
                 this.log.info('Adding new accessory:', `${device.name} Thermostat`);
@@ -471,16 +483,20 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
               if (existingAccessory) {
                 // the accessory already exists
-                this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+                if (!this.config.options.leaksensor.hide && device.isAlive) {
+                  this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
-                // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-                existingAccessory.context.firmwareRevision = device.firmwareVer;
-                this.api.updatePlatformAccessories([existingAccessory]);
+                  // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
+                  existingAccessory.context.firmwareRevision = device.firmwareVer;
+                  this.api.updatePlatformAccessories([existingAccessory]);
 
-                // create the accessory handler for the restored accessory
-                // this is imported from `platformAccessory.ts`
-                new LeakSensor(this, existingAccessory, locationId, device);
-
+                  // create the accessory handler for the restored accessory
+                  // this is imported from `platformAccessory.ts`
+                  new LeakSensor(this, existingAccessory, locationId, device);
+                } else {
+                  // remove platform accessories when no longer present
+                  this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
+                }
               } else {
                 // the accessory does not yet exist, so we need to create it
                 this.log.info('Adding new accessory:', `${device.userDefinedDeviceName} Leak Sensor`);
@@ -501,15 +517,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 // link the accessory to your platform
                 this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
               }
-            }                     
-            /* remove platform accessories when no longer present
-            if (this.config.options.roomsensor.hide || this.config.options.thermostat.hide || this.config.options.leaksensor.hide) {
-              this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
-            }*/
+            }
           }
         } else {
           this.log.info(`The following Device: ${device.deviceID} ${device.deviceClass} was not added. The device is either hidden or not supported.}`);
-          this.log.info(`Request Support for unsupported Devices Here: ${Feature}`);
+          this.log.info(`Request Support Here: ${Feature_Request}`);
         }
       }
     }

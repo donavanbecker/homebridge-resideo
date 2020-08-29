@@ -32,4 +32,4 @@ export const UIurl = 'https://homebridge-honeywell.iot.oz.nu/user/refresh';
 /**
  * This is the url to add Features to Homebridge Honeywell Home plugin.
  */
-export const Feature = 'https://github.com/donavanbecker/homebridge-honeywell-home/issues/new?assignees=&labels=&template=feature_request.md&title=';
+export const Feature_Request = 'https://github.com/donavanbecker/homebridge-honeywell-home/issues/new?assignees=&labels=&template=feature_request.md';
