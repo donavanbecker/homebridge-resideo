@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /**
  * This is the name of the platform that users will use to register the plugin in the Homebridge config.json
  */
@@ -27,3 +28,8 @@ export const LocationURL = 'https://api.honeywell.com/v2/locations';
  * This is the url used to access UI Login to honeywell API
  */
 export const UIurl = 'https://homebridge-honeywell.iot.oz.nu/user/refresh';
+
+/**
+ * This is the url to add Features to Homebridge Honeywell Home plugin.
+ */
+export const Feature = 'https://github.com/donavanbecker/homebridge-honeywell-home/issues/new?assignees=&labels=&template=feature_request.md&title=';
