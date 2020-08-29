@@ -123,11 +123,11 @@ export class ThermostatLCC {
 
     this.service.getCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits)
       .on('set', this.setTemperatureDisplayUnits.bind(this));
-
+  
     // Fan Controls
-    if (this.device.scheduleCapabilities.schedulableFan) {
-      this.fanService = accessory.getService(this.platform.Service.Fanv2) ?
-        accessory.getService(this.platform.Service.Fanv2) : accessory.addService(this.platform.Service.Fanv2, `${this.device.name} ${this.device.deviceClass} Fan`);
+    this.fanService = accessory.getService(this.platform.Service.Fanv2);
+    if (this.device.scheduleCapabilities.schedulableFan && this.fanService && !this.platform.config.options.thermostat.hide_fan) {
+      this.fanService = accessory.addService(this.platform.Service.Fanv2, `${this.device.name} ${this.device.deviceClass} Fan`);
       
       this.fanService
         .getCharacteristic(this.platform.Characteristic.Active)
@@ -136,6 +136,8 @@ export class ThermostatLCC {
       this.fanService
         .getCharacteristic(this.platform.Characteristic.TargetFanState)
         .on('set', this.setTargetFanState.bind(this));
+    } else if (this.fanService && this.platform.config.options.hide_motion) {
+      accessory.removeService(this.fanService);
     }
 
     // Retrieve initial values and updateHomekit

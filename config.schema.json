@@ -55,6 +55,11 @@
                 "title": "Hide Thermostat Device(s)",
                 "type": "boolean",
                 "requried": false
+              },
+              "hide_fan": {
+                "title": "Hide Thermostat(s) Fan",
+                "type": "boolean",
+                "requried": false
               }
             }
           },
@@ -160,7 +165,12 @@
               "type": "help",
               "helpvalue": "<h5>Thermostat</h5><em class='primary-text'>Allows you to hide your Thermostat(s).</em>"
             },
-            "options.thermostat.hide"
+            "options.thermostat.hide",
+            {
+              "type": "help",
+              "helpvalue": "<h5>Hide Thermostat Fan Service</h5><em class='primary-text'>Allows you to hide your Thermostat's Fan.</em>"
+            },
+            "options.thermostat.hide_fan"
           ]
         },
         {
