@@ -539,16 +539,16 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                         // link the accessory to your platform
                         this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
                       }
+                      // remove platform accessories when no longer present
+                      this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
                       
                     } else if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor') {
                       // eslint-disable-next-line max-len
                       if (this.config.options.roomsensor.hide) {
-
                         // eslint-disable-next-line max-len
                         this.log.info(`An ${findaccessories.accessoryAttribute.type} was found. If you haven't already installed homebridge-honeywell-home-roomesensors plugin, install it to be able to view this room sensor inside HomeKit.`);
                       }
                     } else {
-                      this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
                       // eslint-disable-next-line max-len
                       this.log.info(`Ignoring device named ${accessories.name} - ${findaccessories.accessoryAttribute.type}, Alive Status: ${device.isAlive}`);
                     }
