@@ -62,7 +62,7 @@
             "title": "Leak Sensor",
             "type": "object",
             "properties": {
-              "hide_leaksensor": {
+              "hide": {
                 "title": "Hide Leak Sensor Device(s)",
                 "type": "boolean",
                 "requried": false
@@ -88,7 +88,7 @@
             "title": "Room Sensor",
             "type": "object",
             "properties": {
-              "hide_roomsensor": {
+              "hide": {
                 "title": "Hide Room Sensor(s)",
                 "type": "boolean",
                 "requried": false
@@ -160,7 +160,7 @@
               "type": "help",
               "helpvalue": "<h5>Thermostat</h5><em class='primary-text'>Allows you to hide your Thermostat(s).</em>"
             },
-            "options.thermostat.hide_thermostat"
+            "options.thermostat.hide"
           ]
         },
         {
@@ -173,7 +173,7 @@
               "type": "help",
               "helpvalue": "<h5>Leak Sensors</h5><em class='primary-text'>Allows you to hide your Leak Sensor(s).</em>"
             },
-            "options.leaksensor.hide_leaksensor",
+            "options.leaksensor.hide",
             {
               "type": "help",
               "helpvalue": "<h5>Hide Leak Sensor Services</h5><em class='primary-text'>Allows you to hide your Leak Sensor's tempeture sensor, leak sensor, or humidity sensor.</em>"
@@ -193,7 +193,7 @@
               "type": "help",
               "helpvalue": "<h5>Room Sensors</h5><em class='primary-text'>Allows you to hide your Room Sensor(s).</em>"
             },
-            "options.roomsensor.hide_roomsensor",
+            "options.roomsensor.hide",
             {
               "type": "help",
               "helpvalue": "<h5>Hide Room Sensor Services</h5><em class='primary-text'>Allows you to hide your Room Sensor's tempeture sensor, occupancy sensor, motion sensor, or humidity sensor.</em>"
