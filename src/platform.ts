@@ -508,7 +508,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
             }*/
           }
         } else {
-          this.log.info(`A Device was found with the follow Device ID: ${device.deviceID} & Device Class: ${device.deviceClass}.`);
+          this.log.info(`The following Device with a Device ID of ${device.deviceID} & Device Class of ${device.deviceClass}, it was not added because it is either hidden or not supported.`);
         }
       }
     }
