@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 7.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v6.2.0...v7.0.0) (2020-08-29)
+
+### Major Changes
+
+- Added Support for Leak Sensors, Thermostats, and Room Sensors all into one plugin.
+- Seperated each Accessory into its on plugin. 
+  - [homebridge-honeywell-home-thermostat](https://github.com/donavanbecker/homebridge-honeywell-home-thermostat)
+  - [homebridge-honeywell-home-roomsensors](https://github.com/donavanbecker/homebridge-honeywell-home-roomsensors)
+  - [homebridge-honeywell-leak](https://github.com/donavanbecker/homebridge-honeywell-leak)
+
+### Changes
+
+- Added support to Hide Thermstats.
+- Added support to Hide Thermstats Fans.
+- Added support to Hide Leak Sensors.
+- Added support to Hide Room Sensors.
+
 ## [Version 6.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v6.1.0...v6.2.0) (2020-08-24)
 
 ### Changes

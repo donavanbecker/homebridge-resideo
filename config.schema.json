@@ -2,8 +2,8 @@
   "pluginAlias": "HoneywellHome",
   "pluginType": "platform",
   "singular": true,
-  "headerDisplay": "<p align='center'><img width='250px' src='https://user-images.githubusercontent.com/3979615/71876008-d99d7400-3179-11ea-909b-9d2a3d1e670f.png'></p>\n\nThe **Homebridge Honeywell Home** plugin allows you to control your T5, T6 and T9 Honeywell Home thermostats from HomeKit. \n\nIf you have room sensors for your T9 thermostat, checkout my other plugin **homebridge-honeywell-home-roomsensors** To be able to access your Room Sensor data in HomeKit.  To get started link your Honeywell Home account using the button below.",
-  "footerDisplay": "Your Honeywell Home account has been linked. Please raise any issues on our [project page](https://github.com/donavanbecker/homebridge-honeywell-home/issues).",
+  "headerDisplay": "<p align='center'><img width='250px' src='https://user-images.githubusercontent.com/3979615/71876008-d99d7400-3179-11ea-909b-9d2a3d1e670f.png'></p>\n\nThe **Homebridge Honeywell Home** plugin allows you to control Honeywell Home thermostats and also view your Leak and Room Sensors from HomeKit. \n\nTo get started link your Honeywell Home account using the button below.",
+  "footerDisplay": "Your Honeywell Home account has been linked. Please raise any issues on our [project page](https://github.com/donavanbecker/homebridge-honeywell-home/issues).\n\nIf you would like to have other Honeywell Devices besides Thermostat, Leak Sensors, or Room Sensors added to this plugin fill out [Feature Request Form](https://github.com/donavanbecker/homebridge-honeywell-home/issues/new?assignees=&labels=&template=feature_request.md).",
   "schema": {
     "type": "object",
     "properties": {
@@ -46,6 +46,79 @@
             "type": "number",
             "minimum": 600,
             "description": "Indicates the number of seconds between polls of the Honeywell Home service."
+          },
+          "thermostat": {
+            "title": "Thermostat",
+            "type": "object",
+            "properties": {
+              "hide": {
+                "title": "Hide Thermostat Device(s)",
+                "type": "boolean",
+                "requried": false
+              },
+              "hide_fan": {
+                "title": "Hide Thermostat(s) Fan",
+                "type": "boolean",
+                "requried": false
+              }
+            }
+          },
+          "leaksensor": {
+            "title": "Leak Sensor",
+            "type": "object",
+            "properties": {
+              "hide": {
+                "title": "Hide Leak Sensor Device(s)",
+                "type": "boolean",
+                "requried": false
+              },
+              "hide_leak": {
+                "title": "Hide Leak Service",
+                "type": "boolean",
+                "required": false
+              },
+              "hide_temperature": {
+                "title": "Hide Temperature Service",
+                "type": "boolean",
+                "required": false
+              },
+              "hide_humidity": {
+                "title": "Hide Humidity Service",
+                "type": "boolean",
+                "required": false
+              }
+            }
+          },
+          "roomsensor": {
+            "title": "Room Sensor",
+            "type": "object",
+            "properties": {
+              "hide": {
+                "title": "Hide Room Sensor(s)",
+                "type": "boolean",
+                "requried": false
+              },
+              "hide_temperature": {
+                "title": "Hide Temperature Service",
+                "type": "boolean",
+                "requried": false
+              },
+              "hide_humidity": {
+                "title": "Hide Humidity Service",
+                "type": "boolean",
+                "requried": false
+              },
+              "hide_occupancy": {
+                "title": "Hide Occupancy Service",
+                "type": "boolean",
+                "requried": false
+              },
+              "hide_motion": {
+                "title": "Hide Motion Service",
+                "type": "boolean",
+                "requried": false
+              }
+            }
           }
         }
       }
@@ -81,6 +154,65 @@
         {
           "key": "options.ttl",
           "notitle": true
+        },
+        {
+          "type": "fieldset",
+          "title": "Thermostat Options",
+          "expandable": true,
+          "expanded": false,
+          "items": [
+            {
+              "type": "help",
+              "helpvalue": "<h5>Thermostat</h5><em class='primary-text'>Allows you to hide your Thermostat(s).</em>"
+            },
+            "options.thermostat.hide",
+            {
+              "type": "help",
+              "helpvalue": "<h5>Hide Thermostat Fan Service</h5><em class='primary-text'>Allows you to hide your Thermostat's Fan.</em>"
+            },
+            "options.thermostat.hide_fan"
+          ]
+        },
+        {
+          "type": "fieldset",
+          "title": "Leak Sensor Options",
+          "expandable": true,
+          "expanded": false,
+          "items": [
+            {
+              "type": "help",
+              "helpvalue": "<h5>Leak Sensors</h5><em class='primary-text'>Allows you to hide your Leak Sensor(s).</em>"
+            },
+            "options.leaksensor.hide",
+            {
+              "type": "help",
+              "helpvalue": "<h5>Hide Leak Sensor Services</h5><em class='primary-text'>Allows you to hide your Leak Sensor's tempeture sensor, leak sensor, or humidity sensor.</em>"
+            },
+            "options.leaksensor.hide_temperature",
+            "options.leaksensor.hide_leak",
+            "options.leaksensor.hide_humidity"
+          ]
+        },   
+        {
+          "type": "fieldset",
+          "title": "Room Sensor Options",
+          "expandable": true,
+          "expanded": false,
+          "items": [
+            {
+              "type": "help",
+              "helpvalue": "<h5>Room Sensors</h5><em class='primary-text'>Allows you to hide your Room Sensor(s).</em>"
+            },
+            "options.roomsensor.hide",
+            {
+              "type": "help",
+              "helpvalue": "<h5>Hide Room Sensor Services</h5><em class='primary-text'>Allows you to hide your Room Sensor's tempeture sensor, occupancy sensor, motion sensor, or humidity sensor.</em>"
+            },
+            "options.roomsensor.hide_temperature",
+            "options.roomsensor.hide_occupancy",
+            "options.roomsensor.hide_motion",
+            "options.roomsensor.hide_humidity"
+          ]
         }
       ]
     }
