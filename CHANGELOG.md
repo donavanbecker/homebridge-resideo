@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Version 7.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v7.0.0...v7.0.1) (2020-08-29)
 
+### Changes
+
 - Small little cosmetic changes.
 - Update UI Server Portal dependencies.
 
@@ -12,7 +14,7 @@ All notable changes to this project will be documented in this file. This projec
 ### Major Changes
 
 - Added Support for Leak Sensors, Thermostats, and Room Sensors all into one plugin.
-- Seperated each Accessory into its on plugin. 
+- Seperated each Accessory into its on plugin.
   - [homebridge-honeywell-home-thermostat](https://github.com/donavanbecker/homebridge-honeywell-home-thermostat)
   - [homebridge-honeywell-home-roomsensors](https://github.com/donavanbecker/homebridge-honeywell-home-roomsensors)
   - [homebridge-honeywell-leak](https://github.com/donavanbecker/homebridge-honeywell-leak)
@@ -57,6 +59,7 @@ All notable changes to this project will be documented in this file. This projec
 - Changed the way that devices are found.
 
 ### Other Changes
+
 - Created a plugin that can add T9 Thermostat: [homebridge-honeywell-home-roomsensors](https://github.com/donavanbecker/homebridge-honeywell-home-roomsensors).
 - Find firmware of device at startup and add to accessory context.
 - removed provisioning criteria for Honeywell Round Thermostats to be added to plugin.
@@ -252,14 +255,13 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Version 4.0.3](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.0.2...v4.0.3) (2020-01-16)
 
-
 - Update dependencies and working on adding Changelog.
 
 ## [Version 4.0.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.0.1...v4.0.2) (2020-01-10)
 
 - Update on dependencies.
 
-## [Version 4.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.0.0...v4.0.1) (2020-01-09) 
+## [Version 4.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.0.0...v4.0.1) (2020-01-09)
 
 - Updated dependencies and wiki link on Readme.
 
