@@ -126,7 +126,7 @@ export class ThermostatTCC {
 
     // Fan Controls
     this.fanService = accessory.getService(this.platform.Service.Fanv2);
-    if (this.device.scheduleCapabilities.schedulableFan && this.fanService && !this.platform.config.options.thermostat.hide_fan) {
+    if (this.device.scheduleCapabilities.schedulableFan && !this.fanService && !this.platform.config.options.thermostat.hide_fan) {
       this.fanService = accessory.addService(this.platform.Service.Fanv2, `${this.device.name} ${this.device.deviceClass} Fan`);
       
       this.fanService
@@ -136,7 +136,7 @@ export class ThermostatTCC {
       this.fanService
         .getCharacteristic(this.platform.Characteristic.TargetFanState)
         .on('set', this.setTargetFanState.bind(this));
-    } else if (this.fanService && this.platform.config.options.hide_motion) {
+    } else if (this.fanService && this.platform.config.options.thermostat.hide_fan) {
       accessory.removeService(this.fanService);
     }
 
@@ -315,7 +315,7 @@ export class ThermostatTCC {
     this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
     this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, this.TargetHeatingCoolingState);
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, this.CurrentHeatingCoolingState);
-    if (!this.platform.config.options.thermostat.hide_fan && this.device.scheduleCapabilities.schedulableFan) {
+    if (this.device.scheduleCapabilities.schedulableFan && !this.platform.config.options.thermostat.hide_fan) {
       this.fanService.updateCharacteristic(this.platform.Characteristic.TargetFanState, this.TargetFanState);
       this.fanService.updateCharacteristic(this.platform.Characteristic.Active, this.Active);
     }
@@ -401,7 +401,7 @@ export class ThermostatTCC {
     let payload = {
       mode: 'Auto', // default to Auto
     };
-    if (!this.platform.config.options.thermostat.hide_fan && this.device.scheduleCapabilities.schedulableFan) {
+    if (this.device.scheduleCapabilities.schedulableFan && !this.platform.config.options.thermostat.hide_fan) {
       this.platform.log.debug(`TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`);
 
       if (this.TargetFanState === this.platform.Characteristic.TargetFanState.AUTO) {

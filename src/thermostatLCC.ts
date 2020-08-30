@@ -126,7 +126,7 @@ export class ThermostatLCC {
   
     // Fan Controls
     this.fanService = accessory.getService(this.platform.Service.Fanv2);
-    if (this.device.scheduleCapabilities.schedulableFan && this.fanService && !this.platform.config.options.thermostat.hide_fan) {
+    if (this.device.scheduleCapabilities.schedulableFan && !this.fanService && !this.platform.config.options.thermostat.hide_fan) {
       this.fanService = accessory.addService(this.platform.Service.Fanv2, `${this.device.name} ${this.device.deviceClass} Fan`);
       
       this.fanService
@@ -139,7 +139,7 @@ export class ThermostatLCC {
     } else if (this.fanService && this.platform.config.options.thermostat.hide_fan) {
       accessory.removeService(this.fanService);
     }
-
+    
     // Retrieve initial values and updateHomekit
     this.refreshStatus();
 
@@ -401,35 +401,35 @@ export class ThermostatLCC {
     let payload = {
       mode: 'Auto', // default to Auto
     };
-    
-    this.platform.log.debug(`TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`);
+    if (this.device.scheduleCapabilities.schedulableFan && !this.platform.config.options.thermostat.hide_fan){
+      this.platform.log.debug(`TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`);
 
-    if (this.TargetFanState === this.platform.Characteristic.TargetFanState.AUTO) {
-      payload = {
-        mode: 'Auto',
-      };
-    } else if (this.TargetFanState === this.platform.Characteristic.TargetFanState.MANUAL &&
+      if (this.TargetFanState === this.platform.Characteristic.TargetFanState.AUTO) {
+        payload = {
+          mode: 'Auto',
+        };
+      } else if (this.TargetFanState === this.platform.Characteristic.TargetFanState.MANUAL &&
       this.Active === this.platform.Characteristic.Active.ACTIVE) {
-      payload = {
-        mode: 'On',
-      };
-    } else if (this.TargetFanState === this.platform.Characteristic.TargetFanState.MANUAL &&
+        payload = {
+          mode: 'On',
+        };
+      } else if (this.TargetFanState === this.platform.Characteristic.TargetFanState.MANUAL &&
       this.Active === this.platform.Characteristic.Active.INACTIVE) {
-      payload = {
-        mode: 'Circulate',
-      };
+        payload = {
+          mode: 'Circulate',
+        };
+      }
+
+      this.platform.log.info(`Sending request to Honeywell API. Fan Mode: ${payload.mode}`);
+      this.platform.log.debug(JSON.stringify(payload));
+
+      // Make the API request
+      await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, payload, {
+        params: {
+          locationId: this.locationId,
+        },
+      });
     }
-
-    this.platform.log.info(`Sending request to Honeywell API. Fan Mode: ${payload.mode}`);
-    this.platform.log.debug(JSON.stringify(payload));
-
-    // Make the API request
-    await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, payload, {
-      params: {
-        locationId: this.locationId,
-      },
-    });
-    
     // Refresh the status from the API
     await this.refreshStatus();
   }
