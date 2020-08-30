@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 7.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v7.0.0...v7.0.1) (2020-08-29)
+
+- Small little cosmetic changes.
+- Update UI Server Portal dependencies.
+
 ## [Version 7.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v6.2.0...v7.0.0) (2020-08-29)
 
 ### Major Changes
