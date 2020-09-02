@@ -497,6 +497,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
           for (const device of devices) {
             this.log.debug(device);
             this.log.debug(device.deviceID);
+            this.log.warn(device.settings.fan);
             if (device.isAlive && device.deviceClass === 'Thermostat') {
               this.log.debug(`TCC UDID: ${device.name}${device.deviceID}`);
               const uuid = this.api.hap.uuid.generate(`${device.name}${device.deviceID}`);
