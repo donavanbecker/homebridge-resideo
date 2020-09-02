@@ -124,16 +124,15 @@
             "title": "Room Priority",
             "type": "object",
             "properties": {
-              "hide": {
-                "title": "Hide Room Priority Switches",
-                "type": "boolean",
-                "requried": false
-              },
               "kind": {
                 "title": "Room Priority",
                 "type": "string",
                 "default": "thermostat",
                 "oneOf": [
+                  {
+                    "title": "Hide",
+                    "enum": ["hide"]
+                  },
                   {
                     "title": "Thermostat",
                     "enum": ["thermostat"]
@@ -249,9 +248,8 @@
           "items": [
             {
               "type": "help",
-              "helpvalue": "<h5>Hide Room Priority Switches</h5><em class='primary-text'>Allows you to hide your Room Priority Switches.</em>"
+              "helpvalue": "<h5>Room Priority</h5><em class='primary-text'>Allows you to set your Priority to show up as a `Thermostat`, `Switch`, or `Hide` Room Priority all together.</em>"
             },
-            "options.roompriority.hide",
             "options.roompriority.kind"
           ]
         }
