@@ -17,7 +17,7 @@ export class RoomPriority {
   doRoomUpdate!: any;
   RoomOn: any;
   room!: any;
-  
+
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
@@ -35,15 +35,14 @@ export class RoomPriority {
     // set accessory information
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
-      .setCharacteristic(this.platform.Characteristic.Model, `Room Priority`)
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID)
-      // .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
+      .setCharacteristic(this.platform.Characteristic.Model, 'Room Priority')
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID);
+    // .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
     this.service = this.accessory.getService(this.platform.Service.Switch) ||
-      this.accessory.addService(this.platform.Service.Switch),
-    `Room ${this.room} Priority`;
+      this.accessory.addService(this.platform.Service.Switch), `Room ${this.room} Priority`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -62,8 +61,8 @@ export class RoomPriority {
 
     // create handlers for required characteristics
     this.service.getCharacteristic(this.platform.Characteristic.On)
-    .on('get', this.handleOnGet.bind(this))
-    .on('set', this.handleOnSet.bind(this));
+      .on('get', this.handleOnGet.bind(this))
+      .on('set', this.handleOnSet.bind(this));
 
     // Retrieve initial values and updateHomekit
     this.refreshStatus();
@@ -93,16 +92,16 @@ export class RoomPriority {
    */
   parseStatus() {
     // Set Room Priority
-        if (!this.platform.config.options.roompriority.hide) {
-          if (this.RoomOn) {
-            this.platform.log.warn(`${JSON.stringify(this.RoomOn)}`);
-            if (this.RoomOn === this.room) {
-              this.RoomOn = this.platform.Characteristic.On;
-            } else if (this.RoomOn !== this.room) {
-              this.RoomOn = !this.platform.Characteristic.On;
-            }
-          }
+    if (!this.platform.config.options.roompriority.hide) {
+      if (this.RoomOn) {
+        this.platform.log.warn(`${JSON.stringify(this.RoomOn)}`);
+        if (this.RoomOn === this.room) {
+          this.RoomOn = this.platform.Characteristic.On;
+        } else if (this.RoomOn !== this.room) {
+          this.RoomOn = !this.platform.Characteristic.On;
         }
+      }
+    }
   }
 
   /**
@@ -125,44 +124,44 @@ export class RoomPriority {
     }
   }
 
-    /**
-   * Pushes the requested changes to the Honeywell API
-   */
+  /**
+ * Pushes the requested changes to the Honeywell API
+ */
   async pushChanges() {
     let payload = {
       currentPriority: {
-        priorityType: "PickARoom",
+        priorityType: 'PickARoom',
         selectedRooms: [0],
-      }
+      },
     };
-    if (!this.platform.config.options.roompriority.hide){
+    if (!this.platform.config.options.roompriority.hide) {
       this.platform.log.debug(`RoomOn:' ${this.RoomOn}`);
 
       if (this.RoomOn === this.platform.Characteristic.On) {
         payload = {
           currentPriority: {
-            priorityType: "PickARoom",
+            priorityType: 'PickARoom',
             selectedRooms: [0],
-          }
+          },
         };
       } else if (this.RoomOn === !this.platform.Characteristic.On) {
         payload = {
           currentPriority: {
-            priorityType: "PickARoom",
+            priorityType: 'PickARoom',
             selectedRooms: [this.room],
-          }
-        }
+          },
+        };
       }
-    };
-      this.platform.log.info(`Sending request to Honeywell API. Room Priority: ${payload.currentPriority.selectedRooms}`);
-      this.platform.log.debug(JSON.stringify(payload));
+    }
+    this.platform.log.info(`Sending request to Honeywell API. Room Priority: ${payload.currentPriority.selectedRooms}`);
+    this.platform.log.debug(JSON.stringify(payload));
 
-      // Make the API request
-      await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
-        params: {
-          locationId: this.locationId,
-        },
-      });
+    // Make the API request
+    await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
+      params: {
+        locationId: this.locationId,
+      },
+    });
     // Refresh the status from the API
     await this.refreshStatus();
   }
@@ -171,7 +170,7 @@ export class RoomPriority {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-    if (!this.platform.config.options.roompriority.hide){
+    if (!this.platform.config.options.roompriority.hide) {
       this.service.updateCharacteristic(this.platform.Characteristic.On, this.RoomOn);
     }
   }
@@ -180,7 +179,7 @@ export class RoomPriority {
    * Handle requests to get the current value of the "On" characteristic
    */
   handleOnGet(callback: (arg0: null, arg1: number) => void) {
-    this.platform.log.debug(`Trigger GET On`);
+    this.platform.log.debug('Trigger GET On');
 
     // set this to a valid value for On
     const currentValue = this.RoomOn;
