@@ -28,7 +28,6 @@ export class RoomPriority {
 
     // default placeholders
     this.RoomOn;
-    this.roompriority;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doRoomUpdate = new Subject();
@@ -45,6 +44,8 @@ export class RoomPriority {
     // you can create multiple services for each accessory
     this.service = this.accessory.getService(this.platform.Service.Switch) ||
       this.accessory.addService(this.platform.Service.Switch), `Room ${this.room} Priority`;
+
+    this.refreshStatus();
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -94,10 +95,10 @@ export class RoomPriority {
    */
   parseStatus() {
     // Set Room Priority
-    this.platform.log.info(`${JSON.stringify(this.RoomOn)}`);
-    if (this.roompriority.currentPriority.selectedRooms.startsWith(`${this.room}`)) {
+    this.platform.log.info(`${JSON.stringify(this.roompriority)}`);
+    if (this.roompriority.startsWith(`[${this.room}]`)) {
       this.RoomOn = this.platform.Characteristic.On;
-    } else if (!this.roompriority.currentPriority.selectedRooms.startsWith(`${this.room}`)) {
+    } else if (!this.roompriority.startsWith(`[${this.room}]`)) {
       this.RoomOn = !this.platform.Characteristic.On;
     }
   }
