@@ -380,7 +380,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                       this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
                       this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
                     }
-                  } else if (!this.config.options.thermostat.hide) {
+                  } else if (!this.config.options.thermostat.hide && device.isAlive) {
                     // the accessory does not yet exist, so we need to create it
                     this.log.info('Adding new accessory:', `${accessories.name} ${device.deviceClass}`);
                     this.log.debug(`Registering new device: ${accessories.name} ${device.deviceClass} - ${device.deviceID}`);
@@ -409,7 +409,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                   // the cached devices we stored in the `configureAccessory` method above
                   const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
 
-                  if (this.config.options.roompriority.kind !== 'thermostat' && this.config.options.roompriority.kind !== 'switches') {
+                  if (this.config.options.roompriority.kind !== 'thermostat' && this.config.options.roompriority.kind !== 'switches' ) {
                     if (existingAccessory) {
                     // the accessory already exists
                       if (!this.config.options.thermostat.hide && !this.config.options.roomsensor.hide && device.isAlive) {
@@ -446,10 +446,10 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                       // link the accessory to your platform
                       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
                     }
-                  } else if (this.config.options.roompriority.kind === 'thermostat') {
+                  } else if (this.config.options.roompriority.kind === 'thermostat' && !this.config.options.roompriority.hide ) {
                     if (existingAccessory) {
                     // the accessory already exists
-                      if (!this.config.options.thermostat.hide && !this.config.options.roomsensor.hide && device.isAlive) {
+                      if (!this.config.options.thermostat.hide && !this.config.options.roomsensor.hide && device.isAlive && !this.config.options.roompriority.hide) {
                         this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
                         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
@@ -460,7 +460,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                         // this is imported from `platformAccessory.ts`
                         new RoomSensorThermostat(this, existingAccessory, locationId, device, findaccessories, group, this.rooms);
                         
-                      } else if (this.config.options.thermostat.hide || this.config.options.roomsensor.hide || !device.isAlive) {
+                      } else if (this.config.options.thermostat.hide || this.config.options.roomsensor.hide || !device.isAlive || !this.config.options.roompriority.hide) {
                       // remove platform accessories when no longer present
                         this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
                         this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
@@ -485,7 +485,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                       // link the accessory to your platform
                       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
                     }
-                  } else if (this.config.options.roompriority.kind !== 'switches') {
+                  } else if (this.config.options.roompriority.kind !== 'switches' && !this.config.options.roompriority.hide) {
                     this.log.info('Room Priority will be displayed as Switches');
                   }
 
