@@ -93,15 +93,11 @@ export class RoomPriority {
    */
   parseStatus() {
     // Set Room Priority
-    if (!this.platform.config.options.roompriority.hide) {
-      if (this.RoomOn) {
-        this.platform.log.warn(`${JSON.stringify(this.RoomOn)}`);
-        if (this.RoomOn === this.room) {
-          this.RoomOn = this.platform.Characteristic.On;
-        } else if (this.RoomOn !== this.room) {
-          this.RoomOn = !this.platform.Characteristic.On;
-        }
-      }
+    this.platform.log.info(`${JSON.stringify(this.RoomOn)}`);
+    if (this.roompriority.currentPriority.selectedRooms.startsWith(`${this.room}`)) {
+      this.RoomOn = this.platform.Characteristic.On;
+    } else if (!this.roompriority.currentPriority.selectedRooms.startsWith(`${this.room}`)) {
+      this.RoomOn = !this.platform.Characteristic.On;
     }
   }
 
@@ -129,16 +125,16 @@ export class RoomPriority {
  * Pushes the requested changes to the Honeywell API
  */
   async pushChanges() {
-    let payload = {
+    const payload = {
       currentPriority: {
         priorityType: 'PickARoom',
         selectedRooms: [this.room],
       },
     };
 
-    this.platform.log.debug(`RoomOn:' ${this.RoomOn}`);
+    this.platform.log.warn(`RoomOn:' ${this.RoomOn}`);
 
-    if (this.RoomOn === !this.platform.Characteristic.On) {
+    /* if (this.RoomOn === !this.platform.Characteristic.On) {
       payload = {
         currentPriority: {
           priorityType: 'PickARoom',
@@ -152,7 +148,7 @@ export class RoomPriority {
           selectedRooms: [this.room],
         },
       };
-    }
+    }*/
     this.platform.log.info(`Sending request to Honeywell API. Room Priority: ${payload.currentPriority.selectedRooms}`);
     this.platform.log.warn(JSON.stringify(payload));
 
@@ -162,7 +158,7 @@ export class RoomPriority {
         locationId: this.locationId,
       },
     })).data;
-    this.platform.log.warn(JSON.stringify(put));
+    this.platform.log.info(JSON.stringify(put));
     // Refresh the status from the API
     await this.refreshStatus();
   }
