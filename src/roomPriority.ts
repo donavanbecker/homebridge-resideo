@@ -113,9 +113,9 @@ export class RoomPriority {
           locationId: this.locationId,
         },
       })).data;
-      this.platform.log.warn(roompriority);
+      this.platform.log.debug(roompriority);
       this.roompriority = roompriority;
-      this.platform.log.warn(JSON.stringify(this.roompriority));
+      this.platform.log.debug(JSON.stringify(this.roompriority));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {

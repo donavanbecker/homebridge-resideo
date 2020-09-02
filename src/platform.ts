@@ -286,6 +286,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               this.log.debug(`Found Room ${room}`);
               this.log.debug(group.rooms);
               this.log.debug(room);
+              // Room Priority Switches
               this.log.debug(`Room Priority UDID: ${room}${device.deviceID}`);
               const uuid = this.api.hap.uuid.generate(`${room}${device.deviceID}`);
 
@@ -295,7 +296,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
               if (existingAccessory) {
                 // the accessory already exists
-                if (!this.config.options.roompriority.hide && device.isAlive) {
+                if (!this.config.options.thermostat.hide && !this.config.options.roompriority.hide && device.isAlive) {
                   this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
                   // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
@@ -304,12 +305,12 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                   // create the accessory handler for the restored accessory
                   // this is imported from `platformAccessory.ts`
                   new RoomPriority(this, existingAccessory, locationId, device, room);
-                } else if (this.config.options.roompriority.hide || !device.isAlive) {
+                } else if (this.config.options.roompriority.hide || this.config.options.thermostat.hide || !device.isAlive) {
                   // remove platform accessories when no longer present
                   this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
                   this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
                 }
-              } else if (!this.config.options.thermostat.hide) {
+              } else if (!this.config.options.thermostat.hide && !this.config.options.roompriority.hide && device.isAlive) {
                 // the accessory does not yet exist, so we need to create it
                 this.log.info('Adding new accessory:', `Room: ${room}`);
                 this.log.debug(`Registering new device: Room: ${room}`);
