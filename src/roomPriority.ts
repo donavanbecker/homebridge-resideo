@@ -134,25 +134,10 @@ export class RoomPriority {
       },
     };
 
-    this.platform.log.warn(`RoomOn:' ${this.RoomOn}`);
+    this.platform.log.debug(`RoomOn: ${this.room}`);
 
-    /* if (this.RoomOn === !this.platform.Characteristic.On) {
-      payload = {
-        currentPriority: {
-          priorityType: 'PickARoom',
-          selectedRooms: [0],
-        },
-      };
-    } else if (this.RoomOn === this.platform.Characteristic.On) {
-      payload = {
-        currentPriority: {
-          priorityType: 'PickARoom',
-          selectedRooms: [this.room],
-        },
-      };
-    }*/
     this.platform.log.info(`Sending request to Honeywell API. Room Priority: ${payload.currentPriority.selectedRooms}`);
-    this.platform.log.warn(JSON.stringify(payload));
+    this.platform.log.debug(JSON.stringify(payload));
 
     // Make the API request
     const put = (await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
