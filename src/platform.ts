@@ -400,8 +400,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                     // link the accessory to your platform
                     this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
                   } //Room Sensors and RoomSensors Thermostat
-                } else if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor'
-                  && device.isAlive && device.deviceClass === 'Thermostat') {
+                } else if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor' && device.isAlive && device.deviceClass === 'Thermostat') {
                   this.log.debug(`Room Sensor UDID: ${accessories.name}${findaccessories.accessoryAttribute.type}${findaccessories.accessoryAttribute.serialNumber}${device.deviceID}`);
                   const uuid = this.api.hap.uuid.generate(`${accessories.name}${findaccessories.accessoryAttribute.type}${findaccessories.accessoryAttribute.serialNumber}${device.deviceID}`);
 
@@ -429,7 +428,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                       // create the accessory handler for the restored accessory
                       // this is imported from `platformAccessory.ts`
                       new RoomSensorThermostat(this, existingAccessory, locationId, device, findaccessories, group, this.rooms);
-                    } else if (this.config.options.roompriority.kind === 'hide' || this.config.options.thermostat.hide || this.config.options.roomsensor.hide || !device.isAlive) {
+                    } else if (this.config.options.roompriority.kind === 'hide' || this.config.options.thermostat.hide || this.config.options.roomsensor.hide || !device.isAlive || this.config.options.roompriority.kind === 'switches' || this.config.options.roompriority.kind !== 'thermostat') {
                       // remove platform accessories when no longer present
                       this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
                       this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
