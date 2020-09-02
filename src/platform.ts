@@ -286,7 +286,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               this.log.debug(`Found Room ${room}`);
               this.log.debug(group.rooms);
               this.log.debug(room);
-              if (!this.config.options.roompriority.hide) {
                 this.log.debug(`Room Priority UDID: ${room}${device.deviceID}`);
                 const uuid = this.api.hap.uuid.generate(`${room}${device.deviceID}`);
 
@@ -329,7 +328,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                   // link the accessory to your platform
                   this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
                 }
-              }
             }
             const accessory = (await this.axios.get(`${DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
               params: {
