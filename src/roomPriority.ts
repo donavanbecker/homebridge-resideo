@@ -96,9 +96,9 @@ export class RoomPriority {
   parseStatus() {
     // Set Room Priority
     this.platform.log.info(`${JSON.stringify(this.roompriority)}`);
-    if (this.roompriority.startsWith(`[${this.room}]`)) {
+    if (this.roompriority === this.room) {
       this.RoomOn = this.platform.Characteristic.On;
-    } else if (!this.roompriority.startsWith(`[${this.room}]`)) {
+    } else if (this.roompriority !== this.room) {
       this.RoomOn = !this.platform.Characteristic.On;
     }
   }
