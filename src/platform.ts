@@ -429,7 +429,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                       // create the accessory handler for the restored accessory
                       // this is imported from `platformAccessory.ts`
                       new RoomSensorThermostat(this, existingAccessory, locationId, device, findaccessories, group, this.rooms);
-                    } else if (this.config.options.roompriority.kind === 'hide' || this.config.options.roompriority.kind !== 'thermostat' || this.config.options.roompriority.kind === 'switches' || this.config.options.thermostat.hide || this.config.options.roomsensor.hide || !device.isAlive) {
+                    } else /*if (this.config.options.roompriority.kind === 'hide' || this.config.options.roompriority.kind !== 'thermostat' || this.config.options.roompriority.kind === 'switches' || this.config.options.thermostat.hide || this.config.options.roomsensor.hide || !device.isAlive)*/ {
                       // remove platform accessories when no longer present
                       this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
                       this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
