@@ -403,7 +403,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 } else if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor' && device.isAlive && device.deviceClass === 'Thermostat') {
                   this.log.debug(`Room Sensor UDID: ${accessories.name}${findaccessories.accessoryAttribute.type}${findaccessories.accessoryAttribute.serialNumber}${device.deviceID}`);
                   const uuid = this.api.hap.uuid.generate(`${accessories.name}${findaccessories.accessoryAttribute.type}${findaccessories.accessoryAttribute.serialNumber}${device.deviceID}`);
-
+                  this.log.warn(this.config.options.roompriority.kind);
                   // see if an accessory with the same uuid has already been registered and restored from
                   // the cached devices we stored in the `configureAccessory` method above
                   const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
