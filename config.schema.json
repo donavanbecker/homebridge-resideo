@@ -136,15 +136,11 @@
                 "oneOf": [
                   {
                     "title": "Thermostat",
-                    "enum": [
-                      "thermostat"
-                    ]
+                    "enum": ["thermostat"]
                   },
                   {
                     "title": "Switches",
-                    "enum": [
-                      "switches"
-                    ]
+                    "enum": ["switches"]
                   }
                 ],
                 "required": true
