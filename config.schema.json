@@ -121,13 +121,33 @@
             }
           },
           "roompriority": {
-            "title": "Room Sensor",
+            "title": "Room Priority",
             "type": "object",
             "properties": {
               "hide": {
                 "title": "Hide Room Priority Switches",
                 "type": "boolean",
                 "requried": false
+              },
+              "kind": {
+                "title": "Room Priority",
+                "type": "string",
+                "default": "thermostat",
+                "oneOf": [
+                  {
+                    "title": "Thermostat",
+                    "enum": [
+                      "thermostat"
+                    ]
+                  },
+                  {
+                    "title": "Switches",
+                    "enum": [
+                      "switches"
+                    ]
+                  }
+                ],
+                "required": true
               }
             }
           }
@@ -203,7 +223,7 @@
             "options.leaksensor.hide_leak",
             "options.leaksensor.hide_humidity"
           ]
-        },   
+        },
         {
           "type": "fieldset",
           "title": "Room Sensor Options",
@@ -224,7 +244,7 @@
             "options.roomsensor.hide_motion",
             "options.roomsensor.hide_humidity"
           ]
-        },   
+        },
         {
           "type": "fieldset",
           "title": "Room Priority Options",
@@ -235,7 +255,8 @@
               "type": "help",
               "helpvalue": "<h5>Hide Room Priority Switches</h5><em class='primary-text'>Allows you to hide your Room Priority Switches.</em>"
             },
-            "options.roompriority.hide"
+            "options.roompriority.hide",
+            "options.roompriority.kind"
           ]
         }
       ]
