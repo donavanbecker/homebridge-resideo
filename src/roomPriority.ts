@@ -16,13 +16,14 @@ export class RoomPriority {
   RoomUpdateInProgress!: boolean;
   doRoomUpdate!: any;
   RoomOn: any;
-  room!: any;
+  roompriority: any;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
     public readonly locationId: string,
     public device: any,
+    public readonly room: any,
   ) {
 
     // default placeholders
@@ -109,14 +110,14 @@ export class RoomPriority {
    */
   async refreshStatus() {
     try {
-      const room = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
+      const roompriority = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
         params: {
           locationId: this.locationId,
         },
       })).data;
-      this.platform.log.debug(room);
-      this.room = room;
-      this.platform.log.debug(JSON.stringify(this.room));
+      this.platform.log.debug(roompriority);
+      this.roompriority = roompriority;
+      this.platform.log.debug(JSON.stringify(this.roompriority));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {

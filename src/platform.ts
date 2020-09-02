@@ -303,7 +303,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
                     // create the accessory handler for the restored accessory
                     // this is imported from `platformAccessory.ts`
-                    new RoomPriority(this, existingAccessory, locationId, device);
+                    new RoomPriority(this, existingAccessory, locationId, device, room);
                   } else if (this.config.options.roompriority.hide || !device.isAlive) {
                     // remove platform accessories when no longer present
                     this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
@@ -323,7 +323,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
                   // create the accessory handler for the newly create accessory
                   // this is imported from `platformAccessory.ts`
-                  new RoomPriority(this, accessory, locationId, device);
+                  new RoomPriority(this, accessory, locationId, device, room);
 
                   // link the accessory to your platform
                   this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
