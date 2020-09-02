@@ -132,27 +132,26 @@ export class RoomPriority {
     let payload = {
       currentPriority: {
         priorityType: 'PickARoom',
-        selectedRooms: [0],
+        selectedRooms: [this.room],
       },
     };
-    if (!this.platform.config.options.roompriority.hide) {
-      this.platform.log.debug(`RoomOn:' ${this.RoomOn}`);
 
-      if (this.RoomOn === this.platform.Characteristic.On) {
-        payload = {
-          currentPriority: {
-            priorityType: 'PickARoom',
-            selectedRooms: [0],
-          },
-        };
-      } else if (this.RoomOn === !this.platform.Characteristic.On) {
-        payload = {
-          currentPriority: {
-            priorityType: 'PickARoom',
-            selectedRooms: [this.room],
-          },
-        };
-      }
+    this.platform.log.debug(`RoomOn:' ${this.RoomOn}`);
+
+    if (this.RoomOn === !this.platform.Characteristic.On) {
+      payload = {
+        currentPriority: {
+          priorityType: 'PickARoom',
+          selectedRooms: [0],
+        },
+      };
+    } else if (this.RoomOn === this.platform.Characteristic.On) {
+      payload = {
+        currentPriority: {
+          priorityType: 'PickARoom',
+          selectedRooms: [this.room],
+        },
+      };
     }
     this.platform.log.info(`Sending request to Honeywell API. Room Priority: ${payload.currentPriority.selectedRooms}`);
     this.platform.log.warn(JSON.stringify(payload));
