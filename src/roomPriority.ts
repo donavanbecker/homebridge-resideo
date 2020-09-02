@@ -28,6 +28,7 @@ export class RoomPriority {
 
     // default placeholders
     this.RoomOn;
+    this.roompriority;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doRoomUpdate = new Subject();
