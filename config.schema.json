@@ -119,6 +119,17 @@
                 "requried": false
               }
             }
+          },
+          "roompriority": {
+            "title": "Room Sensor",
+            "type": "object",
+            "properties": {
+              "hide": {
+                "title": "Hide Room Priority Switches",
+                "type": "boolean",
+                "requried": false
+              }
+            }
           }
         }
       }
@@ -212,6 +223,19 @@
             "options.roomsensor.hide_occupancy",
             "options.roomsensor.hide_motion",
             "options.roomsensor.hide_humidity"
+          ]
+        },   
+        {
+          "type": "fieldset",
+          "title": "Room Priority Options",
+          "expandable": true,
+          "expanded": false,
+          "items": [
+            {
+              "type": "help",
+              "helpvalue": "<h5>Hide Room Priority Switches</h5><em class='primary-text'>Allows you to hide your Room Priority Switches.</em>"
+            },
+            "options.roompriority.hide"
           ]
         }
       ]
