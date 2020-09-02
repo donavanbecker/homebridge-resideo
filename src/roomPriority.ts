@@ -95,7 +95,7 @@ export class RoomPriority {
    */
   parseStatus() {
     // Set Room Priority
-    this.platform.log.info(`${JSON.stringify(this.roompriority)}`);
+    this.platform.log.debug(`${JSON.stringify(this.roompriority)}`);
     if (this.roompriority === this.rooms) {
       this.RoomOn = this.platform.Characteristic.On;
     } else if (this.roompriority !== this.rooms) {
@@ -140,12 +140,12 @@ export class RoomPriority {
     this.platform.log.debug(JSON.stringify(payload));
 
     // Make the API request
-    const put = (await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
+    const pushRoomChanges = (await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
       params: {
         locationId: this.locationId,
       },
     })).data;
-    this.platform.log.info(JSON.stringify(put));
+    pushRoomChanges;
     // Refresh the status from the API
     await this.refreshStatus();
   }
