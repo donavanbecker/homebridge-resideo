@@ -472,9 +472,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
                     // link the accessory to your platform
                     this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+                  } else if (this.config.options.roompriority.kind === 'switches') {
+                    this.log.info('Room Priority will be displayed as Switches');
                   }
-                } else if (this.config.options.roompriority.kind === 'switches') {
-                  this.log.info('Room Priority will be displayed as Switches');
                 } else {
                   this.log.info(`Ignoring device named ${accessories.name} - ${findaccessories.accessoryAttribute.type}, Alive Status: ${device.isAlive}`);
                 }
