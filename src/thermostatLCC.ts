@@ -44,7 +44,7 @@ export class ThermostatLCC {
     private accessory: PlatformAccessory,
     public readonly locationId: string,
     public device: any,
-    public readonly findaccessories: any,
+    public readonly rooms: any,
   ) {
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
@@ -337,7 +337,7 @@ export class ThermostatLCC {
     const payload = {
       currentPriority: {
         priorityType: 'PickARoom',
-        selectedRooms: [this.findaccessories.rooms.id],
+        selectedRooms: [this.rooms, this.platform.rooms],
       },
     };
     if (this.platform.config.options.roompriority.kind === 'thermostat') {
