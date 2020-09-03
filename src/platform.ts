@@ -338,17 +338,17 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
               }
             }
+            for (const roomaccessories of group.rooms) {
+              this.log.debug(group.rooms);
+              this.log.debug(roomaccessories);
+            }
             const accessory = (await this.axios.get(`${DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
               params: {
                 locationId: location.locationID,
               },
             })).data;
             this.log.warn(JSON.stringify(accessory));
-            for (const roomaccessories of group.rooms) {
-              this.log.debug(`Found ${accessory.rooms.length} accessory.rooms`);
-              this.log.debug(group.rooms);
-              this.log.debug(roomaccessories);
-            }
+            this.log.debug(`Found ${accessory.rooms.length} accessory.rooms`);
             for (const accessories of accessory.rooms) {
               this.log.debug(accessory.rooms);
               this.log.debug(accessories);
