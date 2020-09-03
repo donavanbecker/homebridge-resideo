@@ -156,6 +156,16 @@ export class ThermostatLCC {
 
     // Watch for thermostat change events
     // We put in a debounce of 100ms so we don't make duplicate calls
+    this.doThermostatUpdate.pipe(tap(() => {
+      this.thermostatUpdateInProgress = true;
+    }), debounceTime(100)).subscribe(async () => {
+      try {
+        await this.pushChanges();
+      } catch (e) {
+        this.platform.log.error(e.message);
+      }
+      this.thermostatUpdateInProgress = false;
+    });
     if (this.platform.config.options.roompriority.kind === 'thermostat') {
       this.doRoomUpdate.pipe(tap(() => {
         this.roomUpdateInProgress = true;
@@ -168,16 +178,6 @@ export class ThermostatLCC {
         this.roomUpdateInProgress = false;
       });
     }
-    this.doThermostatUpdate.pipe(tap(() => {
-      this.thermostatUpdateInProgress = true;
-    }), debounceTime(100)).subscribe(async () => {
-      try {
-        await this.pushChanges();
-      } catch (e) {
-        this.platform.log.error(e.message);
-      }
-      this.thermostatUpdateInProgress = false;
-    });
     if (this.device.scheduleCapabilities.schedulableFan && !this.platform.config.options.thermostat.hide_fan) {
       this.doFanUpdate.pipe(tap(() => {
         this.fanUpdateInProgress = true;
@@ -292,34 +292,6 @@ export class ThermostatLCC {
   }
 
   /**
-   * Pushes the requested changes for Fan to the Honeywell API 
-   */
-  async pushRoomChanges() {
-    const payload = {
-      currentPriority: {
-        priorityType: 'PickARoom',
-        selectedRooms: [this.rooms],
-      },
-    };
-    if (this.platform.config.options.roompriority.kind === 'thermostat') {
-      this.platform.log.debug(`RoomOn: ${this.rooms}`);
-
-      this.platform.log.info(`Sending request to Honeywell API. Room Priority: ${payload.currentPriority.selectedRooms}`);
-      this.platform.log.debug(JSON.stringify(payload));
-
-      // Make the API request
-      const pushRoomChanges = (await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
-        params: {
-          locationId: this.locationId,
-        },
-      })).data;
-      pushRoomChanges;
-    }
-    // Refresh the status from the API
-    await this.refreshStatus();
-  }
-
-  /**
    * Pushes the requested changes to the Honeywell API
    */
   async pushChanges() {
@@ -359,6 +331,34 @@ export class ThermostatLCC {
   }
 
   /**
+   * Pushes the requested changes for Fan to the Honeywell API 
+   */
+  async pushRoomChanges() {
+    const payload = {
+      currentPriority: {
+        priorityType: 'PickARoom',
+        selectedRooms: [this.rooms],
+      },
+    };
+    if (this.platform.config.options.roompriority.kind === 'thermostat') {
+      this.platform.log.debug(`RoomOn: ${this.rooms}`);
+
+      this.platform.log.info(`Sending request to Honeywell API. Room Priority: ${payload.currentPriority.selectedRooms}`);
+      this.platform.log.debug(JSON.stringify(payload));
+
+      // Make the API request
+      const pushRoomChanges = (await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
+        params: {
+          locationId: this.locationId,
+        },
+      })).data;
+      pushRoomChanges;
+    }
+    // Refresh the status from the API
+    await this.refreshStatus();
+  }
+
+  /**
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
@@ -388,7 +388,7 @@ export class ThermostatLCC {
       this.TargetTemperature = this.toCelsius(this.device.changeableValues.coolSetpoint);
     }
     this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
-
+    this.doRoomUpdate.next();
     this.doThermostatUpdate.next();
     callback(null);
   }
