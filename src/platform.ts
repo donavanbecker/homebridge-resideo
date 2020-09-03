@@ -294,8 +294,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               const uuid = this.api.hap.uuid.generate(`${rooms}${device.deviceID}`);
 
               this.log.warn('Existing Switches:', this.config.options.roompriority.kind === 'switches' && (!this.config.options.thermostat.hide || this.config.options.thermostat.hide) && this.config.options.roompriority.kind !== 'hide' && device.isAlive);
-              this.log.warn('New Switches:', this.config.options.roompriority.kind === 'switches' && !this.config.options.thermostat.hide && this.config.options.roompriority.kind !== 'hide' && device.isAlive);
-              this.log.warn('Remove Devices:', this.config.options.roompriority.kind === 'thermostat' || this.config.options.roompriority.kind === 'hide' || this.config.options.thermostat.hide || !device.isAlive);
+              this.log.warn('New Switches:', this.config.options.roompriority.kind === 'switches' && (!this.config.options.thermostat.hide || this.config.options.thermostat.hide) && this.config.options.roompriority.kind !== 'hide' && device.isAlive);
+              this.log.warn('Remove Devices:', this.config.options.roompriority.kind === 'thermostat' || this.config.options.roompriority.kind === 'hide' || !device.isAlive);
               this.log.warn(this.config.options.roompriority.kind);
                   
               // see if an accessory with the same uuid has already been registered and restored from
@@ -313,12 +313,12 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                   // create the accessory handler for the restored accessory
                   // this is imported from `platformAccessory.ts`
                   new RoomPriority(this, existingAccessory, locationId, device, rooms);
-                } else if (this.config.options.roompriority.kind === 'thermostat' || this.config.options.roompriority.kind === 'hide' || this.config.options.thermostat.hide || !device.isAlive) {
+                } else if (this.config.options.roompriority.kind === 'thermostat' || this.config.options.roompriority.kind === 'hide' || !device.isAlive) {
                   // remove platform accessories when no longer present
                   this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
                   this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
                 }
-              } else if (this.config.options.roompriority.kind === 'switches' && !this.config.options.thermostat.hide && this.config.options.roompriority.kind !== 'hide' && device.isAlive) {
+              } else if (this.config.options.roompriority.kind === 'switches' && (!this.config.options.thermostat.hide || this.config.options.thermostat.hide) && this.config.options.roompriority.kind !== 'hide' && device.isAlive) {
                 // the accessory does not yet exist, so we need to create it
                 this.log.info('Adding new accessory:', `Room: ${rooms}`);
                 this.log.debug(`Registering new device: Room: ${rooms}`);
