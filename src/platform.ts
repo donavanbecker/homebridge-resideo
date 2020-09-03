@@ -408,7 +408,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                   // the cached devices we stored in the `configureAccessory` method above
                   const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
                   this.log.warn('Existing Room Sensor IF:', this.config.options.roompriority.kind !== 'thermostat' && this.config.options.roompriority.kind !== 'switches' && this.config.options.roompriority.kind === 'hide' && !this.config.options.thermostat.hide && !this.config.options.roomsensor.hide && device.isAlive);
-                  this.log.warn('Existing Room Sensor Thermostat IF:', this.config.options.roompriority.kind === 'thermostat' && this.config.options.roompriority.kind !== 'hide' && this.config.options.roompriority.kind !== 'switches' && !this.config.options.thermostat.hide && !this.config.options.roomsensor.hide && device.isAlive);
+                  this.log.warn('Existing Room Sensor Thermostat IF:', this.config.options.roompriority.kind === 'thermostat' && this.config.options.roompriority.kind !== 'hide' && this.config.options.roompriority.kind !== 'switches' && !this.config.options.thermostat.hide && this.config.options.roomsensor.hide && device.isAlive);
                   this.log.warn('New Room Sensor IF:', !this.config.options.roomsensor.hide&& device.isAlive);
                   this.log.warn('New Room Sensor Thermostat IF:', this.config.options.roompriority.kind === 'thermostat' && device.isAlive);
 

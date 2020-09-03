@@ -271,8 +271,8 @@ export class ThermostatTCC {
   async pushChanges() {
     const payload = {
       mode: this.honeywellMode[this.TargetHeatingCoolingState],
-      autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
       thermostatSetpointStatus: 'PermanentHold',
+      autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
     } as any;
 
     // Set the heat and cool set point value based on the selected mode
