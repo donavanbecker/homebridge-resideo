@@ -335,7 +335,7 @@ export class ThermostatLCC {
     const payload = {
       currentPriority: {
         priorityType: 'PickARoom',
-        selectedRooms: [this.platform.rooms],
+        selectedRooms: [0],
       },
     };
     if (this.platform.config.options.roompriority.kind === 'thermostat') {
