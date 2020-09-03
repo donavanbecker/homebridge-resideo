@@ -262,14 +262,14 @@ export class ThermostatLCC {
       this.device = device;
       this.platform.log.debug(`Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`);
       this.platform.log.debug(JSON.stringify(this.device.changeableValues.mode));
-      this.platform.log.warn(JSON.stringify(this.device));
+      this.platform.log.debug(JSON.stringify(this.device));
       if (this.platform.config.options.roompriority.kind === 'thermostat') {
         const roompriority = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
           params: {
             locationId: this.locationId,
           },
         })).data;
-        this.platform.log.warn(roompriority);
+        this.platform.log.debug(roompriority);
         this.roompriority = roompriority;
       }
       if (this.device.scheduleCapabilities.schedulableFan && !this.platform.config.options.thermostat.hide_fan) {
