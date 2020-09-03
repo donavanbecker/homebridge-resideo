@@ -293,7 +293,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               this.log.debug(`Room Priority Switch UDID: ${rooms}${device.deviceID}`);
               const uuid = this.api.hap.uuid.generate(`${rooms}${device.deviceID}`);
 
-              this.log.warn('Existing Switches:', this.config.options.roompriority.kind === 'switches' && (!this.config.options.thermostat.hide) && this.config.options.roompriority.kind !== 'hide' && device.isAlive);
+              this.log.warn('Existing Switches:', this.config.options.roompriority.kind === 'switches' && (!this.config.options.thermostat.hide || this.config.options.thermostat.hide) && this.config.options.roompriority.kind !== 'hide' && device.isAlive);
               this.log.warn('New Switches:', this.config.options.roompriority.kind === 'switches' && !this.config.options.thermostat.hide && this.config.options.roompriority.kind !== 'hide' && device.isAlive);
               this.log.warn('Remove Devices:', this.config.options.roompriority.kind === 'thermostat' || this.config.options.roompriority.kind === 'hide' || this.config.options.thermostat.hide || !device.isAlive);
               this.log.warn(this.config.options.roompriority.kind);
@@ -304,7 +304,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
               if (existingAccessory) {
                 // the accessory already exists
-                if (this.config.options.roompriority.kind === 'switches' && (!this.config.options.thermostat.hide) && this.config.options.roompriority.kind !== 'hide' && device.isAlive) {
+                if (this.config.options.roompriority.kind === 'switches' && (!this.config.options.thermostat.hide || this.config.options.thermostat.hide) && this.config.options.roompriority.kind !== 'hide' && device.isAlive) {
                   this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
                   // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
