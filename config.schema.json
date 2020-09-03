@@ -227,7 +227,7 @@
           "items": [
             {
               "type": "help",
-              "helpvalue": "<h5>Room Sensors</h5><em class='primary-text'>Allows you to hide your Room Sensor(s).</em>"
+              "helpvalue": "<h5>Room Sensors</h5><em class='primary-text'>Allows you to hide your Room Sensor(s). **This will not effect the Thermostat Room Sensors** </em>"
             },
             "options.roomsensor.hide",
             {
