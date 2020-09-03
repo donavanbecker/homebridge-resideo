@@ -256,6 +256,14 @@ export class ThermostatLCC {
    */
   async refreshStatus() {
     try {
+      const device = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
+        params: {
+          locationId: this.locationId,
+        },
+      })).data;
+      this.device = device;
+      this.platform.log.debug(`Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`);
+      this.platform.log.debug(JSON.stringify(this.device.changeableValues.mode));
       if (this.platform.config.options.roompriority.kind === 'thermostat') {
         const roompriority = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
           params: {
@@ -265,14 +273,6 @@ export class ThermostatLCC {
         this.platform.log.debug(roompriority);
         this.roompriority = roompriority;
       }
-      const device = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
-        params: {
-          locationId: this.locationId,
-        },
-      })).data;
-      this.device = device;
-      this.platform.log.debug(`Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`);
-      this.platform.log.debug(JSON.stringify(this.device.changeableValues.mode));
       if (this.device.scheduleCapabilities.schedulableFan && !this.platform.config.options.thermostat.hide_fan) {
         const deviceFan = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
           params: {
