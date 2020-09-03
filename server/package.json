@@ -1,6 +1,6 @@
 {
   "name": "homebridge-honeywell-server",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Server side oauth portal for the Homebrige Honeywell Home Plugin",
   "license": "GPL-3.0",
   "author": "oznu <dev@oz.nu>",
@@ -36,12 +36,12 @@
     "source-map-support": "^0.5.19"
   },
   "devDependencies": {
-    "@types/node": "^14.0.24",
+    "@types/node": "^14.6.2",
     "concurrently": "^5.2.0",
     "nodemon": "^2.0.4",
     "rimraf": "3.0.2",
-    "ts-node": "^8.10.2",
+    "ts-node": "^9.0.0",
     "tslint": "^6.1.2",
-    "typescript": "^3.9.7"
+    "typescript": "^4.0.2"
   }
 }

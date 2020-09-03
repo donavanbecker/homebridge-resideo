@@ -1,11 +1,11 @@
 import { API } from 'homebridge';
 
 import { PLATFORM_NAME } from './settings';
-import { HoneywellHomeThermostatPlatform } from './platform';
+import { HoneywellHomePlatform } from './platform';
 
 /**
  * This method registers the platform with Homebridge
  */
 export = (api: API) => {
-  api.registerPlatform(PLATFORM_NAME, HoneywellHomeThermostatPlatform);
+  api.registerPlatform(PLATFORM_NAME, HoneywellHomePlatform);
 }
