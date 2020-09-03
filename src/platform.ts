@@ -288,7 +288,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               this.log.debug(`Found Room ${rooms}`);
               this.log.debug(group.rooms);
               this.log.warn(rooms);
-              this.rooms = rooms;
+              this.rooms = group.rooms;
               // Room Priority Switches
               this.log.debug(`Room Priority Switch UDID: ${rooms}${device.deviceID}`);
               const uuid = this.api.hap.uuid.generate(`${rooms}${device.deviceID}`);
