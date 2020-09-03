@@ -26,20 +26,24 @@ export class ThermostatLCC {
   TemperatureDisplayUnits!: any;
   Active!: any;
   TargetFanState!: any;
-  fanMode: any;
-  thermostatUpdateInProgress!: boolean;
-
-  fanUpdateInProgress!: boolean;
-  doThermostatUpdate!: any;
-  doFanUpdate!: any;
+  fanMode: any;  
   deviceFan!: any;
   fanService: any;
   honeywellMode: any;
+  roompriority!: any;
+
+  roomUpdateInProgress!: boolean;
+  doRoomUpdate!: any;
+  thermostatUpdateInProgress!: boolean;
+  doThermostatUpdate!: any;
+  fanUpdateInProgress!: boolean;
+  doFanUpdate!: any;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
     public readonly locationId: string,
+    public readonly rooms: any,
     public device: any,
   ) {
     // Map Honeywell Modes to HomeKit Modes
@@ -68,6 +72,8 @@ export class ThermostatLCC {
     this.fanMode;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
+    this.doRoomUpdate = new Subject();
+    this.roomUpdateInProgress = false;
     this.doThermostatUpdate = new Subject();
     this.thermostatUpdateInProgress = false;
     this.doFanUpdate = new Subject();
@@ -150,6 +156,18 @@ export class ThermostatLCC {
 
     // Watch for thermostat change events
     // We put in a debounce of 100ms so we don't make duplicate calls
+    if (this.platform.config.options.roompriority.kind === 'thermostat') {
+      this.doRoomUpdate.pipe(tap(() => {
+        this.roomUpdateInProgress = true;
+      }), debounceTime(100)).subscribe(async () => {
+        try {
+          await this.pushRoomChanges();
+        } catch (e) {
+          this.platform.log.error(e.message);
+        }
+        this.roomUpdateInProgress = false;
+      });
+    }
     this.doThermostatUpdate.pipe(tap(() => {
       this.thermostatUpdateInProgress = true;
     }), debounceTime(100)).subscribe(async () => {
@@ -238,6 +256,15 @@ export class ThermostatLCC {
    */
   async refreshStatus() {
     try {
+      if (this.platform.config.options.roompriority.kind === 'thermostat') {
+        const roompriority = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
+          params: {
+            locationId: this.locationId,
+          },
+        })).data;
+        this.platform.log.debug(roompriority);
+        this.roompriority = roompriority;
+      }
       const device = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
         params: {
           locationId: this.locationId,
@@ -262,6 +289,34 @@ export class ThermostatLCC {
     } catch (e) {
       this.platform.log.error(`Failed to update status of ${this.device.name}`, e.message);
     }
+  }
+
+  /**
+   * Pushes the requested changes for Fan to the Honeywell API 
+   */
+  async pushRoomChanges() {
+    const payload = {
+      currentPriority: {
+        priorityType: 'PickARoom',
+        selectedRooms: [this.rooms],
+      },
+    };
+    if (this.platform.config.options.roompriority.kind === 'thermostat') {
+      this.platform.log.debug(`RoomOn: ${this.rooms}`);
+
+      this.platform.log.info(`Sending request to Honeywell API. Room Priority: ${payload.currentPriority.selectedRooms}`);
+      this.platform.log.debug(JSON.stringify(payload));
+
+      // Make the API request
+      const pushRoomChanges = (await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
+        params: {
+          locationId: this.locationId,
+        },
+      })).data;
+      pushRoomChanges;
+    }
+    // Refresh the status from the API
+    await this.refreshStatus();
   }
 
   /**
@@ -401,7 +456,7 @@ export class ThermostatLCC {
     let payload = {
       mode: 'Auto', // default to Auto
     };
-    if (this.device.scheduleCapabilities.schedulableFan && !this.platform.config.options.thermostat.hide_fan){
+    if (this.device.scheduleCapabilities.schedulableFan && !this.platform.config.options.thermostat.hide_fan) {
       this.platform.log.debug(`TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`);
 
       if (this.TargetFanState === this.platform.Characteristic.TargetFanState.AUTO) {

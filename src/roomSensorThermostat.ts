@@ -40,7 +40,6 @@ export class RoomSensorThermostat {
   thermostatUpdateInProgress!: boolean;
   doThermostatUpdate!: any;
   honeywellMode: any;
-  honeywellRooms: any;
   SensorUpdateInProgress!: boolean;
   doSensorUpdate!: any;
 
@@ -66,7 +65,6 @@ export class RoomSensorThermostat {
     // Map HomeKit Modes to Honeywell Modes
     // Don't change the order of these!
     this.honeywellMode = ['Off', 'Heat', 'Cool', 'Auto'];
-    this.honeywellRooms = [`${this.roompriority}`, `${this.platform.rooms}`];
 
     // default placeholders
     this.CurrentTemperature;
@@ -346,13 +344,13 @@ export class RoomSensorThermostat {
           locationId: this.locationId,
         },
       })).data;
+      this.platform.log.debug(roompriority);
+      this.roompriority = roompriority;
       const sensor = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/group/${this.group.id}/rooms`, {
         params: {
           locationId: this.locationId,
         },
       })).data;
-      this.platform.log.debug(roompriority);
-      this.roompriority = roompriority;
       this.platform.log.debug(sensor);
       this.sensor = sensor;
       this.findaccessories;
