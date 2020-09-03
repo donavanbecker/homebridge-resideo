@@ -10,7 +10,7 @@ import { ThermostatLCC } from './thermostatLCC';
 import { ThermostatTCC } from './thermostatTCC';
 import { LeakSensor } from './leakSensors';
 import { RoomSensors } from './roomSensors';
-// import { RoomPriority } from './roomPriority';
+import { RoomPriority } from './roomPriority';
 import { RoomSensorThermostat } from './roomSensorThermostat';
 
 /**
@@ -223,7 +223,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       }
 
       // find this plugins current config
-      const pluginConfig = currentConfig.platforms.find(x => x.platform === PLATFORM_NAME);
+      const pluginConfig = currentConfig.platforms.find((x: { platform: string; }) => x.platform === PLATFORM_NAME);
 
       if (!pluginConfig) {
         throw new Error(`Cannot find config for ${PLATFORM_NAME} in platforms array`);
@@ -289,7 +289,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               this.log.debug(group.rooms);
               this.log.warn(rooms);
               this.rooms = rooms;
-              /* // Room Priority Switches
+              // Room Priority Switches
               this.log.debug(`Room Priority Switch UDID: ${rooms}${device.deviceID}`);
               const uuid = this.api.hap.uuid.generate(`${rooms}${device.deviceID}`);
 
@@ -336,12 +336,12 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
                 // link the accessory to your platform
                 this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
-              }*/
+              }
             }
             for (const roomaccessories of group.rooms) {
               this.log.debug(group.rooms);
               this.log.debug(roomaccessories);
-              this.log.warn(JSON.stringify(roomaccessories));
+              this.log.debug(JSON.stringify(roomaccessories));
             }
             const accessory = (await this.axios.get(`${DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
               params: {
@@ -351,12 +351,12 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
             for (const accessories of accessory.rooms) {
               this.log.debug(accessory.rooms);
               this.log.debug(accessories);
-              this.log.warn(JSON.stringify(accessories));
+              this.log.debug(JSON.stringify(accessories));
               for (const findaccessories of accessories.accessories) {
                 this.log.debug(`Found ${accessories.accessories.length} accessories.accessories`);
                 this.log.debug(accessories.accessories);
-                this.log.warn(findaccessories);
-                this.log.warn(JSON.stringify(findaccessories));
+                this.log.debug(findaccessories);
+                this.log.debug(JSON.stringify(findaccessories));
                 this.log.debug(findaccessories.accessoryAttribute.type);
 
                 // generate a unique id for the accessory this should be generated from
