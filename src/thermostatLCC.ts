@@ -86,7 +86,7 @@ export class ThermostatLCC {
       .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID)
       .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
 
-    this.platform.config.warn(this.platform.config.options.roompriority.kind);
+    this.platform.log.warn(this.platform.config.options.roompriority.kind);
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
     this.service = this.accessory.getService(this.platform.Service.Thermostat) ||
