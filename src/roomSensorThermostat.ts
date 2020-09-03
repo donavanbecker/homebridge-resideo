@@ -48,7 +48,7 @@ export class RoomSensorThermostat {
     private accessory: PlatformAccessory,
     public readonly locationId: string,
     public device: any,
-    public findaccessories: any,
+    public readonly findaccessories: any,
     public readonly group: any,
     public readonly rooms: any,
     // public readonly room: any,

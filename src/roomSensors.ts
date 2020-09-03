@@ -34,7 +34,7 @@ export class RoomSensors {
     private accessory: PlatformAccessory,
     public readonly locationId: string,
     public device: any,
-    public findaccessories: any,
+    public readonly findaccessories: any,
     public readonly group: any,
   ) {
 
