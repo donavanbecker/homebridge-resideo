@@ -349,7 +349,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 locationId: location.locationID,
               },
             })).data;
-            this.log.debug(`Found ${accessory.rooms.length} accessory.rooms`);
+            for (const test of accessory){
+              this.log.debug(`Found ${accessory.rooms.length} accessory.rooms`);
+              this.log.warn(JSON.stringify(test));
+              this.log.warn(JSON.stringify(test.rooms));
+            }
             for (const accessories of accessory.rooms) {
               this.log.debug(accessory.rooms);
               this.log.debug(accessories);
