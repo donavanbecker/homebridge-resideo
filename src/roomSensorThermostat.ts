@@ -351,7 +351,7 @@ export class RoomSensorThermostat {
           locationId: this.locationId,
         },
       })).data;
-      this.platform.log.debug(sensor);
+      this.platform.log.warn(sensor);
       this.sensor = sensor;
       this.findaccessories;
       this.platform.log.debug(this.findaccessories);
