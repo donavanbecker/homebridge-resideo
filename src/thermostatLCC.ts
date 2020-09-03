@@ -268,7 +268,7 @@ export class ThermostatLCC {
             locationId: this.locationId,
           },
         })).data;
-        this.platform.log.debug(roompriority);
+        this.platform.log.warn(roompriority);
         this.roompriority = roompriority;
       }
       if (this.device.scheduleCapabilities.schedulableFan && !this.platform.config.options.thermostat.hide_fan) {
