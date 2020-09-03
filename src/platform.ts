@@ -31,6 +31,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
   rooms: any;
   roomaccessories: any;
+  group: any;
   
   constructor(
     public readonly log: Logger,
@@ -382,7 +383,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
                       // create the accessory handler for the restored accessory
                       // this is imported from `platformAccessory.ts`
-                      new ThermostatLCC(this, existingAccessory, locationId, device, this.roomaccessories);
+                      new ThermostatLCC(this, existingAccessory, locationId, device, this.group, this.roomaccessories);
                     } else if (this.config.options.thermostat.hide || !device.isAlive) {
                       // remove platform accessories when no longer present
                       this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
@@ -403,7 +404,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
                     // create the accessory handler for the newly create accessory
                     // this is imported from `platformAccessory.ts`
-                    new ThermostatLCC(this, accessory, locationId, device, this.roomaccessories);
+                    new ThermostatLCC(this, accessory, locationId, device, this.group, this.roomaccessories);
 
                     // link the accessory to your platform
                     this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
