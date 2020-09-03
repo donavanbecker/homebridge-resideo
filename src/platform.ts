@@ -423,7 +423,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                       // create the accessory handler for the restored accessory
                       // this is imported from `platformAccessory.ts`
                       new RoomSensors(this, existingAccessory, locationId, device, findaccessories, group);
-                    } else if (this.config.options.roompriority.kind === 'thermostat' && this.config.options.roompriority.kind !== 'hide' && this.config.options.roompriority.kind !== 'switches' && !this.config.options.thermostat.hide && !this.config.options.roomsensor.hide && device.isAlive) {
+                    } else if (this.config.options.roompriority.kind === 'thermostat' && this.config.options.roompriority.kind !== 'hide' && this.config.options.roompriority.kind !== 'switches' && !this.config.options.thermostat.hide && this.config.options.roomsensor.hide && device.isAlive) {
                       this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
                       // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
