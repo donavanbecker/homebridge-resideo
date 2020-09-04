@@ -1,0 +1,114 @@
+[
+  {
+    "displayedOutdoorHumidity": 52,
+    "vacationHold": { "enabled": false },
+    "currentSchedulePeriod": { "day": "Tuesday", "period": "P1" },
+    "scheduleCapabilities": {
+      "availableScheduleTypes": ["None", "Geofenced", "TimedEmea"],
+      "schedulableFan": false
+    },
+    "scheduleType": { "scheduleType": "Timed", "scheduleSubType": "EMEA" },
+    "scheduleStatus": "Resume",
+    "allowedTimeIncrements": 10,
+    "settings": {
+      "hardwareSettings": { "brightness": 2, "maxBrightness": 5 },
+      "temperatureMode": { "air": true },
+      "specialMode": {},
+      "devicePairingEnabled": true
+    },
+    "deviceClass": "Thermostat",
+    "deviceType": "Thermostat",
+    "deviceID": "LCC-00D02DC1A545",
+    "userDefinedDeviceName": "Thermostat",
+    "name": "Thermostat",
+    "isAlive": true,
+    "isUpgrading": false,
+    "isProvisioned": true,
+    "macID": "00D02DC1A545",
+    "deviceSettings": {},
+    "service": { "mode": "Up" },
+    "deviceRegistrationDate": "2018-01-08T20:04:07.3733333",
+    "dataSyncStatus": "Initiated",
+    "units": "Celsius",
+    "indoorTemperature": 23,
+    "outdoorTemperature": 17,
+    "allowedModes": ["Heat", "Off"],
+    "deadband": 0,
+    "hasDualSetpointStatus": false,
+    "minHeatSetpoint": 5,
+    "maxHeatSetpoint": 35,
+    "minCoolSetpoint": -18,
+    "maxCoolSetpoint": -18,
+    "changeableValues": {
+      "mode": "Off",
+      "heatSetpoint": 23,
+      "coolSetpoint": 10,
+      "thermostatSetpointStatus": "NoHold",
+      "nextPeriodTime": "22:30:00",
+      "heatCoolMode": "Heat",
+      "endHeatSetpoint": null,
+      "endCoolSetpoint": null
+    },
+    "operationStatus": {
+      "mode": "EquipmentOff",
+      "fanRequest": false,
+      "circulationFanRequest": false
+    },
+    "deviceModel": "T5-T6"
+  },
+  {
+    "displayedOutdoorHumidity": 45,
+    "vacationHold": { "enabled": false },
+    "currentSchedulePeriod": { "day": "Monday", "period": "P2" },
+    "scheduleCapabilities": {
+      "availableScheduleTypes": ["Array"],
+      "schedulableFan": false
+    },
+    "scheduleType": { "scheduleType": "Timed", "scheduleSubType": "EMEA" },
+    "scheduleStatus": "Pause",
+    "allowedTimeIncrements": 10,
+    "settings": {
+      "hardwareSettings": ["Object"],
+      "temperatureMode": ["Object"],
+      "specialMode": {},
+      "devicePairingEnabled": true
+    },
+    "deviceClass": "Thermostat",
+    "deviceType": "Thermostat",
+    "deviceID": "LCC-xxxxxxxxxxx",
+    "name": "Thermostat",
+    "isAlive": true,
+    "isUpgrading": false,
+    "isProvisioned": true,
+    "macID": "xxxxxxxxxxxxx",
+    "deviceSettings": {},
+    "service": { "mode": "Up" },
+    "deviceRegistrationDate": "2020-06-26T15:35:10.14",
+    "dataSyncStatus": "Completed",
+    "units": "Celsius",
+    "indoorTemperature": 23,
+    "outdoorTemperature": 19,
+    "allowedModes": ["Heat", "Off"],
+    "deadband": 0,
+    "hasDualSetpointStatus": false,
+    "minHeatSetpoint": 5,
+    "maxHeatSetpoint": 35,
+    "minCoolSetpoint": -18,
+    "maxCoolSetpoint": -18,
+    "changeableValues": {
+      "mode": "Off",
+      "heatSetpoint": 20,
+      "coolSetpoint": 10,
+      "thermostatSetpointStatus": "PermanentHold",
+      "heatCoolMode": "Heat",
+      "endHeatSetpoint": null,
+      "endCoolSetpoint": null
+    },
+    "operationStatus": {
+      "mode": "EquipmentOff",
+      "fanRequest": false,
+      "circulationFanRequest": false
+    },
+    "deviceModel": "T5-T6"
+  }
+]

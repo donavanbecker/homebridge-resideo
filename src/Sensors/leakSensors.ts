@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Service, PlatformAccessory } from 'homebridge';
 
-import { HoneywellHomePlatform } from './platform';
+import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
-import { DeviceURL } from './settings';
+import { DeviceURL } from '../settings';
 
 /**
  * Platform Accessory
@@ -207,15 +207,22 @@ export class LeakSensor {
  */
   async refreshStatus() {
     try {
+      /*  this.log.debug(JSON.stringify(device.deviceType));
+          const sensor = (await this.axios.get(`${DeviceURL}/waterLeakDetectors`, {
+            params: {
+              locationId: location.locationID,
+            },
+          })).data;
+          this.log.debug(JSON.stringify(sensor));*/
       const sensor = (await this.platform.axios.get(DeviceURL, {
         params: {
           locationId: this.locationId,
         },
       })).data;
-      this.platform.log.debug(sensor);
+      this.platform.log.debug(JSON.stringify(sensor));
       this.sensor = sensor;
       this.device;
-      this.platform.log.debug(this.device);
+      this.platform.log.debug(JSON.stringify(this.device));
       this.platform.log.debug(JSON.stringify(this.device.currentSensorReadings));
       this.parseStatus();
       this.updateHomeKitCharacteristics();

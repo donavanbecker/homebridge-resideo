@@ -1,17 +1,17 @@
 /* eslint-disable max-len */
 import { Service, PlatformAccessory } from 'homebridge';
 
-import { HoneywellHomePlatform } from './platform';
+import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
-import { DeviceURL } from './settings';
+import { DeviceURL } from '../settings';
 
 /**
  * Platform Accessory
  * An instance of this class is created for each accessory your platform registers
  * Each accessory may expose multiple services of different service types.
  */
-export class ThermostatLCC {
+export class T5 {
   private service: Service;
 
   private modes: { Off: number; Heat: number; Cool: number; Auto: number; };
@@ -77,8 +77,8 @@ export class ThermostatLCC {
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(this.platform.Characteristic.Model, this.device.deviceModel)
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID)
-      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID);
+    //.setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
 
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
@@ -123,7 +123,7 @@ export class ThermostatLCC {
 
     this.service.getCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits)
       .on('set', this.setTemperatureDisplayUnits.bind(this));
-  
+
     // Fan Controls
     this.fanService = accessory.getService(this.platform.Service.Fanv2);
     if (this.device.scheduleCapabilities.schedulableFan && !this.fanService && !this.platform.config.options.thermostat.hide_fan) {
@@ -139,7 +139,7 @@ export class ThermostatLCC {
     } else if (this.fanService && this.platform.config.options.thermostat.hide_fan) {
       accessory.removeService(this.fanService);
     }
-    
+
     // Retrieve initial values and updateHomekit
     this.refreshStatus();
 
@@ -219,6 +219,7 @@ export class ThermostatLCC {
     if (this.device.scheduleCapabilities.schedulableFan && !this.platform.config.options.thermostat.hide_fan) {
       if (this.deviceFan) {
         this.platform.log.debug(`${JSON.stringify(this.deviceFan)}`);
+
         if (this.deviceFan.mode === 'Auto') {
           this.TargetFanState = this.platform.Characteristic.TargetFanState.AUTO;
           this.Active = this.platform.Characteristic.Active.INACTIVE;
@@ -270,7 +271,6 @@ export class ThermostatLCC {
   async pushChanges() {
     const payload = {
       mode: this.honeywellMode[this.TargetHeatingCoolingState],
-      thermostatSetpointStatus: 'TemporaryHold',
       autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
     } as any;
 
@@ -401,7 +401,7 @@ export class ThermostatLCC {
     let payload = {
       mode: 'Auto', // default to Auto
     };
-    if (this.device.scheduleCapabilities.schedulableFan && !this.platform.config.options.thermostat.hide_fan){
+    if (this.device.scheduleCapabilities.schedulableFan && !this.platform.config.options.thermostat.hide_fan) {
       this.platform.log.debug(`TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`);
 
       if (this.TargetFanState === this.platform.Characteristic.TargetFanState.AUTO) {

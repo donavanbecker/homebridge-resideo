@@ -1,17 +1,17 @@
 /* eslint-disable max-len */
 import { Service, PlatformAccessory } from 'homebridge';
 
-import { HoneywellHomePlatform } from './platform';
+import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
-import { DeviceURL } from './settings';
+import { DeviceURL } from '../settings';
 
 /**
  * Platform Accessory
  * An instance of this class is created for each accessory your platform registers
  * Each accessory may expose multiple services of different service types.
  */
-export class ThermostatTCC {
+export class TCC {
   private service: Service;
 
   private modes: { Off: number; Heat: number; Cool: number; Auto: number; };
