@@ -11,37 +11,49 @@ import { DeviceURL } from '../settings';
  * An instance of this class is created for each accessory your platform registers
  * Each accessory may expose multiple services of different service types.
  */
-export class T5 {
+export class RoomSensorThermostat {
   private service: Service;
+  batteryService: any;
+  temperatureService: any;
+  occupancyService: any;
+  humidityService: any;
+  motionService: any;
 
   private modes: { Off: number; Heat: number; Cool: number; Auto: number; };
 
-  CurrentTemperature: any;
   TargetTemperature: any;
   CurrentHeatingCoolingState: any;
   TargetHeatingCoolingState: any;
   CoolingThresholdTemperature: any;
   HeatingThresholdTemperature!: any;
-  CurrentRelativeHumidity!: any;
-  TemperatureDisplayUnits!: any;
-  Active!: any;
-  TargetFanState!: any;
-  fanMode: any;
-  thermostatUpdateInProgress!: boolean;
+  TemperatureDisplayUnits!: number;
+  CurrentTemperature: any;
+  StatusLowBattery: any;
+  OccupancyDetected: any;
+  CurrentRelativeHumidity: any;
+  MotionDetected!: any;
+  roompriority!: any;
+  sensor!: any;
 
-  fanUpdateInProgress!: boolean;
+  roomUpdateInProgress!: boolean;
+  doRoomUpdate!: any;
+  thermostatUpdateInProgress!: boolean;
   doThermostatUpdate!: any;
-  doFanUpdate!: any;
-  deviceFan!: any;
-  fanService: any;
   honeywellMode: any;
+  SensorUpdateInProgress!: boolean;
+  doSensorUpdate!: any;
+  location: any;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
     public readonly locationId: string,
     public device: any,
+    public rooms: any,
+    public roomsensor: any,
+    // public readonly room: any,
   ) {
+
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
       'Off': platform.Characteristic.TargetHeatingCoolingState.OFF,
@@ -56,35 +68,37 @@ export class T5 {
 
     // default placeholders
     this.CurrentTemperature;
+    this.StatusLowBattery;
+    this.OccupancyDetected;
+    this.CurrentRelativeHumidity;
+    this.MotionDetected;
     this.TargetTemperature;
     this.CurrentHeatingCoolingState;
     this.TargetHeatingCoolingState;
     this.CoolingThresholdTemperature;
     this.HeatingThresholdTemperature;
-    this.CurrentRelativeHumidity;
     this.TemperatureDisplayUnits;
-    this.Active;
-    this.TargetFanState;
-    this.fanMode;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
+    this.doRoomUpdate = new Subject();
+    this.roomUpdateInProgress = false;
     this.doThermostatUpdate = new Subject();
     this.thermostatUpdateInProgress = false;
-    this.doFanUpdate = new Subject();
-    this.fanUpdateInProgress = false;
+    this.doSensorUpdate = new Subject();
+    this.SensorUpdateInProgress = false;
 
     // set accessory information
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
-      .setCharacteristic(this.platform.Characteristic.Model, this.device.deviceModel)
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID);
-    //.setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
+      .setCharacteristic(this.platform.Characteristic.Model, this.roomsensor.type)
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.roomsensor.deviceID);
+    // .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
 
-
-    // get the LightBulb service if it exists, otherwise create a new LightBulb service
+    // get the Thermostat service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
     this.service = this.accessory.getService(this.platform.Service.Thermostat) ||
-      this.accessory.addService(this.platform.Service.Thermostat), `${this.device.name} ${this.device.deviceClass}`;
+      this.accessory.addService(this.platform.Service.Thermostat),
+    `${rooms.roomName} Room Sensor Thermostat`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -92,10 +106,11 @@ export class T5 {
 
     // set the service name, this is what is displayed as the default name on the Home app
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
-    this.service.setCharacteristic(this.platform.Characteristic.Name, `${this.device.name} ${this.device.deviceClass}`);
+    this.service.setCharacteristic(this.platform.Characteristic.Name,
+      `${rooms.roomName} Room Sensor Thermostat`);
 
     // each service must implement at-minimum the "required characteristics" for the given service type
-    // see https://developers.homebridge.io/#/service/Thermostat
+    // see https://developers.homebridge.io/#/service/
 
     // Do initial device parse
     this.parseStatus();
@@ -124,32 +139,105 @@ export class T5 {
     this.service.getCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits)
       .on('set', this.setTemperatureDisplayUnits.bind(this));
 
-    // Fan Controls
-    this.fanService = accessory.getService(this.platform.Service.Fanv2);
-    if (this.device.settings.fan && !this.fanService && !this.platform.config.options.thermostat.hide_fan) {
-      this.fanService = accessory.addService(this.platform.Service.Fanv2, `${this.device.name} ${this.device.deviceClass} Fan`);
-      
-      this.fanService
-        .getCharacteristic(this.platform.Characteristic.Active)
-        .on('set', this.setActive.bind(this));
+    this.batteryService = this.accessory.getService(this.platform.Service.BatteryService);
+    if (!this.batteryService && !this.platform.config.options.roomsensor.hide_battery) {
+      this.batteryService = accessory.addService(this.platform.Service.BatteryService,
+        `${this.rooms.roomName} Battery`);
 
-      this.fanService
-        .getCharacteristic(this.platform.Characteristic.TargetFanState)
-        .on('set', this.setTargetFanState.bind(this));
-    } else if (this.fanService && this.platform.config.options.thermostat.hide_fan) {
-      accessory.removeService(this.fanService);
+      // Set Charging State
+      this.batteryService
+        .setCharacteristic(this.platform.Characteristic.ChargingState, 2);
+
+      // Set Low Battery
+      this.batteryService
+        .getCharacteristic(this.platform.Characteristic.StatusLowBattery)
+        .on('get', this.handeStatusLowBatteryGet.bind(this));
+    } else if (this.batteryService && this.platform.config.options.roomsensor.hide_battery) {
+      accessory.removeService(this.batteryService);
+    }
+
+    // Temperature Sensor  
+    this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor);
+    if (!this.temperatureService && !this.platform.config.options.roomsensor.hide_temperature) {
+      this.temperatureService = accessory.addService(this.platform.Service.TemperatureSensor,
+        `${this.rooms.roomName} Occupancy Sensor`);
+
+      // Set Temperature Sensor  
+      this.temperatureService
+        .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+        .on('get', this.handleCurrentTemperatureGet.bind(this));
+    } else if (this.temperatureService && this.platform.config.options.roomsensor.hide_temperature) {
+      accessory.removeService(this.temperatureService);
+    }
+
+    // Occupancy Sensor  
+    this.occupancyService = accessory.getService(this.platform.Service.OccupancySensor);
+    if (!this.occupancyService && !this.platform.config.options.roomsensor.hide_occupancy) {
+      this.occupancyService = accessory.addService(this.platform.Service.OccupancySensor,
+        `${this.rooms.roomName} Occupancy Sensor`);
+
+      // Set Occupancy Sensor  
+      this.occupancyService
+        .getCharacteristic(this.platform.Characteristic.OccupancyDetected)
+        .on('get', this.handleOccupancyDetectedGet.bind(this));
+    } else if (this.occupancyService && this.platform.config.options.roomsensor.hide_occupancy) {
+      accessory.removeService(this.occupancyService);
+    }
+
+    // Humidity Sensor
+    this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
+    if (!this.humidityService && !this.platform.config.options.roomsensor.hide_humidity) {
+      this.humidityService = accessory.addService(this.platform.Service.HumiditySensor,
+        `${this.rooms.roomName} Humidity Sensor`);
+
+      // Set Humidity Sensor Current Relative Humidity
+      this.humidityService
+        .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
+        .on('get', this.handleCurrentRelativeHumidityGet.bind(this));
+    } else if (this.humidityService && this.platform.config.options.roomsensor.hide_humidity) {
+      accessory.removeService(this.humidityService);
+    }
+
+    // Motion Sensor
+    this.motionService = accessory.getService(this.platform.Service.MotionSensor);
+    if (!this.motionService && !this.platform.config.options.roomsensor.hide_motion) {
+      this.motionService = accessory.addService(this.platform.Service.MotionSensor,
+        `${this.rooms.roomName} Motion Sensor`);
+
+      // Set Motion Sensor Detected
+      this.motionService
+        .getCharacteristic(this.platform.Characteristic.MotionDetected)
+        .on('get', this.handleMotionDetectedGet.bind(this));
+    } else if (this.motionService && this.platform.config.options.roomsensor.hide_motion) {
+      accessory.removeService(this.motionService);
     }
 
     // Retrieve initial values and updateHomekit
     this.refreshStatus();
 
     // Start an update interval
+    interval(this.platform.config.options.ttl * 1000).pipe(skipWhile(() => this.roomUpdateInProgress)).subscribe(() => {
+      this.refreshStatus();
+    });
     interval(this.platform.config.options.ttl * 1000).pipe(skipWhile(() => this.thermostatUpdateInProgress)).subscribe(() => {
+      this.refreshStatus();
+    });
+    interval(this.platform.config.options.ttl * 1000).pipe(skipWhile(() => this.SensorUpdateInProgress)).subscribe(() => {
       this.refreshStatus();
     });
 
     // Watch for thermostat change events
-    // We put in a debounce of 100ms so we don't make duplicate calls
+    // We put in a debounce of 100ms so we don't make duplicate calls    
+    this.doRoomUpdate.pipe(tap(() => {
+      this.roomUpdateInProgress = true;
+    }), debounceTime(100)).subscribe(async () => {
+      try {
+        await this.pushRoomChanges();
+      } catch (e) {
+        this.platform.log.error(e.message);
+      }
+      this.roomUpdateInProgress = false;
+    });
     this.doThermostatUpdate.pipe(tap(() => {
       this.thermostatUpdateInProgress = true;
     }), debounceTime(100)).subscribe(async () => {
@@ -160,18 +248,11 @@ export class T5 {
       }
       this.thermostatUpdateInProgress = false;
     });
-    if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
-      this.doFanUpdate.pipe(tap(() => {
-        this.fanUpdateInProgress = true;
-      }), debounceTime(100)).subscribe(async () => {
-        try {
-          await this.pushFanChanges();
-        } catch (e) {
-          this.platform.log.error(e.message);
-        }
-        this.fanUpdateInProgress = false;
-      });
-    }
+    this.doSensorUpdate.pipe(tap(() => {
+      this.SensorUpdateInProgress = true;
+    }), debounceTime(100)).subscribe(async () => {
+      this.SensorUpdateInProgress = false;
+    });
 
   }
 
@@ -184,8 +265,8 @@ export class T5 {
     this.TemperatureDisplayUnits = this.device.units === 'Fahrenheit' ? this.platform.Characteristic.TemperatureDisplayUnits.FAHRENHEIT :
       this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS;
 
-    this.CurrentTemperature = this.toCelsius(this.device.indoorTemperature);
-    this.CurrentRelativeHumidity = this.device.indoorHumidity;
+    this.CurrentTemperature = this.toCelsius(this.rooms.roomAvgTemp);
+    this.CurrentRelativeHumidity = this.rooms.roomAvgHumidity;
 
     if (this.device.changeableValues.heatSetpoint > 0) {
       this.HeatingThresholdTemperature = this.toCelsius(this.device.changeableValues.heatSetpoint);
@@ -215,21 +296,40 @@ export class T5 {
       }
     }
 
-    // Set the Target Fan State
-    if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
-      if (this.deviceFan) {
-        this.platform.log.debug(`${JSON.stringify(this.deviceFan)}`);
+    if (!this.platform.config.options.roomsensor.hide_battery) {// Set Room Sensor State
+      if (this.roomsensor.status === 'Ok') {
+        this.StatusLowBattery = 0;
+      } else if (this.roomsensor.status !== 'Ok') {
+        this.StatusLowBattery = 1;
+      }
+    }
 
-        if (this.deviceFan.mode === 'Auto') {
-          this.TargetFanState = this.platform.Characteristic.TargetFanState.AUTO;
-          this.Active = this.platform.Characteristic.Active.INACTIVE;
-        } else if (this.deviceFan.mode === 'On') {
-          this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
-          this.Active = this.platform.Characteristic.Active.ACTIVE;
-        } else if (this.deviceFan.mode === 'Circulate') {
-          this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
-          this.Active = this.platform.Characteristic.Active.INACTIVE;
-        }
+    // Set Temperature Sensor State
+    if (!this.platform.config.options.roomsensor.hide_temperature) {
+      this.CurrentTemperature = this.toCelsius(this.rooms.roomAvgTemp);
+    }
+
+    // Set Occupancy Sensor State
+    if (!this.platform.config.options.roomsensor.hide_occupancy) {
+      if (this.roomsensor.detectMotion === true) {
+        this.OccupancyDetected = 1;
+      } else if (this.roomsensor.detectMotion === false) {
+        this.OccupancyDetected = 0;
+      }
+    }
+
+    // Set Humidity Sensor State
+    if (!this.platform.config.options.roomsensor.hide_humidity) {
+      this.CurrentRelativeHumidity = this.rooms.roomAvgHumidity;
+    }
+
+    // Set Motion Sensor State
+    if (!this.platform.config.options.roomsensor.hide_motion) {
+      this.MotionDetected = this.roomsensor.detectMotion;
+      if (this.roomsensor.detectMotion === false) {
+        this.MotionDetected = true;
+      } else if (this.roomsensor.detectMotion === true) {
+        this.MotionDetected = false;
       }
     }
   }
@@ -239,27 +339,13 @@ export class T5 {
    */
   async refreshStatus() {
     try {
-      const device = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
+      const priority = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
         params: {
           locationId: this.locationId,
         },
       })).data;
-      this.device = device;
-      this.platform.log.debug(`Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`);
-      this.platform.log.debug(JSON.stringify(this.device.changeableValues.mode));
-      if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
-        const deviceFan = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
-          params: {
-            locationId: this.locationId,
-          },
-        })).data;
-        this.deviceFan = deviceFan;
-        if (this.device.settings.fan){
-          this.platform.log.debug(this.device.settings.fan.allowedModes);
-        }
-        this.platform.log.debug(deviceFan);
-        this.platform.log.debug(`Fetched update for ${this.device.name} from Honeywell Fan API: ${JSON.stringify(this.deviceFan)}`);
-      }
+      this.platform.log.debug(JSON.stringify(priority));
+      
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
@@ -268,8 +354,32 @@ export class T5 {
   }
 
   /**
-   * Pushes the requested changes to the Honeywell API
+   * Pushes the requested changes for Fan to the Honeywell API 
    */
+  async pushRoomChanges() {
+    const payload = {
+      currentPriority: {
+        priorityType: 'PickARoom',
+        selectedRooms: [this.roomsensor.id],
+      },
+    };
+    this.platform.log.info(`Sending request to Honeywell API. Room Priority: ${this.roomsensor.roomName}`);
+    this.platform.log.debug(JSON.stringify(payload));
+
+    // Make the API request
+    const pushRoomChanges = (await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
+      params: {
+        locationId: this.locationId,
+      },
+    })).data;
+    pushRoomChanges;
+    // Refresh the status from the API
+    await this.refreshStatus();
+  }
+
+  /**
+ * Pushes the requested changes to the Honeywell API
+ */
   async pushChanges() {
     const payload = {
       mode: this.honeywellMode[this.TargetHeatingCoolingState],
@@ -291,24 +401,24 @@ export class T5 {
       payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
       payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
     }
- 
+
     this.platform.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}`);
     this.platform.log.debug(JSON.stringify(payload));
 
     // Make the API request
-    const pushChanges = (await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
+    await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
       params: {
         locationId: this.locationId,
       },
-    })).data;
-    pushChanges;
+    });
+
     // Refresh the status from the API
     await this.refreshStatus();
   }
 
   /**
-   * Updates the status for each of the HomeKit Characteristics
-   */
+ * Updates the status for each of the HomeKit Characteristics
+ */
   updateHomeKitCharacteristics() {
     this.service.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, this.TemperatureDisplayUnits);
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
@@ -318,15 +428,25 @@ export class T5 {
     this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
     this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, this.TargetHeatingCoolingState);
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, this.CurrentHeatingCoolingState);
-    if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
-      this.fanService.updateCharacteristic(this.platform.Characteristic.TargetFanState, this.TargetFanState);
-      this.fanService.updateCharacteristic(this.platform.Characteristic.Active, this.Active);
+    if (!this.platform.config.options.roomsensor.hide_battery) {
+      this.batteryService.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
+    }
+    if (!this.platform.config.options.roomsensor.hide_temperature) {
+      this.temperatureService.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
+    }
+    if (!this.platform.config.options.roomsensor.hide_occupancy) {
+      this.occupancyService.updateCharacteristic(this.platform.Characteristic.OccupancyDetected, this.OccupancyDetected);
+    }
+    if (!this.platform.config.options.roomsensor.hide_humidity) {
+      this.humidityService.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
+    }
+    if (!this.platform.config.options.roomsensor.hide_motion) {
+      this.motionService.updateCharacteristic(this.platform.Characteristic.MotionDetected, this.MotionDetected);
     }
   }
 
   setTargetHeatingCoolingState(value: any, callback: (arg0: null) => void) {
     this.platform.log.debug(`Set TargetHeatingCoolingState: ${value}`);
-
     this.TargetHeatingCoolingState = value;
 
     // Set the TargetTemperature value based on the selected mode
@@ -336,7 +456,7 @@ export class T5 {
       this.TargetTemperature = this.toCelsius(this.device.changeableValues.coolSetpoint);
     }
     this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
-
+    this.doRoomUpdate.next();
     this.doThermostatUpdate.next();
     callback(null);
   }
@@ -375,8 +495,70 @@ export class T5 {
   }
 
   /**
-   * Converts the value to celsius if the temperature units are in Fahrenheit
-   */
+ * Handle requests to get the current value of the "Tempeture Sensor" characteristics
+ */
+  handeStatusLowBatteryGet(callback: (arg0: null, arg1: any) => void) {
+    this.platform.log.debug(`Update Battery Status: ${this.StatusLowBattery}`);
+
+    // set this to a valid value for StatusLowBattery
+    const currentValue = this.StatusLowBattery;
+
+    this.doSensorUpdate.next();
+    callback(null, currentValue);
+  }
+
+  handleCurrentTemperatureGet(callback: (arg0: null, arg1: any) => void) {
+    this.platform.log.debug(`Update Current Temperature: ${this.CurrentTemperature}`);
+
+    // set this to a valid value for CurrentTemperature
+    const currentValue = this.CurrentTemperature;
+
+    this.doSensorUpdate.next();
+    callback(null, currentValue);
+  }
+
+  /**
+ * Handle requests to get the current value of the "Occupancy Sensor" characteristics
+ */
+  handleOccupancyDetectedGet(callback: (arg0: null, arg1: any) => void) {
+    this.platform.log.debug(`Update Occupancy: ${this.OccupancyDetected}`);
+
+    // set this to a valid value for OccupancyDetected
+    const currentValue = this.OccupancyDetected;
+
+    this.doSensorUpdate.next();
+    callback(null, currentValue);
+  }
+
+  /**
+ * Handle requests to get the current value of the "Humidity Sensor" characteristics
+ */
+  handleCurrentRelativeHumidityGet(callback: (arg0: null, arg1: any) => void) {
+    this.platform.log.debug(`Update Current Relative Humidity: ${this.CurrentRelativeHumidity}`);
+
+    // set this to a valid value for CurrentRelativeHumidity
+    const currentValue = this.CurrentRelativeHumidity;
+
+    this.doSensorUpdate.next();
+    callback(null, currentValue);
+  }
+
+  /**
+ * Handle requests to get the current value of the "Motion Sensor" characteristics
+ */
+  handleMotionDetectedGet(callback: (arg0: null, arg1: any) => void) {
+    this.platform.log.debug(`Update Motion: ${this.MotionDetected}`);
+
+    // set this to a valid value for Motion Detected
+    const currentValue = this.MotionDetected;
+
+    this.doSensorUpdate.next();
+    callback(null, currentValue);
+  }
+
+  /**
+ * Converts the value to celsius if the temperature units are in Fahrenheit
+ */
   toCelsius(value: number) {
     if (this.TemperatureDisplayUnits === this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS) {
       return value;
@@ -387,71 +569,14 @@ export class T5 {
   }
 
   /**
-   * Converts the value to fahrenheit if the temperature units are in Fahrenheit
-   */
+ * Converts the value to fahrenheit if the temperature units are in Fahrenheit
+ */
   toFahrenheit(value: number) {
     if (this.TemperatureDisplayUnits === this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS) {
       return value;
     }
 
     return Math.round((value * 9 / 5) + 32);
-  }
-
-  /**
-   * Pushes the requested changes for Fan to the Honeywell API 
-   */
-  async pushFanChanges() {
-    let payload = {
-      mode: 'Auto', // default to Auto
-    };
-    if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
-      this.platform.log.debug(`TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`);
-
-      if (this.TargetFanState === this.platform.Characteristic.TargetFanState.AUTO) {
-        payload = {
-          mode: 'Auto',
-        };
-      } else if (this.TargetFanState === this.platform.Characteristic.TargetFanState.MANUAL &&
-      this.Active === this.platform.Characteristic.Active.ACTIVE) {
-        payload = {
-          mode: 'On',
-        };
-      } else if (this.TargetFanState === this.platform.Characteristic.TargetFanState.MANUAL &&
-      this.Active === this.platform.Characteristic.Active.INACTIVE) {
-        payload = {
-          mode: 'Circulate',
-        };
-      }
-
-      this.platform.log.info(`Sending request to Honeywell API. Fan Mode: ${payload.mode}`);
-      this.platform.log.debug(JSON.stringify(payload));
-
-      // Make the API request
-      await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, payload, {
-        params: {
-          locationId: this.locationId,
-        },
-      });
-    }
-    // Refresh the status from the API
-    await this.refreshStatus();
-  }
-
-  /**
-   * Updates the status for each of the HomeKit Characteristics
-   */
-  setActive(value: any, callback: (arg0: null) => void) {
-    this.platform.log.debug(`Set Active State: ${value}`);
-    this.Active = value;
-    this.doFanUpdate.next();
-    callback(null);
-  }
-
-  setTargetFanState(value: any, callback: (arg0: null) => void) {
-    this.platform.log.debug(`Set Target Fan State: ${value}`);
-    this.TargetFanState = value;
-    this.doFanUpdate.next();
-    callback(null);
   }
 
 }

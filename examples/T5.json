@@ -110,5 +110,61 @@
       "circulationFanRequest": false
     },
     "deviceModel": "T5-T6"
+  },
+  {
+    "displayedOutdoorHumidity": 44,
+    "vacationHold": { "enabled": false },
+    "currentSchedulePeriod": { "day": "Monday", "period": "Wake" },
+    "scheduleCapabilities": {
+      "availableScheduleTypes": ["None", "Geofenced", "TimedNorthAmerica"],
+      "schedulableFan": false
+    },
+    "scheduleType": { "scheduleType": "Timed", "scheduleSubType": "NA" },
+    "scheduleStatus": "Pause",
+    "allowedTimeIncrements": 15,
+    "settings": {
+      "hardwareSettings": { "brightness": 0, "maxBrightness": 5 },
+      "fan": { "allowedModes": ["Array"], "changeableValues": ["Object"] },
+      "temperatureMode": { "air": false },
+      "specialMode": { "autoChangeoverActive": true },
+      "devicePairingEnabled": true
+    },
+    "deviceClass": "Thermostat",
+    "deviceType": "Thermostat",
+    "deviceID": "XXX-XXXXXXXXXXXX",
+    "userDefinedDeviceName": "Honeywell Home Thermostat",
+    "name": "Honeywell Home Thermostat",
+    "isAlive": true,
+    "isUpgrading": false,
+    "isProvisioned": true,
+    "macID": "XXXXXXXXXXXX",
+    "deviceSettings": {},
+    "service": { "mode": "Up" },
+    "deviceRegistrationDate": "2020-03-26T19:07:53.2766667",
+    "dataSyncStatus": "Completed",
+    "units": "Fahrenheit",
+    "indoorTemperature": 75,
+    "outdoorTemperature": 79,
+    "allowedModes": ["Heat", "Off", "Cool", "Auto"],
+    "deadband": 0,
+    "hasDualSetpointStatus": false,
+    "minHeatSetpoint": 50,
+    "maxHeatSetpoint": 90,
+    "minCoolSetpoint": 50,
+    "maxCoolSetpoint": 90,
+    "changeableValues": {
+      "mode": "Auto",
+      "autoChangeoverActive": true,
+      "heatSetpoint": 68,
+      "coolSetpoint": 75,
+      "thermostatSetpointStatus": "PermanentHold",
+      "heatCoolMode": "Cool"
+    },
+    "operationStatus": {
+      "mode": "EquipmentOff",
+      "fanRequest": false,
+      "circulationFanRequest": false
+    },
+    "deviceModel": "T5-T6"
   }
 ]

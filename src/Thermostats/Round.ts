@@ -254,7 +254,9 @@ export class Round {
           },
         })).data;
         this.deviceFan = deviceFan;
-        this.platform.log.debug(this.device.settings.fan.allowedModes);
+        if (this.device.settings) {
+          this.platform.log.debug(this.device.settings.fan.allowedModes);
+        }
         this.platform.log.debug(deviceFan);
         this.platform.log.debug(`Fetched update for ${this.device.name} from Honeywell Fan API: ${JSON.stringify(this.deviceFan)}`);
       }
@@ -271,6 +273,7 @@ export class Round {
   async pushChanges() {
     const payload = {
       mode: this.honeywellMode[this.TargetHeatingCoolingState],
+      thermostatSetpointStatus: 'TemporaryHold',
       autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
     } as any;
 
@@ -293,12 +296,12 @@ export class Round {
     this.platform.log.debug(JSON.stringify(payload));
 
     // Make the API request
-    await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
+    const pushChanges = (await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
       params: {
         locationId: this.locationId,
       },
-    });
-
+    })).data;
+    pushChanges;
     // Refresh the status from the API
     await this.refreshStatus();
   }
