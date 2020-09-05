@@ -284,7 +284,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               // Add T9 Thermostat
               this.T9(device, locationId);
               // Add RoomSensors
-              // this.RoomSensors();
+              this.RoomSensors();
               this.RoomSensorsSwitches();
             } else if (device.deviceModel.startsWith('T5')) {
               this.devicediscovery(device);
