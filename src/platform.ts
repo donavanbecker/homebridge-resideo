@@ -13,7 +13,7 @@ import { TCC } from './Thermostats/TCC';
 import { LeakSensor } from './Sensors/leakSensors';
 import { RoomSensors } from './RoomSensors/roomSensors';
 import { RoomSensorThermostat } from './RoomSensors/roomSensorThermostat';
-import { RoomPriority } from './RoomSensors/RoomPriority';
+import { RoomPriority } from './RoomSensors/roomPriority';
 
 /**
  * HomebridgePlatform
