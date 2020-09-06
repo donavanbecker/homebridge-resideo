@@ -544,14 +544,18 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       // create the accessory handler for the newly create accessory
       // this is imported from `/Sensors/leakSensors.ts`
       new LeakSensor(this, accessory, locationId, device);
+      this.log.debug(`Leak Sensor UDID: ${device.name}-${device.deviceID}-${device.deviceClass}`);
 
       // link the accessory to your platform
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
     }
   }
 
-  private async RoomSensors() {// get the locations
   async RoomSensors() {
+    const locations = (await this.axios.get(LocationURL)).data;
+    locations.forEach((location: { locationID: any; devices: any; }) => {
+      const locationId = location.locationID;
+      location.devices.forEach((device: { deviceID: any; deviceModel: any; groups: any; isAlive: any; deviceClass: any; }) => {
         if ((device.deviceID.startsWith('LCC'))) {
           if (device.deviceModel.startsWith('T9')) {
             if (device.groups) {
