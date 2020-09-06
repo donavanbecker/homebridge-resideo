@@ -52,7 +52,7 @@
             "type": "object",
             "properties": {
               "hide": {
-                "title": "Hide Thermostat Device(s)",
+                "title": "Hide Thermostat(s)",
                 "type": "boolean",
                 "requried": false
               },
@@ -68,7 +68,7 @@
             "type": "object",
             "properties": {
               "hide": {
-                "title": "Hide Leak Sensor Device(s)",
+                "title": "Hide Leak Sensor(s)",
                 "type": "boolean",
                 "requried": false
               },
@@ -124,25 +124,20 @@
             "title": "Room Priority",
             "type": "object",
             "properties": {
-              "kind": {
-                "title": "Room Priority",
-                "type": "string",
-                "default": "roomsensor",
-                "oneOf": [
-                  {
-                    "title": "No Room Prioritys(Only Show Room Sensors)",
-                    "enum": ["roomsensor"]
-                  },
-                  {
-                    "title": "Thermostat",
-                    "enum": ["thermostat"]
-                  },
-                  {
-                    "title": "Switches",
-                    "enum": ["switch"]
-                  }
-                ],
-                "required": true
+              "roomsensor": {
+                "title": "Room Sensor Only",
+                "type": "boolean",
+                "requried": false
+              },
+              "thermostat": {
+                "title": "Thermostat Room Priority",
+                "type": "boolean",
+                "requried": false
+              },
+              "switch": {
+                "title": "Switch Room Priority",
+                "type": "boolean",
+                "requried": false
               }
             }
           }
@@ -153,26 +148,27 @@
   "layout": [
     {
       "type": "fieldset",
-      "title": "Advanced Settings",
+      "title": "Honeywell Home Account Info",
       "expandable": true,
       "expanded": false,
       "items": [
         {
-          "type": "fieldset",
-          "title": "Manual Setup",
-          "expandable": true,
-          "expanded": false,
-          "items": [
-            {
-              "type": "help",
-              "helpvalue": "<h5></h5><em class='primary-text'>This is for Manual Setup Only.</em>"
-            },
-            "name",
-            "credentials.consumerKey",
-            "credentials.consumerSecret",
-            "credentials.refreshToken"
-          ]
+          "type": "help",
+          "helpvalue": "<h5></h5><em class='primary-text'>This is for Manual Setup Only.</em>"
         },
+        "name",
+        "credentials.consumerKey",
+        "credentials.consumerSecret",
+        "credentials.refreshToken"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Advanced Settings",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        
         {
           "type": "help",
           "helpvalue": "<h5>TTL</h5><em class='primary-text'>TTL indicates the number of seconds between polls of the Honeywell Home service.</em>"
@@ -196,7 +192,51 @@
               "type": "help",
               "helpvalue": "<h5>Hide Thermostat Fan Service</h5><em class='primary-text'>Allows you to hide your Thermostat's Fan.</em>"
             },
-            "options.thermostat.hide_fan"
+            "options.thermostat.hide_fan",
+            {
+              "type": "fieldset",
+              "title": "Room Sensor Options",
+              "expandable": true,
+              "expanded": false,
+              "items": [
+                {
+                  "type": "help",
+                  "helpvalue": "<em class='primary-text'>Allows you to hide your Room Sensor(s).</em>"
+                },
+                "options.roomsensor.hide",
+                {
+                  "type": "help",
+                  "helpvalue": "<h5>Hide Room Sensor Services</h5><em class='primary-text'>Allows you to hide your tempeture sensor, occupancy sensor, motion sensor, or humidity sensor of your Room Sensor(s).</em>"
+                },
+                "options.roomsensor.hide_temperature",
+                "options.roomsensor.hide_occupancy",
+                "options.roomsensor.hide_motion",
+                "options.roomsensor.hide_humidity",
+                {
+                  "type": "fieldset",
+                  "title": "Room Priority Options",
+                  "expandable": true,
+                  "expanded": false,
+                  "items": [
+                    {
+                      "type": "help",
+                      "helpvalue": "<em class='primary-text'>Allows you to set your Priority to show up as a Thermostat or Switch(s).</em>"
+                    },
+                    {
+                      "type": "help",
+                      "helpvalue": "<em class='primary-text'>Only select one of the following.</em>"
+                    },
+                    "options.roompriority.thermostat",
+                    "options.roompriority.switch",
+                    {
+                      "type": "help",
+                      "helpvalue": "<em class='primary-text'>Select Room Sensors to Disable Room Priority, and Display Only Room Sensor(s).</em>"
+                    },
+                    "options.roompriority.roomsensor"
+                  ]
+                }
+              ]
+            }
           ]
         },
         {
@@ -217,40 +257,6 @@
             "options.leaksensor.hide_temperature",
             "options.leaksensor.hide_leak",
             "options.leaksensor.hide_humidity"
-          ]
-        },
-        {
-          "type": "fieldset",
-          "title": "Room Sensor Options",
-          "expandable": true,
-          "expanded": false,
-          "items": [
-            {
-              "type": "help",
-              "helpvalue": "<h5>Room Sensors</h5><em class='primary-text'>Allows you to hide your Room Sensor(s). **This will not effect the Thermostat Room Sensors** </em>"
-            },
-            "options.roomsensor.hide",
-            {
-              "type": "help",
-              "helpvalue": "<h5>Hide Room Sensor Services</h5><em class='primary-text'>Allows you to hide your Room Sensor's tempeture sensor, occupancy sensor, motion sensor, or humidity sensor.</em>"
-            },
-            "options.roomsensor.hide_temperature",
-            "options.roomsensor.hide_occupancy",
-            "options.roomsensor.hide_motion",
-            "options.roomsensor.hide_humidity"
-          ]
-        },
-        {
-          "type": "fieldset",
-          "title": "Room Priority Options",
-          "expandable": true,
-          "expanded": false,
-          "items": [
-            {
-              "type": "help",
-              "helpvalue": "<h5>Room Priority</h5><em class='primary-text'>Allows you to set your Priority to show up as a `Thermostat`, `Switch`, or Disable Room Priority and just show Room Sensors.</em>"
-            },
-            "options.roompriority.kind"
           ]
         }
       ]

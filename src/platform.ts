@@ -606,7 +606,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                   this.accessory = await this.findrooms(device, group, location);
                   this.accessory.rooms.forEach((accessories: { accessories: any[]; name: any; }) => {
                     accessories.accessories.forEach((findaccessories: { accessoryAttribute: { type: string; serialNumber: any; softwareRevision: any; }; }) => {
-                      this.log.info(JSON.stringify(findaccessories));
                       if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor') {
                         const uuid = this.api.hap.uuid.generate(`${accessories.name}-${findaccessories.accessoryAttribute.type}-${findaccessories.accessoryAttribute.serialNumber}`);
                         const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
