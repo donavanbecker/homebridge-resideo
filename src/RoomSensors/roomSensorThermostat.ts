@@ -40,17 +40,18 @@ export class RoomSensorThermostat {
   thermostatUpdateInProgress!: boolean;
   doThermostatUpdate!: any;
   honeywellMode: any;
+  honeywellRooms: any;
   SensorUpdateInProgress!: boolean;
   doSensorUpdate!: any;
-  location: any;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
     public readonly locationId: string,
     public device: any,
-    public rooms: any,
-    public roomsensor: any,
+    public findaccessories: any,
+    public readonly group: any,
+    public readonly rooms: any,
     // public readonly room: any,
   ) {
 
@@ -65,6 +66,7 @@ export class RoomSensorThermostat {
     // Map HomeKit Modes to Honeywell Modes
     // Don't change the order of these!
     this.honeywellMode = ['Off', 'Heat', 'Cool', 'Auto'];
+    this.honeywellRooms = [`${this.roompriority}`, `${this.platform.rooms}`];
 
     // default placeholders
     this.CurrentTemperature;
@@ -90,15 +92,15 @@ export class RoomSensorThermostat {
     // set accessory information
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
-      .setCharacteristic(this.platform.Characteristic.Model, this.roomsensor.type)
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.roomsensor.deviceID);
-    // .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
+      .setCharacteristic(this.platform.Characteristic.Model, this.findaccessories.accessoryAttribute.type)
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID)
+      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
 
     // get the Thermostat service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
     this.service = this.accessory.getService(this.platform.Service.Thermostat) ||
       this.accessory.addService(this.platform.Service.Thermostat),
-    `${rooms.roomName} Room Sensor Thermostat`;
+    `${this.findaccessories.accessoryAttribute.name} Room Sensor Thermostat`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -107,7 +109,7 @@ export class RoomSensorThermostat {
     // set the service name, this is what is displayed as the default name on the Home app
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
     this.service.setCharacteristic(this.platform.Characteristic.Name,
-      `${rooms.roomName} Room Sensor Thermostat`);
+      `${this.findaccessories.accessoryAttribute.name} Room Sensor Thermostat`);
 
     // each service must implement at-minimum the "required characteristics" for the given service type
     // see https://developers.homebridge.io/#/service/
@@ -142,7 +144,7 @@ export class RoomSensorThermostat {
     this.batteryService = this.accessory.getService(this.platform.Service.BatteryService);
     if (!this.batteryService && !this.platform.config.options.roomsensor.hide_battery) {
       this.batteryService = accessory.addService(this.platform.Service.BatteryService,
-        `${this.rooms.roomName} Battery`);
+        `${this.findaccessories.accessoryAttribute.name} Battery`);
 
       // Set Charging State
       this.batteryService
@@ -160,7 +162,7 @@ export class RoomSensorThermostat {
     this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor);
     if (!this.temperatureService && !this.platform.config.options.roomsensor.hide_temperature) {
       this.temperatureService = accessory.addService(this.platform.Service.TemperatureSensor,
-        `${this.rooms.roomName} Occupancy Sensor`);
+        `${this.findaccessories.accessoryAttribute.name} Occupancy Sensor`);
 
       // Set Temperature Sensor  
       this.temperatureService
@@ -174,7 +176,7 @@ export class RoomSensorThermostat {
     this.occupancyService = accessory.getService(this.platform.Service.OccupancySensor);
     if (!this.occupancyService && !this.platform.config.options.roomsensor.hide_occupancy) {
       this.occupancyService = accessory.addService(this.platform.Service.OccupancySensor,
-        `${this.rooms.roomName} Occupancy Sensor`);
+        `${this.findaccessories.accessoryAttribute.name} Occupancy Sensor`);
 
       // Set Occupancy Sensor  
       this.occupancyService
@@ -188,7 +190,7 @@ export class RoomSensorThermostat {
     this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
     if (!this.humidityService && !this.platform.config.options.roomsensor.hide_humidity) {
       this.humidityService = accessory.addService(this.platform.Service.HumiditySensor,
-        `${this.rooms.roomName} Humidity Sensor`);
+        `${this.findaccessories.accessoryAttribute.name} Humidity Sensor`);
 
       // Set Humidity Sensor Current Relative Humidity
       this.humidityService
@@ -202,7 +204,7 @@ export class RoomSensorThermostat {
     this.motionService = accessory.getService(this.platform.Service.MotionSensor);
     if (!this.motionService && !this.platform.config.options.roomsensor.hide_motion) {
       this.motionService = accessory.addService(this.platform.Service.MotionSensor,
-        `${this.rooms.roomName} Motion Sensor`);
+        `${this.findaccessories.accessoryAttribute.name} Motion Sensor`);
 
       // Set Motion Sensor Detected
       this.motionService
@@ -265,8 +267,8 @@ export class RoomSensorThermostat {
     this.TemperatureDisplayUnits = this.device.units === 'Fahrenheit' ? this.platform.Characteristic.TemperatureDisplayUnits.FAHRENHEIT :
       this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS;
 
-    this.CurrentTemperature = this.toCelsius(this.rooms.roomAvgTemp);
-    this.CurrentRelativeHumidity = this.rooms.roomAvgHumidity;
+    this.CurrentTemperature = this.toCelsius(this.findaccessories.accessoryValue.indoorTemperature);
+    this.CurrentRelativeHumidity = this.findaccessories.accessoryValue.indoorHumidity;
 
     if (this.device.changeableValues.heatSetpoint > 0) {
       this.HeatingThresholdTemperature = this.toCelsius(this.device.changeableValues.heatSetpoint);
@@ -297,38 +299,38 @@ export class RoomSensorThermostat {
     }
 
     if (!this.platform.config.options.roomsensor.hide_battery) {// Set Room Sensor State
-      if (this.roomsensor.status === 'Ok') {
+      if (this.findaccessories.accessoryValue.batteryStatus === 'Ok') {
         this.StatusLowBattery = 0;
-      } else if (this.roomsensor.status !== 'Ok') {
+      } else if (this.findaccessories.accessoryValue.batteryStatus !== 'Ok') {
         this.StatusLowBattery = 1;
       }
     }
 
     // Set Temperature Sensor State
     if (!this.platform.config.options.roomsensor.hide_temperature) {
-      this.CurrentTemperature = this.toCelsius(this.rooms.roomAvgTemp);
+      this.CurrentTemperature = this.toCelsius(this.findaccessories.accessoryValue.indoorTemperature);
     }
 
     // Set Occupancy Sensor State
     if (!this.platform.config.options.roomsensor.hide_occupancy) {
-      if (this.roomsensor.detectMotion === true) {
+      if (this.findaccessories.accessoryValue.occupancyDet === true) {
         this.OccupancyDetected = 1;
-      } else if (this.roomsensor.detectMotion === false) {
+      } else if (this.findaccessories.accessoryValue.occupancyDet === false) {
         this.OccupancyDetected = 0;
       }
     }
 
     // Set Humidity Sensor State
     if (!this.platform.config.options.roomsensor.hide_humidity) {
-      this.CurrentRelativeHumidity = this.rooms.roomAvgHumidity;
+      this.CurrentRelativeHumidity = this.findaccessories.accessoryValue.indoorHumidity;
     }
 
     // Set Motion Sensor State
     if (!this.platform.config.options.roomsensor.hide_motion) {
-      this.MotionDetected = this.roomsensor.detectMotion;
-      if (this.roomsensor.detectMotion === false) {
+      this.MotionDetected = this.findaccessories.accessoryValue.motionDet;
+      if (this.findaccessories.accessoryValue.motionDet === false) {
         this.MotionDetected = true;
-      } else if (this.roomsensor.detectMotion === true) {
+      } else if (this.findaccessories.accessoryValue.motionDet === true) {
         this.MotionDetected = false;
       }
     }
@@ -339,13 +341,23 @@ export class RoomSensorThermostat {
    */
   async refreshStatus() {
     try {
-      const priority = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
+      const roompriority = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
         params: {
           locationId: this.locationId,
         },
       })).data;
-      this.platform.log.debug(JSON.stringify(priority));
-      
+      const sensor = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/group/${this.group.id}/rooms`, {
+        params: {
+          locationId: this.locationId,
+        },
+      })).data;
+      this.platform.log.debug(JSON.stringify(roompriority));
+      this.roompriority = roompriority;
+      this.platform.log.debug(JSON.stringify(sensor));
+      this.sensor = sensor;
+      this.findaccessories;
+      this.platform.log.debug(JSON.stringify(this.findaccessories));
+      this.platform.log.debug(JSON.stringify(this.findaccessories.accessoryValue));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
@@ -360,10 +372,13 @@ export class RoomSensorThermostat {
     const payload = {
       currentPriority: {
         priorityType: 'PickARoom',
-        selectedRooms: [this.roomsensor.id],
+        selectedRooms: [this.rooms],
       },
     };
-    this.platform.log.info(`Sending request to Honeywell API. Room Priority: ${this.roomsensor.roomName}`);
+
+    this.platform.log.debug(`RoomOn: ${this.rooms}`);
+
+    this.platform.log.info(`Sending request to Honeywell API. Room Priority: ${payload.currentPriority.selectedRooms}`);
     this.platform.log.debug(JSON.stringify(payload));
 
     // Make the API request
