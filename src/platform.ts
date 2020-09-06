@@ -86,30 +86,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     });
   }
 
-  // await this.discoverDevice();
-  private async discoverDevices() {
-    try {
-      await this.discoverThermostats();
-    } catch (e) {
-      this.log.error('Failed to refresh access token.', e.message);
-    }
-    try {
-      await this.discoverRoomSensors();
-    } catch (e) {
-      this.log.error('Failed to refresh access token.', e.message);
-    }
-    try {
-      await this.discoverRoomSensorThermostat();
-    } catch (e) {
-      this.log.error('Failed to refresh access token.', e.message);
-    }
-    try {
-      await this.discoverRoomPriority();
-    } catch (e) {
-      this.log.error('Failed to refresh access token.', e.message);
-    }
-  }
-
   /**
    * This function is invoked when homebridge restores cached accessories from disk at startup.
    * It should be used to setup event handlers for characteristics and update respective values.
@@ -354,6 +330,21 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
             if (device.deviceModel.startsWith('T9')) {
               this.deviceinfo(device);
               this.T9(device, locationId);
+              try {
+                await this.discoverRoomSensors();
+              } catch (e) {
+                this.log.error('Failed to refresh access token.', e.message);
+              }
+              try {
+                await this.discoverRoomSensorThermostat();
+              } catch (e) {
+                this.log.error('Failed to refresh access token.', e.message);
+              }
+              try {
+                await this.discoverRoomPriority();
+              } catch (e) {
+                this.log.error('Failed to refresh access token.', e.message);
+              }
             } else if (device.deviceModel.startsWith('T5')) {
               this.deviceinfo(device);
               this.T5({ device, locationId });
