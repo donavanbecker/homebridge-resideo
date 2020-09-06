@@ -155,8 +155,7 @@ export class T9 {
     });
 
     // Watch for thermostat change events
-    // We put in a debounce of 100ms so we don't make duplicate calls 
-    this.platform.log.warn(this.platform.config.options.roompriority.thermostat);
+    // We put in a debounce of 100ms so we don't make duplicate calls
     if (this.platform.config.options.roompriority.thermostat) {
       this.doRoomUpdate.pipe(tap(() => {
         this.roomUpdateInProgress = true;
