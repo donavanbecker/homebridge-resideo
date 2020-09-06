@@ -27,11 +27,15 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   // this is used to track restored cached accessories
   public readonly accessories: PlatformAccessory[] = [];
   public rooms: any;
+  public locations: any;
+  public accessory: any;
 
   public axios: AxiosInstance = axios.create({
     responseType: 'json',
   });
 
+  location: any;
+  //accessory: any;
   
 
   constructor(
@@ -70,18 +74,19 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     this.api.on('didFinishLaunching', async () => {
       log.debug('Executed didFinishLaunching callback');
       // run the method to discover / register your devices as accessories
-      await this.discoverDevices();
-
+      this.locations = this.discoverlocations();
       interval((1800 / 3) * 1000).subscribe(async () => {
         try {
           await this.getAccessToken();
         } catch (e) {
           this.log.error('Failed to refresh access token.');
         }
+        
       });
     });
   }
 
+  // await this.discoverDevice();
   private async discoverDevices() {
     try {
       await this.discoverThermostats();
@@ -304,32 +309,42 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    * this method discovers the Locations
    */
   public async discoverlocations() {
+    // try and get the access token. If it fails stop here.
+    try {
+      await this.getAccessToken();
+    } catch (e) {
+      this.log.error('Could not discover locations.', e.message);
+      return;
+    }
     const locations = (await this.axios.get(LocationURL)).data;
     this.log.info(`Total Locations Found: ${locations.length}`);
     return locations;
   }
 
   /**
+   * this method discovers the Locations
+   */
+  public async findrooms(device: { deviceID: string; deviceModel: string; groups: any[]; isAlive: any; deviceClass: string; }, group: { rooms: any[]; id: any; }, location: { locationID: any; devices: (arg0: (device: any) => void) => void; }) {
+    const accessory = (await this.axios.get(`${DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
+      params: {
+        locationId: location.locationID,
+      },
+    }).data
+    return accessory
+  }
+
+
+  /**
    * This method is used to discover the your location and devices.
    * Accessories are registered by either their DeviceClass, DeviceModel, or DeviceID
    */
   async discoverThermostats() {
-    // try and get the access token. If it fails stop here.
-    try {
-      await this.getAccessToken();
-    } catch (e) {
-      this.log.error('Could not discover devices.', e.message);
-      return;
-    }
-
-    const locations = await this.discoverlocations();
-
     // get the devices at each location
-    locations.forEach((location: { name: any; devices: any[]; locationID: any; }) => {
+    this.log.info(`Getting devices for ${this.location.name}...`);
+    this.locations.forEach((location: { name: any; devices: any[]; locationID: any; }) => {
       this.log.info(`Getting devices for ${location.name}...`);
       this.log.info(`Total Devices Found at ${location.name}: ${location.devices.length}`);
       const locationId = location.locationID;
-
       location.devices.forEach(async (device: { isAlive: any; deviceClass: string; deviceID: string; deviceModel: string; DeviceModel: any; }) => {
         if (!device.isAlive && device.deviceClass === 'LeakDetector') {
           this.deviceinfo(device);
@@ -590,8 +605,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   }
 
   async discoverRoomSensors() {
-    const locations = await this.discoverlocations();
-    locations.forEach((location: { locationID: any; devices: any; }) => {
+
+    this.locations.forEach((location: { locationID: any; devices: any; }) => {
       const locationId = location.locationID;
       location.devices.forEach((device: { deviceID: any; deviceModel: any; groups: any; isAlive: any; deviceClass: any; }) => {
         if ((device.deviceID.startsWith('LCC'))) {
@@ -602,11 +617,10 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                   room;
                 });
                 {
-                  const accessory = await this.findrooms(device, group, location);
                   group.rooms.forEach((roomaccessories: any) => {
                     roomaccessories;
                   });
-                  accessory.rooms.forEach((accessories: { accessories: any[]; name: string; }) => {
+                  this.accessory.rooms.forEach((accessories: { accessories: any[]; name: string; }) => {
                     accessories.accessories.forEach(findaccessories => {
                       this.log.info(JSON.stringify(findaccessories));
                       if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor') {
@@ -669,11 +683,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     });
   }
 
-  async discoverRoomSensorThermostat() {    
-    // get the locations
-    const locations = await this.discoverlocations();
-    // get the devices at each location
-    locations.forEach((location: { locationID: any; devices: any; }) => {
+  async discoverRoomSensorThermostat() {  
+    // get the devices at each location  
+    this.locations.forEach((location: { locationID: any; devices: any; }) => {
       const locationId = location.locationID;
       location.devices.forEach((device: { deviceID: any; deviceModel: any; groups: any; isAlive: any; deviceClass: any; }) => {
         if ((device.deviceID.startsWith('LCC'))) {
@@ -683,13 +695,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 group.rooms.forEach((rooms: any) => {
                   this.rooms = rooms;
                 });
-                
                 {
-                  const accessory = await this.findrooms(device, group, location);
                   group.rooms.forEach((roomaccessories: any) => {
                     roomaccessories;
                   });
-                  accessory.rooms.forEach((accessories: { accessories: any[]; name: any; }) => {
+                  this.accessory.rooms.forEach((accessories: { accessories: any[]; name: any; }) => {
                     accessories.accessories.forEach((findaccessories: { accessoryAttribute: { type: string; serialNumber: any; softwareRevision: any; }; }) => {
                       if (findaccessories.accessoryAttribute.type === 'IndoorAirSensor') {
                         const uuid = this.api.hap.uuid.generate(`${accessories.name}-${findaccessories.accessoryAttribute.type}-${findaccessories.accessoryAttribute.serialNumber}`);
@@ -756,10 +766,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   }
 
   async discoverRoomPriority() {    
-    // get the locations
-    const locations = await this.discoverlocations();
     // get the devices at each location
-    locations.forEach((location: { locationID: any; devices: any[]; }) => {
+    this.locations.forEach((location: { locationID: any; devices: any[]; }) => {
       const locationId = location.locationID;
       location.devices.forEach((device: { name: string; deviceID: string; deviceModel: string; groups: any[]; isAlive: any; }) => {
         // T9 Thermostats
@@ -827,14 +835,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
     this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
   }      
-
-  private async findrooms(device: { deviceID: string; deviceModel: string; groups: any[]; isAlive: any; deviceClass: string; }, group: { rooms: any[]; id: any; }, location: { locationID: any; devices: (arg0: (device: any) => void) => void; }) {
-    return (await this.axios.get(`${DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
-      params: {
-        locationId: location.locationID,
-      },
-    })).data;
-  }
 
   private deviceinfo(device: any) {
     if (this.config.devicediscovery) {
