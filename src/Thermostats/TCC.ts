@@ -273,7 +273,7 @@ export class TCC {
   async pushChanges() {
     const payload = {
       mode: this.honeywellMode[this.TargetHeatingCoolingState],
-      thermostatSetpointStatus: 'TemporaryHold',
+      thermostatSetpointStatus: 'NoHold',
       autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
     } as any;
 

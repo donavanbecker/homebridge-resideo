@@ -119,6 +119,32 @@
                 "requried": false
               }
             }
+          },
+          "roompriority": {
+            "title": "Room Priority",
+            "type": "object",
+            "properties": {
+              "kind": {
+                "title": "Room Priority",
+                "type": "string",
+                "default": "roomsensor",
+                "oneOf": [
+                  {
+                    "title": "No Room Prioritys(Only Show Room Sensors)",
+                    "enum": ["roomsensor"]
+                  },
+                  {
+                    "title": "Thermostat",
+                    "enum": ["thermostat"]
+                  },
+                  {
+                    "title": "Switches",
+                    "enum": ["switch"]
+                  }
+                ],
+                "required": true
+              }
+            }
           }
         }
       }
@@ -192,7 +218,7 @@
             "options.leaksensor.hide_leak",
             "options.leaksensor.hide_humidity"
           ]
-        },   
+        },
         {
           "type": "fieldset",
           "title": "Room Sensor Options",
@@ -201,7 +227,7 @@
           "items": [
             {
               "type": "help",
-              "helpvalue": "<h5>Room Sensors</h5><em class='primary-text'>Allows you to hide your Room Sensor(s).</em>"
+              "helpvalue": "<h5>Room Sensors</h5><em class='primary-text'>Allows you to hide your Room Sensor(s). **This will not effect the Thermostat Room Sensors** </em>"
             },
             "options.roomsensor.hide",
             {
@@ -212,6 +238,19 @@
             "options.roomsensor.hide_occupancy",
             "options.roomsensor.hide_motion",
             "options.roomsensor.hide_humidity"
+          ]
+        },
+        {
+          "type": "fieldset",
+          "title": "Room Priority Options",
+          "expandable": true,
+          "expanded": false,
+          "items": [
+            {
+              "type": "help",
+              "helpvalue": "<h5>Room Priority</h5><em class='primary-text'>Allows you to set your Priority to show up as a `Thermostat`, `Switch`, or Disable Room Priority and just show Room Sensors.</em>"
+            },
+            "options.roompriority.kind"
           ]
         }
       ]

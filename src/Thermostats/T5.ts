@@ -257,7 +257,7 @@ export class T5 {
         if (this.device.settings.fan){
           this.platform.log.debug(this.device.settings.fan.allowedModes);
         }
-        this.platform.log.debug(deviceFan);
+        this.platform.log.debug(JSON.stringify(deviceFan));
         this.platform.log.debug(`Fetched update for ${this.device.name} from Honeywell Fan API: ${JSON.stringify(this.deviceFan)}`);
       }
       this.parseStatus();

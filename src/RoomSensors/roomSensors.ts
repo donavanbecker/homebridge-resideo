@@ -27,7 +27,6 @@ export class RoomSensors {
   SensorUpdateInProgress!: boolean;
   doSensorUpdate!: any;
   TemperatureDisplayUnits!: number;
-  location: any;
 
 
   constructor(
@@ -35,8 +34,8 @@ export class RoomSensors {
     private accessory: PlatformAccessory,
     public readonly locationId: string,
     public device: any,
-    public rooms: any,
-    public roomsensor: any,
+    public findaccessories: any,
+    public readonly group: any,
   ) {
 
     // default placeholders
@@ -53,15 +52,15 @@ export class RoomSensors {
     // set accessory information
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
-      .setCharacteristic(this.platform.Characteristic.Model, this.roomsensor.type)
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.rooms.deviceID);
-    // .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
+      .setCharacteristic(this.platform.Characteristic.Model, this.findaccessories.accessoryAttribute.type)
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID)
+      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
     this.service = this.accessory.getService(this.platform.Service.BatteryService) ||
       this.accessory.addService(this.platform.Service.BatteryService),
-    `${this.rooms.roomName} Room Sensor`;
+    `${this.findaccessories.accessoryAttribute.name} Room Sensor`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -70,7 +69,7 @@ export class RoomSensors {
     // set the service name, this is what is displayed as the default name on the Home app
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
     this.service.setCharacteristic(this.platform.Characteristic.Name,
-      `${this.rooms.roomName} Room Sensor`);
+      `${this.findaccessories.accessoryAttribute.name} Room Sensor`);
 
     // each service must implement at-minimum the "required characteristics" for the given service type
     // see https://developers.homebridge.io/#/service/
@@ -87,57 +86,57 @@ export class RoomSensors {
 
     // Temperature Sensor  
     this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor);  
-    if (!this.temperatureService && !this.platform.config.options.roomsensor.hide_temperature) {
+    if (!this.temperatureService && !this.platform.config.options.hide_temperature) {
       this.temperatureService = accessory.addService(this.platform.Service.TemperatureSensor,
-        `${this.rooms.roomName} Occupancy Sensor`);
+        `${this.findaccessories.accessoryAttribute.name} Occupancy Sensor`);
 
       // Set Temperature Sensor  
       this.temperatureService
         .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
         .on('get', this.handleCurrentTemperatureGet.bind(this));
-    } else if (this.temperatureService && this.platform.config.options.roomsensor.hide_temperature) {
+    } else if (this.temperatureService && this.platform.config.options.hide_temperature) {
       accessory.removeService(this.temperatureService);
     }
       
     // Occupancy Sensor  
     this.occupancyService = accessory.getService(this.platform.Service.OccupancySensor);  
-    if (!this.occupancyService && !this.platform.config.options.roomsensor.hide_occupancy) {
+    if (!this.occupancyService && !this.platform.config.options.hide_occupancy) {
       this.occupancyService = accessory.addService(this.platform.Service.OccupancySensor,
-        `${this.rooms.roomName} Occupancy Sensor`);
+        `${this.findaccessories.accessoryAttribute.name} Occupancy Sensor`);
 
       // Set Occupancy Sensor  
       this.occupancyService
         .getCharacteristic(this.platform.Characteristic.OccupancyDetected)
         .on('get', this.handleOccupancyDetectedGet.bind(this));
-    } else if (this.occupancyService && this.platform.config.options.roomsensor.hide_occupancy) {
+    } else if (this.occupancyService && this.platform.config.options.hide_occupancy) {
       accessory.removeService(this.occupancyService);
     }
 
     // Humidity Sensor
     this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
-    if (!this.humidityService && !this.platform.config.options.roomsensor.hide_humidity) {
+    if (!this.humidityService && !this.platform.config.options.hide_humidity) {
       this.humidityService = accessory.addService(this.platform.Service.HumiditySensor,
-        `${this.rooms.roomName} Humidity Sensor`);
+        `${this.findaccessories.accessoryAttribute.name} Humidity Sensor`);
 
       // Set Humidity Sensor Current Relative Humidity
       this.humidityService
         .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
         .on('get', this.handleCurrentRelativeHumidityGet.bind(this));
-    } else if (this.humidityService && this.platform.config.options.roomsensor.hide_humidity) {
+    } else if (this.humidityService && this.platform.config.options.hide_humidity) {
       accessory.removeService(this.humidityService);
     }
     
     // Motion Sensor
     this.motionService = accessory.getService(this.platform.Service.MotionSensor);
-    if (!this.motionService && !this.platform.config.options.roomsensor.hide_motion) {
+    if (!this.motionService && !this.platform.config.options.hide_motion) {
       this.motionService = accessory.addService(this.platform.Service.MotionSensor,
-        `${this.rooms.roomName} Motion Sensor`);
+        `${this.findaccessories.accessoryAttribute.name} Motion Sensor`);
 
       // Set Motion Sensor Detected
       this.motionService
         .getCharacteristic(this.platform.Characteristic.MotionDetected)
         .on('get', this.handleMotionDetectedGet.bind(this));
-    } else if (this.motionService && this.platform.config.options.roomsensor.hide_motion) {
+    } else if (this.motionService && this.platform.config.options.hide_motion) {
       accessory.removeService(this.motionService);
     }
 
@@ -164,37 +163,37 @@ export class RoomSensors {
    */
   parseStatus() {
     // Set Room Sensor State
-    if (this.roomsensor.status === 'Ok') {
+    if (this.findaccessories.accessoryValue.batteryStatus === 'Ok') {
       this.StatusLowBattery = 0;
-    } else if (this.roomsensor.status !== 'Ok') {
+    } else if (this.findaccessories.accessoryValue.batteryStatus !== 'Ok') {
       this.StatusLowBattery = 1;
     }
 
     // Set Temperature Sensor State
-    if (!this.platform.config.options.roomsensor.hide_temperature) {
-      this.CurrentTemperature = this.toCelsius(this.roomsensor.roomAvgTemp);
+    if (!this.platform.config.options.hide_temperature) {
+      this.CurrentTemperature = this.toCelsius(this.findaccessories.accessoryValue.indoorTemperature);
     }
 
     // Set Occupancy Sensor State
-    if (!this.platform.config.options.roomsensor.hide_occupancy) {
-      if (this.roomsensor.detectMotion === true) {
+    if (!this.platform.config.options.hide_occupancy) {
+      if (this.findaccessories.accessoryValue.occupancyDet === true) {
         this.OccupancyDetected = 1;
-      } else if (this.roomsensor.detectMotion === false) {
+      } else if (this.findaccessories.accessoryValue.occupancyDet === false) {
         this.OccupancyDetected = 0;
       }
     }
 
     // Set Humidity Sensor State
-    if (!this.platform.config.options.roomsensor.hide_humidity) {
-      this.CurrentRelativeHumidity = this.rooms.roomAvgHumidity;
+    if (!this.platform.config.options.hide_humidity) {
+      this.CurrentRelativeHumidity = this.findaccessories.accessoryValue.indoorHumidity;
     }
 
     // Set Motion Sensor State
-    if (!this.platform.config.options.roomsensor.hide_motion) {
-      this.MotionDetected = this.roomsensor.detectMotion;
-      if (this.roomsensor.detectMotion === false) {
+    if (!this.platform.config.options.hide_motion) {
+      this.MotionDetected = this.findaccessories.accessoryValue.motionDet;
+      if (this.findaccessories.accessoryValue.motionDet === false) {
         this.MotionDetected = true;
-      } else if (this.roomsensor.detectMotion === true) {
+      } else if (this.findaccessories.accessoryValue.motionDet === true) {
         this.MotionDetected = false;
       }
     }
@@ -205,13 +204,16 @@ export class RoomSensors {
    */
   async refreshStatus() {
     try {
-      const priority = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
+      const sensor = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/group/${this.group.id}/rooms`, {
         params: {
           locationId: this.locationId,
         },
       })).data;
-      this.platform.log.debug(JSON.stringify(priority));
-
+      this.platform.log.debug(JSON.stringify(sensor));
+      this.sensor = sensor;
+      this.findaccessories;
+      this.platform.log.debug(JSON.stringify(this.findaccessories));
+      this.platform.log.debug(JSON.stringify(this.findaccessories.accessoryValue));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
@@ -224,16 +226,16 @@ export class RoomSensors {
    */
   updateHomeKitCharacteristics() {
     this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
-    if (!this.platform.config.options.roomsensor.hide_temperature){
+    if (!this.platform.config.options.hide_temperature){
       this.temperatureService.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
     }
-    if (!this.platform.config.options.roomsensor.hide_occupancy) {
+    if (!this.platform.config.options.hide_occupancy) {
       this.occupancyService.updateCharacteristic(this.platform.Characteristic.OccupancyDetected, this.OccupancyDetected);
     }
-    if (!this.platform.config.options.roomsensor.hide_humidity) {
+    if (!this.platform.config.options.hide_humidity) {
       this.humidityService.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
     }
-    if (!this.platform.config.options.roomsensor.hide_motion) {
+    if (!this.platform.config.options.hide_motion) {
       this.motionService.updateCharacteristic(this.platform.Characteristic.MotionDetected, this.MotionDetected);
     }
   }
