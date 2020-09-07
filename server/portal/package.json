@@ -27,7 +27,7 @@
     "core-js": "^3.6.5",
     "jquery": "^3.5.1",
     "popper.js": "1.16.1",
-    "rxjs": "6.6.2",
+    "rxjs": "6.6.3",
     "zone.js": "0.10.3"
   },
   "devDependencies": {
