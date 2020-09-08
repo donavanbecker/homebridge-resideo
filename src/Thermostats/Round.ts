@@ -39,8 +39,8 @@ export class Round {
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId: string,
-    public device: any,
+    public readonly locationId,
+    public device,
   ) {
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {

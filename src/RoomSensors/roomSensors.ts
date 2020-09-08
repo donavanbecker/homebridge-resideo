@@ -28,22 +28,21 @@ export class RoomSensors {
   SensorUpdateInProgress!: boolean;
   doSensorUpdate!: any;
   TemperatureDisplayUnits!: number;
-  batteryStatus!: string;
+  batteryStatus: any;
   indoorTemperature!: number;
-  occupancyDet: any;
-  indoorHumidity: any;
-  motionDet: any;
-
+  occupancyDet!: boolean;
+  indoorHumidity!: number;
+  motionDet!: boolean;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId: string,
-    public device: any,
-    public accessories: any,
-    public sensoraccessory: any, 
-    public rooms: any,
-    public readonly group: any,
+    public readonly locationId,
+    public device,
+    public accessories,
+    public sensoraccessory,
+    public rooms,
+    public readonly group,
   ) {
 
     // default placeholders
@@ -52,11 +51,6 @@ export class RoomSensors {
     this.OccupancyDetected;
     this.CurrentRelativeHumidity;
     this.MotionDetected;
-    this.batteryStatus;
-    this.indoorTemperature;
-    this.occupancyDet;
-    this.indoorHumidity;
-    this.motionDet;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doSensorUpdate = new Subject();
@@ -176,9 +170,9 @@ export class RoomSensors {
    */
   parseStatus() {
     // Set Room Sensor State
-    if (this.batteryStatus === 'Ok') {
+    if (this.sensoraccessory.accessoryValue.batteryStatus === 'Ok') {
       this.StatusLowBattery = 0;
-    } else if (this.batteryStatus !== 'Ok') {
+    } else if (this.sensoraccessory.accessoryValue.batteryStatus !== 'Ok') {
       this.StatusLowBattery = 1;
     }
 
@@ -189,24 +183,24 @@ export class RoomSensors {
 
     // Set Occupancy Sensor State
     if (!this.platform.config.options.hide_occupancy) {
-      if (this.occupancyDet === true) {
+      if (this.sensoraccessory.accessoryValue.occupancyDet) {
         this.OccupancyDetected = 1;
-      } else if (this.occupancyDet === false) {
+      } else if (!this.sensoraccessory.accessoryValue.occupancyDet) {
         this.OccupancyDetected = 0;
       }
     }
 
     // Set Humidity Sensor State
     if (!this.platform.config.options.hide_humidity) {
-      this.CurrentRelativeHumidity = this.indoorHumidity;
+      this.CurrentRelativeHumidity = this.sensoraccessory.accessoryValue.indoorHumidity;
     }
 
     // Set Motion Sensor State
     if (!this.platform.config.options.hide_motion) {
-      this.MotionDetected = this.motionDet;
-      if (this.motionDet === false) {
+      this.MotionDetected = this.sensoraccessory.accessoryValue.motionDet;
+      if (!this.sensoraccessory.accessoryValue.motionDet) {
         this.MotionDetected = true;
-      } else if (this.motionDet === true) {
+      } else if (this.sensoraccessory.accessoryValue.motionDet) {
         this.MotionDetected = false;
       }
     }
@@ -225,13 +219,13 @@ export class RoomSensors {
       this.platform.log.debug(JSON.stringify(sensoraccessory));
       this.sensoraccessory = sensoraccessory;
       this.platform.log.debug(JSON.stringify(sensoraccessory.accessoryValue));
-      this.batteryStatus = sensoraccessory.accessoryValue.batteryStatus;
+      /* this.batteryStatus = sensoraccessory.accessoryValue.batteryStatus;
       this.indoorTemperature = sensoraccessory.accessoryValue.indoorTemperature;
       this.occupancyDet = sensoraccessory.accessoryValue.occupancyDet;
       this.indoorHumidity = sensoraccessory.accessoryValue.indoorHumidity;
       this.motionDet = sensoraccessory.accessoryValue.motionDet;
       this.platform.log.debug(JSON.stringify(this.sensoraccessory));
-      this.platform.log.debug(JSON.stringify(this.sensoraccessory.accessoryValue));
+      this.platform.log.debug(JSON.stringify(this.sensoraccessory.accessoryValue));*/
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {

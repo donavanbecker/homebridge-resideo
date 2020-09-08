@@ -50,13 +50,12 @@ export class RoomSensorThermostat {
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId: string,
-    public device: any,
-    public sensoraccessory: any,
-    public accessories: any,
-    public rooms: any,
-    public readonly group: any,
-    
+    public readonly locationId,
+    public device,
+    public accessories,
+    public sensoraccessory,
+    public rooms,
+    public readonly group,
   ) {
 
     // Map Honeywell Modes to HomeKit Modes
