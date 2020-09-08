@@ -33,14 +33,17 @@ export class RoomSensorThermostat {
   CurrentRelativeHumidity: any;
   MotionDetected!: any;
   roompriority!: any;
-  sensor!: any;
+  batteryStatus!: string;
+  indoorTemperature!: number;
+  occupancyDet: any;
+  indoorHumidity: any;
+  motionDet: any;
 
   roomUpdateInProgress!: boolean;
   doRoomUpdate!: any;
   thermostatUpdateInProgress!: boolean;
   doThermostatUpdate!: any;
   honeywellMode: any;
-  honeywellRooms: any;
   SensorUpdateInProgress!: boolean;
   doSensorUpdate!: any;
 
@@ -49,10 +52,11 @@ export class RoomSensorThermostat {
     private accessory: PlatformAccessory,
     public readonly locationId: string,
     public device: any,
-    public findaccessories: any,
+    public sensoraccessory: any,
+    public accessories: any,
+    public rooms: any,
     public readonly group: any,
-    public readonly rooms: any,
-    // public readonly room: any,
+    
   ) {
 
     // Map Honeywell Modes to HomeKit Modes
@@ -66,7 +70,6 @@ export class RoomSensorThermostat {
     // Map HomeKit Modes to Honeywell Modes
     // Don't change the order of these!
     this.honeywellMode = ['Off', 'Heat', 'Cool', 'Auto'];
-    this.honeywellRooms = [`${this.roompriority}`, `${this.platform.rooms}`];
 
     // default placeholders
     this.CurrentTemperature;
@@ -80,6 +83,11 @@ export class RoomSensorThermostat {
     this.CoolingThresholdTemperature;
     this.HeatingThresholdTemperature;
     this.TemperatureDisplayUnits;
+    this.batteryStatus;
+    this.indoorTemperature;
+    this.occupancyDet;
+    this.indoorHumidity;
+    this.motionDet;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doRoomUpdate = new Subject();
@@ -92,7 +100,7 @@ export class RoomSensorThermostat {
     // set accessory information
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
-      .setCharacteristic(this.platform.Characteristic.Model, this.findaccessories.accessoryAttribute.type)
+      .setCharacteristic(this.platform.Characteristic.Model, accessory.context.type)
       .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID)
       .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
 
@@ -100,7 +108,7 @@ export class RoomSensorThermostat {
     // you can create multiple services for each accessory
     this.service = this.accessory.getService(this.platform.Service.Thermostat) ||
       this.accessory.addService(this.platform.Service.Thermostat),
-    `${this.findaccessories.accessoryAttribute.name} Room Sensor Thermostat`;
+    `${this.accessory.context.name} Room Sensor Thermostat`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -109,7 +117,7 @@ export class RoomSensorThermostat {
     // set the service name, this is what is displayed as the default name on the Home app
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
     this.service.setCharacteristic(this.platform.Characteristic.Name,
-      `${this.findaccessories.accessoryAttribute.name} Room Sensor Thermostat`);
+      `${this.accessory.context.name} Room Sensor Thermostat`);
 
     // each service must implement at-minimum the "required characteristics" for the given service type
     // see https://developers.homebridge.io/#/service/
@@ -144,7 +152,7 @@ export class RoomSensorThermostat {
     this.batteryService = this.accessory.getService(this.platform.Service.BatteryService);
     if (!this.batteryService && !this.platform.config.options.roomsensor.hide_battery) {
       this.batteryService = accessory.addService(this.platform.Service.BatteryService,
-        `${this.findaccessories.accessoryAttribute.name} Battery`);
+        `${this.accessory.context.name} Battery`);
 
       // Set Charging State
       this.batteryService
@@ -162,7 +170,7 @@ export class RoomSensorThermostat {
     this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor);
     if (!this.temperatureService && !this.platform.config.options.roomsensor.hide_temperature) {
       this.temperatureService = accessory.addService(this.platform.Service.TemperatureSensor,
-        `${this.findaccessories.accessoryAttribute.name} Occupancy Sensor`);
+        `${this.accessory.context.name} Occupancy Sensor`);
 
       // Set Temperature Sensor  
       this.temperatureService
@@ -176,7 +184,7 @@ export class RoomSensorThermostat {
     this.occupancyService = accessory.getService(this.platform.Service.OccupancySensor);
     if (!this.occupancyService && !this.platform.config.options.roomsensor.hide_occupancy) {
       this.occupancyService = accessory.addService(this.platform.Service.OccupancySensor,
-        `${this.findaccessories.accessoryAttribute.name} Occupancy Sensor`);
+        `${this.accessory.context.name} Occupancy Sensor`);
 
       // Set Occupancy Sensor  
       this.occupancyService
@@ -190,7 +198,7 @@ export class RoomSensorThermostat {
     this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
     if (!this.humidityService && !this.platform.config.options.roomsensor.hide_humidity) {
       this.humidityService = accessory.addService(this.platform.Service.HumiditySensor,
-        `${this.findaccessories.accessoryAttribute.name} Humidity Sensor`);
+        `${this.accessory.context.name} Humidity Sensor`);
 
       // Set Humidity Sensor Current Relative Humidity
       this.humidityService
@@ -204,7 +212,7 @@ export class RoomSensorThermostat {
     this.motionService = accessory.getService(this.platform.Service.MotionSensor);
     if (!this.motionService && !this.platform.config.options.roomsensor.hide_motion) {
       this.motionService = accessory.addService(this.platform.Service.MotionSensor,
-        `${this.findaccessories.accessoryAttribute.name} Motion Sensor`);
+        `${this.accessory.context.name} Motion Sensor`);
 
       // Set Motion Sensor Detected
       this.motionService
@@ -267,8 +275,8 @@ export class RoomSensorThermostat {
     this.TemperatureDisplayUnits = this.device.units === 'Fahrenheit' ? this.platform.Characteristic.TemperatureDisplayUnits.FAHRENHEIT :
       this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS;
 
-    this.CurrentTemperature = this.toCelsius(this.findaccessories.accessoryValue.indoorTemperature);
-    this.CurrentRelativeHumidity = this.findaccessories.accessoryValue.indoorHumidity;
+    this.CurrentTemperature = this.toCelsius(this.indoorTemperature);
+    this.CurrentRelativeHumidity = this.indoorHumidity;
 
     if (this.device.changeableValues.heatSetpoint > 0) {
       this.HeatingThresholdTemperature = this.toCelsius(this.device.changeableValues.heatSetpoint);
@@ -299,38 +307,38 @@ export class RoomSensorThermostat {
     }
 
     if (!this.platform.config.options.roomsensor.hide_battery) {// Set Room Sensor State
-      if (this.findaccessories.accessoryValue.batteryStatus === 'Ok') {
+      if (this.batteryStatus === 'Ok') {
         this.StatusLowBattery = 0;
-      } else if (this.findaccessories.accessoryValue.batteryStatus !== 'Ok') {
+      } else if (this.batteryStatus !== 'Ok') {
         this.StatusLowBattery = 1;
       }
     }
 
     // Set Temperature Sensor State
     if (!this.platform.config.options.roomsensor.hide_temperature) {
-      this.CurrentTemperature = this.toCelsius(this.findaccessories.accessoryValue.indoorTemperature);
+      this.CurrentTemperature = this.toCelsius(this.indoorTemperature);
     }
 
     // Set Occupancy Sensor State
     if (!this.platform.config.options.roomsensor.hide_occupancy) {
-      if (this.findaccessories.accessoryValue.occupancyDet === true) {
+      if (this.occupancyDet === true) {
         this.OccupancyDetected = 1;
-      } else if (this.findaccessories.accessoryValue.occupancyDet === false) {
+      } else if (this.occupancyDet === false) {
         this.OccupancyDetected = 0;
       }
     }
 
     // Set Humidity Sensor State
     if (!this.platform.config.options.roomsensor.hide_humidity) {
-      this.CurrentRelativeHumidity = this.findaccessories.accessoryValue.indoorHumidity;
+      this.CurrentRelativeHumidity = this.indoorHumidity;
     }
 
     // Set Motion Sensor State
     if (!this.platform.config.options.roomsensor.hide_motion) {
-      this.MotionDetected = this.findaccessories.accessoryValue.motionDet;
-      if (this.findaccessories.accessoryValue.motionDet === false) {
+      this.MotionDetected = this.motionDet;
+      if (this.motionDet === false) {
         this.MotionDetected = true;
-      } else if (this.findaccessories.accessoryValue.motionDet === true) {
+      } else if (this.motionDet === true) {
         this.MotionDetected = false;
       }
     }
@@ -346,18 +354,25 @@ export class RoomSensorThermostat {
           locationId: this.locationId,
         },
       })).data;
-      const sensor = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/group/${this.group.id}/rooms`, {
+      const sensoraccessory = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/group/${this.group.id}/rooms`, {
         params: {
           locationId: this.locationId,
         },
       })).data;
       this.platform.log.debug(JSON.stringify(roompriority));
       this.roompriority = roompriority;
-      this.platform.log.debug(JSON.stringify(sensor));
-      this.sensor = sensor;
-      this.findaccessories;
-      this.platform.log.debug(JSON.stringify(this.findaccessories));
-      this.platform.log.debug(JSON.stringify(this.findaccessories.accessoryValue));
+      this.platform.log.debug(JSON.stringify(sensoraccessory));
+      this.sensoraccessory = sensoraccessory;
+      this.platform.log.debug(JSON.stringify(sensoraccessory.accessoryValue));
+      this.batteryStatus = sensoraccessory.accessoryValue.batteryStatus;
+      this.platform.log.warn(JSON.stringify(sensoraccessory.accessoryValue.batteryStatus));
+      this.indoorTemperature = sensoraccessory.accessoryValue.indoorTemperature;
+      this.platform.log.warn(JSON.stringify(sensoraccessory.accessoryValue.indoorTemperature));
+      this.occupancyDet = sensoraccessory.accessoryValue.occupancyDet;
+      this.platform.log.warn(JSON.stringify(sensoraccessory.accessoryValue.occupancyDet));
+      this.indoorHumidity = sensoraccessory.accessoryValue.indoorHumidity;
+      this.platform.log.warn(JSON.stringify(sensoraccessory.accessoryValue.indoorHumidity));
+      this.motionDet = sensoraccessory.accessoryValue.motionDet;
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
@@ -372,11 +387,9 @@ export class RoomSensorThermostat {
     const payload = {
       currentPriority: {
         priorityType: 'PickARoom',
-        selectedRooms: [this.rooms],
+        selectedRooms: [this.rooms.id],
       },
     };
-
-    this.platform.log.debug(`RoomOn: ${this.rooms}`);
 
     this.platform.log.info(`Sending request to Honeywell API. Room Priority: ${payload.currentPriority.selectedRooms}`);
     this.platform.log.debug(JSON.stringify(payload));

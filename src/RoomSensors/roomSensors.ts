@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { Service, PlatformAccessory } from 'homebridge';
 
 import { HoneywellHomePlatform } from '../platform';
@@ -27,6 +28,11 @@ export class RoomSensors {
   SensorUpdateInProgress!: boolean;
   doSensorUpdate!: any;
   TemperatureDisplayUnits!: number;
+  batteryStatus!: string;
+  indoorTemperature!: number;
+  occupancyDet: any;
+  indoorHumidity: any;
+  motionDet: any;
 
 
   constructor(
@@ -34,7 +40,9 @@ export class RoomSensors {
     private accessory: PlatformAccessory,
     public readonly locationId: string,
     public device: any,
-    public findaccessories: any,
+    public accessories: any,
+    public sensoraccessory: any, 
+    public rooms: any,
     public readonly group: any,
   ) {
 
@@ -44,6 +52,11 @@ export class RoomSensors {
     this.OccupancyDetected;
     this.CurrentRelativeHumidity;
     this.MotionDetected;
+    this.batteryStatus;
+    this.indoorTemperature;
+    this.occupancyDet;
+    this.indoorHumidity;
+    this.motionDet;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doSensorUpdate = new Subject();
@@ -52,7 +65,7 @@ export class RoomSensors {
     // set accessory information
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
-      .setCharacteristic(this.platform.Characteristic.Model, this.findaccessories.accessoryAttribute.type)
+      .setCharacteristic(this.platform.Characteristic.Model, accessory.context.type)
       .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID)
       .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
 
@@ -60,7 +73,7 @@ export class RoomSensors {
     // you can create multiple services for each accessory
     this.service = this.accessory.getService(this.platform.Service.BatteryService) ||
       this.accessory.addService(this.platform.Service.BatteryService),
-    `${this.findaccessories.accessoryAttribute.name} Room Sensor`;
+    `${this.accessory.context.name} Room Sensor`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -69,7 +82,7 @@ export class RoomSensors {
     // set the service name, this is what is displayed as the default name on the Home app
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
     this.service.setCharacteristic(this.platform.Characteristic.Name,
-      `${this.findaccessories.accessoryAttribute.name} Room Sensor`);
+      `${this.accessory.context.type.name} Room Sensor`);
 
     // each service must implement at-minimum the "required characteristics" for the given service type
     // see https://developers.homebridge.io/#/service/
@@ -88,7 +101,7 @@ export class RoomSensors {
     this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor);  
     if (!this.temperatureService && !this.platform.config.options.hide_temperature) {
       this.temperatureService = accessory.addService(this.platform.Service.TemperatureSensor,
-        `${this.findaccessories.accessoryAttribute.name} Occupancy Sensor`);
+        `${this.accessory.context.name} Occupancy Sensor`);
 
       // Set Temperature Sensor  
       this.temperatureService
@@ -102,7 +115,7 @@ export class RoomSensors {
     this.occupancyService = accessory.getService(this.platform.Service.OccupancySensor);  
     if (!this.occupancyService && !this.platform.config.options.hide_occupancy) {
       this.occupancyService = accessory.addService(this.platform.Service.OccupancySensor,
-        `${this.findaccessories.accessoryAttribute.name} Occupancy Sensor`);
+        `${this.accessory.context.name} Occupancy Sensor`);
 
       // Set Occupancy Sensor  
       this.occupancyService
@@ -116,7 +129,7 @@ export class RoomSensors {
     this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
     if (!this.humidityService && !this.platform.config.options.hide_humidity) {
       this.humidityService = accessory.addService(this.platform.Service.HumiditySensor,
-        `${this.findaccessories.accessoryAttribute.name} Humidity Sensor`);
+        `${this.accessory.context.name} Humidity Sensor`);
 
       // Set Humidity Sensor Current Relative Humidity
       this.humidityService
@@ -130,7 +143,7 @@ export class RoomSensors {
     this.motionService = accessory.getService(this.platform.Service.MotionSensor);
     if (!this.motionService && !this.platform.config.options.hide_motion) {
       this.motionService = accessory.addService(this.platform.Service.MotionSensor,
-        `${this.findaccessories.accessoryAttribute.name} Motion Sensor`);
+        `${this.accessory.context.name} Motion Sensor`);
 
       // Set Motion Sensor Detected
       this.motionService
@@ -163,37 +176,37 @@ export class RoomSensors {
    */
   parseStatus() {
     // Set Room Sensor State
-    if (this.findaccessories.accessoryValue.batteryStatus === 'Ok') {
+    if (this.batteryStatus === 'Ok') {
       this.StatusLowBattery = 0;
-    } else if (this.findaccessories.accessoryValue.batteryStatus !== 'Ok') {
+    } else if (this.batteryStatus !== 'Ok') {
       this.StatusLowBattery = 1;
     }
 
     // Set Temperature Sensor State
     if (!this.platform.config.options.hide_temperature) {
-      this.CurrentTemperature = this.toCelsius(this.findaccessories.accessoryValue.indoorTemperature);
+      this.CurrentTemperature = this.toCelsius(this.indoorTemperature);
     }
 
     // Set Occupancy Sensor State
     if (!this.platform.config.options.hide_occupancy) {
-      if (this.findaccessories.accessoryValue.occupancyDet === true) {
+      if (this.occupancyDet === true) {
         this.OccupancyDetected = 1;
-      } else if (this.findaccessories.accessoryValue.occupancyDet === false) {
+      } else if (this.occupancyDet === false) {
         this.OccupancyDetected = 0;
       }
     }
 
     // Set Humidity Sensor State
     if (!this.platform.config.options.hide_humidity) {
-      this.CurrentRelativeHumidity = this.findaccessories.accessoryValue.indoorHumidity;
+      this.CurrentRelativeHumidity = this.indoorHumidity;
     }
 
     // Set Motion Sensor State
     if (!this.platform.config.options.hide_motion) {
-      this.MotionDetected = this.findaccessories.accessoryValue.motionDet;
-      if (this.findaccessories.accessoryValue.motionDet === false) {
+      this.MotionDetected = this.motionDet;
+      if (this.motionDet === false) {
         this.MotionDetected = true;
-      } else if (this.findaccessories.accessoryValue.motionDet === true) {
+      } else if (this.motionDet === true) {
         this.MotionDetected = false;
       }
     }
@@ -204,16 +217,21 @@ export class RoomSensors {
    */
   async refreshStatus() {
     try {
-      const sensor = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/group/${this.group.id}/rooms`, {
+      const sensoraccessory = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/group/${this.group.id}/rooms`, {
         params: {
           locationId: this.locationId,
         },
       })).data;
-      this.platform.log.debug(JSON.stringify(sensor));
-      this.sensor = sensor;
-      this.findaccessories;
-      this.platform.log.debug(JSON.stringify(this.findaccessories));
-      this.platform.log.debug(JSON.stringify(this.findaccessories.accessoryValue));
+      this.platform.log.debug(JSON.stringify(sensoraccessory));
+      this.sensoraccessory = sensoraccessory;
+      this.platform.log.debug(JSON.stringify(sensoraccessory.accessoryValue));
+      this.batteryStatus = sensoraccessory.accessoryValue.batteryStatus;
+      this.indoorTemperature = sensoraccessory.accessoryValue.indoorTemperature;
+      this.occupancyDet = sensoraccessory.accessoryValue.occupancyDet;
+      this.indoorHumidity = sensoraccessory.accessoryValue.indoorHumidity;
+      this.motionDet = sensoraccessory.accessoryValue.motionDet;
+      this.platform.log.debug(JSON.stringify(this.sensoraccessory));
+      this.platform.log.debug(JSON.stringify(this.sensoraccessory.accessoryValue));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {

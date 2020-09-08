@@ -1,4 +1,4 @@
-
+[
   {
     "id": 0,
     "roomName": "Hallway",
@@ -16,7 +16,7 @@
         "detectMotion": false
       }
     ]
-  }
+  },
   {
     "id": 1,
     "roomName": "Family Room",

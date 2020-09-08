@@ -24,6 +24,9 @@ export class RoomPriority {
     public readonly locationId: string,
     public device: any,
     public rooms: any,
+    public accessories: any,
+    public currentPriority: any, 
+    public priorityrooms: any,
   ) {
 
     // default placeholders
@@ -37,13 +40,13 @@ export class RoomPriority {
     this.accessory.getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(this.platform.Characteristic.Model, 'Room Priority')
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.rooms.deviceID);
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID);
     // .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
     this.service = this.accessory.getService(this.platform.Service.Switch) ||
-      this.accessory.addService(this.platform.Service.Switch), `Room ${this.rooms.roomName} Priority`;
+      this.accessory.addService(this.platform.Service.Switch), `${this.rooms.roomName} Room Priority`;
 
     this.refreshStatus();
 
@@ -54,7 +57,7 @@ export class RoomPriority {
     // set the service name, this is what is displayed as the default name on the Home app
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
     this.service.setCharacteristic(this.platform.Characteristic.Name,
-      `Room ${this.rooms.roomName} Priority`);
+      `${this.rooms.roomName} Room Priority`);
 
     // each service must implement at-minimum the "required characteristics" for the given service type
     // see https://developers.homebridge.io/#/service/
@@ -133,9 +136,7 @@ export class RoomPriority {
         selectedRooms: [this.rooms.id],
       },
     };
-
-    this.platform.log.debug(`RoomOn: ${this.rooms.id}`);
-
+    
     this.platform.log.info(`Sending request to Honeywell API. Room Priority: ${payload.currentPriority.selectedRooms}`);
     this.platform.log.debug(JSON.stringify(payload));
 

@@ -1,0 +1,650 @@
+[
+  {
+    "locationID": 52245,
+    "name": "Home",
+    "streetAddress": "32 Hickory Drive",
+    "city": "East Hartford",
+    "state": "CT",
+    "country": "US",
+    "zipcode": "06118",
+    "devices": [
+      {
+        "waterPresent": false,
+        "currentSensorReadings": {
+          "time": "2020-09-07T09:53:21",
+          "temperature": 20.33,
+          "humidity": 61.4
+        },
+        "currentAlarms": [],
+        "lastCheckin": "2020-09-07T09:53:23",
+        "lastDeviceSettingUpdatedOn": "0001-01-01T00:00:00",
+        "batteryRemaining": 62,
+        "isRegistered": true,
+        "hasDeviceCheckedIn": true,
+        "isDeviceOffline": false,
+        "firstFailedAttemptTime": "0001-01-01T00:00:00",
+        "failedConnectionAttempts": 0,
+        "wifiSignalStrength": -63,
+        "time": "2020-09-07T09:53:21",
+        "deviceClass": "LeakDetector",
+        "deviceType": "Water Leak Detector",
+        "deviceID": "927462a6-fede-4c75-b813-e6965db5f953",
+        "userDefinedDeviceName": "Utility Room",
+        "backend": {},
+        "isAlive": true,
+        "isUpgrading": false,
+        "isProvisioned": true,
+        "deviceSettings": {
+          "temp": { "high": {}, "low": {} },
+          "humidity": { "high": {}, "low": {} },
+          "userDefinedName": "Utility Room",
+          "buzzerMuted": false,
+          "checkinPeriod": 24,
+          "currentSensorReadPeriod": 60
+        },
+        "service": { "mode": "Up" },
+        "deviceRegistrationDate": "2016-03-16T15:20:02.89",
+        "dataSyncStatus": "UnKnown"
+      }
+    ],
+    "users": [
+      {
+        "userID": 71993,
+        "username": "sunookitsune@kitsunet.org",
+        "firstname": "David",
+        "lastname": "Maher",
+        "created": 1458141356,
+        "deleted": -62135596800,
+        "activated": true,
+        "connectedHomeAccountExists": true,
+        "locationRoleMapping": [
+          {
+            "locationID": 52245,
+            "role": "Adult",
+            "locationName": "Home",
+            "status": 1
+          }
+        ],
+        "isOptOut": "",
+        "isCurrentUser": false
+      },
+      {
+        "userID": 1959474,
+        "username": "beckersmarthome@icloud.com",
+        "firstname": "HomeBridge",
+        "lastname": "Honeywell-Home",
+        "created": 1577881583,
+        "deleted": -62135596800,
+        "activated": true,
+        "connectedHomeAccountExists": true,
+        "locationRoleMapping": [
+          {
+            "locationID": 52245,
+            "role": "Adult",
+            "locationName": "Home",
+            "status": 1
+          }
+        ],
+        "isOptOut": "False",
+        "isCurrentUser": true
+      }
+    ],
+    "timeZoneId": "Eastern",
+    "timeZone": "Eastern Standard Time",
+    "ianaTimeZone": "America/New_York",
+    "daylightSavingTimeEnabled": true,
+    "geoFenceEnabled": false,
+    "geoFenceNotificationEnabled": false,
+    "geoFenceNotificationTypeId": 13,
+    "configuration": {
+      "faceRecognition": {
+        "enabled": false,
+        "maxPersons": 2,
+        "maxEtas": 2,
+        "maxEtaPersons": 1,
+        "schedules": [
+          {
+            "time": [{ "start": "15:00:00", "end": "17:00:00" }],
+            "days": [
+              "Sunday",
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday"
+            ]
+          }
+        ]
+      }
+    },
+    "stateName": "Connecticut"
+  },
+  {
+    "locationID": 853880,
+    "name": "Becker House",
+    "streetAddress": "3004 Plainview Dr SE",
+    "city": "Mandan",
+    "state": "ND",
+    "country": "US",
+    "zipcode": "58554",
+    "devices": [
+      {
+        "groups": [{ "id": 0, "name": "default", "rooms": [0, 1] }],
+        "displayedOutdoorHumidity": 100,
+        "vacationHold": { "enabled": false },
+        "currentSchedulePeriod": { "day": "Monday", "period": "Home" },
+        "scheduleCapabilities": {
+          "availableScheduleTypes": ["None", "Geofenced", "TimedNorthAmerica"],
+          "schedulableFan": true
+        },
+        "scheduleType": { "scheduleType": "Geofence" },
+        "inBuiltSensorState": { "roomId": 0, "roomName": "Hallway" },
+        "scheduleStatus": "Resume",
+        "allowedTimeIncrements": 15,
+        "settings": {
+          "hardwareSettings": { "brightness": 0, "maxBrightness": 0 },
+          "fan": {
+            "allowedModes": ["On", "Auto", "Circulate"],
+            "changeableValues": { "mode": "Auto" }
+          },
+          "temperatureMode": { "air": true },
+          "specialMode": { "autoChangeoverActive": true },
+          "devicePairingEnabled": true
+        },
+        "deviceClass": "Thermostat",
+        "deviceType": "Thermostat",
+        "deviceID": "LCC-B82CA0415E07",
+        "userDefinedDeviceName": "Hallway",
+        "name": "Hallway",
+        "isAlive": true,
+        "isUpgrading": false,
+        "isProvisioned": true,
+        "macID": "B82CA0415E07",
+        "deviceSettings": {},
+        "priorityType": "PickARoom",
+        "service": { "mode": "Up" },
+        "deviceRegistrationDate": "2019-07-04T04:24:48.3766667",
+        "dataSyncStatus": "Initiated",
+        "units": "Fahrenheit",
+        "indoorTemperature": 71,
+        "outdoorTemperature": 45,
+        "allowedModes": ["Heat", "Off", "Cool", "Auto"],
+        "deadband": 0,
+        "hasDualSetpointStatus": false,
+        "minHeatSetpoint": 50,
+        "maxHeatSetpoint": 90,
+        "minCoolSetpoint": 50,
+        "maxCoolSetpoint": 90,
+        "changeableValues": {
+          "mode": "Auto",
+          "autoChangeoverActive": true,
+          "heatSetpoint": 71,
+          "coolSetpoint": 73,
+          "thermostatSetpointStatus": "TemporaryHold",
+          "nextPeriodTime": "22:00:00",
+          "endHeatSetpoint": 71,
+          "endCoolSetpoint": 73,
+          "heatCoolMode": "Cool"
+        },
+        "operationStatus": {
+          "mode": "EquipmentOff",
+          "fanRequest": false,
+          "circulationFanRequest": false
+        },
+        "indoorHumidity": 53,
+        "indoorHumidityStatus": "Measured",
+        "deviceModel": "T9-T10"
+      }
+    ],
+    "users": [
+      {
+        "userID": 938213,
+        "username": "donavan.becker@icloud.com",
+        "firstname": "Donavan",
+        "lastname": "Becker",
+        "address1": "3004 Plainview Dr SE",
+        "city": "Mandan",
+        "zipcode": "58554",
+        "phone": "1 - 7014251749",
+        "created": 1535488023,
+        "deleted": -62135596800,
+        "activated": true,
+        "connectedHomeAccountExists": true,
+        "locationRoleMapping": [
+          {
+            "locationID": 853880,
+            "role": "Adult",
+            "locationName": "Becker House",
+            "status": 1
+          }
+        ],
+        "isOptOut": "True",
+        "isCurrentUser": false
+      },
+      {
+        "userID": 940657,
+        "username": "Jekuntz1531@aol.com",
+        "firstname": "Jennifer",
+        "lastname": "Becker",
+        "created": 1535627430,
+        "deleted": -62135596800,
+        "activated": true,
+        "connectedHomeAccountExists": true,
+        "locationRoleMapping": [
+          {
+            "locationID": 853880,
+            "role": "Adult",
+            "locationName": "Becker House",
+            "status": 1
+          }
+        ],
+        "isOptOut": "True",
+        "isCurrentUser": false
+      },
+      {
+        "userID": 1959474,
+        "username": "beckersmarthome@icloud.com",
+        "firstname": "HomeBridge",
+        "lastname": "Honeywell-Home",
+        "created": 1577881583,
+        "deleted": -62135596800,
+        "activated": true,
+        "connectedHomeAccountExists": true,
+        "locationRoleMapping": [
+          {
+            "locationID": 853880,
+            "role": "Adult",
+            "locationName": "Becker House",
+            "status": 1
+          }
+        ],
+        "isOptOut": "False",
+        "isCurrentUser": true
+      }
+    ],
+    "timeZoneId": "Central",
+    "timeZone": "Central Standard Time",
+    "ianaTimeZone": "America/Chicago",
+    "daylightSavingTimeEnabled": true,
+    "geoFences": [
+      {
+        "geofenceEnabled": true,
+        "geoFenceID": 861467,
+        "latitude": 46.7980232,
+        "longitude": -100.875854,
+        "radius": 4325,
+        "geoOccupancy": { "withinFence": 3, "outsideFence": 0 },
+        "geoFenceNotificationEnabled": true
+      }
+    ],
+    "geoFenceEnabled": true,
+    "predictiveAIREnabled": false,
+    "comfortLevel": 0,
+    "geoFenceNotificationEnabled": false,
+    "geoFenceNotificationTypeId": 13,
+    "configuration": {
+      "faceRecognition": {
+        "enabled": false,
+        "maxPersons": 2,
+        "maxEtas": 2,
+        "maxEtaPersons": 1,
+        "schedules": [
+          {
+            "time": [{ "start": "15:00:00", "end": "17:00:00" }],
+            "days": [
+              "Sunday",
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday"
+            ]
+          }
+        ]
+      }
+    },
+    "stateName": "North Dakota"
+  },
+  {
+    "locationID": 1684361,
+    "name": "Rayan_Home",
+    "country": "US",
+    "zipcode": "75036",
+    "devices": [
+      {
+        "displayedOutdoorHumidity": 49,
+        "vacationHold": { "enabled": false },
+        "currentSchedulePeriod": { "day": "Monday", "period": "Away" },
+        "scheduleCapabilities": {
+          "availableScheduleTypes": ["None", "Geofenced", "TimedNorthAmerica"],
+          "schedulableFan": false
+        },
+        "scheduleType": { "scheduleType": "Timed", "scheduleSubType": "NA" },
+        "scheduleStatus": "Pause",
+        "allowedTimeIncrements": 15,
+        "settings": {
+          "hardwareSettings": { "brightness": 1, "maxBrightness": 5 },
+          "fan": {
+            "allowedModes": ["On", "Auto", "Circulate"],
+            "changeableValues": { "mode": "Auto" }
+          },
+          "temperatureMode": { "air": true },
+          "specialMode": { "autoChangeoverActive": false },
+          "devicePairingEnabled": true
+        },
+        "deviceClass": "Thermostat",
+        "deviceType": "Thermostat",
+        "deviceID": "LCC-B82CA075E85F",
+        "userDefinedDeviceName": "Upstairs Thermostat",
+        "name": "Upstairs Thermostat",
+        "isAlive": true,
+        "isUpgrading": false,
+        "isProvisioned": true,
+        "macID": "B82CA075E85F",
+        "deviceSettings": {},
+        "service": { "mode": "Up" },
+        "deviceRegistrationDate": "2020-02-03T23:59:53.1366667",
+        "dataSyncStatus": "Completed",
+        "units": "Fahrenheit",
+        "indoorTemperature": 73,
+        "outdoorTemperature": 94.1,
+        "allowedModes": ["Heat", "Off", "Cool", "Auto"],
+        "deadband": 0,
+        "hasDualSetpointStatus": false,
+        "minHeatSetpoint": 50,
+        "maxHeatSetpoint": 90,
+        "minCoolSetpoint": 50,
+        "maxCoolSetpoint": 90,
+        "changeableValues": {
+          "mode": "Cool",
+          "autoChangeoverActive": false,
+          "heatSetpoint": 68,
+          "coolSetpoint": 73,
+          "thermostatSetpointStatus": "PermanentHold",
+          "heatCoolMode": "Cool"
+        },
+        "operationStatus": {
+          "mode": "Cool",
+          "fanRequest": true,
+          "circulationFanRequest": false
+        },
+        "deviceModel": "T5-T6"
+      },
+      {
+        "displayedOutdoorHumidity": 49,
+        "vacationHold": { "enabled": false },
+        "currentSchedulePeriod": { "day": "Monday", "period": "Home" },
+        "scheduleCapabilities": {
+          "availableScheduleTypes": ["None", "Geofenced", "TimedNorthAmerica"],
+          "schedulableFan": false
+        },
+        "scheduleType": { "scheduleType": "None" },
+        "scheduleStatus": "Resume",
+        "allowedTimeIncrements": 15,
+        "settings": {
+          "hardwareSettings": { "brightness": 5, "maxBrightness": 5 },
+          "fan": {
+            "allowedModes": ["On", "Auto", "Circulate"],
+            "changeableValues": { "mode": "Circulate" }
+          },
+          "temperatureMode": { "air": false },
+          "specialMode": { "autoChangeoverActive": false },
+          "devicePairingEnabled": true
+        },
+        "deviceClass": "Thermostat",
+        "deviceType": "Thermostat",
+        "deviceID": "LCC-00D02DF1C85B",
+        "userDefinedDeviceName": "Living Room Thermostat",
+        "name": "Living Room Thermostat",
+        "isAlive": true,
+        "isUpgrading": false,
+        "isProvisioned": true,
+        "macID": "00D02DF1C85B",
+        "deviceSettings": {},
+        "service": { "mode": "Up" },
+        "deviceRegistrationDate": "2020-04-06T17:42:36.55",
+        "dataSyncStatus": "Completed",
+        "units": "Fahrenheit",
+        "indoorTemperature": 74,
+        "outdoorTemperature": 94.1,
+        "allowedModes": ["Heat", "Off", "Cool", "Auto"],
+        "deadband": 0,
+        "hasDualSetpointStatus": false,
+        "minHeatSetpoint": 50,
+        "maxHeatSetpoint": 90,
+        "minCoolSetpoint": 50,
+        "maxCoolSetpoint": 90,
+        "changeableValues": {
+          "mode": "Cool",
+          "autoChangeoverActive": false,
+          "heatSetpoint": 68,
+          "coolSetpoint": 74,
+          "thermostatSetpointStatus": "NoHold",
+          "heatCoolMode": "Cool"
+        },
+        "operationStatus": {
+          "mode": "EquipmentOff",
+          "fanRequest": false,
+          "circulationFanRequest": false
+        },
+        "deviceModel": "T5-T6"
+      }
+    ],
+    "users": [
+      {
+        "userID": 683856,
+        "username": "Khanrayan7088@gmail.com",
+        "firstname": "Rayan",
+        "lastname": "Khan",
+        "created": 1520471754,
+        "deleted": -62135596800,
+        "activated": true,
+        "connectedHomeAccountExists": true,
+        "locationRoleMapping": [
+          {
+            "locationID": 1684361,
+            "role": "Adult",
+            "locationName": "Home",
+            "status": 1
+          }
+        ],
+        "isOptOut": "",
+        "isCurrentUser": false
+      },
+      {
+        "userID": 1959474,
+        "username": "beckersmarthome@icloud.com",
+        "firstname": "HomeBridge",
+        "lastname": "Honeywell-Home",
+        "created": 1577881583,
+        "deleted": -62135596800,
+        "activated": true,
+        "connectedHomeAccountExists": true,
+        "locationRoleMapping": [
+          {
+            "locationID": 1684361,
+            "role": "Adult",
+            "locationName": "Rayan_Home",
+            "status": 1
+          }
+        ],
+        "isOptOut": "False",
+        "isCurrentUser": true
+      }
+    ],
+    "timeZoneId": "Central",
+    "timeZone": "Central Standard Time",
+    "ianaTimeZone": "America/Chicago",
+    "daylightSavingTimeEnabled": true,
+    "geoFences": [
+      {
+        "geofenceEnabled": true,
+        "geoFenceID": 1692098,
+        "latitude": 33.1378441,
+        "longitude": -96.87356,
+        "radius": 500,
+        "geoOccupancy": { "withinFence": 0, "outsideFence": 1 },
+        "geoFenceNotificationEnabled": false
+      }
+    ],
+    "geoFenceEnabled": true,
+    "predictiveAIREnabled": false,
+    "comfortLevel": 0,
+    "geoFenceNotificationEnabled": false,
+    "geoFenceNotificationTypeId": 13,
+    "configuration": {
+      "faceRecognition": {
+        "enabled": false,
+        "maxPersons": 2,
+        "maxEtas": 2,
+        "maxEtaPersons": 1,
+        "schedules": [
+          {
+            "time": [{ "start": "15:00:00", "end": "17:00:00" }],
+            "days": [
+              "Sunday",
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "locationID": 2173090,
+    "name": "Sean_Home",
+    "country": "CA",
+    "zipcode": "M1C 3B8",
+    "devices": [
+      {
+        "thermostatVersion": "03.02.07.00",
+        "scheduleStatus": "Resume",
+        "settings": {
+          "fan": {
+            "allowedModes": ["Auto", "On"],
+            "changeableValues": { "mode": "On" },
+            "fanRunning": true
+          }
+        },
+        "deviceClass": "Thermostat",
+        "deviceType": "Thermostat",
+        "deviceID": "TCC-2077898",
+        "userDefinedDeviceName": "Bonacres",
+        "backend": { "id": "2077898" },
+        "name": "Bonacres",
+        "schedule": { "scheduleType": "Timed", "scheduleSubType": "NA" },
+        "isAlive": true,
+        "isUpgrading": false,
+        "isProvisioned": false,
+        "macID": "00D02DA8868D",
+        "deviceSettings": { "deviceClass": "Thermostat" },
+        "parentDeviceId": 2077898,
+        "service": { "mode": "Up" },
+        "deviceRegistrationDate": "2020-09-02T18:12:28.62",
+        "dataSyncStatus": "UnKnown",
+        "units": "Celsius",
+        "indoorTemperature": 22,
+        "outdoorTemperature": 128,
+        "allowedModes": ["Cool", "Heat", "Off"],
+        "deadband": 0,
+        "hasDualSetpointStatus": false,
+        "minHeatSetpoint": 4,
+        "maxHeatSetpoint": 32,
+        "minCoolSetpoint": 10,
+        "maxCoolSetpoint": 37,
+        "changeableValues": {
+          "mode": "Off",
+          "heatSetpoint": 16.5,
+          "coolSetpoint": 23.5,
+          "thermostatSetpointStatus": "PermanentHold",
+          "nextPeriodTime": "18:00:00",
+          "heatCoolMode": "Off"
+        },
+        "operationStatus": { "mode": "EquipmentOff" },
+        "indoorHumidity": 128,
+        "indoorHumidityStatus": "NotAvailable",
+        "deviceModel": "Unknown"
+      }
+    ],
+    "users": [
+      {
+        "userID": 2536462,
+        "username": "seangracey@yahoo.ca",
+        "firstname": "Sean",
+        "lastname": "Gracey",
+        "created": 1599070162,
+        "deleted": -62135596800,
+        "activated": true,
+        "connectedHomeAccountExists": true,
+        "locationRoleMapping": [
+          {
+            "locationID": 2173090,
+            "role": "Adult",
+            "locationName": "Home",
+            "status": 1
+          }
+        ],
+        "isOptOut": "False",
+        "isCurrentUser": false
+      },
+      {
+        "userID": 1959474,
+        "username": "beckersmarthome@icloud.com",
+        "firstname": "HomeBridge",
+        "lastname": "Honeywell-Home",
+        "created": 1577881583,
+        "deleted": -62135596800,
+        "activated": true,
+        "connectedHomeAccountExists": true,
+        "locationRoleMapping": [
+          {
+            "locationID": 2173090,
+            "role": "Adult",
+            "locationName": "Sean_Home",
+            "status": 1
+          }
+        ],
+        "isOptOut": "False",
+        "isCurrentUser": true
+      }
+    ],
+    "timeZoneId": "Eastern",
+    "timeZone": "Eastern Standard Time",
+    "ianaTimeZone": "America/New_York",
+    "daylightSavingTimeEnabled": true,
+    "geoFenceEnabled": false,
+    "predictiveAIREnabled": false,
+    "comfortLevel": 0,
+    "geoFenceNotificationEnabled": false,
+    "geoFenceNotificationTypeId": 13,
+    "configuration": {
+      "faceRecognition": {
+        "enabled": false,
+        "maxPersons": 2,
+        "maxEtas": 2,
+        "maxEtaPersons": 1,
+        "schedules": [
+          {
+            "time": [{ "start": "15:00:00", "end": "17:00:00" }],
+            "days": [
+              "Sunday",
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday"
+            ]
+          }
+        ]
+      }
+    }
+  }
+]
