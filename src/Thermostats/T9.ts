@@ -107,12 +107,23 @@ export class T9 {
     this.parseStatus();
 
     // Set Min and Max
-    this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature)
-      .setProps({
-        minValue: this.toCelsius(device.minCoolSetpoint),
-        maxValue: this.toCelsius(device.maxCoolSetpoint),
-        minStep: 0.5,
-      });
+    if (this.device.changeableValues.heatCoolMode === 'Heat') {
+      this.platform.log.debug('Device is in "Heat" mode');
+      this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature)
+        .setProps({
+          minValue: this.toCelsius(device.minHeatSetpoint),
+          maxValue: this.toCelsius(device.maxHeatSetpoint),
+          minStep: 0.5,
+        });
+    } else if (this.device.changeableValues.heatCoolMode === 'Cool') {
+      this.platform.log.debug('Device is in "Cool" mode');
+      this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature)
+        .setProps({
+          minValue: this.toCelsius(device.minCoolSetpoint),
+          maxValue: this.toCelsius(device.maxCoolSetpoint),
+          minStep: 0.5,
+        });
+    } 
 
     // Set control bindings
     this.service.getCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState)
