@@ -5,6 +5,7 @@ import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
 import { DeviceURL } from '../settings';
+import * as configTypes from '../configTypes';
 
 /**
  * Platform Accessory
@@ -28,35 +29,26 @@ export class RoomSensors {
   SensorUpdateInProgress!: boolean;
   doSensorUpdate!: any;
   TemperatureDisplayUnits!: number;
-  batteryStatus!: string;
-  indoorTemperature!: number;
-  occupancyDet: any;
-  indoorHumidity: any;
-  motionDet: any;
-
+  accessoryValue!: configTypes.accessoryValue;
+  accessoryAttribute!: configTypes.accessoryAttribute;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId: string,
-    public device: any,
-    public accessories: any,
-    public sensoraccessory: any, 
-    public rooms: any,
-    public readonly group: any,
+    public readonly locationId: configTypes.location['locationID'],
+    public device: configTypes.T9Thermostat,
+    public accessories: configTypes.rooms,
+    public roomsensors: configTypes.roomsensor,
+    public sensoraccessory: { accessoryValue: configTypes.accessoryValue ; accessoryAttribute: configTypes.accessoryAttribute; },
+    public readonly group: configTypes.groups,
   ) {
-
+    
     // default placeholders
     this.CurrentTemperature;
     this.StatusLowBattery;
     this.OccupancyDetected;
     this.CurrentRelativeHumidity;
     this.MotionDetected;
-    this.batteryStatus;
-    this.indoorTemperature;
-    this.occupancyDet;
-    this.indoorHumidity;
-    this.motionDet;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doSensorUpdate = new Subject();
@@ -176,37 +168,37 @@ export class RoomSensors {
    */
   parseStatus() {
     // Set Room Sensor State
-    if (this.batteryStatus === 'Ok') {
+    if (this.sensoraccessory.accessoryValue.batteryStatus.startsWith('Ok')) {
       this.StatusLowBattery = 0;
-    } else if (this.batteryStatus !== 'Ok') {
+    } else {
       this.StatusLowBattery = 1;
     }
 
     // Set Temperature Sensor State
     if (!this.platform.config.options.hide_temperature) {
-      this.CurrentTemperature = this.toCelsius(this.indoorTemperature);
+      this.CurrentTemperature = this.toCelsius(this.sensoraccessory.accessoryValue.indoorTemperature);
     }
 
     // Set Occupancy Sensor State
     if (!this.platform.config.options.hide_occupancy) {
-      if (this.occupancyDet === true) {
+      if (this.sensoraccessory.accessoryValue.occupancyDet) {
         this.OccupancyDetected = 1;
-      } else if (this.occupancyDet === false) {
+      } else if (!this.sensoraccessory.accessoryValue.occupancyDet) {
         this.OccupancyDetected = 0;
       }
     }
 
     // Set Humidity Sensor State
     if (!this.platform.config.options.hide_humidity) {
-      this.CurrentRelativeHumidity = this.indoorHumidity;
+      this.CurrentRelativeHumidity = this.sensoraccessory.accessoryValue.indoorHumidity;
     }
 
     // Set Motion Sensor State
     if (!this.platform.config.options.hide_motion) {
-      this.MotionDetected = this.motionDet;
-      if (this.motionDet === false) {
+      this.MotionDetected = this.sensoraccessory.accessoryValue.motionDet;
+      if (!this.sensoraccessory.accessoryValue.motionDet) {
         this.MotionDetected = true;
-      } else if (this.motionDet === true) {
+      } else if (this.sensoraccessory.accessoryValue.motionDet) {
         this.MotionDetected = false;
       }
     }
@@ -217,21 +209,12 @@ export class RoomSensors {
    */
   async refreshStatus() {
     try {
-      const sensoraccessory = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/group/${this.group.id}/rooms`, {
+      this.roomsensors = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/group/${this.group.id}/rooms`, {
         params: {
           locationId: this.locationId,
         },
       })).data;
-      this.platform.log.debug(JSON.stringify(sensoraccessory));
-      this.sensoraccessory = sensoraccessory;
-      this.platform.log.debug(JSON.stringify(sensoraccessory.accessoryValue));
-      this.batteryStatus = sensoraccessory.accessoryValue.batteryStatus;
-      this.indoorTemperature = sensoraccessory.accessoryValue.indoorTemperature;
-      this.occupancyDet = sensoraccessory.accessoryValue.occupancyDet;
-      this.indoorHumidity = sensoraccessory.accessoryValue.indoorHumidity;
-      this.motionDet = sensoraccessory.accessoryValue.motionDet;
-      this.platform.log.debug(JSON.stringify(this.sensoraccessory));
-      this.platform.log.debug(JSON.stringify(this.sensoraccessory.accessoryValue));
+      this.platform.log.debug(JSON.stringify(this.roomsensors));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {

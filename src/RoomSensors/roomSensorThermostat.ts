@@ -5,6 +5,7 @@ import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
 import { DeviceURL } from '../settings';
+import * as configTypes from '../configTypes';
 
 /**
  * Platform Accessory
@@ -50,13 +51,13 @@ export class RoomSensorThermostat {
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId: string,
-    public device: any,
-    public sensoraccessory: any,
-    public accessories: any,
-    public rooms: any,
-    public readonly group: any,
-    
+    public readonly locationId: configTypes.location['locationID'],
+    public device: configTypes.T9Thermostat,
+    public accessories: configTypes.rooms,
+    public roomsensors: configTypes.roomsensor,
+    public rooms,
+    public sensoraccessory: { accessoryValue: configTypes.accessoryValue ; accessoryAttribute: configTypes.accessoryAttribute; },
+    public readonly group: configTypes.groups,
   ) {
 
     // Map Honeywell Modes to HomeKit Modes
@@ -354,25 +355,14 @@ export class RoomSensorThermostat {
           locationId: this.locationId,
         },
       })).data;
-      const sensoraccessory = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/group/${this.group.id}/rooms`, {
+      this.roomsensors = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/group/${this.group.id}/rooms`, {
         params: {
           locationId: this.locationId,
         },
       })).data;
       this.platform.log.debug(JSON.stringify(roompriority));
       this.roompriority = roompriority;
-      this.platform.log.debug(JSON.stringify(sensoraccessory));
-      this.sensoraccessory = sensoraccessory;
-      this.platform.log.debug(JSON.stringify(sensoraccessory.accessoryValue));
-      this.batteryStatus = sensoraccessory.accessoryValue.batteryStatus;
-      this.platform.log.warn(JSON.stringify(sensoraccessory.accessoryValue.batteryStatus));
-      this.indoorTemperature = sensoraccessory.accessoryValue.indoorTemperature;
-      this.platform.log.warn(JSON.stringify(sensoraccessory.accessoryValue.indoorTemperature));
-      this.occupancyDet = sensoraccessory.accessoryValue.occupancyDet;
-      this.platform.log.warn(JSON.stringify(sensoraccessory.accessoryValue.occupancyDet));
-      this.indoorHumidity = sensoraccessory.accessoryValue.indoorHumidity;
-      this.platform.log.warn(JSON.stringify(sensoraccessory.accessoryValue.indoorHumidity));
-      this.motionDet = sensoraccessory.accessoryValue.motionDet;
+      this.platform.log.debug(JSON.stringify(this.roomsensors));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {

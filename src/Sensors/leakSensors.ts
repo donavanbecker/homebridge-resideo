@@ -5,6 +5,7 @@ import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
 import { DeviceURL } from '../settings';
+//import { } from '../configTypes';
 
 /**
  * Platform Accessory
@@ -35,8 +36,8 @@ export class LeakSensor {
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId: string,
-    public device: any,
+    public readonly locationId,
+    public device,
   ) {
 
     // default placeholders

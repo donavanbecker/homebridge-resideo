@@ -5,6 +5,7 @@ import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
 import { DeviceURL } from '../settings';
+import * as configTypes from '../configTypes';
 
 /**
  * Platform Accessory
@@ -22,12 +23,12 @@ export class T5 {
   TargetHeatingCoolingState: any;
   CoolingThresholdTemperature: any;
   HeatingThresholdTemperature!: any;
-  CurrentRelativeHumidity!: any;
   TemperatureDisplayUnits!: any;
   Active!: any;
   TargetFanState!: any;
   fanMode: any;
   thermostatUpdateInProgress!: boolean;
+  // CurrentRelativeHumidity!: any;
 
   fanUpdateInProgress!: boolean;
   doThermostatUpdate!: any;
@@ -39,8 +40,8 @@ export class T5 {
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId: string,
-    public device: any,
+    public readonly locationId: configTypes.location['locationID'],
+    public device: configTypes.T5Device,
   ) {
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
@@ -61,11 +62,11 @@ export class T5 {
     this.TargetHeatingCoolingState;
     this.CoolingThresholdTemperature;
     this.HeatingThresholdTemperature;
-    this.CurrentRelativeHumidity;
     this.TemperatureDisplayUnits;
     this.Active;
     this.TargetFanState;
     this.fanMode;
+    // this.CurrentRelativeHumidity;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doThermostatUpdate = new Subject();
@@ -187,7 +188,7 @@ export class T5 {
     }
 
     this.CurrentTemperature = this.toCelsius(this.device.indoorTemperature);
-    this.CurrentRelativeHumidity = this.device.indoorHumidity;
+    // this.CurrentRelativeHumidity = this.device.indoorHumidity;
 
     if (this.device.changeableValues.heatSetpoint > 0) {
       this.HeatingThresholdTemperature = this.toCelsius(this.device.changeableValues.heatSetpoint);
@@ -314,7 +315,6 @@ export class T5 {
   updateHomeKitCharacteristics() {
     this.service.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, this.TemperatureDisplayUnits);
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
-    this.service.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
     this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
     this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, this.HeatingThresholdTemperature);
     this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
@@ -324,6 +324,7 @@ export class T5 {
       this.fanService.updateCharacteristic(this.platform.Characteristic.TargetFanState, this.TargetFanState);
       this.fanService.updateCharacteristic(this.platform.Characteristic.Active, this.Active);
     }
+    // this.service.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
   }
 
   setTargetHeatingCoolingState(value: any, callback: (arg0: null) => void) {
