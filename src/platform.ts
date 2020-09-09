@@ -79,7 +79,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         this.log.error('Failed to Discover Locations.', e.message);
       }
       try {
-        this.discoverThermostats();
+        this.discoverDevices();
       } catch (e) {
         this.log.error('Failed to Discover Thermostats.', e.message);
       }
@@ -391,7 +391,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    * This method is used to discover the your location and devices.
    * Accessories are registered by either their DeviceClass, DeviceModel, or DeviceID
    */
-  private async discoverThermostats() {
+  private async discoverDevices() {
     // get the devices at each location
     for (const location of this.locations) {
       this.log.info(`Getting devices for ${location.name}...`);
@@ -399,7 +399,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       const locationId = location.locationID;
       this.locationinfo(location);
       for (const device of location.devices) {
-        if (!device.isAlive && device.deviceClass === 'LeakDetector') {
+        if (device.isAlive && device.deviceClass === 'LeakDetector') {
           this.deviceinfo(device);
           this.Leak(device, locationId);
         } else if (device.isAlive && device.deviceClass === 'Thermostat') {
@@ -459,19 +459,22 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 const roomsensors = await this.Sensors(device, group, locationId);
                 if (roomsensors.rooms){
                   const rooms = roomsensors.rooms;
+                  this.log.error(JSON.stringify(roomsensors));
                   if (this.config.options.roompriority.roomsensor || this.config.options.roompriority.thermostat) {
                     this.log.info(`Total Rooms Found: ${rooms.length}`);
                   }
                   for (const accessories of rooms) {
                     if (accessories){
+                      this.log.debug(JSON.stringify(accessories));
                       for (const accessory of accessories.accessories){
-                        const sensoraccessory = accessory;
-                        if (sensoraccessory.accessoryAttribute) {
-                          if (sensoraccessory.accessoryAttribute.type) {
-                            if (sensoraccessory.accessoryAttribute.type.startsWith('IndoorAirSensor')){
-                              this.log.debug(JSON.stringify(sensoraccessory.accessoryAttribute.softwareRevision));
-                              this.RoomSensors(device, locationId, accessories, sensoraccessory, rooms, group);
-                              this.RoomSensorThermostat(device, locationId, accessories, sensoraccessory, rooms, group);
+                        this.sensoraccessory = accessory;
+                        if (this.sensoraccessory.accessoryAttribute) {
+                          if (this.sensoraccessory.accessoryAttribute.type) {
+                            if (this.sensoraccessory.accessoryAttribute.type.startsWith('IndoorAirSensor')){
+                              this.log.debug(JSON.stringify(this.sensoraccessory));
+                              this.log.debug(JSON.stringify(this.sensoraccessory.accessoryAttribute.softwareRevision));
+                              this.RoomSensors(device, locationId, accessories, this.sensoraccessory, rooms, group);
+                              this.RoomSensorThermostat(device, locationId, accessories, this.sensoraccessory, rooms, group);
                             }
                           }
                         }
@@ -914,7 +917,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   public deviceinfo(device) {
     if (this.config.devicediscovery) {
       if (device) {
-        this.log.info(JSON.stringify(device));
+        this.log.warn(JSON.stringify(device));
       }
       if (device.deviceID){
         this.log.info(JSON.stringify(device.deviceID));

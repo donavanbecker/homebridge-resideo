@@ -5,6 +5,7 @@ import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
 import { DeviceURL } from '../settings';
+import * as configTypes from '../configTypes';
 
 /**
  * Platform Accessory
@@ -38,13 +39,12 @@ export class T9 {
   doThermostatUpdate!: any;
   fanUpdateInProgress!: boolean;
   doFanUpdate!: any;
- 
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId,
-    public device,
+    public readonly locationId: configTypes.location,
+    public device: configTypes.T9Thermostat,
   ) {
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
@@ -287,7 +287,7 @@ export class T9 {
         })).data;
         this.deviceFan = deviceFan;
         if (this.device.settings) {
-          this.platform.log.debug(this.device.settings.fan.allowedModes);
+          this.platform.log.warn(JSON.stringify(this.device.settings.fan.allowedModes));
         }
         this.platform.log.debug(deviceFan);
         this.platform.log.debug(`Fetched update for ${this.device.name} from Honeywell Fan API: ${JSON.stringify(this.deviceFan)}`);

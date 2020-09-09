@@ -5,6 +5,7 @@ import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
 import { DeviceURL } from '../settings';
+import * as configTypes from '../configTypes';
 
 /**
  * Platform Accessory
@@ -28,23 +29,20 @@ export class RoomSensors {
   SensorUpdateInProgress!: boolean;
   doSensorUpdate!: any;
   TemperatureDisplayUnits!: number;
-  batteryStatus: any;
-  indoorTemperature!: number;
-  occupancyDet!: boolean;
-  indoorHumidity!: number;
-  motionDet!: boolean;
+  accessoryValue!: configTypes.accessoryValue;
+  accessoryAttribute!: configTypes.accessoryAttribute;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId,
-    public device,
-    public accessories,
-    public sensoraccessory,
-    public rooms,
-    public readonly group,
+    public readonly locationId: any,
+    public device: configTypes.T9Thermostat,
+    public accessories: configTypes.roomsensor,
+    public sensoraccessory: configTypes.sensoraccessory,
+    public rooms: configTypes.groups['rooms'],
+    public readonly group: configTypes.groups,
   ) {
-
+    this.platform.log.error(JSON.stringify(this.sensoraccessory.accessoryValue.batteryStatus));
     // default placeholders
     this.CurrentTemperature;
     this.StatusLowBattery;
@@ -170,15 +168,15 @@ export class RoomSensors {
    */
   parseStatus() {
     // Set Room Sensor State
-    if (this.sensoraccessory.accessoryValue.batteryStatus === 'Ok') {
+    if (this.sensoraccessory.accessoryValue.batteryStatus) {
       this.StatusLowBattery = 0;
-    } else if (this.sensoraccessory.accessoryValue.batteryStatus !== 'Ok') {
+    } else {
       this.StatusLowBattery = 1;
     }
 
     // Set Temperature Sensor State
     if (!this.platform.config.options.hide_temperature) {
-      this.CurrentTemperature = this.toCelsius(this.indoorTemperature);
+      this.CurrentTemperature = this.toCelsius(this.sensoraccessory.accessoryValue.indoorTemperature);
     }
 
     // Set Occupancy Sensor State
@@ -219,13 +217,6 @@ export class RoomSensors {
       this.platform.log.debug(JSON.stringify(sensoraccessory));
       this.sensoraccessory = sensoraccessory;
       this.platform.log.debug(JSON.stringify(sensoraccessory.accessoryValue));
-      /* this.batteryStatus = sensoraccessory.accessoryValue.batteryStatus;
-      this.indoorTemperature = sensoraccessory.accessoryValue.indoorTemperature;
-      this.occupancyDet = sensoraccessory.accessoryValue.occupancyDet;
-      this.indoorHumidity = sensoraccessory.accessoryValue.indoorHumidity;
-      this.motionDet = sensoraccessory.accessoryValue.motionDet;
-      this.platform.log.debug(JSON.stringify(this.sensoraccessory));
-      this.platform.log.debug(JSON.stringify(this.sensoraccessory.accessoryValue));*/
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
