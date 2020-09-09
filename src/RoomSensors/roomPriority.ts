@@ -4,7 +4,7 @@ import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
 import { DeviceURL } from '../settings';
-//import { } from '../configTypes';
+import * as configTypes from '../configTypes';
 
 /**
  * Platform Accessory
@@ -22,8 +22,8 @@ export class RoomPriority {
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId: string,
-    public device: any,
+    public readonly locationId: configTypes.location['locationID'],
+    public device: configTypes.T9Thermostat,
     public rooms: any,
     public accessories: any,
     public currentPriority: any, 

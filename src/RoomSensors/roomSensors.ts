@@ -35,14 +35,14 @@ export class RoomSensors {
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId: any,
+    public readonly locationId: configTypes.location['locationID'],
     public device: configTypes.T9Thermostat,
-    public accessories: configTypes.roomsensor,
-    public sensoraccessory: configTypes.sensoraccessory,
-    public rooms: configTypes.groups['rooms'],
+    public accessories: configTypes.rooms,
+    public roomsensors: configTypes.roomsensor,
+    public sensoraccessory: { accessoryValue: configTypes.accessoryValue ; accessoryAttribute: configTypes.accessoryAttribute; },
     public readonly group: configTypes.groups,
   ) {
-    this.platform.log.error(JSON.stringify(this.sensoraccessory.accessoryValue.batteryStatus));
+    
     // default placeholders
     this.CurrentTemperature;
     this.StatusLowBattery;
@@ -168,7 +168,7 @@ export class RoomSensors {
    */
   parseStatus() {
     // Set Room Sensor State
-    if (this.sensoraccessory.accessoryValue.batteryStatus) {
+    if (this.sensoraccessory.accessoryValue.batteryStatus.startsWith('Ok')) {
       this.StatusLowBattery = 0;
     } else {
       this.StatusLowBattery = 1;
@@ -209,14 +209,12 @@ export class RoomSensors {
    */
   async refreshStatus() {
     try {
-      const sensoraccessory = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/group/${this.group.id}/rooms`, {
+      this.roomsensors = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/group/${this.group.id}/rooms`, {
         params: {
           locationId: this.locationId,
         },
       })).data;
-      this.platform.log.debug(JSON.stringify(sensoraccessory));
-      this.sensoraccessory = sensoraccessory;
-      this.platform.log.debug(JSON.stringify(sensoraccessory.accessoryValue));
+      this.platform.log.debug(JSON.stringify(this.roomsensors));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {

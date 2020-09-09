@@ -43,7 +43,7 @@ export class T9 {
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId: configTypes.location,
+    public readonly locationId: configTypes.location['locationID'],
     public device: configTypes.T9Thermostat,
   ) {
     // Map Honeywell Modes to HomeKit Modes
@@ -261,12 +261,11 @@ export class T9 {
    */
   async refreshStatus() {
     try {
-      const device = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
+      this.device = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
         params: {
           locationId: this.locationId,
         },
       })).data;
-      this.device = device;
       this.platform.log.debug(`Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`);
       this.platform.log.debug(JSON.stringify(this.device.changeableValues.mode));
       this.platform.log.debug(JSON.stringify(this.device));
@@ -287,7 +286,7 @@ export class T9 {
         })).data;
         this.deviceFan = deviceFan;
         if (this.device.settings) {
-          this.platform.log.warn(JSON.stringify(this.device.settings.fan.allowedModes));
+          this.platform.log.debug(JSON.stringify(this.device.settings.fan.allowedModes));
         }
         this.platform.log.debug(deviceFan);
         this.platform.log.debug(`Fetched update for ${this.device.name} from Honeywell Fan API: ${JSON.stringify(this.deviceFan)}`);
