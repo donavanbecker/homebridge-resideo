@@ -32,7 +32,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     responseType: 'json',
   });
 
-  accessory!: any;
   locations!: configTypes.location | any;
   firmware!: configTypes.accessoryAttribute['softwareRevision'];
   sensoraccessory: any;
@@ -507,12 +506,15 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                   this.log.info(`Total Rooms Found: ${currentPriority.length}`);
                 }
                 for (const rooms of currentPriority) {
+                  this.log.debug(JSON.stringify(rooms));
                   if (rooms.accessories){
                     const priorityrooms = rooms.accessories;
+                    this.log.debug(JSON.stringify(priorityrooms));
                     if (this.config.options.roompriority.switch) {
                       this.log.info(`Total Accessories Found in Room (${rooms.id}): ${priorityrooms.length}`);
                     }
                     for (const accessories of priorityrooms) {
+                      this.log.debug(JSON.stringify(accessories));
                       this.RoomPriority(device, locationId, accessories, currentPriority, priorityrooms, rooms);
                     }
                   }
@@ -616,7 +618,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     }
   }
 
-  private Round(device, locationId: configTypes.location['locationID']) {
+  private Round(device: configTypes.RoundDevice, locationId: configTypes.location['locationID']) {
     const uuid = this.api.hap.uuid.generate(`${device.name}-${device.deviceID}-${device.deviceModel}`);
 
     // see if an accessory with the same uuid has already been registered and restored from
@@ -629,8 +631,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-        //existingAccessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
-        //this.api.updatePlatformAccessories([existingAccessory]);
+        existingAccessory.context.firmwareRevision = device.thermostatVersion;
+        this.api.updatePlatformAccessories([existingAccessory]);
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
         new Round(this, existingAccessory, locationId, device);
@@ -650,7 +652,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
       accessory.context.device = device;
-      // accessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
+      accessory.context.firmwareRevision = device.thermostatVersion;
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
       new Round(this, accessory, locationId, device);
@@ -855,7 +857,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
   } 
 
-  private RoomPriority(device: configTypes.T9Thermostat, locationId: configTypes.location['locationID'], accessories, currentPriority, priorityrooms, rooms) {
+  private RoomPriority(device: configTypes.T9Thermostat, locationId: configTypes.location['locationID'], accessories: configTypes.Accessory, currentPriority: configTypes.CurrentPriority, priorityrooms: configTypes.Room['accessories'], rooms: configTypes.Room) {
     // Room Priority Switches
     const uuid = this.api.hap.uuid.generate(`${rooms.roomName}-${rooms.id}-${accessories.type}-${accessories.id}`);
 
@@ -873,7 +875,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
-        new RoomPriority(this, existingAccessory, locationId, device, accessories, rooms, currentPriority, priorityrooms);
+        new RoomPriority(this, existingAccessory, locationId, device, rooms, currentPriority, priorityrooms);
         this.log.debug(`Room Priority Switch UDID: ${rooms.roomName}-${rooms.id}-${accessories.type}-${accessories.id}`);
 
       } else if (!device.isAlive || !this.config.options.roompriority.switch) {
@@ -893,7 +895,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
-      new RoomPriority(this, accessory, locationId, device, accessories, rooms, currentPriority, priorityrooms);
+      new RoomPriority(this, accessory, locationId, device, rooms, currentPriority, priorityrooms);
       this.log.debug(`Room Priority Switch UDID: ${rooms.roomName}-${rooms.id}-${accessories.type}-${accessories.id}`);
 
       // link the accessory to your platform
@@ -901,7 +903,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     }
   }
 
-  public unregisterPlatformAccessories(existingAccessory) {
+  public unregisterPlatformAccessories(existingAccessory: PlatformAccessory) {
     // remove platform accessories when no longer present
     this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
     this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
@@ -915,7 +917,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     }
   }
 
-  public deviceinfo(device) {
+  public deviceinfo(device: { deviceID: string; deviceType: string; deviceClass: string; deviceModel: string; priorityType: string; settings: { fan: { allowedModes: string[]; changeableValues: any; }; }; inBuiltSensorState: { roomId: number; roomName: string; }; groups: configTypes.T9Thermostat['groups']; }) {
     if (this.config.devicediscovery) {
       if (device) {
         this.log.warn(JSON.stringify(device));

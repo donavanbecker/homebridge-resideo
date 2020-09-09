@@ -132,16 +132,18 @@ export class T9 {
   
     // Fan Controls
     this.fanService = accessory.getService(this.platform.Service.Fanv2);
-    if (this.device.settings.fan && !this.fanService && !this.platform.config.options.thermostat.hide_fan) {
-      this.fanService = accessory.addService(this.platform.Service.Fanv2, `${this.device.name} ${this.device.deviceClass} Fan`);
+    if (this.device.settings) {
+      if (this.device.settings.fan && !this.fanService && !this.platform.config.options.thermostat.hide_fan) {
+        this.fanService = accessory.addService(this.platform.Service.Fanv2, `${this.device.name} ${this.device.deviceClass} Fan`);
       
-      this.fanService
-        .getCharacteristic(this.platform.Characteristic.Active)
-        .on('set', this.setActive.bind(this));
+        this.fanService
+          .getCharacteristic(this.platform.Characteristic.Active)
+          .on('set', this.setActive.bind(this));
 
-      this.fanService
-        .getCharacteristic(this.platform.Characteristic.TargetFanState)
-        .on('set', this.setTargetFanState.bind(this));
+        this.fanService
+          .getCharacteristic(this.platform.Characteristic.TargetFanState)
+          .on('set', this.setTargetFanState.bind(this));
+      }
     } else if (this.fanService && this.platform.config.options.thermostat.hide_fan) {
       accessory.removeService(this.fanService);
     }
@@ -178,17 +180,19 @@ export class T9 {
       }
       this.thermostatUpdateInProgress = false;
     });
-    if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
-      this.doFanUpdate.pipe(tap(() => {
-        this.fanUpdateInProgress = true;
-      }), debounceTime(100)).subscribe(async () => {
-        try {
-          await this.pushFanChanges();
-        } catch (e) {
-          this.platform.log.error(e.message);
-        }
-        this.fanUpdateInProgress = false;
-      });
+    if (this.device.settings) {
+      if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
+        this.doFanUpdate.pipe(tap(() => {
+          this.fanUpdateInProgress = true;
+        }), debounceTime(100)).subscribe(async () => {
+          try {
+            await this.pushFanChanges();
+          } catch (e) {
+            this.platform.log.error(e.message);
+          }
+          this.fanUpdateInProgress = false;
+        });
+      }
     }
   }
   
@@ -239,18 +243,20 @@ export class T9 {
     }
 
     // Set the Target Fan State
-    if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
-      if (this.deviceFan) {
-        this.platform.log.debug(`${JSON.stringify(this.deviceFan)}`);
-        if (this.deviceFan.mode === 'Auto') {
-          this.TargetFanState = this.platform.Characteristic.TargetFanState.AUTO;
-          this.Active = this.platform.Characteristic.Active.INACTIVE;
-        } else if (this.deviceFan.mode === 'On') {
-          this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
-          this.Active = this.platform.Characteristic.Active.ACTIVE;
-        } else if (this.deviceFan.mode === 'Circulate') {
-          this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
-          this.Active = this.platform.Characteristic.Active.INACTIVE;
+    if (this.device.settings) {
+      if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
+        if (this.deviceFan) {
+          this.platform.log.debug(`${JSON.stringify(this.deviceFan)}`);
+          if (this.deviceFan.mode === 'Auto') {
+            this.TargetFanState = this.platform.Characteristic.TargetFanState.AUTO;
+            this.Active = this.platform.Characteristic.Active.INACTIVE;
+          } else if (this.deviceFan.mode === 'On') {
+            this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
+            this.Active = this.platform.Characteristic.Active.ACTIVE;
+          } else if (this.deviceFan.mode === 'Circulate') {
+            this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
+            this.Active = this.platform.Characteristic.Active.INACTIVE;
+          }
         }
       }
     }
@@ -261,12 +267,12 @@ export class T9 {
    */
   async refreshStatus() {
     try {
-      this.device = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
+      const device = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
         params: {
           locationId: this.locationId,
         },
       })).data;
-      this.platform.log.debug(`Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`);
+      this.platform.log.debug(`Fetched update for ${device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`);
       this.platform.log.debug(JSON.stringify(this.device.changeableValues.mode));
       this.platform.log.debug(JSON.stringify(this.device));
       if (this.platform.config.options.roompriority.thermostat) {
@@ -278,18 +284,18 @@ export class T9 {
         this.platform.log.debug(JSON.stringify(roompriority));
         this.roompriority = roompriority;
       }
-      if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
-        const deviceFan = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
-          params: {
-            locationId: this.locationId,
-          },
-        })).data;
-        this.deviceFan = deviceFan;
-        if (this.device.settings) {
+      if (this.device.settings) {
+        if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
+          const deviceFan = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
+            params: {
+              locationId: this.locationId,
+            },
+          })).data;
+          this.deviceFan = deviceFan;
           this.platform.log.debug(JSON.stringify(this.device.settings.fan.allowedModes));
+          this.platform.log.debug(deviceFan);
+          this.platform.log.debug(`Fetched update for ${this.device.name} from Honeywell Fan API: ${JSON.stringify(this.deviceFan)}`);
         }
-        this.platform.log.debug(deviceFan);
-        this.platform.log.debug(`Fetched update for ${this.device.name} from Honeywell Fan API: ${JSON.stringify(this.deviceFan)}`);
       }
       this.parseStatus();
       this.updateHomeKitCharacteristics();
@@ -375,9 +381,11 @@ export class T9 {
     this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
     this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, this.TargetHeatingCoolingState);
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, this.CurrentHeatingCoolingState);
-    if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
-      this.fanService.updateCharacteristic(this.platform.Characteristic.TargetFanState, this.TargetFanState);
-      this.fanService.updateCharacteristic(this.platform.Characteristic.Active, this.Active);
+    if (this.device.settings) {
+      if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
+        this.fanService.updateCharacteristic(this.platform.Characteristic.TargetFanState, this.TargetFanState);
+        this.fanService.updateCharacteristic(this.platform.Characteristic.Active, this.Active);
+      }
     }
   }
 
@@ -461,34 +469,36 @@ export class T9 {
     let payload = {
       mode: 'Auto', // default to Auto
     };
-    if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan){
-      this.platform.log.debug(`TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`);
+    if (this.device.settings) {
+      if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan){
+        this.platform.log.debug(`TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`);
 
-      if (this.TargetFanState === this.platform.Characteristic.TargetFanState.AUTO) {
-        payload = {
-          mode: 'Auto',
-        };
-      } else if (this.TargetFanState === this.platform.Characteristic.TargetFanState.MANUAL &&
+        if (this.TargetFanState === this.platform.Characteristic.TargetFanState.AUTO) {
+          payload = {
+            mode: 'Auto',
+          };
+        } else if (this.TargetFanState === this.platform.Characteristic.TargetFanState.MANUAL &&
       this.Active === this.platform.Characteristic.Active.ACTIVE) {
-        payload = {
-          mode: 'On',
-        };
-      } else if (this.TargetFanState === this.platform.Characteristic.TargetFanState.MANUAL &&
+          payload = {
+            mode: 'On',
+          };
+        } else if (this.TargetFanState === this.platform.Characteristic.TargetFanState.MANUAL &&
       this.Active === this.platform.Characteristic.Active.INACTIVE) {
-        payload = {
-          mode: 'Circulate',
-        };
+          payload = {
+            mode: 'Circulate',
+          };
+        }
+
+        this.platform.log.info(`Sending request to Honeywell API. Fan Mode: ${payload.mode}`);
+        this.platform.log.debug(JSON.stringify(payload));
+
+        // Make the API request
+        await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, payload, {
+          params: {
+            locationId: this.locationId,
+          },
+        });
       }
-
-      this.platform.log.info(`Sending request to Honeywell API. Fan Mode: ${payload.mode}`);
-      this.platform.log.debug(JSON.stringify(payload));
-
-      // Make the API request
-      await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, payload, {
-        params: {
-          locationId: this.locationId,
-        },
-      });
     }
     // Refresh the status from the API
     await this.refreshStatus();

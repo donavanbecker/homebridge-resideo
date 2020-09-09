@@ -5,7 +5,7 @@ import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
 import { DeviceURL } from '../settings';
-//import { } from '../configTypes';
+import * as configTypes from '../configTypes';
 
 /**
  * Platform Accessory
@@ -28,8 +28,8 @@ export class Round {
   Active!: any;
   TargetFanState!: any;
   fanMode: any;
-  thermostatUpdateInProgress!: boolean;
 
+  thermostatUpdateInProgress!: boolean;
   fanUpdateInProgress!: boolean;
   doThermostatUpdate!: any;
   doFanUpdate!: any;
@@ -40,8 +40,8 @@ export class Round {
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId,
-    public device,
+    public readonly locationId: configTypes.location['locationID'],
+    public device: configTypes.RoundDevice,
   ) {
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
@@ -127,7 +127,7 @@ export class Round {
 
     // Fan Controls
     this.fanService = accessory.getService(this.platform.Service.Fanv2);
-    if (this.device.scheduleCapabilities.schedulableFan && !this.fanService && !this.platform.config.options.thermostat.hide_fan) {
+    if (this.device.settings.fan && !this.fanService && !this.platform.config.options.thermostat.hide_fan) {
       this.fanService = accessory.addService(this.platform.Service.Fanv2, `${this.device.name} ${this.device.deviceClass} Fan`);
       
       this.fanService
@@ -161,7 +161,7 @@ export class Round {
       }
       this.thermostatUpdateInProgress = false;
     });
-    if (this.device.scheduleCapabilities.schedulableFan && !this.platform.config.options.thermostat.hide_fan) {
+    if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
       this.doFanUpdate.pipe(tap(() => {
         this.fanUpdateInProgress = true;
       }), debounceTime(100)).subscribe(async () => {
@@ -219,7 +219,7 @@ export class Round {
     }
 
     // Set the Target Fan State
-    if (this.device.scheduleCapabilities.schedulableFan && !this.platform.config.options.thermostat.hide_fan) {
+    if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
       if (this.deviceFan) {
         this.platform.log.debug(`${JSON.stringify(this.deviceFan)}`);
 
@@ -250,7 +250,7 @@ export class Round {
       this.device = device;
       this.platform.log.debug(`Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`);
       this.platform.log.debug(JSON.stringify(this.device.changeableValues.mode));
-      if (this.device.scheduleCapabilities.schedulableFan && !this.platform.config.options.thermostat.hide_fan) {
+      if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
         const deviceFan = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
           params: {
             locationId: this.locationId,
@@ -321,7 +321,7 @@ export class Round {
     this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
     this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, this.TargetHeatingCoolingState);
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, this.CurrentHeatingCoolingState);
-    if (this.device.scheduleCapabilities.schedulableFan && !this.platform.config.options.thermostat.hide_fan) {
+    if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
       this.fanService.updateCharacteristic(this.platform.Characteristic.TargetFanState, this.TargetFanState);
       this.fanService.updateCharacteristic(this.platform.Characteristic.Active, this.Active);
     }
@@ -407,7 +407,7 @@ export class Round {
     let payload = {
       mode: 'Auto', // default to Auto
     };
-    if (this.device.scheduleCapabilities.schedulableFan && !this.platform.config.options.thermostat.hide_fan) {
+    if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
       this.platform.log.debug(`TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`);
 
       if (this.TargetFanState === this.platform.Characteristic.TargetFanState.AUTO) {

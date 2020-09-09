@@ -159,6 +159,79 @@ export type TCCDeviceSettings = {
   deviceClass: string;
 }
 
+// Round Thermostat
+export type RoundDevice = {
+  thermostatVersion: string;
+  settings: RoundSettings;
+  deviceClass: string;
+  deviceType: string;
+  deviceID: string;
+  userDefinedDeviceName: string;
+  name: string;
+  isAlive: boolean;
+  macID: string;
+  deviceSettings: RoundDeviceSettings;
+  service: Service;
+  units: string;
+  indoorTemperature: number;
+  outdoorTemperature: number;
+  allowedModes: string[];
+  hasDualSetpointStatus: boolean;
+  minHeatSetpoint: number;
+  maxHeatSetpoint: number;
+  minCoolSetpoint: number;
+  maxCoolSetpoint: number;
+  changeableValues: RoundChangeableValues;
+  operationStatus: OperationStatus;
+  indoorHumidity: number;
+  deviceModel: string;
+}
+
+export type RoundChangeableValues = {
+  mode: string;
+  autoChangeoverActive: boolean;
+  emergencyHeatActive: boolean;
+  heatSetpoint: number;
+  coolSetpoint: number;
+  heatCoolMode: string;
+}
+
+export type RoundDeviceSettings = {
+}
+
+export type RoundSettings = {
+  homeSetPoints: HomeSetPoints;
+  awaySetPoints: AwaySetPoints;
+  fan: Fan;
+  temperatureMode: TemperatureMode;
+  specialMode: SpecialMode;
+}
+
+export type AwaySetPoints = {
+  awayHeatSP: number;
+  awayCoolSP: number;
+  smartCoolSP: number;
+  smartHeatSP: number;
+  useAutoSmart: boolean;
+  units: string;
+}
+
+export type HomeSetPoints = {
+  homeHeatSP: number;
+  homeCoolSP: number;
+  units: string;
+}
+
+export type TemperatureMode = {
+  feelsLike: boolean;
+  air: boolean;
+}
+
+export type SpecialMode = {
+  autoChangeoverActive: boolean;
+  emergencyHeatActive: boolean;
+}
+
 // Fan Settings
 export type Settings = {
   fan: Fan;
@@ -275,3 +348,44 @@ export type accessoryValue = {
   rssiAverage: number;
   occupancySensitivity: string;
 }
+
+// T9 Room Priority
+export type Priority = {
+  deviceId: string;
+  status: string;
+  currentPriority: CurrentPriority;
+}
+
+export type CurrentPriority = {
+  priorityType: string;
+  selectedRooms: selectedRooms;
+  rooms: Rooms[];
+}
+
+export type selectedRooms = {
+}
+
+export type Rooms = {
+  rooms: Room;
+}
+
+export type Room = {
+  id: number;
+  roomName: string;
+  roomAvgTemp: number;
+  roomAvgHumidity: number;
+  overallMotion: boolean;
+  accessories: Accessory[];
+}
+
+export type Accessory = {
+  id: number;
+  type: string;
+  excludeTemp: boolean;
+  excludeMotion: boolean;
+  temperature: number;
+  status: string;
+  detectMotion: boolean;
+}
+
+
