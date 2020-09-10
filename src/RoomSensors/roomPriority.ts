@@ -100,10 +100,13 @@ export class RoomPriority {
    */
   parseStatus() {
     // Set Room Priority
-    this.platform.log.warn(JSON.stringify(this.selectedRooms));
-    this.platform.log.error(JSON.stringify(this.rooms.id));
-    this.platform.log.warn(JSON.stringify(this.RoomOn));
-    this.RoomOn === this.rooms.id;
+    this.platform.log.debug(JSON.stringify(this.selectedRooms));
+    this.platform.log.debug(JSON.stringify(this.rooms.id));
+    if (this.selectedRooms === this.rooms.id) {
+      this.rooms.id === this.RoomOn;
+    } else {
+      this.rooms.id !== this.RoomOn;
+    }
   }
 
   /**
@@ -140,15 +143,16 @@ export class RoomPriority {
     
     this.platform.log.info(`Sending request to Honeywell API. Room Priority: ${payload.currentPriority.selectedRooms}`);
     this.platform.log.debug(JSON.stringify(payload));
-
+    if (this.rooms.id !== this.RoomOn) {
     // Make the API request
-    const pushRoomChanges = (await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
-      params: {
-        locationId: this.locationId,
-      },
-    })).data;
-    pushRoomChanges;
-    // Refresh the status from the API
+      const pushRoomChanges = (await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
+        params: {
+          locationId: this.locationId,
+        },
+      })).data;
+      pushRoomChanges;
+    }
+    // Refresh the status from the API}
     await this.refreshStatus();
   }
 

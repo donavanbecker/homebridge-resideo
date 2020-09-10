@@ -124,21 +124,11 @@ export class Round {
     this.service.getCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState)
       .on('set', this.setTargetHeatingCoolingState.bind(this));
 
-    if (this.device.allowedModes === ['Off', 'Heat', 'Cool', 'Auto']) {
-      this.service.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature)
-        .on('set', this.setHeatingThresholdTemperature.bind(this));
-    } else if (this.device.allowedModes === ['Off', 'Heat']) {
-      this.service.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature)
-        .on('set', this.setHeatingThresholdTemperature.bind(this));
-    }
-  
-    if (this.device.allowedModes === ['Off', 'Heat', 'Cool', 'Auto']) {
-      this.service.getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
-        .on('set', this.setCoolingThresholdTemperature.bind(this));
-    } else if (this.device.allowedModes === ['Off', 'Cool']) {
-      this.service.getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
-        .on('set', this.setCoolingThresholdTemperature.bind(this));
-    }
+    this.service.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature)
+      .on('set', this.setHeatingThresholdTemperature.bind(this));
+
+    this.service.getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
+      .on('set', this.setCoolingThresholdTemperature.bind(this));
 
     this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature)
       .on('set', this.setTargetTemperature.bind(this));
@@ -338,16 +328,8 @@ export class Round {
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
     this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
-    if (this.device.allowedModes === ['Off', 'Heat', 'Cool', 'Auto']){
-      this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, this.HeatingThresholdTemperature);
-    } else if (this.device.allowedModes === ['Off', 'Cool']){
-      this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, this.HeatingThresholdTemperature);
-    }
-    if (this.device.allowedModes === ['Off', 'Heat', 'Cool', 'Auto']){
-      this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
-    } else if (this.device.allowedModes === ['Off', 'Cool']){
-      this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
-    }
+    this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, this.HeatingThresholdTemperature);
+    this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
     this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, this.TargetHeatingCoolingState);
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, this.CurrentHeatingCoolingState);
     if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
