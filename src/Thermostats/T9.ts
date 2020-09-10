@@ -39,6 +39,10 @@ export class T9 {
   doThermostatUpdate!: any;
   fanUpdateInProgress!: boolean;
   doFanUpdate!: any;
+  allowedModes!: configTypes.T9Thermostat['allowedModes'];
+  heatonlyMode!: any;
+  coolonlyMode!: any;
+  noAutoMode!: any;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
@@ -129,11 +133,21 @@ export class T9 {
     this.service.getCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState)
       .on('set', this.setTargetHeatingCoolingState.bind(this));
 
-    this.service.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature)
-      .on('set', this.setHeatingThresholdTemperature.bind(this));
+    if (this.device.allowedModes === ['Off', 'Heat', 'Cool', 'Auto']) {
+      this.service.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature)
+        .on('set', this.setHeatingThresholdTemperature.bind(this));
+    } else if (this.device.allowedModes === ['Off', 'Heat']) {
+      this.service.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature)
+        .on('set', this.setHeatingThresholdTemperature.bind(this));
+    }
 
-    this.service.getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
-      .on('set', this.setCoolingThresholdTemperature.bind(this));
+    if (this.device.allowedModes === ['Off', 'Heat', 'Cool', 'Auto']) {
+      this.service.getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
+        .on('set', this.setCoolingThresholdTemperature.bind(this));
+    } else if (this.device.allowedModes === ['Off', 'Cool']) {
+      this.service.getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
+        .on('set', this.setCoolingThresholdTemperature.bind(this));
+    }
 
     this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature)
       .on('set', this.setTargetTemperature.bind(this));
@@ -339,9 +353,19 @@ export class T9 {
       payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
       payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
     }
- 
-    this.platform.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}`);
-    this.platform.log.debug(JSON.stringify(payload));
+
+    if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.AUTO){
+      this.platform.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}`);
+      this.platform.log.debug(JSON.stringify(payload));
+    }
+    if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT){
+      this.platform.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, heatSetpoint: ${payload.heatSetpoint}`);
+      this.platform.log.debug(JSON.stringify(payload));
+    }
+    if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.COOL){
+      this.platform.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}`);
+      this.platform.log.debug(JSON.stringify(payload));
+    }
 
     // Make the API request
     const pushChanges = (await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
@@ -388,8 +412,16 @@ export class T9 {
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
     this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
-    this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, this.HeatingThresholdTemperature);
-    this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
+    if (this.device.allowedModes === ['Off', 'Heat', 'Cool', 'Auto']){
+      this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, this.HeatingThresholdTemperature);
+    }else if (this.device.allowedModes === ['Off', 'Cool']){
+      this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, this.HeatingThresholdTemperature);
+    }
+    if (this.device.allowedModes === ['Off', 'Heat', 'Cool', 'Auto']){
+      this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
+    }else if (this.device.allowedModes === ['Off', 'Cool']){
+      this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
+    }
     this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, this.TargetHeatingCoolingState);
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, this.CurrentHeatingCoolingState);
     if (this.device.settings) {
