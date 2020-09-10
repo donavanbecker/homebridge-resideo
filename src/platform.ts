@@ -145,6 +145,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     this.config.options.roompriority.thermostat;
     this.config.options.roompriority.switch;
     this.config.options.roompriority.roomsensor;
+    if (this.config.options.roompriority.switch){
+      this.config.options.roompriority.roomsensor === true;
+    }
 
     /**
      * Room Priority Errors
@@ -774,7 +777,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         this.log.debug(`Room Sensors UDID: ${accessories.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryAttribute.serialNumber}`);
         this.log.info(`${group.rooms.length} Rooms Found.`);
 
-      } else if (!device.isAlive || this.config.options.roompriority.thermostat) {
+      } else if (!device.isAlive || !this.config.options.roompriority.roomsensor) {
         this.unregisterPlatformAccessories(existingAccessory);
       }
     } else if (device.isAlive && !this.config.options.roompriority.thermostat) {

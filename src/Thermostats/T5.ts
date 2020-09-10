@@ -326,18 +326,8 @@ export class T5 {
       payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
     }
  
-    if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.AUTO){
-      this.platform.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}`);
-      this.platform.log.debug(JSON.stringify(payload));
-    }
-    if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT){
-      this.platform.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, heatSetpoint: ${payload.heatSetpoint}`);
-      this.platform.log.debug(JSON.stringify(payload));
-    }
-    if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.COOL){
-      this.platform.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}`);
-      this.platform.log.debug(JSON.stringify(payload));
-    }
+    this.platform.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}`);
+    this.platform.log.debug(JSON.stringify(payload));
 
     // Make the API request
     const pushChanges = (await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
