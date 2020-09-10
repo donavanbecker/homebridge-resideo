@@ -134,7 +134,7 @@ export class RoomPriority {
     const payload = {
       currentPriority: {
         priorityType: 'PickARoom',
-        selectedRooms: [this.RoomOn],
+        selectedRooms: [this.rooms.id],
       },
     };
     
