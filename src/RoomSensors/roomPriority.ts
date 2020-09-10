@@ -16,9 +16,9 @@ export class RoomPriority {
 
   RoomUpdateInProgress!: boolean;
   doRoomUpdate!: any;
-  RoomOn!: any;
+  RoomOn!: number;
   roompriority!: configTypes.Priority;
-  selectedRooms!: configTypes.selectedRooms;
+  selectedRooms!: any;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
@@ -100,22 +100,10 @@ export class RoomPriority {
    */
   parseStatus() {
     // Set Room Priority
-    this.platform.log.error(JSON.stringify(this.selectedRooms));
+    this.platform.log.warn(JSON.stringify(this.selectedRooms));
     this.platform.log.error(JSON.stringify(this.rooms.id));
     this.platform.log.warn(JSON.stringify(this.RoomOn));
-    if (this.selectedRooms === this.rooms.id) {
-      this.RoomOn === this.rooms.id;
-    }
-    /*if (this.deviceFan.mode === 'Auto') {
-        this.TargetFanState = this.platform.Characteristic.TargetFanState.AUTO;
-        this.Active = this.platform.Characteristic.Active.INACTIVE;
-      } else if (this.deviceFan.mode === 'On') {
-        this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
-        this.Active = this.platform.Characteristic.Active.ACTIVE;
-      } else if (this.deviceFan.mode === 'Circulate') {
-        this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
-        this.Active = this.platform.Characteristic.Active.INACTIVE;
-      }*/
+    this.RoomOn === this.rooms.id;
   }
 
   /**
@@ -146,7 +134,7 @@ export class RoomPriority {
     const payload = {
       currentPriority: {
         priorityType: 'PickARoom',
-        selectedRooms: [this.rooms.id],
+        selectedRooms: [this.RoomOn],
       },
     };
     
@@ -168,28 +156,24 @@ export class RoomPriority {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-    if (!this.platform.config.options.roompriority.hide) {
-      this.service.updateCharacteristic(this.platform.Characteristic.On, this.RoomOn);
-    }
+    this.service.updateCharacteristic(this.platform.Characteristic.On, this.selectedRooms);
   }
 
   /**
    * Handle requests to get the current value of the "On" characteristic
    */
   handleOnGet(callback: (arg0: null, arg1: number) => void) {
-    this.platform.log.debug('Check to See if Switch is On');
-
-    // set this to a valid value for On
-    const currentValue = this.RoomOn;
-
-    callback(null, currentValue);
+    this.platform.log.warn(`Get Room Priority of Room: ${this.rooms.id}`);
+    this.doRoomUpdate.next();
+    callback(null, this.RoomOn);
   }
 
   /**
    * Handle requests to set the "On" characteristic
    */
   handleOnSet(value: any, callback: (arg0: null) => void) {
-    this.platform.log.debug(`Set Room Priority to Room: ${value}`);
+    this.platform.log.warn(`Set Room Priority to Room: ${value}`);
+    value = this.rooms.id;
     this.RoomOn = value;
     this.doRoomUpdate.next();
     callback(null);
