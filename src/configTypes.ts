@@ -2,12 +2,12 @@
 export type location = {
   locationID: number;
   name: string;
-  devices: T9Thermostat | T5Device | LeakDevice;
+  devices: T9Thermostat | T5Device | LeakDevice | TCCDevice | RoundDevice;
 }
 
 // T9 Thermostat
 export type T9Thermostat = {
-  groups: Array<groups>;
+  groups: Array<T9groups>;
   inBuiltSensorState: inBuiltSensorState;
   settings: Settings;
   deviceClass: string;
@@ -19,7 +19,7 @@ export type T9Thermostat = {
   priorityType: string;
   units: string;
   indoorTemperature: number;
-  allowedModes: Array<string>;
+  allowedModes: string;
   minHeatSetpoint: number;
   maxHeatSetpoint: number;
   minCoolSetpoint: number;
@@ -29,10 +29,8 @@ export type T9Thermostat = {
   deviceModel: string;
 }
 
-export type groups = {
+export type T9groups = {
   id: number;
-  name: string;
-  rooms: Array<number>
 }
 
 export type inBuiltSensorState = {
@@ -71,7 +69,7 @@ export type T5Device = {
   units: string;
   indoorTemperature: number;
   outdoorTemperature: number;
-  allowedModes: string[];
+  allowedModes: string;
   deadband: number;
   hasDualSetpointStatus: boolean;
   minHeatSetpoint: number;
@@ -100,20 +98,17 @@ export type TCCDevice = {
   deviceType: string;
   deviceID: string;
   userDefinedDeviceName: string;
-  backend: TCCBackend;
   name: string;
-  schedule: Schedule;
   isAlive: boolean;
   isUpgrading: boolean;
   isProvisioned: boolean;
   macID: string;
-  deviceSettings: TCCDeviceSettings;
   parentDeviceId: number;
   service: Service;
   units: string;
   indoorTemperature: number;
   outdoorTemperature: number;
-  allowedModes: string[];
+  allowedModes: string;
   hasDualSetpointStatus: boolean;
   minHeatSetpoint: number;
   maxHeatSetpoint: number;
@@ -142,23 +137,6 @@ export type Service = {
   mode: string;
 }
 
-export type ChangeableValues = {
-  mode: string;
-}
-
-export type TCCBackend = {
-  id: string;
-}
-
-export type Schedule = {
-  scheduleType: string;
-  scheduleSubType: string;
-}
-
-export type TCCDeviceSettings = {
-  deviceClass: string;
-}
-
 // Round Thermostat
 export type RoundDevice = {
   thermostatVersion: string;
@@ -175,7 +153,7 @@ export type RoundDevice = {
   units: string;
   indoorTemperature: number;
   outdoorTemperature: number;
-  allowedModes: string[];
+  allowedModes: string;
   hasDualSetpointStatus: boolean;
   minHeatSetpoint: number;
   maxHeatSetpoint: number;
@@ -301,23 +279,8 @@ export type Temp = {
 }
 
 // T9 Room Sensors
-export type roomsensor = {
-  deviceId: string;
-  groupId: number;
-  rooms: rooms[];
-}
-
-export type rooms = {
-  id: number;
-  name: string;
-  type: string;
-  avgTemperature: number;
-  avgHumidity: number;
-  accessories: sensoraccessory[];
-}
-
 export type sensoraccessory = {
-  accessoryId: 0;
+  accessoryId: number;
   accessoryAttribute: accessoryAttribute;
   accessoryValue: accessoryValue;
 }
@@ -359,17 +322,17 @@ export type Priority = {
 export type CurrentPriority = {
   priorityType: string;
   selectedRooms: selectedRooms;
-  rooms: Rooms[];
+  rooms: PriorityRooms[];
 }
 
 export type selectedRooms = {
 }
 
-export type Rooms = {
-  rooms: Room;
+export type PriorityRooms = {
+  rooms: PriorityRoom;
 }
 
-export type Room = {
+export type PriorityRoom = {
   id: number;
   roomName: string;
   roomAvgTemp: number;

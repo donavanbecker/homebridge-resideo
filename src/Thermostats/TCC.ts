@@ -5,7 +5,7 @@ import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
 import { DeviceURL } from '../settings';
-//import { } from '../configTypes';
+import * as configTypes from '../configTypes';
 
 /**
  * Platform Accessory
@@ -14,34 +14,33 @@ import { DeviceURL } from '../settings';
  */
 export class TCC {
   private service: Service;
+  fanService: any;
 
   private modes: { Off: number; Heat: number; Cool: number; Auto: number; };
 
-  CurrentTemperature: any;
-  TargetTemperature: any;
-  CurrentHeatingCoolingState: any;
-  TargetHeatingCoolingState: any;
-  CoolingThresholdTemperature: any;
-  HeatingThresholdTemperature!: any;
-  CurrentRelativeHumidity!: any;
-  TemperatureDisplayUnits!: any;
-  Active!: any;
-  TargetFanState!: any;
-  fanMode: any;
-  thermostatUpdateInProgress!: boolean;
-
-  fanUpdateInProgress!: boolean;
-  doThermostatUpdate!: any;
-  doFanUpdate!: any;
+  CurrentTemperature!: number;
+  TargetTemperature!: number;
+  CurrentHeatingCoolingState!: number;
+  TargetHeatingCoolingState!: number;
+  CoolingThresholdTemperature!: number;
+  HeatingThresholdTemperature!: number;
+  CurrentRelativeHumidity!: number;
+  TemperatureDisplayUnits!: number;
+  honeywellMode!: Array<string>;
+  Active!: number;
+  TargetFanState!: number;
   deviceFan!: any;
-  fanService: any;
-  honeywellMode: any;
+
+  thermostatUpdateInProgress!: boolean;
+  doThermostatUpdate!: any;
+  fanUpdateInProgress!: boolean;
+  doFanUpdate!: any;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId,
-    public device,
+    public readonly locationId: configTypes.location['locationID'],
+    public device: configTypes.TCCDevice,
   ) {
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
@@ -66,7 +65,6 @@ export class TCC {
     this.TemperatureDisplayUnits;
     this.Active;
     this.TargetFanState;
-    this.fanMode;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doThermostatUpdate = new Subject();
@@ -79,7 +77,7 @@ export class TCC {
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(this.platform.Characteristic.Model, this.device.deviceModel)
       .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID)
-      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
+      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.device.thermostatVersion);
 
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
@@ -122,7 +120,12 @@ export class TCC {
 
     // Set control bindings
     this.service.getCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState)
+      .setProps({
+        validValues: this.modes[this.device.allowedModes],
+      })  
       .on('set', this.setTargetHeatingCoolingState.bind(this));
+
+    this.service.setCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, this.CurrentHeatingCoolingState);
 
     this.service.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature)
       .on('set', this.setHeatingThresholdTemperature.bind(this));
@@ -259,29 +262,23 @@ export class TCC {
    */
   async refreshStatus() {
     try {
-      const device = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
+      this.device = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
         params: {
           locationId: this.locationId,
         },
       })).data;
-      this.device = device;
       this.platform.log.debug(`Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`);
-      this.platform.log.debug(JSON.stringify(this.device.changeableValues.mode));
+      this.platform.log.debug(JSON.stringify(this.device));
       if (this.device.settings) {
         if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
-          const deviceFan = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
+          this.deviceFan = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
             params: {
               locationId: this.locationId,
             },
           })).data;
-          this.deviceFan = deviceFan;
-          if (this.device.settings.fan){
-            if (this.device.settings.fan.allowedModes) {
-              this.platform.log.debug(this.device.settings.fan.allowedModes);
-            }
-          }
-          this.platform.log.debug(deviceFan);
-          this.platform.log.debug(`Fetched update for ${this.device.name} from Honeywell Fan API: ${JSON.stringify(this.deviceFan)}`);
+          this.platform.log.debug(JSON.stringify(this.device.settings.fan));
+          this.platform.log.debug(JSON.stringify(this.deviceFan));
+          this.platform.log.debug(`Fetched update for ${this.device.name} Fan from Honeywell Fan API: ${JSON.stringify(this.deviceFan)}`);
         }
       }
       this.parseStatus();
@@ -297,8 +294,8 @@ export class TCC {
   async pushChanges() {
     const payload = {
       mode: this.honeywellMode[this.TargetHeatingCoolingState],
-      thermostatSetpointStatus: 'NoHold',
-      autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
+      thermostatSetpointStatus: 'PermanentHold',
+      nextPeriodTime: '18:00:00',
     } as any;
 
     // Set the heat and cool set point value based on the selected mode
@@ -454,11 +451,12 @@ export class TCC {
         this.platform.log.debug(JSON.stringify(payload));
 
         // Make the API request
-        await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, payload, {
+        const pushFanChanges = (await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, payload, {
           params: {
             locationId: this.locationId,
           },
-        });
+        })).data;
+        pushFanChanges;
       }
     }
     // Refresh the status from the API
@@ -468,14 +466,14 @@ export class TCC {
   /**
    * Updates the status for each of the HomeKit Characteristics
    */
-  setActive(value: any, callback: (arg0: null) => void) {
+  setActive(value, callback) {
     this.platform.log.debug(`Set Active State: ${value}`);
     this.Active = value;
     this.doFanUpdate.next();
     callback(null);
   }
 
-  setTargetFanState(value: any, callback: (arg0: null) => void) {
+  setTargetFanState(value: number, callback: (arg0: null) => void) {
     this.platform.log.debug(`Set Target Fan State: ${value}`);
     this.TargetFanState = value;
     this.doFanUpdate.next();

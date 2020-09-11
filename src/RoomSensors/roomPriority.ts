@@ -25,9 +25,9 @@ export class RoomPriority {
     private accessory: PlatformAccessory,
     public readonly locationId: configTypes.location['locationID'],
     public device: configTypes.T9Thermostat,
-    public rooms: configTypes.Room,
+    public rooms: configTypes.PriorityRoom,
     public currentPriority: configTypes.CurrentPriority, 
-    public priorityrooms: configTypes.Room['accessories'],
+    public priorityrooms: configTypes.Priority,
   ) {
     
     // default placeholders
@@ -114,15 +114,12 @@ export class RoomPriority {
    */
   async refreshStatus() {
     try {
-      const roompriority = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
+      this.roompriority = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
         params: {
           locationId: this.locationId,
         },
       })).data;
-      this.platform.log.debug(JSON.stringify(roompriority));
-      for (const selectedRooms of roompriority.currentPriority.selectedRooms) {
-        this.selectedRooms = selectedRooms;
-      }
+      this.platform.log.debug(JSON.stringify(this.roompriority));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
