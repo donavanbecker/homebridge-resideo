@@ -122,7 +122,7 @@ export class TCC {
     this.service.getCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState)
       .setProps({
         validValues: this.modes[this.device.allowedModes],
-      })  
+      })
       .on('set', this.setTargetHeatingCoolingState.bind(this));
 
     this.service.setCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, this.CurrentHeatingCoolingState);
@@ -140,11 +140,12 @@ export class TCC {
       .on('set', this.setTemperatureDisplayUnits.bind(this));
 
     // Fan Controls
-    this.fanService = accessory.getService(this.platform.Service.Fanv2);
+
     if (this.device.settings) {
-      if (this.device.settings.fan && !this.fanService && !this.platform.config.options.thermostat.hide_fan) {
-        this.fanService = accessory.addService(this.platform.Service.Fanv2, `${this.device.name} ${this.device.deviceClass} Fan`);
-      
+      if (this.device.settings.fan && !this.platform.config.options.thermostat.hide_fan) {
+        this.platform.log.debug('Available FAN settings', this.device.settings.fan);
+        this.fanService = accessory.getService(this.platform.Service.Fanv2) || accessory.addService(this.platform.Service.Fanv2, `${this.device.name} ${this.device.deviceClass} Fan`);
+
         this.fanService
           .getCharacteristic(this.platform.Characteristic.Active)
           .on('set', this.setActive.bind(this));
@@ -312,7 +313,7 @@ export class TCC {
       payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
       payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
     }
- 
+
     this.platform.log.info(`Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}`);
     this.platform.log.debug(JSON.stringify(payload));
 
@@ -421,7 +422,7 @@ export class TCC {
   }
 
   /**
-   * Pushes the requested changes for Fan to the Honeywell API 
+   * Pushes the requested changes for Fan to the Honeywell API
    */
   async pushFanChanges() {
     let payload = {
