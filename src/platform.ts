@@ -536,13 +536,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               );
             }
           } else {
-<<<<<<< Updated upstream
             this.log.info(
               'Your Device isn\'t supported, Please open Feature Request Here: https://git.io/JUWN2',
             );
-=======
-            this.log.info('Your Device isn\'t supported, Please open Feature Request Here: https://git.io/JUWN2');
->>>>>>> Stashed changes
           }
         }
       }

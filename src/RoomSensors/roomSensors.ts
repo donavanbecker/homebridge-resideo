@@ -152,14 +152,10 @@ export class RoomSensors {
       this.humidityService
         .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
         .on('get', this.handleCurrentRelativeHumidityGet.bind(this));
-<<<<<<< Updated upstream
     } else if (
       this.humidityService &&
       this.platform.config.options.roomsensor.hide_humidity
     ) {
-=======
-    } else if (this.humidityService && this.platform.config.options.roomsensor.hide_humidity) {
->>>>>>> Stashed changes
       accessory.removeService(this.humidityService);
     }
 
@@ -187,17 +183,11 @@ export class RoomSensors {
     this.refreshStatus();
 
     // Start an update interval
-<<<<<<< Updated upstream
     interval(this.platform.config.options.ttl * 100)
       .pipe(skipWhile(() => this.SensorUpdateInProgress))
       .subscribe(() => {
         this.refreshStatus();
       });
-=======
-    interval(this.platform.config.options.ttl * 100).pipe(skipWhile(() => this.SensorUpdateInProgress)).subscribe(() => {
-      this.refreshStatus();
-    });
->>>>>>> Stashed changes
 
     // Watch for thermostat change events
     // We put in a debounce of 100ms so we don't make duplicate calls
@@ -318,7 +308,6 @@ export class RoomSensors {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-<<<<<<< Updated upstream
     this.service.updateCharacteristic(
       this.platform.Characteristic.StatusLowBattery,
       this.StatusLowBattery,
@@ -346,20 +335,6 @@ export class RoomSensors {
         this.platform.Characteristic.MotionDetected,
         this.MotionDetected,
       );
-=======
-    this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
-    if (!this.platform.config.options.roomsensor.hide_temperature) {
-      this.temperatureService.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
-    }
-    if (!this.platform.config.options.roomsensor.hide_occupancy) {
-      this.occupancyService.updateCharacteristic(this.platform.Characteristic.OccupancyDetected, this.OccupancyDetected);
-    }
-    if (!this.platform.config.options.roomsensor.hide_humidity) {
-      this.humidityService.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
-    }
-    if (!this.platform.config.options.roomsensor.hide_motion) {
-      this.motionService.updateCharacteristic(this.platform.Characteristic.MotionDetected, this.MotionDetected);
->>>>>>> Stashed changes
     }
   }
 
@@ -377,13 +352,9 @@ export class RoomSensors {
   }
 
   handleCurrentTemperatureGet(callback: (arg0: null, arg1: any) => void) {
-<<<<<<< Updated upstream
     this.platform.log.debug(
       `Update Current Temperature: ${this.CurrentTemperature}`,
     );
-=======
-    this.platform.log.debug(`Update Current Temperature: ${this.CurrentTemperature}`);
->>>>>>> Stashed changes
 
     // set this to a valid value for CurrentTemperature
     const currentValue = this.CurrentTemperature;
@@ -409,13 +380,9 @@ export class RoomSensors {
    * Handle requests to get the current value of the "Humidity Sensor" characteristics
    */
   handleCurrentRelativeHumidityGet(callback: (arg0: null, arg1: any) => void) {
-<<<<<<< Updated upstream
     this.platform.log.debug(
       `Update Current Relative Humidity: ${this.CurrentRelativeHumidity}`,
     );
-=======
-    this.platform.log.debug(`Update Current Relative Humidity: ${this.CurrentRelativeHumidity}`);
->>>>>>> Stashed changes
 
     // set this to a valid value for CurrentRelativeHumidity
     const currentValue = this.CurrentRelativeHumidity;

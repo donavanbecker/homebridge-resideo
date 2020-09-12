@@ -174,7 +174,9 @@ export type RoundChangeableValues = {
   heatCoolMode: string;
 };
 
-export type RoundDeviceSettings = {};
+export type RoundDeviceSettings = {
+
+};
 
 export type RoundSettings = {
   homeSetPoints: HomeSetPoints;
@@ -255,18 +257,26 @@ export type Humidity = {
   low: Low2;
 };
 
-export type High2 = {};
+export type High2 = {
 
-export type Low2 = {};
+};
+
+export type Low2 = {
+
+};
 
 export type CurrentSensorReadings = {
   temperature: number;
   humidity: number;
 };
 
-export type High = {};
+export type High = {
 
-export type Low = {};
+};
+
+export type Low = {
+
+};
 
 export type Temp = {
   high: High;
@@ -320,7 +330,9 @@ export type CurrentPriority = {
   rooms: PriorityRooms[];
 };
 
-export type selectedRooms = {};
+export type selectedRooms = {
+  
+};
 
 export type PriorityRooms = {
   rooms: PriorityRoom;

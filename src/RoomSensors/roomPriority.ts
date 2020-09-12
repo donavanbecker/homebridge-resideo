@@ -25,14 +25,8 @@ export class RoomPriority {
     private accessory: PlatformAccessory,
     public readonly locationId: configTypes.location['locationID'],
     public device: configTypes.T9Thermostat,
-<<<<<<< Updated upstream
     public sensoraccessory: configTypes.sensoraccessory,
     public readonly group: configTypes.T9groups,
-=======
-    public rooms,
-    public currentPriority, 
-    public priorityrooms,
->>>>>>> Stashed changes
   ) {
     // default placeholders
     this.selectedRooms;
@@ -231,7 +225,9 @@ export class RoomPriority {
    * Handle requests to get the current value of the "On" characteristic
    */
   handleOnGet(callback: (arg0: null, arg1: number) => void) {
-    this.platform.log.debug(`Get Room Priority of Room: ${this.sensoraccessory.accessoryId}`);
+    this.platform.log.debug(
+      `Get Room Priority of Room: ${this.sensoraccessory.accessoryId}`,
+    );
     this.doRoomUpdate.next();
     callback(null, this.selectedRooms);
   }

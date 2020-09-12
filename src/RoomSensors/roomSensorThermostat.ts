@@ -174,19 +174,12 @@ export class RoomSensorThermostat {
     this.refreshSensorStatus();
 
     // Start an update interval
-<<<<<<< Updated upstream
     interval(this.platform.config.options.ttl * 1000)
       .pipe(skipWhile(() => this.thermostatUpdateInProgress))
       .subscribe(() => {
         this.refreshStatus();
-        this.refreshSensorStatus;
+        this.refreshSensorStatus();
       });
-=======
-    interval(this.platform.config.options.ttl * 1000).pipe(skipWhile(() => this.thermostatUpdateInProgress)).subscribe(() => {
-      this.refreshStatus(); 
-      this.refreshSensorStatus;
-    });
->>>>>>> Stashed changes
 
     // Watch for thermostat change events
     // We put in a debounce of 100ms so we don't make duplicate calls
