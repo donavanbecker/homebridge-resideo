@@ -13,42 +13,58 @@ import * as configTypes from '../configTypes';
  */
 export class RoomPriority {
   private service: Service;
+  switchservice: any;
 
   RoomUpdateInProgress!: boolean;
   doRoomUpdate!: any;
-  RoomOn!: number;
-  roompriority!: configTypes.Priority;
   selectedRooms!: any;
+  SwitchOn: any;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
     public readonly locationId: configTypes.location['locationID'],
     public device: configTypes.T9Thermostat,
-    public rooms: configTypes.PriorityRoom,
-    public currentPriority: configTypes.CurrentPriority, 
-    public priorityrooms: configTypes.Priority,
+<<<<<<< Updated upstream
+    public sensoraccessory: configTypes.sensoraccessory,
+    public readonly group: configTypes.T9groups,
+=======
+    public rooms,
+    public currentPriority, 
+    public priorityrooms,
+>>>>>>> Stashed changes
   ) {
-    
     // default placeholders
-    this.RoomOn;
     this.selectedRooms;
+    this.SwitchOn;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doRoomUpdate = new Subject();
     this.RoomUpdateInProgress = false;
 
     // set accessory information
-    this.accessory.getService(this.platform.Service.AccessoryInformation)!
+    this.accessory
+      .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
-      .setCharacteristic(this.platform.Characteristic.Model, 'Room Priority')
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID)
-      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, this.rooms.id);
+      .setCharacteristic(
+        this.platform.Characteristic.Model,
+        this.sensoraccessory.accessoryAttribute.model,
+      )
+      .setCharacteristic(
+        this.platform.Characteristic.SerialNumber,
+        this.sensoraccessory.accessoryAttribute.serialNumber,
+      )
+      .setCharacteristic(
+        this.platform.Characteristic.FirmwareRevision,
+        this.sensoraccessory.accessoryAttribute.softwareRevision,
+      );
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
-    this.service = this.accessory.getService(this.platform.Service.Switch) ||
-      this.accessory.addService(this.platform.Service.Switch), `${this.rooms.roomName} Priority`;
+    (this.service =
+      this.accessory.getService(this.platform.Service.Switch) ||
+      this.accessory.addService(this.platform.Service.Switch)),
+    `${this.sensoraccessory.accessoryAttribute.name} Priority`;
 
     this.refreshStatus();
 
@@ -58,8 +74,10 @@ export class RoomPriority {
 
     // set the service name, this is what is displayed as the default name on the Home app
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
-    this.service.setCharacteristic(this.platform.Characteristic.Name,
-      `${this.rooms.roomName} Priority`);
+    this.service.setCharacteristic(
+      this.platform.Characteristic.Name,
+      `${this.sensoraccessory.accessoryAttribute.name} Priority`,
+    );
 
     // each service must implement at-minimum the "required characteristics" for the given service type
     // see https://developers.homebridge.io/#/service/
@@ -68,7 +86,8 @@ export class RoomPriority {
     this.parseStatus();
 
     // create handlers for required characteristics
-    this.service.getCharacteristic(this.platform.Characteristic.On)
+    this.service
+      .getCharacteristic(this.platform.Characteristic.On)
       .on('get', this.handleOnGet.bind(this))
       .on('set', this.handleOnSet.bind(this));
 
@@ -76,23 +95,29 @@ export class RoomPriority {
     this.refreshStatus();
 
     // Start an update interval
-    interval(this.platform.config.options.ttl * 1000).pipe(skipWhile(() => this.RoomUpdateInProgress)).subscribe(() => {
-      this.refreshStatus();
-    });
+    interval(this.platform.config.options.ttl * 1000)
+      .pipe(skipWhile(() => this.RoomUpdateInProgress))
+      .subscribe(() => {
+        this.refreshStatus();
+      });
 
     // Watch for thermostat change events
     // We put in a debounce of 100ms so we don't make duplicate calls
-    this.doRoomUpdate.pipe(tap(() => {
-      this.RoomUpdateInProgress = true;
-    }), debounceTime(100)).subscribe(async () => {
-      try {
-        await this.pushChanges();
-      } catch (e) {
-        this.platform.log.error(e.message);
-      }
-      this.RoomUpdateInProgress = false;
-    });
-
+    this.doRoomUpdate
+      .pipe(
+        tap(() => {
+          this.RoomUpdateInProgress = true;
+        }),
+        debounceTime(100),
+      )
+      .subscribe(async () => {
+        try {
+          await this.pushChanges();
+        } catch (e) {
+          this.platform.log.error(e.message);
+        }
+        this.RoomUpdateInProgress = false;
+      });
   }
 
   /**
@@ -101,11 +126,9 @@ export class RoomPriority {
   parseStatus() {
     // Set Room Priority
     this.platform.log.debug(JSON.stringify(this.selectedRooms));
-    this.platform.log.debug(JSON.stringify(this.rooms.id));
-    if (this.selectedRooms === this.rooms.id) {
-      this.rooms.id === this.RoomOn;
-    } else {
-      this.rooms.id !== this.RoomOn;
+    this.platform.log.debug(JSON.stringify(this.sensoraccessory.accessoryId));
+    if (this.sensoraccessory.accessoryId === this.selectedRooms) {
+      this.SwitchOn === this.platform.Characteristic.On;
     }
   }
 
@@ -114,41 +137,82 @@ export class RoomPriority {
    */
   async refreshStatus() {
     try {
-      this.roompriority = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
-        params: {
-          locationId: this.locationId,
-        },
-      })).data;
-      this.platform.log.debug(JSON.stringify(this.roompriority));
+      if (this.device.deviceID.startsWith('LCC')) {
+        if (this.device.deviceModel.startsWith('T9')) {
+          if (this.device.groups) {
+            const groups = this.device.groups;
+            for (const group of groups) {
+              const roomsensors = await this.platform.Sensors(
+                this.device,
+                group,
+                this.locationId,
+              );
+              if (roomsensors.rooms) {
+                const rooms = roomsensors.rooms;
+                this.platform.log.debug(JSON.stringify(roomsensors));
+                for (const accessories of rooms) {
+                  if (accessories) {
+                    this.platform.log.debug(JSON.stringify(accessories));
+                    for (const accessory of accessories.accessories) {
+                      this.sensoraccessory = accessory;
+                      this.platform.log.debug(
+                        JSON.stringify(this.sensoraccessory),
+                      );
+                      this.platform.log.debug(
+                        JSON.stringify(this.sensoraccessory),
+                      );
+                      this.platform.log.debug(
+                        JSON.stringify(
+                          this.sensoraccessory.accessoryAttribute
+                            .softwareRevision,
+                        ),
+                      );
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
-      this.platform.log.error(`Failed to update status of ${this.device.name}`, e.message);
+      this.platform.log.error(
+        `Failed to update status of ${this.device.name}`,
+        e.message,
+      );
     }
   }
 
   /**
- * Pushes the requested changes to the Honeywell API
- */
+   * Pushes the requested changes to the Honeywell API
+   */
   async pushChanges() {
     const payload = {
       currentPriority: {
         priorityType: 'PickARoom',
-        selectedRooms: [this.rooms.id],
+        selectedRooms: [this.sensoraccessory.accessoryId],
       },
     };
-    
-    this.platform.log.info(`Sending request to Honeywell API. Room Priority: ${payload.currentPriority.selectedRooms}`);
+    this.platform.log.info(
+      `Sending request to Honeywell API. Room Priority: ${this.sensoraccessory.accessoryAttribute.name}`,
+    );
     this.platform.log.debug(JSON.stringify(payload));
-    if (this.rooms.id !== this.RoomOn) {
+
     // Make the API request
-      const pushRoomChanges = (await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
-        params: {
-          locationId: this.locationId,
+    const pushRoomChanges = (
+      await this.platform.axios.put(
+        `${DeviceURL}/thermostats/${this.device.deviceID}/priority`,
+        payload,
+        {
+          params: {
+            locationId: this.locationId,
+          },
         },
-      })).data;
-      pushRoomChanges;
-    }
+      )
+    ).data;
+    pushRoomChanges;
     // Refresh the status from the API}
     await this.refreshStatus();
   }
@@ -157,27 +221,28 @@ export class RoomPriority {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-    this.service.updateCharacteristic(this.platform.Characteristic.On, this.selectedRooms);
+    this.service.updateCharacteristic(
+      this.platform.Characteristic.On,
+      this.SwitchOn,
+    );
   }
 
   /**
    * Handle requests to get the current value of the "On" characteristic
    */
   handleOnGet(callback: (arg0: null, arg1: number) => void) {
-    this.platform.log.warn(`Get Room Priority of Room: ${this.rooms.id}`);
+    this.platform.log.debug(`Get Room Priority of Room: ${this.sensoraccessory.accessoryId}`);
     this.doRoomUpdate.next();
-    callback(null, this.RoomOn);
+    callback(null, this.selectedRooms);
   }
 
   /**
    * Handle requests to set the "On" characteristic
    */
   handleOnSet(value: any, callback: (arg0: null) => void) {
-    this.platform.log.warn(`Set Room Priority to Room: ${value}`);
-    value = this.rooms.id;
-    this.RoomOn = value;
+    this.platform.log.debug(`Set Room Priority to Room: ${value}`);
+    this.selectedRooms = value;
     this.doRoomUpdate.next();
     callback(null);
   }
-
 }

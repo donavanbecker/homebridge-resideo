@@ -8,4 +8,4 @@ import { HoneywellHomePlatform } from './platform';
  */
 export = (api: API) => {
   api.registerPlatform(PLATFORM_NAME, HoneywellHomePlatform);
-}
+};

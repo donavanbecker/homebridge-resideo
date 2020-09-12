@@ -3,7 +3,7 @@ export type location = {
   locationID: number;
   name: string;
   devices: T9Thermostat | T5Device | LeakDevice | TCCDevice | RoundDevice;
-}
+};
 
 // T9 Thermostat
 export type T9Thermostat = {
@@ -27,20 +27,20 @@ export type T9Thermostat = {
   changeableValues: T9changeableValues;
   indoorHumidity: number;
   deviceModel: string;
-}
+};
 
 export type T9groups = {
   id: number;
-}
+};
 
 export type inBuiltSensorState = {
   roomId: number;
   roomName: string;
-}
+};
 
 export type T9changeableValues = {
   mode: string;
-  autoChangeoverActive: boolean,
+  autoChangeoverActive: boolean;
   heatSetpoint: number;
   coolSetpoint: number;
   thermostatSetpointStatus: string;
@@ -48,7 +48,7 @@ export type T9changeableValues = {
   endHeatSetpoint: number;
   endCoolSetpoint: number;
   heatCoolMode: string;
-}
+};
 
 // T5 Thermostat
 export type T5Device = {
@@ -78,7 +78,7 @@ export type T5Device = {
   maxCoolSetpoint: number;
   changeableValues: T5ChangeableValues;
   deviceModel: string;
-}
+};
 
 export type T5ChangeableValues = {
   mode: string;
@@ -87,7 +87,7 @@ export type T5ChangeableValues = {
   coolSetpoint: number;
   thermostatSetpointStatus: string;
   heatCoolMode: string;
-}
+};
 
 // TCC (Unknown) Thermostat
 export type TCCDevice = {
@@ -118,11 +118,11 @@ export type TCCDevice = {
   operationStatus: OperationStatus;
   indoorHumidity: number;
   deviceModel: string;
-}
+};
 
 export type OperationStatus = {
   mode: string;
-}
+};
 
 export type TCC_ChangeableValues = {
   mode: string;
@@ -131,11 +131,11 @@ export type TCC_ChangeableValues = {
   thermostatSetpointStatus: string;
   nextPeriodTime: string;
   heatCoolMode: string;
-}
+};
 
 export type Service = {
   mode: string;
-}
+};
 
 // Round Thermostat
 export type RoundDevice = {
@@ -163,7 +163,7 @@ export type RoundDevice = {
   operationStatus: OperationStatus;
   indoorHumidity: number;
   deviceModel: string;
-}
+};
 
 export type RoundChangeableValues = {
   mode: string;
@@ -172,10 +172,9 @@ export type RoundChangeableValues = {
   heatSetpoint: number;
   coolSetpoint: number;
   heatCoolMode: string;
-}
+};
 
-export type RoundDeviceSettings = {
-}
+export type RoundDeviceSettings = {};
 
 export type RoundSettings = {
   homeSetPoints: HomeSetPoints;
@@ -183,7 +182,7 @@ export type RoundSettings = {
   fan: Fan;
   temperatureMode: TemperatureMode;
   specialMode: SpecialMode;
-}
+};
 
 export type AwaySetPoints = {
   awayHeatSP: number;
@@ -192,98 +191,94 @@ export type AwaySetPoints = {
   smartHeatSP: number;
   useAutoSmart: boolean;
   units: string;
-}
+};
 
 export type HomeSetPoints = {
   homeHeatSP: number;
   homeCoolSP: number;
   units: string;
-}
+};
 
 export type TemperatureMode = {
   feelsLike: boolean;
   air: boolean;
-}
+};
 
 export type SpecialMode = {
   autoChangeoverActive: boolean;
   emergencyHeatActive: boolean;
-}
+};
 
 // Fan Settings
 export type Settings = {
   fan: Fan;
-}
+};
 
 export type Fan = {
   allowedModes: string;
   changeableValues: FanChangeableValues;
   fanRunning: boolean;
-}
+};
 
 export type FanChangeableValues = {
   mode: string;
-}
+};
 
 // Leak Sensor
 export type LeakDevice = {
-    waterPresent: boolean;
-    currentSensorReadings: CurrentSensorReadings;
-    batteryRemaining: number;
-    isRegistered: boolean;
-    hasDeviceCheckedIn: boolean;
-    isDeviceOffline: boolean;
-    deviceClass: string;
-    deviceType: string;
-    deviceID: string;
-    userDefinedDeviceName: string;
-    isAlive: boolean;
-    deviceSettings: DeviceSettings;
-    service: Service;
-}
+  waterPresent: boolean;
+  currentSensorReadings: CurrentSensorReadings;
+  batteryRemaining: number;
+  isRegistered: boolean;
+  hasDeviceCheckedIn: boolean;
+  isDeviceOffline: boolean;
+  deviceClass: string;
+  deviceType: string;
+  deviceID: string;
+  userDefinedDeviceName: string;
+  isAlive: boolean;
+  deviceSettings: DeviceSettings;
+  service: Service;
+};
 
 export type DeviceSettings = {
-    temp: Temp;
-    humidity: Humidity;
-    userDefinedName: string;
-    buzzerMuted: boolean;
-    checkinPeriod: number;
-    currentSensorReadPeriod: number;
-}
+  temp: Temp;
+  humidity: Humidity;
+  userDefinedName: string;
+  buzzerMuted: boolean;
+  checkinPeriod: number;
+  currentSensorReadPeriod: number;
+};
 
 export type Humidity = {
-    high: High2;
-    low: Low2;
-}
+  high: High2;
+  low: Low2;
+};
 
-export type High2 = {
-}
+export type High2 = {};
 
-export type Low2 = {
-}
+export type Low2 = {};
 
 export type CurrentSensorReadings = {
-    temperature: number;
-    humidity: number;
-}
+  temperature: number;
+  humidity: number;
+};
 
-export type High = {
-}
+export type High = {};
 
-export type Low = {
-}
+export type Low = {};
 
 export type Temp = {
-    high: High;
-    low: Low;
-}
+  high: High;
+  low: Low;
+};
 
 // T9 Room Sensors
 export type sensoraccessory = {
   accessoryId: number;
   accessoryAttribute: accessoryAttribute;
   accessoryValue: accessoryValue;
-}
+};
 
 export type accessoryAttribute = {
   type: string;
@@ -293,7 +288,7 @@ export type accessoryAttribute = {
   serialNumber: string;
   softwareRevision: string;
   hardwareRevision: string;
-}
+};
 
 export type accessoryValue = {
   coolSetpoint: number;
@@ -310,27 +305,26 @@ export type accessoryValue = {
   batteryStatus: string;
   rssiAverage: number;
   occupancySensitivity: string;
-}
+};
 
 // T9 Room Priority
 export type Priority = {
   deviceId: string;
   status: string;
   currentPriority: CurrentPriority;
-}
+};
 
 export type CurrentPriority = {
   priorityType: string;
   selectedRooms: selectedRooms;
   rooms: PriorityRooms[];
-}
+};
 
-export type selectedRooms = {
-}
+export type selectedRooms = {};
 
 export type PriorityRooms = {
   rooms: PriorityRoom;
-}
+};
 
 export type PriorityRoom = {
   id: number;
@@ -339,7 +333,7 @@ export type PriorityRoom = {
   roomAvgHumidity: number;
   overallMotion: boolean;
   accessories: Accessory[];
-}
+};
 
 export type Accessory = {
   id: number;
@@ -349,6 +343,4 @@ export type Accessory = {
   temperature: number;
   status: string;
   detectMotion: boolean;
-}
-
-
+};

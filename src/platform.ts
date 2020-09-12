@@ -1,11 +1,26 @@
 /* eslint-disable max-len */
-import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
+import {
+  API,
+  DynamicPlatformPlugin,
+  Logger,
+  PlatformAccessory,
+  PlatformConfig,
+  Service,
+  Characteristic,
+} from 'homebridge';
 import { interval } from 'rxjs';
 import axios, { AxiosInstance } from 'axios';
 import * as qs from 'querystring';
 import { readFileSync, writeFileSync } from 'fs';
 
-import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl } from './settings';
+import {
+  PLATFORM_NAME,
+  PLUGIN_NAME,
+  AuthURL,
+  LocationURL,
+  DeviceURL,
+  UIurl,
+} from './settings';
 import { T9 } from './Thermostats/T9';
 import { T5 } from './Thermostats/T5';
 import { Round } from './Thermostats/Round';
@@ -23,7 +38,8 @@ import * as configTypes from './configTypes';
  */
 export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service = this.api.hap.Service;
-  public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
+  public readonly Characteristic: typeof Characteristic = this.api.hap
+    .Characteristic;
 
   // this is used to track restored cached accessories
   public readonly accessories: PlatformAccessory[] = [];
@@ -58,7 +74,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
     // setup axios interceptor to add headers / api key to each request
     this.axios.interceptors.request.use((request) => {
-      request.headers.Authorization = 'Bearer ' + this.config.credentials.accessToken;
+      request.headers.Authorization =
+        'Bearer ' + this.config.credentials.accessToken;
       request.params = request.params || {};
       request.params.apikey = this.config.credentials.consumerKey;
       request.headers['Content-Type'] = 'application/json';
@@ -111,16 +128,28 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     if (!this.config.options || typeof this.config.options !== 'object') {
       this.config.options = {};
     }
-    if (!this.config.options.thermostat || typeof this.config.options.thermostat !== 'object') {
+    if (
+      !this.config.options.thermostat ||
+      typeof this.config.options.thermostat !== 'object'
+    ) {
       this.config.options.thermostat = {};
     }
-    if (!this.config.options.leaksensor || typeof this.config.options.leaksensor !== 'object') {
+    if (
+      !this.config.options.leaksensor ||
+      typeof this.config.options.leaksensor !== 'object'
+    ) {
       this.config.options.leaksensor = {};
     }
-    if (!this.config.options.roomsensor || typeof this.config.options.roomsensor !== 'object') {
+    if (
+      !this.config.options.roomsensor ||
+      typeof this.config.options.roomsensor !== 'object'
+    ) {
       this.config.options.roomsensor = {};
     }
-    if (!this.config.options.roompriority || typeof this.config.options.roompriority !== 'object') {
+    if (
+      !this.config.options.roompriority ||
+      typeof this.config.options.roompriority !== 'object'
+    ) {
       this.config.options.roompriority = {};
     }
 
@@ -150,30 +179,51 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
      * Room Priority Errors
      * This will only error if multiple optioins have been set to true
      */
-    if (!this.config.options.roompriority.thermostat && !this.config.options.roompriority.switch && !this.config.options.roompriority.roomsensor) {
+    if (
+      !this.config.options.roompriority.thermostat &&
+      !this.config.options.roompriority.switch &&
+      !this.config.options.roompriority.roomsensor
+    ) {
       this.config.options.roompriority.roomsensor = true;
     }
-    if (this.config.options.roompriority.thermostat && this.config.options.roompriority.switch) {
+    if (
+      this.config.options.roompriority.thermostat &&
+      this.config.options.roompriority.switch
+    ) {
       this.multipleRoomPriority();
       this.config.options.roompriority.roomsensor = true;
     }
-    if (this.config.options.roompriority.thermostat && this.config.options.roompriority.roomsensor) {
+    if (
+      this.config.options.roompriority.thermostat &&
+      this.config.options.roompriority.roomsensor
+    ) {
       this.multipleRoomPriority();
       this.config.options.roompriority.roomsensor = true;
     }
-    if (this.config.options.roompriority.switch && this.config.options.roompriority.roomsensor) {
+    if (
+      this.config.options.roompriority.switch &&
+      this.config.options.roompriority.roomsensor
+    ) {
       this.multipleRoomPriority();
       this.config.options.roompriority.roomsensor = true;
     }
-    if (this.config.options.roompriority.thermostat && this.config.options.roompriority.switch && this.config.options.roompriority.roomsensor) {
+    if (
+      this.config.options.roompriority.thermostat &&
+      this.config.options.roompriority.switch &&
+      this.config.options.roompriority.roomsensor
+    ) {
       this.multipleRoomPriority();
       this.config.options.roompriority.roomsensor = true;
     }
     if (this.config.options.roompriority.switch) {
-      this.log.warn('Switch Room Priority has been selected. You can set your Thermostat\'s Priroty to the desired Room with the flick/touch of a Switch.');
+      this.log.warn(
+        'Switch Room Priority has been selected. You can set your Thermostat\'s Priroty to the desired Room with the flick/touch of a Switch.',
+      );
     }
     if (this.config.options.roompriority.thermsotat) {
-      this.log.warn('Thermostat Room Priority has been selected. You will have a Thermostat for Each Room Sensor so that you can set the priority of that Room.');
+      this.log.warn(
+        'Thermostat Room Priority has been selected. You will have a Thermostat for Each Room Sensor so that you can set the priority of that Room.',
+      );
     }
     if (this.config.options.roompriority.roomsensor) {
       this.log.warn('Room Sensors will only display as Room Sensors.');
@@ -187,8 +237,13 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
     this.config.options.ttl = this.config.options.ttl || 1800; // default 1800 seconds
 
-    if (!this.config.credentials.consumerSecret && this.config.options.ttl < 1800) {
-      this.log.debug('TTL must be set to 1800 or higher unless you setup your own consumerSecret.');
+    if (
+      !this.config.credentials.consumerSecret &&
+      this.config.options.ttl < 1800
+    ) {
+      this.log.debug(
+        'TTL must be set to 1800 or higher unless you setup your own consumerSecret.',
+      );
       this.config.options.ttl = 1800;
     }
 
@@ -204,7 +259,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   }
 
   private multipleRoomPriority() {
-    throw new Error('You can only have 1 Room Priority Option Selected. Room Sensors will be treated only as Room Sensors');
+    throw new Error(
+      'You can only have 1 Room Priority Option Selected. Room Sensors will be treated only as Room Sensors',
+    );
   }
 
   /**
@@ -214,34 +271,39 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     let result: any;
 
     if (this.config.credentials.consumerSecret) {
-      result = (await axios({
-        url: AuthURL,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        auth: {
-          username: this.config.credentials.consumerKey,
-          password: this.config.credentials.consumerSecret,
-        },
-        data: qs.stringify({
-          grant_type: 'refresh_token',
-          refresh_token: this.config.credentials.refreshToken,
-        }),
-        responseType: 'json',
-      })).data;
+      result = (
+        await axios({
+          url: AuthURL,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          auth: {
+            username: this.config.credentials.consumerKey,
+            password: this.config.credentials.consumerSecret,
+          },
+          data: qs.stringify({
+            grant_type: 'refresh_token',
+            refresh_token: this.config.credentials.refreshToken,
+          }),
+          responseType: 'json',
+        })
+      ).data;
     } else {
       this.log.warn('Please re-link your account in the Homebridge UI.');
       // if no consumerSecret is defined, attempt to use the shared consumerSecret
       try {
-        result = (await axios.post(UIurl,
-          {
+        result = (
+          await axios.post(UIurl, {
             consumerKey: this.config.credentials.consumerKey,
             refresh_token: this.config.credentials.refreshToken,
-          },
-        )).data;
+          })
+        ).data;
       } catch (e) {
-        this.log.error('Failed to exchange refresh token for an access token.', e.message);
+        this.log.error(
+          'Failed to exchange refresh token for an access token.',
+          e.message,
+        );
         throw e;
       }
     }
@@ -261,7 +323,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   /**
    * The refresh token will periodically change.
    * This method saves the updated refresh token in the config.json file
-   * @param newRefreshToken 
+   * @param newRefreshToken
    */
   async updateRefreshToken(newRefreshToken: string) {
     try {
@@ -271,7 +333,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       }
 
       // load in the current config
-      const currentConfig = JSON.parse(readFileSync(this.api.user.configPath(), 'utf8'));
+      const currentConfig = JSON.parse(
+        readFileSync(this.api.user.configPath(), 'utf8'),
+      );
 
       // check the platforms section is an array before we do array things on it
       if (!Array.isArray(currentConfig.platforms)) {
@@ -279,10 +343,14 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       }
 
       // find this plugins current config
-      const pluginConfig = currentConfig.platforms.find((x: { platform: string; }) => x.platform === PLATFORM_NAME);
+      const pluginConfig = currentConfig.platforms.find(
+        (x: { platform: string }) => x.platform === PLATFORM_NAME,
+      );
 
       if (!pluginConfig) {
-        throw new Error(`Cannot find config for ${PLATFORM_NAME} in platforms array`);
+        throw new Error(
+          `Cannot find config for ${PLATFORM_NAME} in platforms array`,
+        );
       }
 
       // check the .credentials is an object before doing object things with it
@@ -294,16 +362,18 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       pluginConfig.credentials.refreshToken = newRefreshToken;
 
       // save the config, ensuring we maintain pretty json
-      writeFileSync(this.api.user.configPath(), JSON.stringify(currentConfig, null, 4));
+      writeFileSync(
+        this.api.user.configPath(),
+        JSON.stringify(currentConfig, null, 4),
+      );
 
-      this.log.warn('Homebridge config.json has been updated with new refresh token.');
-
+      this.log.warn(
+        'Homebridge config.json has been updated with new refresh token.',
+      );
     } catch (e) {
       this.log.error(`Failed to update refresh token in config: ${e.message}`);
     }
   }
-
-
 
   /**
    * this method discovers the Locations
@@ -324,23 +394,21 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   /**
    * this method discovers the rooms at each location
    */
-  public async Sensors(device: configTypes.T9Thermostat, group: configTypes.T9groups, locationId: configTypes.location['locationID']) {
-    return (await this.axios.get(`${DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
-      params: {
-        locationId: locationId,
-      },
-    })).data;
-  }
-
-  /**
-   * this method discovers the sesnors at each location
-   */
-  private async Priority(device: configTypes.T9Thermostat, locationId: configTypes.location['locationID']) {
-    return (await this.axios.get(`${DeviceURL}/thermostats/${device.deviceID}/priority`, {
-      params: {
-        locationId: locationId,
-      },
-    })).data;
+  public async Sensors(
+    device: configTypes.T9Thermostat,
+    group: configTypes.T9groups,
+    locationId: configTypes.location['locationID'],
+  ) {
+    return (
+      await this.axios.get(
+        `${DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`,
+        {
+          params: {
+            locationId: locationId,
+          },
+        },
+      )
+    ).data;
   }
 
   /**
@@ -351,15 +419,22 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     for (const location of this.locations) {
       const locationId = location.locationID;
       for (const device of location.devices) {
-        if ((device.deviceID.startsWith('LCC'))) {
+        if (device.deviceID.startsWith('LCC')) {
           if (device.deviceModel.startsWith('T9')) {
             if (device.groups) {
               const groups = device.groups;
               for (const group of groups) {
-                const roomsensors = await this.Sensors(device, group, locationId);
+                const roomsensors = await this.Sensors(
+                  device,
+                  group,
+                  locationId,
+                );
                 if (roomsensors.rooms) {
                   const rooms = roomsensors.rooms;
-                  if (this.config.options.roompriority.roomsensor || this.config.options.roompriority.thermostat) {
+                  if (
+                    this.config.options.roompriority.roomsensor ||
+                    this.config.options.roompriority.thermostat
+                  ) {
                     this.log.info(`Total Rooms Found: ${rooms.length}`);
                   }
                   for (const accessories of rooms) {
@@ -368,9 +443,20 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                         const sensoraccessory = accessory;
                         if (sensoraccessory.accessoryAttribute) {
                           if (sensoraccessory.accessoryAttribute.type) {
-                            if (sensoraccessory.accessoryAttribute.type.startsWith('Thermostat')) {
-                              this.log.debug(JSON.stringify(sensoraccessory.accessoryAttribute.softwareRevision));
-                              const softwareRevision = sensoraccessory.accessoryAttribute.softwareRevision;
+                            if (
+                              sensoraccessory.accessoryAttribute.type.startsWith(
+                                'Thermostat',
+                              )
+                            ) {
+                              this.log.debug(
+                                JSON.stringify(
+                                  sensoraccessory.accessoryAttribute
+                                    .softwareRevision,
+                                ),
+                              );
+                              const softwareRevision =
+                                sensoraccessory.accessoryAttribute
+                                  .softwareRevision;
                               return softwareRevision;
                             }
                           }
@@ -395,7 +481,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     // get the devices at each location
     for (const location of this.locations) {
       this.log.info(`Getting devices for ${location.name}...`);
-      this.log.info(`Total Devices Found at ${location.name}: ${location.devices.length}`);
+      this.log.info(
+        `Total Devices Found at ${location.name}: ${location.devices.length}`,
+      );
       const locationId = location.locationID;
       this.locationinfo(location);
       for (const device of location.devices) {
@@ -404,7 +492,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
           this.log.debug(JSON.stringify(device));
           this.Leak(device, locationId);
         } else if (device.isAlive && device.deviceClass === 'Thermostat') {
-          if ((device.deviceID.startsWith('LCC'))) {
+          if (device.deviceID.startsWith('LCC')) {
             if (device.deviceModel.startsWith('T9')) {
               try {
                 this.firmware = await this.Firmware();
@@ -420,7 +508,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 this.log.error('Failed to Find Room Sesnors.', e.message);
               }
               try {
-                this.discoverRoomPriority();
+                // this.discoverRoomPriority();
               } catch (e) {
                 this.log.error('Failed to Find Room Priority.', e.message);
               }
@@ -429,9 +517,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               this.log.debug(JSON.stringify(device));
               this.T5(device, locationId);
             } else if (!device.DeviceModel) {
-              this.log.info('A LLC Device has been discovered with a deviceModel that doesn\'t start with T5 or T9');
+              this.log.info(
+                'A LLC Device has been discovered with a deviceModel that doesn\'t start with T5 or T9',
+              );
             }
-          } else if ((device.deviceID.startsWith('TCC'))) {
+          } else if (device.deviceID.startsWith('TCC')) {
             if (device.deviceModel.startsWith('Round')) {
               this.deviceinfo(device);
               this.log.debug(JSON.stringify(device));
@@ -441,10 +531,18 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               this.log.debug(JSON.stringify(device));
               this.TCC(device, locationId);
             } else if (!device.deviceModel) {
-              this.log.info('A TCC Device has been discovered with a deviceModel that doesn\'t start with Round or Unknown');
+              this.log.info(
+                'A TCC Device has been discovered with a deviceModel that doesn\'t start with Round or Unknown',
+              );
             }
           } else {
-            this.log.info('Your Device isn\'t supported, Please open Feature Request');
+<<<<<<< Updated upstream
+            this.log.info(
+              'Your Device isn\'t supported, Please open Feature Request Here: https://git.io/JUWN2',
+            );
+=======
+            this.log.info('Your Device isn\'t supported, Please open Feature Request Here: https://git.io/JUWN2');
+>>>>>>> Stashed changes
           }
         }
       }
@@ -456,30 +554,67 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     for (const location of this.locations) {
       const locationId = location.locationID;
       for (const device of location.devices) {
-        if ((device.deviceID.startsWith('LCC'))) {
+        if (device.deviceID.startsWith('LCC')) {
           if (device.deviceModel.startsWith('T9')) {
             if (device.groups) {
               const groups = device.groups;
               for (const group of groups) {
-                const roomsensors = await this.Sensors(device, group, locationId);
+                const roomsensors = await this.Sensors(
+                  device,
+                  group,
+                  locationId,
+                );
                 if (roomsensors.rooms) {
                   const rooms = roomsensors.rooms;
                   this.log.debug(JSON.stringify(roomsensors));
-                  if (this.config.options.roompriority.roomsensor || this.config.options.roompriority.thermostat) {
+                  if (
+                    this.config.options.roompriority.roomsensor ||
+                    this.config.options.roompriority.thermostat
+                  ) {
                     this.log.info(`Total Rooms Found: ${rooms.length}`);
-                  } for (const accessories of rooms) {
+                  }
+                  for (const accessories of rooms) {
                     if (accessories) {
                       this.log.debug(JSON.stringify(accessories));
                       for (const accessory of accessories.accessories) {
+                        const sensoraccessory = accessory;
+                        this.RoomPriority(
+                          device,
+                          locationId,
+                          sensoraccessory,
+                          group,
+                        );
                         if (accessory.accessoryAttribute) {
                           if (accessory.accessoryAttribute.type) {
-                            if (accessory.accessoryAttribute.type.startsWith('IndoorAirSensor')) {
-                              const sensoraccessory = accessory;
+                            if (
+                              accessory.accessoryAttribute.type.startsWith(
+                                'IndoorAirSensor',
+                              )
+                            ) {
                               this.log.debug(JSON.stringify(sensoraccessory));
-                              this.log.debug(JSON.stringify(sensoraccessory.accessoryAttribute.name));
-                              this.log.debug(JSON.stringify(sensoraccessory.accessoryAttribute.softwareRevision));
-                              this.RoomSensors(device, locationId, sensoraccessory, group);
-                              this.RoomSensorThermostat(device, locationId, sensoraccessory, group);
+                              this.log.debug(
+                                JSON.stringify(
+                                  sensoraccessory.accessoryAttribute.name,
+                                ),
+                              );
+                              this.log.debug(
+                                JSON.stringify(
+                                  sensoraccessory.accessoryAttribute
+                                    .softwareRevision,
+                                ),
+                              );
+                              this.RoomSensors(
+                                device,
+                                locationId,
+                                sensoraccessory,
+                                group,
+                              );
+                              this.RoomSensorThermostat(
+                                device,
+                                locationId,
+                                sensoraccessory,
+                                group,
+                              );
                             }
                           }
                         }
@@ -495,53 +630,28 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     }
   }
 
-  private async discoverRoomPriority() {
-    // get the devices at each location
-    for (const location of this.locations) {
-      const locationId = location.locationID;
-      for (const device of location.devices) {
-        if ((device.deviceID.startsWith('LCC'))) {
-          if (device.deviceModel.startsWith('T9')) {
-            const priority = await this.Priority(device, locationId);
-            if (priority.currentPriority) {
-              if (priority.currentPriority.rooms) {
-                const currentPriority = priority.currentPriority.rooms;
-                this.log.debug(JSON.stringify(currentPriority));
-                if (this.config.options.roompriority.switch) {
-                  this.log.info(`Total Rooms Found: ${currentPriority.length}`);
-                } for (const rooms of currentPriority) {
-                  this.log.debug(JSON.stringify(rooms));
-                  if (rooms.accessories) {
-                    const priorityrooms = rooms.accessories;
-                    this.log.debug(JSON.stringify(priorityrooms));
-                    if (this.config.options.roompriority.switch) {
-                      this.log.info(`Total Accessories Found in Room (${rooms.id}): ${priorityrooms.length}`);
-                    }
-                    for (const accessories of priorityrooms) {
-                      this.log.debug(JSON.stringify(accessories));
-                      this.RoomPriority(device, locationId, accessories, currentPriority, priorityrooms, rooms);
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  private async T9(device: configTypes.T9Thermostat, locationId: configTypes.location['locationID'], firmware: configTypes.accessoryAttribute['softwareRevision']) {
-    const uuid = this.api.hap.uuid.generate(`${device.name}-${device.deviceID}-${device.deviceModel}`);
+  private async T9(
+    device: configTypes.T9Thermostat,
+    locationId: configTypes.location['locationID'],
+    firmware: configTypes.accessoryAttribute['softwareRevision'],
+  ) {
+    const uuid = this.api.hap.uuid.generate(
+      `${device.name}-${device.deviceID}-${device.deviceModel}`,
+    );
 
     // see if an accessory with the same uuid has already been registered and restored from
     // the cached devices we stored in the `configureAccessory` method above
-    const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
+    const existingAccessory = this.accessories.find(
+      (accessory) => accessory.UUID === uuid,
+    );
 
     if (existingAccessory) {
       // the accessory already exists
       if (!this.config.options.thermostat.hide && device.isAlive) {
-        this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+        this.log.info(
+          'Restoring existing accessory from cache:',
+          existingAccessory.displayName,
+        );
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
         existingAccessory.context.firmwareRevision = firmware;
@@ -549,18 +659,27 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
         new T9(this, existingAccessory, locationId, device, firmware);
-        this.log.debug(`T9 UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
-
+        this.log.debug(
+          `T9 UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`,
+        );
       } else if (!device.isAlive || this.config.options.thermostat.hide) {
         this.unregisterPlatformAccessories(existingAccessory, uuid);
       }
     } else if (!this.config.options.thermostat.hide) {
       // the accessory does not yet exist, so we need to create it
-      this.log.info('Adding new accessory:', `${device.name} ${device.deviceModel} ${device.deviceType}`);
-      this.log.debug(`Registering new device: ${device.name} ${device.deviceModel} ${device.deviceType} - ${device.deviceID}`);
+      this.log.info(
+        'Adding new accessory:',
+        `${device.name} ${device.deviceModel} ${device.deviceType}`,
+      );
+      this.log.debug(
+        `Registering new device: ${device.name} ${device.deviceModel} ${device.deviceType} - ${device.deviceID}`,
+      );
 
       // create a new accessory
-      const accessory = new this.api.platformAccessory(`${device.name} ${device.deviceType}`, uuid);
+      const accessory = new this.api.platformAccessory(
+        `${device.name} ${device.deviceType}`,
+        uuid,
+      );
 
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
@@ -570,24 +689,38 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
       new T9(this, accessory, locationId, device, firmware);
-      this.log.debug(`T9 UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
+      this.log.debug(
+        `T9 UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`,
+      );
 
       // link the accessory to your platform
-      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [
+        accessory,
+      ]);
     }
   }
 
-  private T5(device: configTypes.T5Device, locationId: configTypes.location['locationID']) {
-    const uuid = this.api.hap.uuid.generate(`${device.name}-${device.deviceID}-${device.deviceModel}`);
+  private T5(
+    device: configTypes.T5Device,
+    locationId: configTypes.location['locationID'],
+  ) {
+    const uuid = this.api.hap.uuid.generate(
+      `${device.name}-${device.deviceID}-${device.deviceModel}`,
+    );
 
     // see if an accessory with the same uuid has already been registered and restored from
     // the cached devices we stored in the `configureAccessory` method above
-    const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
+    const existingAccessory = this.accessories.find(
+      (accessory) => accessory.UUID === uuid,
+    );
 
     if (existingAccessory) {
       // the accessory already exists
       if (!this.config.options.thermostat.hide && device.isAlive) {
-        this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+        this.log.info(
+          'Restoring existing accessory from cache:',
+          existingAccessory.displayName,
+        );
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
         //existingAccessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
@@ -595,18 +728,27 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
         new T5(this, existingAccessory, locationId, device);
-        this.log.debug(`T5 UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
-
+        this.log.debug(
+          `T5 UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`,
+        );
       } else if (!device.isAlive || this.config.options.thermostat.hide) {
         this.unregisterPlatformAccessories(existingAccessory, uuid);
       }
     } else if (!this.config.options.thermostat.hide) {
       // the accessory does not yet exist, so we need to create it
-      this.log.info('Adding new accessory:', `${device.name} ${device.deviceModel} ${device.deviceType}`);
-      this.log.debug(`Registering new device: ${device.name} ${device.deviceModel} ${device.deviceType} - ${device.deviceID}`);
+      this.log.info(
+        'Adding new accessory:',
+        `${device.name} ${device.deviceModel} ${device.deviceType}`,
+      );
+      this.log.debug(
+        `Registering new device: ${device.name} ${device.deviceModel} ${device.deviceType} - ${device.deviceID}`,
+      );
 
       // create a new accessory
-      const accessory = new this.api.platformAccessory(`${device.name} ${device.deviceType}`, uuid);
+      const accessory = new this.api.platformAccessory(
+        `${device.name} ${device.deviceType}`,
+        uuid,
+      );
 
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
@@ -615,24 +757,38 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
       new T5(this, accessory, locationId, device);
-      this.log.debug(`T5 UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
+      this.log.debug(
+        `T5 UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`,
+      );
 
       // link the accessory to your platform
-      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [
+        accessory,
+      ]);
     }
   }
 
-  private Round(device: configTypes.RoundDevice, locationId: configTypes.location['locationID']) {
-    const uuid = this.api.hap.uuid.generate(`${device.name}-${device.deviceID}-${device.deviceModel}`);
+  private Round(
+    device: configTypes.RoundDevice,
+    locationId: configTypes.location['locationID'],
+  ) {
+    const uuid = this.api.hap.uuid.generate(
+      `${device.name}-${device.deviceID}-${device.deviceModel}`,
+    );
 
     // see if an accessory with the same uuid has already been registered and restored from
     // the cached devices we stored in the `configureAccessory` method above
-    const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
+    const existingAccessory = this.accessories.find(
+      (accessory) => accessory.UUID === uuid,
+    );
 
     if (existingAccessory) {
       // the accessory already exists
       if (!this.config.options.thermostat.hide && device.isAlive) {
-        this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+        this.log.info(
+          'Restoring existing accessory from cache:',
+          existingAccessory.displayName,
+        );
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
         existingAccessory.context.firmwareRevision = device.thermostatVersion;
@@ -640,18 +796,27 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
         new Round(this, existingAccessory, locationId, device);
-        this.log.debug(`Round UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
-
+        this.log.debug(
+          `Round UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`,
+        );
       } else if (!device.isAlive || this.config.options.thermostat.hide) {
         this.unregisterPlatformAccessories(existingAccessory, uuid);
       }
     } else if (!this.config.options.thermostat.hide) {
       // the accessory does not yet exist, so we need to create it
-      this.log.info('Adding new accessory:', `${device.name} ${device.deviceModel} ${device.deviceType}`);
-      this.log.debug(`Registering new device: ${device.name} ${device.deviceModel} ${device.deviceType} - ${device.deviceID}`);
+      this.log.info(
+        'Adding new accessory:',
+        `${device.name} ${device.deviceModel} ${device.deviceType}`,
+      );
+      this.log.debug(
+        `Registering new device: ${device.name} ${device.deviceModel} ${device.deviceType} - ${device.deviceID}`,
+      );
 
       // create a new accessory
-      const accessory = new this.api.platformAccessory(`${device.name} ${device.deviceType}`, uuid);
+      const accessory = new this.api.platformAccessory(
+        `${device.name} ${device.deviceType}`,
+        uuid,
+      );
 
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
@@ -660,24 +825,38 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
       new Round(this, accessory, locationId, device);
-      this.log.debug(`Round UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
+      this.log.debug(
+        `Round UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`,
+      );
 
       // link the accessory to your platform
-      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [
+        accessory,
+      ]);
     }
   }
 
-  private TCC(device: configTypes.TCCDevice, locationId: configTypes.location['locationID']) {
-    const uuid = this.api.hap.uuid.generate(`${device.name}-${device.deviceID}-${device.deviceModel}`);
+  private TCC(
+    device: configTypes.TCCDevice,
+    locationId: configTypes.location['locationID'],
+  ) {
+    const uuid = this.api.hap.uuid.generate(
+      `${device.name}-${device.deviceID}-${device.deviceModel}`,
+    );
 
     // see if an accessory with the same uuid has already been registered and restored from
     // the cached devices we stored in the `configureAccessory` method above
-    const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
+    const existingAccessory = this.accessories.find(
+      (accessory) => accessory.UUID === uuid,
+    );
 
     if (existingAccessory) {
       // the accessory already exists
       if (!this.config.options.thermostat.hide && device.isAlive) {
-        this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+        this.log.info(
+          'Restoring existing accessory from cache:',
+          existingAccessory.displayName,
+        );
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
         existingAccessory.context.firmwareRevision = device.thermostatVersion;
@@ -685,18 +864,27 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
         new TCC(this, existingAccessory, locationId, device);
-        this.log.debug(`TCC UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
-
+        this.log.debug(
+          `TCC UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`,
+        );
       } else if (!device.isAlive || this.config.options.thermostat.hide) {
         this.unregisterPlatformAccessories(existingAccessory, uuid);
       }
     } else if (!this.config.options.thermostat.hide) {
       // the accessory does not yet exist, so we need to create it
-      this.log.info('Adding new accessory:', `${device.name} TCC(${device.deviceModel}) ${device.deviceType}`);
-      this.log.debug(`Registering new device: ${device.name} TCC(${device.deviceModel}) ${device.deviceType} - ${device.deviceID}`);
+      this.log.info(
+        'Adding new accessory:',
+        `${device.name} TCC(${device.deviceModel}) ${device.deviceType}`,
+      );
+      this.log.debug(
+        `Registering new device: ${device.name} TCC(${device.deviceModel}) ${device.deviceType} - ${device.deviceID}`,
+      );
 
       // create a new accessory
-      const accessory = new this.api.platformAccessory(`${device.name} ${device.deviceType}`, uuid);
+      const accessory = new this.api.platformAccessory(
+        `${device.name} ${device.deviceType}`,
+        uuid,
+      );
 
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
@@ -705,24 +893,38 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
       new TCC(this, accessory, locationId, device);
-      this.log.debug(`TCC UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
+      this.log.debug(
+        `TCC UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`,
+      );
 
       // link the accessory to your platform
-      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [
+        accessory,
+      ]);
     }
   }
 
-  private Leak(device: configTypes.LeakDevice, locationId: configTypes.location['locationID']) {
-    const uuid = this.api.hap.uuid.generate(`${device.userDefinedDeviceName}-${device.deviceID}-${device.deviceClass}`);
+  private Leak(
+    device: configTypes.LeakDevice,
+    locationId: configTypes.location['locationID'],
+  ) {
+    const uuid = this.api.hap.uuid.generate(
+      `${device.userDefinedDeviceName}-${device.deviceID}-${device.deviceClass}`,
+    );
 
     // see if an accessory with the same uuid has already been registered and restored from
     // the cached devices we stored in the `configureAccessory` method above
-    const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
+    const existingAccessory = this.accessories.find(
+      (accessory) => accessory.UUID === uuid,
+    );
 
     if (existingAccessory) {
       // the accessory already exists
       if (!this.config.options.leaksensor.hide && device.isAlive) {
-        this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+        this.log.info(
+          'Restoring existing accessory from cache:',
+          existingAccessory.displayName,
+        );
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
         //existingAccessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
@@ -731,18 +933,27 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
         new LeakSensor(this, existingAccessory, locationId, device);
-        this.log.debug(`Leak Sensor UDID: ${device.userDefinedDeviceName}-${device.deviceID}-${device.deviceClass}`);
-
+        this.log.debug(
+          `Leak Sensor UDID: ${device.userDefinedDeviceName}-${device.deviceID}-${device.deviceClass}`,
+        );
       } else if (!device.isAlive || this.config.options.leaksensor.hide) {
         this.unregisterPlatformAccessories(existingAccessory, uuid);
       }
     } else if (!this.config.options.leaksensor.hide) {
       // the accessory does not yet exist, so we need to create it
-      this.log.info('Adding new accessory:', `${device.userDefinedDeviceName}  ${device.deviceClass}`);
-      this.log.debug(`Registering new device: ${device.userDefinedDeviceName} ${device.deviceClass} - ${device.deviceID}`);
+      this.log.info(
+        'Adding new accessory:',
+        `${device.userDefinedDeviceName}  ${device.deviceClass}`,
+      );
+      this.log.debug(
+        `Registering new device: ${device.userDefinedDeviceName} ${device.deviceClass} - ${device.deviceID}`,
+      );
 
       // create a new accessory
-      const accessory = new this.api.platformAccessory(`${device.userDefinedDeviceName} ${device.deviceClass}`, uuid);
+      const accessory = new this.api.platformAccessory(
+        `${device.userDefinedDeviceName} ${device.deviceClass}`,
+        uuid,
+      );
 
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
@@ -751,65 +962,131 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       // create the accessory handler for the newly create accessory
       // this is imported from `/Sensors/leakSensors.ts`
       new LeakSensor(this, accessory, locationId, device);
-      this.log.debug(`Leak Sensor UDID: ${device.userDefinedDeviceName}-${device.deviceID}-${device.deviceClass}`);
+      this.log.debug(
+        `Leak Sensor UDID: ${device.userDefinedDeviceName}-${device.deviceID}-${device.deviceClass}`,
+      );
 
       // link the accessory to your platform
-      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [
+        accessory,
+      ]);
     }
   }
 
-  private RoomSensors(device: configTypes.T9Thermostat, locationId: configTypes.location['locationID'], sensoraccessory: configTypes.sensoraccessory, group: configTypes.T9groups) {
-    const uuid = this.api.hap.uuid.generate(`${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryId}-RoomSensor`);
-    const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
+  private RoomSensors(
+    device: configTypes.T9Thermostat,
+    locationId: configTypes.location['locationID'],
+    sensoraccessory: configTypes.sensoraccessory,
+    group: configTypes.T9groups,
+  ) {
+    const uuid = this.api.hap.uuid.generate(
+      `${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryId}-RoomSensor`,
+    );
+    const existingAccessory = this.accessories.find(
+      (accessory) => accessory.UUID === uuid,
+    );
     if (existingAccessory) {
       // the accessory already exists
-      if (device.isAlive && (this.config.options.roompriority.roomsensor || this.config.options.roompriority.switch)) {
-        this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+      if (
+        device.isAlive &&
+        (this.config.options.roompriority.roomsensor ||
+          this.config.options.roompriority.switch)
+      ) {
+        this.log.info(
+          'Restoring existing accessory from cache:',
+          existingAccessory.displayName,
+        );
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
         this.api.updatePlatformAccessories([existingAccessory]);
 
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
-        new RoomSensors(this, existingAccessory, locationId, device, sensoraccessory, group);
-        this.log.debug(`Room Sensors UDID: ${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryId}-RoomSensor`);
-
-      } else if (!device.isAlive && this.config.options.roompriority.thermostat) {
+        new RoomSensors(
+          this,
+          existingAccessory,
+          locationId,
+          device,
+          sensoraccessory,
+          group,
+        );
+        this.log.debug(
+          `Room Sensors UDID: ${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryId}-RoomSensor`,
+        );
+      } else if (
+        !device.isAlive &&
+        this.config.options.roompriority.thermostat
+      ) {
         this.unregisterPlatformAccessories(existingAccessory, uuid);
       }
-    } else if (device.isAlive && (this.config.options.roompriority.roomsensor || this.config.options.roompriority.switch)) {
+    } else if (
+      device.isAlive &&
+      (this.config.options.roompriority.roomsensor ||
+        this.config.options.roompriority.switch)
+    ) {
       // the accessory does not yet exist, so we need to create it
-      this.log.info(`Adding new accessory: ${sensoraccessory.accessoryAttribute.name} ${sensoraccessory.accessoryAttribute.type}`);
-      this.log.debug(`Registering new device: ${sensoraccessory.accessoryAttribute.name} ${sensoraccessory.accessoryAttribute.type} - ${device.deviceID}`);
+      this.log.info(
+        `Adding new accessory: ${sensoraccessory.accessoryAttribute.name} ${sensoraccessory.accessoryAttribute.type}`,
+      );
+      this.log.debug(
+        `Registering new device: ${sensoraccessory.accessoryAttribute.name} ${sensoraccessory.accessoryAttribute.type} - ${device.deviceID}`,
+      );
 
       // create a new accessory
-      const accessory = new this.api.platformAccessory(`${sensoraccessory.accessoryAttribute.name} ${sensoraccessory.accessoryAttribute.type}`, uuid);
+      const accessory = new this.api.platformAccessory(
+        `${sensoraccessory.accessoryAttribute.name} ${sensoraccessory.accessoryAttribute.type}`,
+        uuid,
+      );
 
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
-      accessory.context.firmwareRevision = sensoraccessory.accessoryAttribute.softwareRevision;
+      accessory.context.firmwareRevision =
+        sensoraccessory.accessoryAttribute.softwareRevision;
 
       // create the accessory handler for the newly create accessory
       // this is imported from `roomSensor.ts`
-      new RoomSensors(this, accessory, locationId, device, sensoraccessory, group);
-      this.log.debug(`Room Sensors UDID: ${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryId}-RoomSensor`);
+      new RoomSensors(
+        this,
+        accessory,
+        locationId,
+        device,
+        sensoraccessory,
+        group,
+      );
+      this.log.debug(
+        `Room Sensors UDID: ${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryId}-RoomSensor`,
+      );
 
       // link the accessory to your platform
-      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [
+        accessory,
+      ]);
     }
   }
 
-  private RoomSensorThermostat(device: configTypes.T9Thermostat, locationId: configTypes.location['locationID'], sensoraccessory: configTypes.sensoraccessory, group: configTypes.T9groups) {
-    const uuid = this.api.hap.uuid.generate(`${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryId}-RoomSensorThermostat-${device.deviceID}`);
+  private RoomSensorThermostat(
+    device: configTypes.T9Thermostat,
+    locationId: configTypes.location['locationID'],
+    sensoraccessory: configTypes.sensoraccessory,
+    group: configTypes.T9groups,
+  ) {
+    const uuid = this.api.hap.uuid.generate(
+      `${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryId}-RoomSensorThermostat-${device.deviceID}`,
+    );
 
     // see if an accessory with the same uuid has already been registered and restored from
     // the cached devices we stored in the `configureAccessory` method above
-    const existingAccessory = this.accessories.find((accessory: { UUID: any; }) => accessory.UUID === uuid);
+    const existingAccessory = this.accessories.find(
+      (accessory: { UUID: any }) => accessory.UUID === uuid,
+    );
 
     if (existingAccessory) {
       // the accessory already exists
       if (device.isAlive && this.config.options.roompriority.thermostat) {
-        this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+        this.log.info(
+          'Restoring existing accessory from cache:',
+          existingAccessory.displayName,
+        );
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
         // existingAccessory.context.firmwareRevision = sensoraccessory.accessoryAttribute.softwareRevision;
@@ -819,66 +1096,124 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
-        new RoomSensorThermostat(this, existingAccessory, locationId, device, sensoraccessory, group);
-        this.log.debug(`Room Sensor Thermostat UDID: ${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryId}-RoomSensorThermostat-${device.deviceID}`);
-
-      } else if (!device.isAlive && !this.config.options.roompriority.thermostat) {
+        new RoomSensorThermostat(
+          this,
+          existingAccessory,
+          locationId,
+          device,
+          sensoraccessory,
+          group,
+        );
+        this.log.debug(
+          `Room Sensor Thermostat UDID: ${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryId}-RoomSensorThermostat-${device.deviceID}`,
+        );
+      } else if (
+        !device.isAlive &&
+        !this.config.options.roompriority.thermostat
+      ) {
         this.unregisterPlatformAccessories(existingAccessory, uuid);
       }
     } else if (device.isAlive && this.config.options.roompriority.thermostat) {
       // the accessory does not yet exist, so we need to create it
-      this.log.info('Adding new accessory:', `${sensoraccessory.accessoryAttribute.name} ${sensoraccessory.accessoryAttribute.type} Thermostat`);
-      this.log.debug(`Registering new device: ${sensoraccessory.accessoryAttribute.name} ${sensoraccessory.accessoryAttribute.type} Thermostat - ${device.deviceID}`);
+      this.log.info(
+        'Adding new accessory:',
+        `${sensoraccessory.accessoryAttribute.name} ${sensoraccessory.accessoryAttribute.type} Thermostat`,
+      );
+      this.log.debug(
+        `Registering new device: ${sensoraccessory.accessoryAttribute.name} ${sensoraccessory.accessoryAttribute.type} Thermostat - ${device.deviceID}`,
+      );
 
       // create a new accessory
-      const accessory = new this.api.platformAccessory(`${sensoraccessory.accessoryAttribute.name} ${sensoraccessory.accessoryAttribute.type} Thermostat`, uuid);
+      const accessory = new this.api.platformAccessory(
+        `${sensoraccessory.accessoryAttribute.name} ${sensoraccessory.accessoryAttribute.type} Thermostat`,
+        uuid,
+      );
 
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
-      accessory.context.firmwareRevision = sensoraccessory.accessoryAttribute.softwareRevision;
+      accessory.context.firmwareRevision =
+        sensoraccessory.accessoryAttribute.softwareRevision;
 
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
-      new RoomSensorThermostat(this, accessory, locationId, device, sensoraccessory, group);
-      this.log.debug(`Room Sensor Thermostat UDID: ${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryId}-RoomSensorThermostat-${device.deviceID}`);
+      new RoomSensorThermostat(
+        this,
+        accessory,
+        locationId,
+        device,
+        sensoraccessory,
+        group,
+      );
+      this.log.debug(
+        `Room Sensor Thermostat UDID: ${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryId}-RoomSensorThermostat-${device.deviceID}`,
+      );
 
       // link the accessory to your platform
-      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [
+        accessory,
+      ]);
     }
-
   }
 
-  private RoomPriority(device: configTypes.T9Thermostat, locationId: configTypes.location['locationID'], accessories: configTypes.Accessory, currentPriority: configTypes.CurrentPriority, priorityrooms: configTypes.Priority, rooms: configTypes.PriorityRoom) {
+  private RoomPriority(
+    device: configTypes.T9Thermostat,
+    locationId: configTypes.location['locationID'],
+    sensoraccessory: configTypes.sensoraccessory,
+    group: configTypes.T9groups,
+  ) {
     // Room Priority Switches
-    const uuid = this.api.hap.uuid.generate(`${rooms.roomName}-${rooms.id}-${accessories.type}-${accessories.id}`);
+    const uuid = this.api.hap.uuid.generate(
+      `${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryId}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryAttribute.hardwareRevision}`,
+    );
 
     // see if an accessory with the same uuid has already been registered and restored from
     // the cached devices we stored in the `configureAccessory` method above
-    const existingAccessory = this.accessories.find((accessory: { UUID: any; }) => accessory.UUID === uuid);
+    const existingAccessory = this.accessories.find(
+      (accessory: { UUID: any }) => accessory.UUID === uuid,
+    );
 
     if (existingAccessory) {
       // the accessory already exists
       if (device.isAlive && this.config.options.roompriority.switch) {
-        this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
+        this.log.info(
+          'Restoring existing accessory from cache:',
+          existingAccessory.displayName,
+        );
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
         // this.api.updatePlatformAccessories([existingAccessory]);
 
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
-        new RoomPriority(this, existingAccessory, locationId, device, rooms, currentPriority, priorityrooms);
-        this.log.debug(`Room Priority Switch UDID: ${rooms.roomName}-${rooms.id}-${accessories.type}-${accessories.id}`);
-
+        new RoomPriority(
+          this,
+          existingAccessory,
+          locationId,
+          device,
+          sensoraccessory,
+          group,
+        );
+        this.log.debug(
+          `Room Priority Switch UDID: ${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryId}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryAttribute.hardwareRevision}`,
+        );
       } else if (!device.isAlive || !this.config.options.roompriority.switch) {
         this.unregisterPlatformAccessories(existingAccessory, uuid);
       }
     } else if (device.isAlive && this.config.options.roompriority.switch) {
       // the accessory does not yet exist, so we need to create it
-      this.log.info('Adding new accessory:', `${rooms.roomName} ${accessories.type} Room Priority Switch`);
-      this.log.debug(`Registering new device: ${rooms.roomName} ${accessories.type} Room Priority Switch - ${device.deviceID}`);
+      this.log.info(
+        'Adding new accessory:',
+        `${sensoraccessory.accessoryAttribute.type} Room Priority Switch`,
+      );
+      this.log.debug(
+        `Registering new device: ${sensoraccessory.accessoryAttribute.type} Room Priority Switch - ${sensoraccessory.accessoryAttribute.hardwareRevision}`,
+      );
 
       // create a new accessory
-      const accessory = new this.api.platformAccessory(`${rooms.roomName} ${accessories.type} Room Priority Switch`, uuid);
+      const accessory = new this.api.platformAccessory(
+        `${sensoraccessory.accessoryAttribute.name} ${sensoraccessory.accessoryAttribute.type} Room Priority Switch`,
+        uuid,
+      );
 
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
@@ -886,30 +1221,59 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
-      new RoomPriority(this, accessory, locationId, device, rooms, currentPriority, priorityrooms);
-      this.log.debug(`Room Priority Switch UDID: ${rooms.roomName}-${rooms.id}-${accessories.type}-${accessories.id}`);
+      new RoomPriority(
+        this,
+        accessory,
+        locationId,
+        device,
+        sensoraccessory,
+        group,
+      );
+      this.log.debug(
+        `Room Priority Switch UDID: ${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryId}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryAttribute.hardwareRevision}`,
+      );
 
       // link the accessory to your platform
-      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [
+        accessory,
+      ]);
     }
   }
 
-  public unregisterPlatformAccessories(existingAccessory: PlatformAccessory, uuid: string) {
+  public unregisterPlatformAccessories(
+    existingAccessory: PlatformAccessory,
+    uuid: string,
+  ) {
     // remove platform accessories when no longer present
-    this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
-    this.log.info('Removing existing accessory from cache:', `${existingAccessory.displayName}-${uuid}`);
+    this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [
+      existingAccessory,
+    ]);
+    this.log.info(
+      'Removing existing accessory from cache:',
+      `${existingAccessory.displayName}-${uuid}`,
+    );
   }
 
   public locationinfo(location: configTypes.location) {
     if (this.config.devicediscovery) {
       if (location) {
-        // this.log.warn(JSON.stringify(location));
+        this.log.warn(JSON.stringify(location));
       }
     }
   }
 
-  public deviceinfo(device: { deviceID: string; deviceType: string; deviceClass: string; deviceModel: string; priorityType: string; settings: { fan: { allowedModes: string[]; changeableValues: any; }; }; inBuiltSensorState: { roomId: number; roomName: string; }; groups: configTypes.T9Thermostat['groups']; }) {
+  public deviceinfo(device: {
+    deviceID: string;
+    deviceType: string;
+    deviceClass: string;
+    deviceModel: string;
+    priorityType: string;
+    settings: { fan: { allowedModes: string[]; changeableValues: any } };
+    inBuiltSensorState: { roomId: number; roomName: string };
+    groups: configTypes.T9Thermostat['groups'];
+  }) {
     if (this.config.devicediscovery) {
+      this.log.warn(JSON.stringify(device));
       if (device.deviceID) {
         this.log.warn(JSON.stringify(device.deviceID));
         this.log.error(`Device ID: ${device.deviceID}`);
@@ -925,7 +1289,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       if (device.deviceModel) {
         this.log.warn(JSON.stringify(device.deviceModel));
         this.log.error(`Device Model: ${device.deviceModel}`);
-
       }
       if (device.priorityType) {
         this.log.warn(JSON.stringify(device.priorityType));
@@ -938,11 +1301,15 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
           this.log.error(`Device Fan Settings: ${device.settings.fan}`);
           if (device.settings.fan.allowedModes) {
             this.log.warn(JSON.stringify(device.settings.fan.allowedModes));
-            this.log.error(`Device Fan Allowed Modes: ${device.settings.fan.allowedModes}`);
+            this.log.error(
+              `Device Fan Allowed Modes: ${device.settings.fan.allowedModes}`,
+            );
           }
           if (device.settings.fan.changeableValues) {
             this.log.warn(JSON.stringify(device.settings.fan.changeableValues));
-            this.log.error(`Device Fan Changeable Values: ${device.settings.fan.changeableValues}`);
+            this.log.error(
+              `Device Fan Changeable Values: ${device.settings.fan.changeableValues}`,
+            );
           }
         }
       }
@@ -950,11 +1317,15 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         this.log.warn(JSON.stringify(device.inBuiltSensorState));
         if (device.inBuiltSensorState.roomId) {
           this.log.warn(JSON.stringify(device.inBuiltSensorState.roomId));
-          this.log.error(`Device Built In Sensor Room ID: ${device.inBuiltSensorState.roomId}`);
+          this.log.error(
+            `Device Built In Sensor Room ID: ${device.inBuiltSensorState.roomId}`,
+          );
         }
         if (device.inBuiltSensorState.roomName) {
           this.log.warn(JSON.stringify(device.inBuiltSensorState.roomName));
-          this.log.error(`Device Built In Sensor Room Name: ${device.inBuiltSensorState.roomName}`);
+          this.log.error(
+            `Device Built In Sensor Room Name: ${device.inBuiltSensorState.roomName}`,
+          );
         }
       }
       if (device.groups) {
