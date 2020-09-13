@@ -65,7 +65,7 @@
                 "title": "Thermostat Setpoint Status",
                 "type": "string",
                 "requried": true,
-                "default": "PermanentHold", 
+                "default": "TemporaryHold", 
                 "oneOf": [
                   {
                     "title": "NoHold",
@@ -150,18 +150,8 @@
             "title": "Room Priority",
             "type": "object",
             "properties": {
-              "roomsensor": {
-                "title": "Room Sensor Only",
-                "type": "boolean",
-                "requried": false
-              },
               "thermostat": {
                 "title": "Thermostat Room Priority",
-                "type": "boolean",
-                "requried": false
-              },
-              "switch": {
-                "title": "Switch Room Priority",
                 "type": "boolean",
                 "requried": false
               }
@@ -209,6 +199,7 @@
           "expandable": true,
           "expanded": false,
           "items": [
+            "options.thermostat.thermostatSetpointStatus",
             {
               "type": "help",
               "helpvalue": "<h5>Thermostat</h5><em class='primary-text'>Allows you to hide your Thermostat(s).</em>"
@@ -219,7 +210,6 @@
               "helpvalue": "<h5>Hide Thermostat Fan Service</h5><em class='primary-text'>Allows you to hide your Thermostat's Fan.</em>"
             },
             "options.thermostat.hide_fan",
-            "options.thermostat.thermostatSetpointStatus",
             {
               "type": "fieldset",
               "title": "Room Sensor Options",
@@ -247,19 +237,9 @@
                   "items": [
                     {
                       "type": "help",
-                      "helpvalue": "<em class='primary-text'>Allows you to set your Priority to show up as a Thermostat or Switch(s).</em>"
+                      "helpvalue": "<em class='primary-text'>Allows you to set your Priority to your Room Sensor(s).</em>"
                     },
-                    {
-                      "type": "help",
-                      "helpvalue": "<em class='primary-text'>Only select one of the following.</em>"
-                    },
-                    "options.roompriority.thermostat",
-                    "options.roompriority.switch",
-                    {
-                      "type": "help",
-                      "helpvalue": "<em class='primary-text'>Select Room Sensors to Disable Room Priority, and Display Only Room Sensor(s).</em>"
-                    },
-                    "options.roompriority.roomsensor"
+                    "options.roompriority.thermostat"
                   ]
                 }
               ]

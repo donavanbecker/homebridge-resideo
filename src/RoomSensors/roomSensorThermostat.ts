@@ -139,9 +139,15 @@ export class RoomSensorThermostat {
         });
     }
 
+    // The value property of TargetHeaterCoolerState must be one of the following:
+    //AUTO = 0; HEAT = 1; COOL = 2; OFF = 3;
     // Set control bindings
+    const TargetState = this.TargetState();
     this.service
       .getCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState)
+      .setProps({
+        validValues: TargetState,
+      })
       .on('set', this.setTargetHeatingCoolingState.bind(this));
 
     this.service.setCharacteristic(
@@ -195,8 +201,8 @@ export class RoomSensorThermostat {
           try {
             await this.pushRoomChanges();
           } catch (e) {
-            this.platform.log.error(e);
-            this.platform.log.debug(e.message);
+            this.platform.log.error(e.message);
+            this.platform.log.debug(e);
           }
           this.roomUpdateInProgress = false;
         });
@@ -212,8 +218,8 @@ export class RoomSensorThermostat {
         try {
           await this.pushChanges();
         } catch (e) {
-          this.platform.log.error(e);
-          this.platform.log.debug(e.message);
+          this.platform.log.error(e.message);
+          this.platform.log.debug(e);
         }
         this.thermostatUpdateInProgress = false;
       });
@@ -311,9 +317,9 @@ export class RoomSensorThermostat {
     } catch (e) {
       this.platform.log.error(
         `Failed to update status of ${this.sensoraccessory.accessoryAttribute.name} ${this.sensoraccessory.accessoryAttribute.type} Thermostat`,
-        e,
+        e.message,
       );
-      this.platform.log.debug(e.message);
+      this.platform.log.debug(e);
     }
   }
 
@@ -379,9 +385,9 @@ export class RoomSensorThermostat {
     } catch (e) {
       this.platform.log.error(
         `Failed to update status of ${this.sensoraccessory.accessoryAttribute.name} ${this.sensoraccessory.accessoryAttribute.type} Thermostat`,
-        e,
+        e.message,
       );
-      this.platform.log.debug(e.message);
+      this.platform.log.debug(e);
     }
   }
 
@@ -402,18 +408,15 @@ export class RoomSensorThermostat {
       this.platform.log.debug(JSON.stringify(payload));
 
       // Make the API request
-      const pushRoomChanges = (
-        await this.platform.axios.put(
-          `${DeviceURL}/thermostats/${this.device.deviceID}/priority`,
-          payload,
-          {
-            params: {
-              locationId: this.locationId,
-            },
+      await this.platform.axios.put(
+        `${DeviceURL}/thermostats/${this.device.deviceID}/priority`,
+        payload,
+        {
+          params: {
+            locationId: this.locationId,
           },
-        )
-      ).data;
-      pushRoomChanges;
+        },
+      );
     }
     // Refresh the status from the API
     await this.refreshSensorStatus();
@@ -471,18 +474,15 @@ export class RoomSensorThermostat {
     this.platform.log.debug(JSON.stringify(payload));
 
     // Make the API request
-    const pushChanges = (
-      await this.platform.axios.post(
-        `${DeviceURL}/thermostats/${this.device.deviceID}`,
-        payload,
-        {
-          params: {
-            locationId: this.locationId,
-          },
+    await this.platform.axios.post(
+      `${DeviceURL}/thermostats/${this.device.deviceID}`,
+      payload,
+      {
+        params: {
+          locationId: this.locationId,
         },
-      )
-    ).data;
-    pushChanges;
+      },
+    );
     // Refresh the status from the API
     await this.refreshStatus();
   }
@@ -617,5 +617,26 @@ export class RoomSensorThermostat {
     }
 
     return Math.round((value * 9) / 5 + 32);
+  }
+  
+  private TargetState() {
+    this.platform.log.debug(this.device.allowedModes);
+
+    const TargetState = [4];
+    TargetState.pop();
+    if (this.device.allowedModes.includes('Cool')) {
+      TargetState.push(2);
+    }
+    if (this.device.allowedModes.includes('Heat')) {
+      TargetState.push(1);
+    }
+    if (this.device.allowedModes.includes('Off')) {
+      TargetState.push(3);
+    }
+    if (this.device.allowedModes.includes('Auto')) {
+      TargetState.push(0);
+    }
+    this.platform.log.debug(JSON.stringify(TargetState));
+    return TargetState;
   }
 }

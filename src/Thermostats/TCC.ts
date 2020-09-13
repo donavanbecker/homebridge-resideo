@@ -134,13 +134,18 @@ export class TCC {
         });
     }
 
+    // The value property of TargetHeaterCoolerState must be one of the following:
+    //AUTO = 0; HEAT = 1; COOL = 2; OFF = 3;
     // Set control bindings
-    this.service
-      .getCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState)
-      .setProps({
-        validValues: this.modes[this.device.allowedModes],
-      })
-      .on('set', this.setTargetHeatingCoolingState.bind(this));
+    const TargetState = this.TargetState();
+    {
+      this.service
+        .getCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState)
+        .setProps({
+          validValues: TargetState,
+        })
+        .on('set', this.setTargetHeatingCoolingState.bind(this));
+    }
 
     this.service.setCharacteristic(
       this.platform.Characteristic.CurrentHeatingCoolingState,
@@ -175,7 +180,7 @@ export class TCC {
       ) {
         this.platform.log.debug(
           'Available FAN settings',
-          this.device.settings.fan,
+          JSON.stringify(this.device.settings.fan),
         );
         this.fanService =
           accessory.getService(this.platform.Service.Fanv2) ||
@@ -222,8 +227,8 @@ export class TCC {
         try {
           await this.pushChanges();
         } catch (e) {
-          this.platform.log.error(e);
-          this.platform.log.debug(e.message);
+          this.platform.log.error(e.message);
+          this.platform.log.debug(e);
         }
         this.thermostatUpdateInProgress = false;
       });
@@ -243,8 +248,8 @@ export class TCC {
             try {
               await this.pushFanChanges();
             } catch (e) {
-              this.platform.log.error(e);
-              this.platform.log.debug(e.message);
+              this.platform.log.error(e.message);
+              this.platform.log.debug(e);
             }
             this.fanUpdateInProgress = false;
           });
@@ -391,9 +396,9 @@ export class TCC {
     } catch (e) {
       this.platform.log.error(
         `Failed to update status of ${this.device.name}`,
-        e,
+        e.message,
       );
-      this.platform.log.debug(e.message);
+      this.platform.log.debug(e);
     }
   }
 
@@ -402,44 +407,43 @@ export class TCC {
    */
   async pushChanges() {
     const payload = {
-      SystemSwitch: this.honeywellMode[this.TargetHeatingCoolingState],
-      setpointStatus: 'Temporary',
+      ThermostatMode: this.honeywellMode[this.TargetHeatingCoolingState],
+      mode: this.honeywellMode[this.TargetHeatingCoolingState],
+      SetpointStatus: 'Hold',
+      thermostatSetpointStatus: this.platform.config.options.thermostat.thermostatSetpointStatus,
     } as any;
-    //thermostatSetpointStatus: this.platform.config.options.thermostat.thermostatSetpointStatus,
-    //autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
-
     // Set the heat and cool set point value based on the selected mode
     if (
       this.TargetHeatingCoolingState ===
       this.platform.Characteristic.TargetHeatingCoolingState.HEAT
     ) {
-      payload.HeatSetpoint = this.toFahrenheit(this.TargetTemperature);
-      payload.CoolSetpoint = this.toFahrenheit(
+      payload.heatSetpoint = this.toFahrenheit(this.TargetTemperature);
+      payload.coolSetpoint = this.toFahrenheit(
         this.CoolingThresholdTemperature,
       );
     } else if (
       this.TargetHeatingCoolingState ===
       this.platform.Characteristic.TargetHeatingCoolingState.COOL
     ) {
-      payload.CoolSetpoint = this.toFahrenheit(this.TargetTemperature);
-      payload.HeatSetpoint = this.toFahrenheit(
+      payload.coolSetpoint = this.toFahrenheit(this.TargetTemperature);
+      payload.heatSetpoint = this.toFahrenheit(
         this.HeatingThresholdTemperature,
       );
     } else if (
       this.TargetHeatingCoolingState ===
       this.platform.Characteristic.TargetHeatingCoolingState.AUTO
     ) {
-      payload.CoolSetpoint = this.toFahrenheit(
+      payload.coolSetpoint = this.toFahrenheit(
         this.CoolingThresholdTemperature,
       );
-      payload.HeatSetpoint = this.toFahrenheit(
+      payload.heatSetpoint = this.toFahrenheit(
         this.HeatingThresholdTemperature,
       );
     } else {
-      payload.CoolSetpoint = this.toFahrenheit(
+      payload.coolSetpoint = this.toFahrenheit(
         this.CoolingThresholdTemperature,
       );
-      payload.HeatSetpoint = this.toFahrenheit(
+      payload.heatSetpoint = this.toFahrenheit(
         this.HeatingThresholdTemperature,
       );
     }
@@ -687,5 +691,26 @@ export class TCC {
     this.TargetFanState = value;
     this.doFanUpdate.next();
     callback(null);
+  }
+
+  private TargetState() {
+    this.platform.log.debug(this.device.allowedModes);
+
+    const TargetState = [4];
+    TargetState.pop();
+    if (this.device.allowedModes.includes('Cool')) {
+      TargetState.push(2);
+    }
+    if (this.device.allowedModes.includes('Heat')) {
+      TargetState.push(1);
+    }
+    if (this.device.allowedModes.includes('Off')) {
+      TargetState.push(3);
+    }
+    if (this.device.allowedModes.includes('Auto')) {
+      TargetState.push(0);
+    }
+    this.platform.log.debug(JSON.stringify(TargetState));
+    return TargetState;
   }
 }

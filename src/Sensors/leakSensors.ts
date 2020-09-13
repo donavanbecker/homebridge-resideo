@@ -282,6 +282,7 @@ export class LeakSensor {
         `Failed to update status of ${this.device.userDefinedDeviceName}`,
         e.message,
       );
+      this.platform.log.debug(e);
     }
   }
 

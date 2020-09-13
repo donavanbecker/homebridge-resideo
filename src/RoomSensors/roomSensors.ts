@@ -299,9 +299,9 @@ export class RoomSensors {
     } catch (e) {
       this.platform.log.error(
         `Failed to update status of ${this.sensoraccessory.accessoryAttribute.name} ${this.sensoraccessory.accessoryAttribute.type}`,
-        e,
+        e.message,
       );
-      this.platform.log.debug(e.message);
+      this.platform.log.debug(e);
     }
   }
 

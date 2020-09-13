@@ -28,7 +28,6 @@ import { TCC } from './Thermostats/TCC';
 import { LeakSensor } from './Sensors/leakSensors';
 import { RoomSensors } from './RoomSensors/roomSensors';
 import { RoomSensorThermostat } from './RoomSensors/roomSensorThermostat';
-import { RoomPriority } from './RoomSensors/roomPriority';
 import * as configTypes from './configTypes';
 
 /**
@@ -94,21 +93,21 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         try {
           await this.getAccessToken();
         } catch (e) {
-          this.log.error('Failed to refresh access token.', e);
-          this.log.debug(e.message);
+          this.log.error('Failed to refresh access token.', e.message);
+          this.log.debug(e);
         }
       });
       try {
         this.locations = await this.discoverlocations();
       } catch (e) {
-        this.log.error('Failed to Discover Locations.', e);
-        this.log.debug(e.message);
+        this.log.error('Failed to Discover Locations.', e.message);
+        this.log.debug(e);
       }
       try {
         this.discoverDevices();
       } catch (e) {
-        this.log.error('Failed to Discover Thermostats.', e);
-        this.log.debug(e.message);
+        this.log.error('Failed to Discover Thermostats.', e.message);
+        this.log.debug(e);
       }
     });
   }
@@ -178,61 +177,19 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
     // Room Priority Config Options
     this.config.options.roompriority.thermostat;
-    this.config.options.roompriority.switch;
-    this.config.options.roompriority.roomsensor;
 
     /**
-     * Room Priority Errors
-     * This will only error if multiple optioins have been set to true
+     * Room Priority
+     * This will display what room priority option that has been selected.
      */
-    if (
-      !this.config.options.roompriority.thermostat &&
-      !this.config.options.roompriority.switch &&
-      !this.config.options.roompriority.roomsensor
-    ) {
-      this.config.options.roompriority.roomsensor = true;
-    }
-    if (
-      this.config.options.roompriority.thermostat &&
-      this.config.options.roompriority.switch
-    ) {
-      this.multipleRoomPriority();
-      this.config.options.roompriority.roomsensor = true;
-    }
-    if (
-      this.config.options.roompriority.thermostat &&
-      this.config.options.roompriority.roomsensor
-    ) {
-      this.multipleRoomPriority();
-      this.config.options.roompriority.roomsensor = true;
-    }
-    if (
-      this.config.options.roompriority.switch &&
-      this.config.options.roompriority.roomsensor
-    ) {
-      this.multipleRoomPriority();
-      this.config.options.roompriority.roomsensor = true;
-    }
-    if (
-      this.config.options.roompriority.thermostat &&
-      this.config.options.roompriority.switch &&
-      this.config.options.roompriority.roomsensor
-    ) {
-      this.multipleRoomPriority();
-      this.config.options.roompriority.roomsensor = true;
-    }
-    if (this.config.options.roompriority.switch) {
-      this.log.warn(
-        'Switch Room Priority has been selected. You can set your Thermostat\'s Priroty to the desired Room with the flick/touch of a Switch.',
-      );
-    }
+
     if (this.config.options.roompriority.thermsotat) {
       this.log.warn(
-        'Thermostat Room Priority has been selected. You will have a Thermostat for Each Room Sensor so that you can set the priority of that Room.',
+        'Displaying Room Sensors as Thermostats. You will have a Thermostat for Each Room Sensor so that you can set the priority of that Room.',
       );
     }
-    if (this.config.options.roompriority.roomsensor) {
-      this.log.warn('Room Sensors will only display as Room Sensors.');
+    if (!this.config.options.roompriority.thermsotat) {
+      this.log.warn('Only displaying Room Sensors.');
     }
 
     /**
@@ -262,12 +219,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     if (!this.config.credentials.refreshToken) {
       throw new Error('Missing refreshToken');
     }
-  }
-
-  private multipleRoomPriority() {
-    throw new Error(
-      'You can only have 1 Room Priority Option Selected. Room Sensors will be treated only as Room Sensors',
-    );
   }
 
   /**
@@ -308,9 +259,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       } catch (e) {
         this.log.error(
           'Failed to exchange refresh token for an access token.',
-          e,
+          e.message,
         );
-        this.log.debug(e.message);
+        this.log.debug(e);
         throw e;
       }
     }
@@ -378,8 +329,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         'Homebridge config.json has been updated with new refresh token.',
       );
     } catch (e) {
-      this.log.error('Failed to update refresh token in config:', e);
-      this.log.debug(e.message);
+      this.log.error('Failed to update refresh token in config:', e.message);
+      this.log.debug(e);
     }
   }
 
@@ -391,8 +342,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     try {
       await this.getAccessToken();
     } catch (e) {
-      this.log.error('Failed to refresh access token.', e);
-      this.log.debug(e.message);
+      this.log.error('Failed to refresh access token.', e.message);
+      this.log.debug(e);
       return;
     }
     const locations = (await this.axios.get(LocationURL)).data;
@@ -506,8 +457,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               try {
                 this.firmware = await this.Firmware();
               } catch (e) {
-                this.log.error('Failed to Get Firmware Version.', e);
-                this.log.debug(e.message);
+                this.log.error('Failed to Get Firmware Version.', e.message);
+                this.log.debug(e);
               }
               this.deviceinfo(device);
               this.log.debug(JSON.stringify(device));
@@ -515,14 +466,14 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               try {
                 this.discoverRoomSensors();
               } catch (e) {
-                this.log.error('Failed to Find Room Sensors.', e);
-                this.log.debug(e.message);
+                this.log.error('Failed to Find Room Sensors.', e.message);
+                this.log.debug(e);
               }
               try {
                 // this.discoverRoomPriority();
               } catch (e) {
-                this.log.error('Failed to Find Room Priority.', e);
-                this.log.debug(e.message);
+                this.log.error('Failed to Find Room Priority.', e.message);
+                this.log.debug(e);
               }
             } else if (device.deviceModel.startsWith('T5')) {
               this.deviceinfo(device);
@@ -586,12 +537,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                       this.log.debug(JSON.stringify(accessories));
                       for (const accessory of accessories.accessories) {
                         const sensoraccessory = accessory;
-                        this.RoomPriority(
-                          device,
-                          locationId,
-                          sensoraccessory,
-                          group,
-                        );
                         if (accessory.accessoryAttribute) {
                           if (accessory.accessoryAttribute.type) {
                             if (
@@ -996,11 +941,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     );
     if (existingAccessory) {
       // the accessory already exists
-      if (
-        device.isAlive &&
-        (this.config.options.roompriority.roomsensor ||
-          this.config.options.roompriority.switch)
-      ) {
+      if (device.isAlive && !this.config.options.roomsensor.hide) {
         this.log.info(
           'Restoring existing accessory from cache:',
           existingAccessory.displayName,
@@ -1022,17 +963,10 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         this.log.debug(
           `Room Sensors UDID: ${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryId}-RoomSensor`,
         );
-      } else if (
-        !device.isAlive &&
-        this.config.options.roompriority.thermostat
-      ) {
+      } else if (!device.isAlive || this.config.options.roomsensor.hide) {
         this.unregisterPlatformAccessories(existingAccessory);
       }
-    } else if (
-      device.isAlive &&
-      (this.config.options.roompriority.roomsensor ||
-        this.config.options.roompriority.switch)
-    ) {
+    } else if (device.isAlive && !this.config.options.roomsensor.hide) {
       // the accessory does not yet exist, so we need to create it
       this.log.info(
         `Adding new accessory: ${sensoraccessory.accessoryAttribute.name} ${sensoraccessory.accessoryAttribute.type}`,
@@ -1155,89 +1089,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       );
       this.log.debug(
         `Room Sensor Thermostat UDID: ${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryId}-RoomSensorThermostat-${device.deviceID}`,
-      );
-
-      // link the accessory to your platform
-      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [
-        accessory,
-      ]);
-    }
-  }
-
-  private RoomPriority(
-    device: configTypes.T9Thermostat,
-    locationId: configTypes.location['locationID'],
-    sensoraccessory: configTypes.sensoraccessory,
-    group: configTypes.T9groups,
-  ) {
-    // Room Priority Switches
-    const uuid = this.api.hap.uuid.generate(
-      `${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryId}-Room-Priority-Switch`,
-    );
-    const existingAccessory = this.accessories.find(
-      (accessory) => accessory.UUID === uuid,
-    );
-
-    if (existingAccessory) {
-      // the accessory already exists
-      if (device.isAlive && this.config.options.roompriority.switch) {
-        this.log.info(
-          'Restoring existing accessory from cache:',
-          existingAccessory.displayName,
-        );
-
-        // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-        // this.api.updatePlatformAccessories([existingAccessory]);
-
-        // create the accessory handler for the restored accessory
-        // this is imported from `platformAccessory.ts`
-        new RoomPriority(
-          this,
-          existingAccessory,
-          locationId,
-          device,
-          sensoraccessory,
-          group,
-        );
-        this.log.debug(
-          `Room Priority Switch UDID: ${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryId}-Room-Priority-Switch`,
-        );
-      } else if (!device.isAlive && !this.config.options.roompriority.switch) {
-        this.unregisterPlatformAccessories(existingAccessory);
-      }
-    } else if (device.isAlive && this.config.options.roompriority.switch) {
-      // the accessory does not yet exist, so we need to create it
-      this.log.info(
-        'Adding new accessory:',
-        `${sensoraccessory.accessoryAttribute.type} Room Priority Switch`,
-      );
-      this.log.debug(
-        `Registering new device: ${sensoraccessory.accessoryAttribute.type} Room Priority Switch - ${sensoraccessory.accessoryAttribute.hardwareRevision}`,
-      );
-
-      // create a new accessory
-      const accessory = new this.api.platformAccessory(
-        `${sensoraccessory.accessoryAttribute.type} Room Priority Switch`,
-        uuid,
-      );
-
-      // store a copy of the device object in the `accessory.context`
-      // the `context` property can be used to store any data about the accessory you may need
-      accessory.context.firmwareRevision =
-        sensoraccessory.accessoryAttribute.softwareRevision;
-
-      // create the accessory handler for the newly create accessory
-      // this is imported from `platformAccessory.ts`
-      new RoomPriority(
-        this,
-        accessory,
-        locationId,
-        device,
-        sensoraccessory,
-        group,
-      );
-      this.log.debug(
-        `Room Priority Switch UDID: ${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryId}-Room-Priority-Switch`,
       );
 
       // link the accessory to your platform
