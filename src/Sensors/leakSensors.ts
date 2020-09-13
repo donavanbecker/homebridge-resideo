@@ -280,9 +280,9 @@ export class LeakSensor {
     } catch (e) {
       this.platform.log.error(
         `Failed to update status of ${this.device.userDefinedDeviceName}`,
-        e.message,
+        JSON.stringify(e.message),
+        this.platform.log.debug(JSON.stringify(e)),
       );
-      this.platform.log.debug(e);
     }
   }
 

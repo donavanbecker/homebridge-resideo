@@ -67,8 +67,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       this.verifyConfig();
       this.log.debug('Config OK');
     } catch (e) {
-      this.log.error(e);
-      this.log.debug(e.message);
+      this.log.error(JSON.stringify(e.message));
+      this.log.debug(JSON.stringify(e));
       return;
     }
 
@@ -93,21 +93,21 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         try {
           await this.getAccessToken();
         } catch (e) {
-          this.log.error('Failed to refresh access token.', e.message);
-          this.log.debug(e);
+          this.log.error('Failed to refresh access token.', JSON.stringify(e.message));
+          this.log.debug(JSON.stringify(e));
         }
       });
       try {
         this.locations = await this.discoverlocations();
       } catch (e) {
-        this.log.error('Failed to Discover Locations.', e.message);
-        this.log.debug(e);
+        this.log.error('Failed to Discover Locations.', JSON.stringify(e.message));
+        this.log.debug(JSON.stringify(e));
       }
       try {
         this.discoverDevices();
       } catch (e) {
-        this.log.error('Failed to Discover Thermostats.', e.message);
-        this.log.debug(e);
+        this.log.error('Failed to Discover Thermostats.', JSON.stringify(e.message));
+        this.log.debug(JSON.stringify(e));
       }
     });
   }
@@ -259,9 +259,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       } catch (e) {
         this.log.error(
           'Failed to exchange refresh token for an access token.',
-          e.message,
+          JSON.stringify(e.message),
         );
-        this.log.debug(e);
+        this.log.debug(JSON.stringify(e));
         throw e;
       }
     }
@@ -329,8 +329,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         'Homebridge config.json has been updated with new refresh token.',
       );
     } catch (e) {
-      this.log.error('Failed to update refresh token in config:', e.message);
-      this.log.debug(e);
+      this.log.error('Failed to update refresh token in config:', JSON.stringify(e.message));
+      this.log.debug(JSON.stringify(e));
     }
   }
 
@@ -342,8 +342,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     try {
       await this.getAccessToken();
     } catch (e) {
-      this.log.error('Failed to refresh access token.', e.message);
-      this.log.debug(e);
+      this.log.error('Failed to refresh access token.', JSON.stringify(e.message));
+      this.log.debug(JSON.stringify(e));
       return;
     }
     const locations = (await this.axios.get(LocationURL)).data;
@@ -457,8 +457,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               try {
                 this.firmware = await this.Firmware();
               } catch (e) {
-                this.log.error('Failed to Get Firmware Version.', e.message);
-                this.log.debug(e);
+                this.log.error('Failed to Get Firmware Version.', JSON.stringify(e.message));
+                this.log.debug(JSON.stringify(e));
               }
               this.deviceinfo(device);
               this.log.debug(JSON.stringify(device));
@@ -466,14 +466,14 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               try {
                 this.discoverRoomSensors();
               } catch (e) {
-                this.log.error('Failed to Find Room Sensors.', e.message);
-                this.log.debug(e);
+                this.log.error('Failed to Find Room Sensors.', JSON.stringify(e.message));
+                this.log.debug(JSON.stringify(e));
               }
               try {
                 // this.discoverRoomPriority();
               } catch (e) {
-                this.log.error('Failed to Find Room Priority.', e.message);
-                this.log.debug(e);
+                this.log.error('Failed to Find Room Priority.', JSON.stringify(e.message));
+                this.log.debug(JSON.stringify(e));
               }
             } else if (device.deviceModel.startsWith('T5')) {
               this.deviceinfo(device);

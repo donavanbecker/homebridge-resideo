@@ -201,8 +201,8 @@ export class RoomSensorThermostat {
           try {
             await this.pushRoomChanges();
           } catch (e) {
-            this.platform.log.error(e.message);
-            this.platform.log.debug(e);
+            this.platform.log.error(JSON.stringify(e.message));
+            this.platform.log.debug(JSON.stringify(e));
           }
           this.roomUpdateInProgress = false;
         });
@@ -218,8 +218,8 @@ export class RoomSensorThermostat {
         try {
           await this.pushChanges();
         } catch (e) {
-          this.platform.log.error(e.message);
-          this.platform.log.debug(e);
+          this.platform.log.error(JSON.stringify(e.message));
+          this.platform.log.debug(JSON.stringify(e));
         }
         this.thermostatUpdateInProgress = false;
       });
@@ -317,9 +317,9 @@ export class RoomSensorThermostat {
     } catch (e) {
       this.platform.log.error(
         `Failed to update status of ${this.sensoraccessory.accessoryAttribute.name} ${this.sensoraccessory.accessoryAttribute.type} Thermostat`,
-        e.message,
+        JSON.stringify(e.message),
+        this.platform.log.debug(JSON.stringify(e)),
       );
-      this.platform.log.debug(e);
     }
   }
 
@@ -385,9 +385,9 @@ export class RoomSensorThermostat {
     } catch (e) {
       this.platform.log.error(
         `Failed to update status of ${this.sensoraccessory.accessoryAttribute.name} ${this.sensoraccessory.accessoryAttribute.type} Thermostat`,
-        e.message,
+        JSON.stringify(e.message),
+        this.platform.log.debug(JSON.stringify(e)),
       );
-      this.platform.log.debug(e);
     }
   }
 
@@ -618,25 +618,36 @@ export class RoomSensorThermostat {
 
     return Math.round((value * 9) / 5 + 32);
   }
-  
+
   private TargetState() {
     this.platform.log.debug(this.device.allowedModes);
 
     const TargetState = [4];
     TargetState.pop();
     if (this.device.allowedModes.includes('Cool')) {
-      TargetState.push(2);
+      TargetState.push(
+        this.platform.Characteristic.TargetHeatingCoolingState.COOL,
+      );
     }
     if (this.device.allowedModes.includes('Heat')) {
-      TargetState.push(1);
+      TargetState.push(
+        this.platform.Characteristic.TargetHeatingCoolingState.HEAT,
+      );
     }
     if (this.device.allowedModes.includes('Off')) {
-      TargetState.push(3);
+      TargetState.push(
+        this.platform.Characteristic.TargetHeatingCoolingState.OFF,
+      );
     }
     if (this.device.allowedModes.includes('Auto')) {
-      TargetState.push(0);
+      TargetState.push(
+        this.platform.Characteristic.TargetHeatingCoolingState.AUTO,
+      );
     }
-    this.platform.log.debug(JSON.stringify(TargetState));
+    this.platform.log.debug(
+      'Only Show These Modes:',
+      JSON.stringify(TargetState),
+    );
     return TargetState;
   }
 }

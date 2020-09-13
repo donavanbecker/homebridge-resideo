@@ -140,7 +140,9 @@ export class TCC {
     const TargetState = this.TargetState();
     {
       this.service
-        .getCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState)
+        .getCharacteristic(
+          this.platform.Characteristic.TargetHeatingCoolingState,
+        )
         .setProps({
           validValues: TargetState,
         })
@@ -227,8 +229,8 @@ export class TCC {
         try {
           await this.pushChanges();
         } catch (e) {
-          this.platform.log.error(e.message);
-          this.platform.log.debug(e);
+          this.platform.log.error(JSON.stringify(e.message));
+          this.platform.log.debug(JSON.stringify(e));
         }
         this.thermostatUpdateInProgress = false;
       });
@@ -248,8 +250,8 @@ export class TCC {
             try {
               await this.pushFanChanges();
             } catch (e) {
-              this.platform.log.error(e.message);
-              this.platform.log.debug(e);
+              this.platform.log.error(JSON.stringify(e.message));
+              this.platform.log.debug(JSON.stringify(e));
             }
             this.fanUpdateInProgress = false;
           });
@@ -396,9 +398,9 @@ export class TCC {
     } catch (e) {
       this.platform.log.error(
         `Failed to update status of ${this.device.name}`,
-        e.message,
+        JSON.stringify(e.message),
+        this.platform.log.debug(JSON.stringify(e)),
       );
-      this.platform.log.debug(e);
     }
   }
 
@@ -410,7 +412,8 @@ export class TCC {
       ThermostatMode: this.honeywellMode[this.TargetHeatingCoolingState],
       mode: this.honeywellMode[this.TargetHeatingCoolingState],
       SetpointStatus: 'Hold',
-      thermostatSetpointStatus: this.platform.config.options.thermostat.thermostatSetpointStatus,
+      thermostatSetpointStatus: this.platform.config.options.thermostat
+        .thermostatSetpointStatus,
     } as any;
     // Set the heat and cool set point value based on the selected mode
     if (
@@ -699,18 +702,18 @@ export class TCC {
     const TargetState = [4];
     TargetState.pop();
     if (this.device.allowedModes.includes('Cool')) {
-      TargetState.push(2);
+      TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.COOL);
     }
     if (this.device.allowedModes.includes('Heat')) {
-      TargetState.push(1);
+      TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
     }
     if (this.device.allowedModes.includes('Off')) {
-      TargetState.push(3);
+      TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.OFF);
     }
     if (this.device.allowedModes.includes('Auto')) {
-      TargetState.push(0);
+      TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.AUTO);
     }
-    this.platform.log.debug(JSON.stringify(TargetState));
+    this.platform.log.debug('Only Show These Modes:', JSON.stringify(TargetState));
     return TargetState;
   }
 }
