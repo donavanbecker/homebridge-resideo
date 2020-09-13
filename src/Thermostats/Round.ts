@@ -223,6 +223,7 @@ export class Round {
           await this.pushChanges();
         } catch (e) {
           this.platform.log.error(e.message);
+          this.platform.log.debug(e);
         }
         this.thermostatUpdateInProgress = false;
       });
@@ -241,7 +242,8 @@ export class Round {
           try {
             await this.pushFanChanges();
           } catch (e) {
-            this.platform.log.error(e.message);
+            this.platform.log.error(e);
+            this.platform.log.debug(e.message);
           }
           this.fanUpdateInProgress = false;
         });
@@ -380,8 +382,8 @@ export class Round {
     } catch (e) {
       this.platform.log.error(
         `Failed to update status of ${this.device.name}`,
-        e.message,
-      );
+        e);
+      this.platform.log.debug(e.message);
     }
   }
 
@@ -437,18 +439,15 @@ export class Round {
     this.platform.log.debug(JSON.stringify(payload));
 
     // Make the API request
-    const pushChanges = (
-      await this.platform.axios.post(
-        `${DeviceURL}/thermostats/${this.device.deviceID}`,
-        payload,
-        {
-          params: {
-            locationId: this.locationId,
-          },
+    await this.platform.axios.post(
+      `${DeviceURL}/thermostats/${this.device.deviceID}`,
+      payload,
+      {
+        params: {
+          locationId: this.locationId,
         },
-      )
-    ).data;
-    pushChanges;
+      },
+    );
     // Refresh the status from the API
     await this.refreshStatus();
   }

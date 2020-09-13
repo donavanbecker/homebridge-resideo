@@ -108,7 +108,8 @@ export class RoomPriority {
         try {
           await this.pushChanges();
         } catch (e) {
-          this.platform.log.error(e.message);
+          this.platform.log.error(e);
+          this.platform.log.debug(e.message);
         }
         this.RoomUpdateInProgress = false;
       });
@@ -174,8 +175,9 @@ export class RoomPriority {
     } catch (e) {
       this.platform.log.error(
         `Failed to update status of ${this.device.name}`,
-        e.message,
+        e,
       );
+      this.platform.log.debug(e.message);
     }
   }
 
@@ -195,18 +197,15 @@ export class RoomPriority {
     this.platform.log.debug(JSON.stringify(payload));
 
     // Make the API request
-    const pushRoomChanges = (
-      await this.platform.axios.put(
-        `${DeviceURL}/thermostats/${this.device.deviceID}/priority`,
-        payload,
-        {
-          params: {
-            locationId: this.locationId,
-          },
+    await this.platform.axios.put(
+      `${DeviceURL}/thermostats/${this.device.deviceID}/priority`,
+      payload,
+      {
+        params: {
+          locationId: this.locationId,
         },
-      )
-    ).data;
-    pushRoomChanges;
+      },
+    );
     // Refresh the status from the API}
     await this.refreshStatus();
   }

@@ -60,6 +60,32 @@
                 "title": "Hide Thermostat(s) Fan",
                 "type": "boolean",
                 "requried": false
+              },
+              "thermostatSetpointStatus": {
+                "title": "Thermostat Setpoint Status",
+                "type": "string",
+                "requried": true,
+                "default": "PermanentHold", 
+                "oneOf": [
+                  {
+                    "title": "NoHold",
+                    "enum": [
+                      "NoHold"
+                    ]
+                  },
+                  {
+                    "title": "PermanentHold",
+                    "enum": [
+                      "PermanentHold"
+                    ]
+                  },
+                  {
+                    "title": "TemporaryHold",
+                    "enum": [
+                      "TemporaryHold"
+                    ]
+                  }
+                ]
               }
             }
           },
@@ -193,6 +219,7 @@
               "helpvalue": "<h5>Hide Thermostat Fan Service</h5><em class='primary-text'>Allows you to hide your Thermostat's Fan.</em>"
             },
             "options.thermostat.hide_fan",
+            "options.thermostat.thermostatSetpointStatus",
             {
               "type": "fieldset",
               "title": "Room Sensor Options",

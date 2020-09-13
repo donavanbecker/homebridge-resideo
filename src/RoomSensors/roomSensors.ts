@@ -183,7 +183,7 @@ export class RoomSensors {
     this.refreshStatus();
 
     // Start an update interval
-    interval(this.platform.config.options.ttl * 100)
+    interval(this.platform.config.options.ttl * 1000)
       .pipe(skipWhile(() => this.SensorUpdateInProgress))
       .subscribe(() => {
         this.refreshStatus();
@@ -299,8 +299,9 @@ export class RoomSensors {
     } catch (e) {
       this.platform.log.error(
         `Failed to update status of ${this.sensoraccessory.accessoryAttribute.name} ${this.sensoraccessory.accessoryAttribute.type}`,
-        e.message,
+        e,
       );
+      this.platform.log.debug(e.message);
     }
   }
 

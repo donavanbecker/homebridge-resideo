@@ -222,7 +222,8 @@ export class TCC {
         try {
           await this.pushChanges();
         } catch (e) {
-          this.platform.log.error(e.message);
+          this.platform.log.error(e);
+          this.platform.log.debug(e.message);
         }
         this.thermostatUpdateInProgress = false;
       });
@@ -242,7 +243,8 @@ export class TCC {
             try {
               await this.pushFanChanges();
             } catch (e) {
-              this.platform.log.error(e.message);
+              this.platform.log.error(e);
+              this.platform.log.debug(e.message);
             }
             this.fanUpdateInProgress = false;
           });
@@ -389,8 +391,9 @@ export class TCC {
     } catch (e) {
       this.platform.log.error(
         `Failed to update status of ${this.device.name}`,
-        e.message,
+        e,
       );
+      this.platform.log.debug(e.message);
     }
   }
 
@@ -399,43 +402,44 @@ export class TCC {
    */
   async pushChanges() {
     const payload = {
-      mode: this.honeywellMode[this.TargetHeatingCoolingState],
-      thermostatSetpointStatus: 'PermanentHold',
-      nextPeriodTime: '18:00:00',
+      SystemSwitch: this.honeywellMode[this.TargetHeatingCoolingState],
+      setpointStatus: 'Temporary',
     } as any;
+    //thermostatSetpointStatus: this.platform.config.options.thermostat.thermostatSetpointStatus,
+    //autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
 
     // Set the heat and cool set point value based on the selected mode
     if (
       this.TargetHeatingCoolingState ===
       this.platform.Characteristic.TargetHeatingCoolingState.HEAT
     ) {
-      payload.heatSetpoint = this.toFahrenheit(this.TargetTemperature);
-      payload.coolSetpoint = this.toFahrenheit(
+      payload.HeatSetpoint = this.toFahrenheit(this.TargetTemperature);
+      payload.CoolSetpoint = this.toFahrenheit(
         this.CoolingThresholdTemperature,
       );
     } else if (
       this.TargetHeatingCoolingState ===
       this.platform.Characteristic.TargetHeatingCoolingState.COOL
     ) {
-      payload.coolSetpoint = this.toFahrenheit(this.TargetTemperature);
-      payload.heatSetpoint = this.toFahrenheit(
+      payload.CoolSetpoint = this.toFahrenheit(this.TargetTemperature);
+      payload.HeatSetpoint = this.toFahrenheit(
         this.HeatingThresholdTemperature,
       );
     } else if (
       this.TargetHeatingCoolingState ===
       this.platform.Characteristic.TargetHeatingCoolingState.AUTO
     ) {
-      payload.coolSetpoint = this.toFahrenheit(
+      payload.CoolSetpoint = this.toFahrenheit(
         this.CoolingThresholdTemperature,
       );
-      payload.heatSetpoint = this.toFahrenheit(
+      payload.HeatSetpoint = this.toFahrenheit(
         this.HeatingThresholdTemperature,
       );
     } else {
-      payload.coolSetpoint = this.toFahrenheit(
+      payload.CoolSetpoint = this.toFahrenheit(
         this.CoolingThresholdTemperature,
       );
-      payload.heatSetpoint = this.toFahrenheit(
+      payload.HeatSetpoint = this.toFahrenheit(
         this.HeatingThresholdTemperature,
       );
     }
@@ -446,18 +450,15 @@ export class TCC {
     this.platform.log.debug(JSON.stringify(payload));
 
     // Make the API request
-    const pushChanges = (
-      await this.platform.axios.post(
-        `${DeviceURL}/thermostats/${this.device.deviceID}`,
-        payload,
-        {
-          params: {
-            locationId: this.locationId,
-          },
+    await this.platform.axios.post(
+      `${DeviceURL}/thermostats/${this.device.deviceID}`,
+      payload,
+      {
+        params: {
+          locationId: this.locationId,
         },
-      )
-    ).data;
-    pushChanges;
+      },
+    );
     // Refresh the status from the API
     await this.refreshStatus();
   }
@@ -656,18 +657,15 @@ export class TCC {
         this.platform.log.debug(JSON.stringify(payload));
 
         // Make the API request
-        const pushFanChanges = (
-          await this.platform.axios.post(
-            `${DeviceURL}/thermostats/${this.device.deviceID}/fan`,
-            payload,
-            {
-              params: {
-                locationId: this.locationId,
-              },
+        await this.platform.axios.post(
+          `${DeviceURL}/thermostats/${this.device.deviceID}/fan`,
+          payload,
+          {
+            params: {
+              locationId: this.locationId,
             },
-          )
-        ).data;
-        pushFanChanges;
+          },
+        );
       }
     }
     // Refresh the status from the API

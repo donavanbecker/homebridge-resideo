@@ -195,7 +195,8 @@ export class RoomSensorThermostat {
           try {
             await this.pushRoomChanges();
           } catch (e) {
-            this.platform.log.error(e.message);
+            this.platform.log.error(e);
+            this.platform.log.debug(e.message);
           }
           this.roomUpdateInProgress = false;
         });
@@ -211,7 +212,8 @@ export class RoomSensorThermostat {
         try {
           await this.pushChanges();
         } catch (e) {
-          this.platform.log.error(e.message);
+          this.platform.log.error(e);
+          this.platform.log.debug(e.message);
         }
         this.thermostatUpdateInProgress = false;
       });
@@ -309,8 +311,9 @@ export class RoomSensorThermostat {
     } catch (e) {
       this.platform.log.error(
         `Failed to update status of ${this.sensoraccessory.accessoryAttribute.name} ${this.sensoraccessory.accessoryAttribute.type} Thermostat`,
-        e.message,
+        e,
       );
+      this.platform.log.debug(e.message);
     }
   }
 
@@ -376,8 +379,9 @@ export class RoomSensorThermostat {
     } catch (e) {
       this.platform.log.error(
         `Failed to update status of ${this.sensoraccessory.accessoryAttribute.name} ${this.sensoraccessory.accessoryAttribute.type} Thermostat`,
-        e.message,
+        e,
       );
+      this.platform.log.debug(e.message);
     }
   }
 
