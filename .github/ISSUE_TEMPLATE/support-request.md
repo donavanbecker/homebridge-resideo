@@ -16,15 +16,23 @@ assignees: ''
 <!-- Support requests that do not contain logs may be closed without warning. -->
 
 ```
-Show the Homebridge logs here.
-Remove any sensative information.
+Show the Homebridge logs here. If using Homebridge Config-UI-X, you can easly downlaod your log by visiting the log page on the UI and Clicking the Download Icon in the top right.
+Remove any sensitive information, such as your homebridge-honeywell-home refreshToken.
+
+Please Turn on Debug Mode before submitting your Issue so more logs can be shared to fix the issue being submitted.
+
+There is a hidden `"devicediscovery: true"` option that you can add to your config that will output data about your device to your log also.
+
+***Read and Paste over this Text the Text Above^^^^^^
 ```
 
 **Homebridge Config:**
 
 ```json
-Show your homebridge config.json here. 
-Remove any sensitive information, such as your homebridge-gsh / google-smarthome token.
+Paste your homebridge config.json here.
+Remove any sensitive information, such as your homebridge-honeywell-home consumerKey/ consumerSecret / refreshToken.
+
+***Read and Paste over this Text the Text Above^^^^^^
 ```
 
 **Screenshots:**

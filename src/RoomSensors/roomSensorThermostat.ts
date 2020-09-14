@@ -402,34 +402,41 @@ export class RoomSensorThermostat {
     if (
       this.platform.config.options.roompriority.priorityType === 'PickARoom'
     ) {
-      payload.currentPriority.selectedRooms = [this.sensoraccessory.accessoryId];
+      payload.currentPriority.selectedRooms = [
+        this.sensoraccessory.accessoryId,
+      ];
     }
-    
+
     /**
-   * For "LCC-" devices only.
-   * "NoHold" will return to schedule.
-   * "TemporaryHold" will hold the set temperature until "nextPeriodTime".
-   * "PermanentHold" will hold the setpoint until user requests another change.
-   */
+     * For "LCC-" devices only.
+     * "NoHold" will return to schedule.
+     * "TemporaryHold" will hold the set temperature until "nextPeriodTime".
+     * "PermanentHold" will hold the setpoint until user requests another change.
+     */
     if (this.platform.config.options.roompriority.thermostat) {
       if (
         this.platform.config.options.roompriority.priorityType === 'FollowMe'
       ) {
         this.platform.log.info(
-          'Sending request to Honeywell API. Room Priority: Priority Type: ', this.platform.config.options.roompriority.priorityType,
+          'Sending request to Honeywell API. Room Priority: Priority Type: ',
+          this.platform.config.options.roompriority.priorityType,
           ', Built-in Motion/Occupancy Sensor(s) Will be used to set Priority Automatically.',
         );
       } else if (
         this.platform.config.options.roompriority.priorityType === 'WholeHouse'
       ) {
         this.platform.log.info(
-          `Sending request to Honeywell API. Priority Type: ${this.platform.config.options.roompriority.priorityType}`,
+          'Sending request to Honeywell API. Priority Type: ',
+          this.platform.config.options.roompriority.priorityType,
         );
       } else if (
         this.platform.config.options.roompriority.priorityType === 'PickARoom'
       ) {
         this.platform.log.info(
-          `Sending request to Honeywell API. Room Priority: ${this.device.inBuiltSensorState.roomName}, Priority Type: ${this.platform.config.options.roompriority.priorityType}`,
+          'Sending request to Honeywell API. Room Priority: ',
+          this.sensoraccessory.accessoryId,
+          ' Priority Type: ',
+          this.platform.config.options.roompriority.priorityType,
         );
       }
       this.platform.log.debug(JSON.stringify(payload));

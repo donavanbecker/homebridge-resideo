@@ -410,7 +410,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 if (roomsensors.rooms) {
                   const rooms = roomsensors.rooms;
                   if (
-                    this.config.options.roompriority.roomsensor ||
                     this.config.options.roompriority.thermostat
                   ) {
                     this.log.info(`Total Rooms Found: ${rooms.length}`);
@@ -495,15 +494,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                   );
                   this.log.debug(JSON.stringify(e));
                 }
-                try {
-                  // this.discoverRoomPriority();
-                } catch (e) {
-                  this.log.error(
-                    'Failed to Find Room Priority.',
-                    JSON.stringify(e.message),
-                  );
-                  this.log.debug(JSON.stringify(e));
-                }
               } else if (device.deviceModel.startsWith('T5')) {
                 this.deviceinfo(device);
                 this.log.debug(JSON.stringify(device));
@@ -529,7 +519,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               }
             } else {
               this.log.info(
-                'Your Device isn\'t supported, Please open Feature Request Here: https://git.io/JUWN2',
+                'A Device was found that is not supported, Please open Feature Request Here: https://git.io/JUWN2, If you would like to see support.',
               );
             }
           }
@@ -561,7 +551,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                   const rooms = roomsensors.rooms;
                   this.log.debug(JSON.stringify(roomsensors));
                   if (
-                    this.config.options.roompriority.roomsensor ||
                     this.config.options.roompriority.thermostat
                   ) {
                     this.log.info(`Total Rooms Found: ${rooms.length}`);
@@ -1085,7 +1074,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
           `Room Sensor Thermostat UDID: ${sensoraccessory.accessoryAttribute.name}-${sensoraccessory.accessoryAttribute.type}-${sensoraccessory.accessoryId}-RoomSensorThermostat-${device.deviceID}`,
         );
       } else if (
-        !device.isAlive &&
+        !device.isAlive ||
         !this.config.options.roompriority.thermostat
       ) {
         this.unregisterPlatformAccessories(existingAccessory);
