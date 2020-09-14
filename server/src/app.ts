@@ -20,26 +20,25 @@ const serveSpa = (req, res, next) => {
 };
 
 // set some headers to help secure the app
-app.use(helmet({
-  hsts: false,
-  frameguard: true,
-  referrerPolicy: true,
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: [`'self'`],
-      frameSrc: [`'none'`],
-      scriptSrc: [`'self'`, `'unsafe-inline'`],
-      styleSrc: [
-        `'self'`,
-        `'unsafe-inline'`,
-      ],
-      imgSrc: [`'self'`, `https://user-images.githubusercontent.com`],
-      fontSrc: [`'self'`],
-      workerSrc: [`'none'`],
-      connectSrc: [`'self'`],
+app.use(
+  helmet({
+    hsts: false,
+    frameguard: true,
+    referrerPolicy: true,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: [`'self'`],
+        frameSrc: [`'none'`],
+        scriptSrc: [`'self'`, `'unsafe-inline'`],
+        styleSrc: [`'self'`, `'unsafe-inline'`],
+        imgSrc: [`'self'`, `https://user-images.githubusercontent.com`],
+        fontSrc: [`'self'`],
+        workerSrc: [`'none'`],
+        connectSrc: [`'self'`],
+      },
     },
-  },
-}));
+  })
+);
 
 // parse json body
 app.use(bodyParser.json());
@@ -50,9 +49,11 @@ app.get('/', serveSpa);
 // static assets
 app.use(express.static(path.resolve(__dirname, '../static')));
 
-app.use(cors({
-  origin: 'http://localhost:4500',
-}));
+app.use(
+  cors({
+    origin: 'http://localhost:4500',
+  })
+);
 
 // include routes
 app.use('/user', userRouter);

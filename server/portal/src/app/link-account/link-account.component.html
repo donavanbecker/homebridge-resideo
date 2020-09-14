@@ -1,28 +1,31 @@
 <div class="row">
   <div *ngIf="authData" class="col-md-12">
     <div *ngIf="!parentOrigin" class="text-center">
-      <div style="text-align:center; font-size:70px;">
+      <div style="text-align: center; font-size: 70px">
         <i class="fas fa-cog fa-spin"></i>
       </div>
       <p class="text-simple">Waiting for Homebridge, please wait...</p>
     </div>
     <div *ngIf="parentOrigin">
-      <div style="text-align:center; font-size:70px;">
+      <div style="text-align: center; font-size: 70px">
         <i class="fas fa-exclamation-triangle"></i>
       </div>
       <p>
-        Please confirm the URL below is the address of your Homebridge Config UI X instance:
+        Please confirm the URL below is the address of your Homebridge Config UI
+        X instance:
       </p>
       <div class="text-center">
         <h5>{{ parentOrigin }}</h5>
-        <button class="btn btn-lg btn-dark mt-4" (click)="confirm()">Confirm</button>
+        <button class="btn btn-lg btn-dark mt-4" (click)="confirm()">
+          Confirm
+        </button>
       </div>
     </div>
   </div>
 
   <div *ngIf="!authData && !authError" class="col-md-12">
     <div class="text-center">
-      <div style="text-align:center; font-size:70px;">
+      <div style="text-align: center; font-size: 70px">
         <i class="fas fa-cog fa-spin"></i>
       </div>
       <p class="text-simple">Please wait...</p>
@@ -31,11 +34,13 @@
 
   <div *ngIf="authError" class="col-md-12">
     <div class="text-center">
-      <div style="text-align:center; font-size:70px;">
+      <div style="text-align: center; font-size: 70px">
         <i class="fas fa-exclamation-triangle"></i>
       </div>
       <p class="text-simple">An error occured while authenticating.</p>
-      <button class="btn btn-lg btn-dark mt-4" (click)="startOAuthFlow()">Try Again</button>
+      <button class="btn btn-lg btn-dark mt-4" (click)="startOAuthFlow()">
+        Try Again
+      </button>
     </div>
   </div>
 </div>

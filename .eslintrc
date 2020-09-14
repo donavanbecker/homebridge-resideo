@@ -51,7 +51,7 @@
     ],
     "max-len": [
       "warn",
-      140
+      200
     ],
     "no-console": [
       "warn"

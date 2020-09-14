@@ -1,6 +1,4 @@
-/* eslint-disable max-len */
 import { Service, PlatformAccessory } from 'homebridge';
-
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
@@ -135,7 +133,7 @@ export class Round {
     }
 
     // The value property of TargetHeaterCoolerState must be one of the following:
-    //AUTO = 0; HEAT = 1; COOL = 2; OFF = 3;
+    //AUTO = 3; HEAT = 1; COOL = 2; OFF = 0;
     // Set control bindings
     const TargetState = this.TargetState();
     this.service

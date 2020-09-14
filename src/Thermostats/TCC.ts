@@ -1,6 +1,4 @@
-/* eslint-disable max-len */
 import { Service, PlatformAccessory } from 'homebridge';
-
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
@@ -135,7 +133,7 @@ export class TCC {
     }
 
     // The value property of TargetHeaterCoolerState must be one of the following:
-    //AUTO = 0; HEAT = 1; COOL = 2; OFF = 3;
+    //AUTO = 3; HEAT = 1; COOL = 2; OFF = 0;
     // Set control bindings
     const TargetState = this.TargetState();
     {
@@ -409,9 +407,7 @@ export class TCC {
    */
   async pushChanges() {
     const payload = {
-      ThermostatMode: this.honeywellMode[this.TargetHeatingCoolingState],
       mode: this.honeywellMode[this.TargetHeatingCoolingState],
-      SetpointStatus: 'Hold',
       thermostatSetpointStatus: this.platform.config.options.thermostat
         .thermostatSetpointStatus,
     } as any;
@@ -702,18 +698,29 @@ export class TCC {
     const TargetState = [4];
     TargetState.pop();
     if (this.device.allowedModes.includes('Cool')) {
-      TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.COOL);
+      TargetState.push(
+        this.platform.Characteristic.TargetHeatingCoolingState.COOL,
+      );
     }
     if (this.device.allowedModes.includes('Heat')) {
-      TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
+      TargetState.push(
+        this.platform.Characteristic.TargetHeatingCoolingState.HEAT,
+      );
     }
     if (this.device.allowedModes.includes('Off')) {
-      TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.OFF);
+      TargetState.push(
+        this.platform.Characteristic.TargetHeatingCoolingState.OFF,
+      );
     }
     if (this.device.allowedModes.includes('Auto')) {
-      TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.AUTO);
+      TargetState.push(
+        this.platform.Characteristic.TargetHeatingCoolingState.AUTO,
+      );
     }
-    this.platform.log.debug('Only Show These Modes:', JSON.stringify(TargetState));
+    this.platform.log.debug(
+      'Only Show These Modes:',
+      JSON.stringify(TargetState),
+    );
     return TargetState;
   }
 }

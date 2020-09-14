@@ -1,6 +1,4 @@
-/* eslint-disable max-len */
 import { Service, PlatformAccessory } from 'homebridge';
-
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
@@ -142,7 +140,7 @@ export class T9 {
     }
 
     // The value property of TargetHeaterCoolerState must be one of the following:
-    //AUTO = 0; HEAT = 1; COOL = 2; OFF = 3;
+    //AUTO = 3; HEAT = 1; COOL = 2; OFF = 0;
     // Set control bindings
     const TargetState = this.TargetState();
     this.service
@@ -505,14 +503,43 @@ export class T9 {
   async pushRoomChanges() {
     const payload = {
       currentPriority: {
-        priorityType: 'PickARoom',
-        selectedRooms: [this.device.inBuiltSensorState.roomId],
+        priorityType: this.platform.config.options.roompriority.priorityType,
       },
-    };
+    } as any;
+
+    if (
+      this.platform.config.options.roompriority.priorityType === 'PickARoom'
+    ) {
+      payload.currentPriority.selectedRooms = [this.device.inBuiltSensorState.roomId];
+    }
+    
+    /**
+   * For "LCC-" devices only.
+   * "NoHold" will return to schedule.
+   * "TemporaryHold" will hold the set temperature until "nextPeriodTime".
+   * "PermanentHold" will hold the setpoint until user requests another change.
+   */  
     if (this.platform.config.options.roompriority.thermostat) {
-      this.platform.log.info(
-        `Sending request to Honeywell API. Room Priority: ${this.device.inBuiltSensorState.roomName}`,
-      );
+      if (
+        this.platform.config.options.roompriority.priorityType === 'FollowMe'
+      ) {
+        this.platform.log.info(
+          'Sending request to Honeywell API. Room Priority: Priority Type: ', this.platform.config.options.roompriority.priorityType,
+          ', Built-in Motion/Occupancy Sensor(s) Will be used to set Priority Automatically.',
+        );
+      } else if (
+        this.platform.config.options.roompriority.priorityType === 'WholeHouse'
+      ) {
+        this.platform.log.info(
+          `Sending request to Honeywell API. Priority Type: ${this.platform.config.options.roompriority.priorityType}`,
+        );
+      } else if (
+        this.platform.config.options.roompriority.priorityType === 'PickARoom'
+      ) {
+        this.platform.log.info(
+          `Sending request to Honeywell API. Room Priority: ${this.device.inBuiltSensorState.roomName}, Priority Type: ${this.platform.config.options.roompriority.priorityType}`,
+        );
+      }
       this.platform.log.debug(JSON.stringify(payload));
 
       // Make the API request

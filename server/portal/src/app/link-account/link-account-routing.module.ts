@@ -5,12 +5,12 @@ import { LinkAccountComponent } from './link-account.component';
 const routes: Routes = [
   {
     path: 'link-account',
-    component: LinkAccountComponent
-  }
+    component: LinkAccountComponent,
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class LinkAccountRoutingModule { }
+export class LinkAccountRoutingModule {}

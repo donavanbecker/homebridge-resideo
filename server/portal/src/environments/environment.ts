@@ -8,8 +8,8 @@ export const environment = {
     base: `http://${document.location.hostname}:3000`,
   },
   honeywell: {
-    redirectUrl: 'http://localhost:4500/link-account'
-  }
+    redirectUrl: 'http://localhost:4500/link-account',
+  },
 };
 
 /*
@@ -19,4 +19,4 @@ export const environment = {
  * This import should be commented out in production mode because it will have a negative impact
  * on performance if an error is thrown.
  */
-import 'zone.js/dist/zone-error';  // Included with Angular CLI.
+import 'zone.js/dist/zone-error'; // Included with Angular CLI.

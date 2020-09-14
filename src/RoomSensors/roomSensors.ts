@@ -1,6 +1,4 @@
-/* eslint-disable max-len */
 import { Service, PlatformAccessory } from 'homebridge';
-
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';

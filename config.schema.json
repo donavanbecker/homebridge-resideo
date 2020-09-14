@@ -64,23 +64,24 @@
               "thermostatSetpointStatus": {
                 "title": "Thermostat Setpoint Status",
                 "type": "string",
-                "requried": true,
+                "description": "For \"LCC-\" devices only. \"PermanentHold\" will hold the setpoint until user requests another change. \"NoHold\" will return to schedule. \"TemporaryHold\" will hold the set temperature until \"nextPeriodTime\".",
+                "required": true,
                 "default": "TemporaryHold", 
                 "oneOf": [
                   {
-                    "title": "NoHold",
+                    "title": "No Hold",
                     "enum": [
                       "NoHold"
                     ]
                   },
                   {
-                    "title": "PermanentHold",
+                    "title": "Permanent Hold",
                     "enum": [
                       "PermanentHold"
                     ]
                   },
                   {
-                    "title": "TemporaryHold",
+                    "title": "Temporary Hold",
                     "enum": [
                       "TemporaryHold"
                     ]
@@ -154,6 +155,32 @@
                 "title": "Thermostat Room Priority",
                 "type": "boolean",
                 "requried": false
+              },
+              "priorityType": {
+                "title": "Priority Type",
+                "type": "string",
+                "required": true,
+                "default": "PickARoom", 
+                "oneOf": [
+                  {
+                    "title": "Pick A Room",
+                    "enum": [
+                      "PickARoom"
+                    ]
+                  },
+                  {
+                    "title": "Whole House",
+                    "enum": [
+                      "WholeHouse"
+                    ]
+                  },
+                  {
+                    "title": "Follow Me",
+                    "enum": [
+                      "FollowMe"
+                    ]
+                  }
+                ]
               }
             }
           }
@@ -235,6 +262,7 @@
                   "expandable": true,
                   "expanded": false,
                   "items": [
+                    "options.roompriority.priorityType",
                     {
                       "type": "help",
                       "helpvalue": "<em class='primary-text'>Allows you to set your Priority to your Room Sensor(s).</em>"

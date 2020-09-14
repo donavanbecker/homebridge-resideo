@@ -6,7 +6,7 @@ import { environment } from '../../environments/environment';
 @Component({
   selector: 'app-link-account',
   templateUrl: './link-account.component.html',
-  styleUrls: ['./link-account.component.scss']
+  styleUrls: ['./link-account.component.scss'],
 })
 export class LinkAccountComponent implements OnInit {
   public parentOrigin: string;
@@ -17,16 +17,13 @@ export class LinkAccountComponent implements OnInit {
   private consumerKey?: string;
   private consumerSecret?: string;
 
-  constructor(
-    private $api: ApiService,
-    private $route: ActivatedRoute
-  ) { }
+  constructor(private $api: ApiService, private $route: ActivatedRoute) {}
 
   ngOnInit() {
     this.consumerKey = sessionStorage.consumerKey;
     this.consumerSecret = sessionStorage.consumerSecret;
 
-    this.$route.queryParams.subscribe(params => {
+    this.$route.queryParams.subscribe((params) => {
       if (params.consumerKey && params.consumerSecret) {
         sessionStorage.consumerKey = params.consumerKey;
         sessionStorage.consumerSecret = params.consumerSecret;
@@ -43,43 +40,48 @@ export class LinkAccountComponent implements OnInit {
   startOAuthFlow() {
     window.location.href =
       `https://api.honeywell.com/oauth2/authorize` +
-        `?response_type=code` +
-        `&client_id=${this.consumerKey}` +
-        `&redirect_uri=${encodeURIComponent(environment.honeywell.redirectUrl)}`;
+      `?response_type=code` +
+      `&client_id=${this.consumerKey}` +
+      `&redirect_uri=${encodeURIComponent(environment.honeywell.redirectUrl)}`;
   }
 
   getToken() {
-    this.$api.post('/user/token', {
-      code: this.code,
-      redirect_uri: environment.honeywell.redirectUrl,
-      consumerKey: this.consumerKey,
-      consumerSecret: this.consumerSecret,
-    }).subscribe(
-      (response) => {
-        this.authData = {
-          consumerKey: this.consumerKey,
-          consumerSecret: this.consumerSecret,
-          accessToken: response.access_token,
-          refreshToken: response.refresh_token,
-        };
-        this.listen();
-      },
-      (err) => {
-        this.authError = true;
-      }
-    );
+    this.$api
+      .post('/user/token', {
+        code: this.code,
+        redirect_uri: environment.honeywell.redirectUrl,
+        consumerKey: this.consumerKey,
+        consumerSecret: this.consumerSecret,
+      })
+      .subscribe(
+        (response) => {
+          this.authData = {
+            consumerKey: this.consumerKey,
+            consumerSecret: this.consumerSecret,
+            accessToken: response.access_token,
+            refreshToken: response.refresh_token,
+          };
+          this.listen();
+        },
+        (err) => {
+          this.authError = true;
+        }
+      );
   }
 
   listen() {
-    window.addEventListener('message', (event) => {
-      if (event.data === 'origin-check') {
-        this.parentOrigin = event.origin;
-      }
-    }, false);
+    window.addEventListener(
+      'message',
+      (event) => {
+        if (event.data === 'origin-check') {
+          this.parentOrigin = event.origin;
+        }
+      },
+      false
+    );
   }
 
   confirm() {
     window.opener.postMessage(JSON.stringify(this.authData), this.parentOrigin);
   }
-
 }

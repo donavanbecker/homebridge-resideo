@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import {
   API,
   DynamicPlatformPlugin,
@@ -12,7 +11,6 @@ import { interval } from 'rxjs';
 import axios, { AxiosInstance } from 'axios';
 import * as qs from 'querystring';
 import { readFileSync, writeFileSync } from 'fs';
-
 import {
   PLATFORM_NAME,
   PLUGIN_NAME,
@@ -93,20 +91,29 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         try {
           await this.getAccessToken();
         } catch (e) {
-          this.log.error('Failed to refresh access token.', JSON.stringify(e.message));
+          this.log.error(
+            'Failed to refresh access token.',
+            JSON.stringify(e.message),
+          );
           this.log.debug(JSON.stringify(e));
         }
       });
       try {
         this.locations = await this.discoverlocations();
       } catch (e) {
-        this.log.error('Failed to Discover Locations.', JSON.stringify(e.message));
+        this.log.error(
+          'Failed to Discover Locations.',
+          JSON.stringify(e.message),
+        );
         this.log.debug(JSON.stringify(e));
       }
       try {
         this.discoverDevices();
       } catch (e) {
-        this.log.error('Failed to Discover Thermostats.', JSON.stringify(e.message));
+        this.log.error(
+          'Failed to Discover Devices.',
+          JSON.stringify(e.message),
+        );
         this.log.debug(JSON.stringify(e));
       }
     });
@@ -177,6 +184,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
     // Room Priority Config Options
     this.config.options.roompriority.thermostat;
+    this.config.options.roompriority.priorityType =
+      this.config.options.roompriority.priorityType || 'PickARoom';
 
     /**
      * Room Priority
@@ -185,11 +194,14 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
     if (this.config.options.roompriority.thermsotat) {
       this.log.warn(
-        'Displaying Room Sensors as Thermostats. You will have a Thermostat for Each Room Sensor so that you can set the priority of that Room.',
+        'Displaying Room Sensors as Thermostats.',
+      );
+      this.log.warn(
+        'You will have a Thermostat for Each Room Sensor so that you can set the priority of that Room.',
       );
     }
     if (!this.config.options.roompriority.thermsotat) {
-      this.log.warn('Only displaying Room Sensors.');
+      this.log.warn('Only Displaying Room Sensors.');
     }
 
     /**
@@ -329,7 +341,10 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         'Homebridge config.json has been updated with new refresh token.',
       );
     } catch (e) {
-      this.log.error('Failed to update refresh token in config:', JSON.stringify(e.message));
+      this.log.error(
+        'Failed to update refresh token in config:',
+        JSON.stringify(e.message),
+      );
       this.log.debug(JSON.stringify(e));
     }
   }
@@ -342,7 +357,10 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     try {
       await this.getAccessToken();
     } catch (e) {
-      this.log.error('Failed to refresh access token.', JSON.stringify(e.message));
+      this.log.error(
+        'Failed to refresh access token.',
+        JSON.stringify(e.message),
+      );
       this.log.debug(JSON.stringify(e));
       return;
     }
@@ -438,73 +456,89 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    * Accessories are registered by either their DeviceClass, DeviceModel, or DeviceID
    */
   private async discoverDevices() {
-    // get the devices at each location
-    for (const location of this.locations) {
-      this.log.info(`Getting devices for ${location.name}...`);
-      this.log.info(
-        `Total Devices Found at ${location.name}: ${location.devices.length}`,
-      );
-      const locationId = location.locationID;
-      this.locationinfo(location);
-      for (const device of location.devices) {
-        if (device.isAlive && device.deviceClass === 'LeakDetector') {
-          this.deviceinfo(device);
-          this.log.debug(JSON.stringify(device));
-          this.Leak(device, locationId);
-        } else if (device.isAlive && device.deviceClass === 'Thermostat') {
-          if (device.deviceID.startsWith('LCC')) {
-            if (device.deviceModel.startsWith('T9')) {
-              try {
-                this.firmware = await this.Firmware();
-              } catch (e) {
-                this.log.error('Failed to Get Firmware Version.', JSON.stringify(e.message));
-                this.log.debug(JSON.stringify(e));
+    if (this.locations) {
+      // get the devices at each location
+      for (const location of this.locations) {
+        this.log.info(`Getting devices for ${location.name}...`);
+        this.log.info(
+          `Total Devices Found at ${location.name}: ${location.devices.length}`,
+        );
+        const locationId = location.locationID;
+        this.log.debug(JSON.stringify(location));
+        this.locationinfo(location);
+        for (const device of location.devices) {
+          if (device.isAlive && device.deviceClass === 'LeakDetector') {
+            this.deviceinfo(device);
+            this.log.debug(JSON.stringify(device));
+            this.Leak(device, locationId);
+          } else if (device.isAlive && device.deviceClass === 'Thermostat') {
+            if (device.deviceID.startsWith('LCC')) {
+              if (device.deviceModel.startsWith('T9')) {
+                try {
+                  this.firmware = await this.Firmware();
+                } catch (e) {
+                  this.log.error(
+                    'Failed to Get Firmware Version.',
+                    JSON.stringify(e.message),
+                  );
+                  this.log.debug(JSON.stringify(e));
+                }
+                this.deviceinfo(device);
+                this.log.debug(JSON.stringify(device));
+                this.T9(device, locationId, this.firmware);
+                try {
+                  this.discoverRoomSensors();
+                } catch (e) {
+                  this.log.error(
+                    'Failed to Find Room Sensors.',
+                    JSON.stringify(e.message),
+                  );
+                  this.log.debug(JSON.stringify(e));
+                }
+                try {
+                  // this.discoverRoomPriority();
+                } catch (e) {
+                  this.log.error(
+                    'Failed to Find Room Priority.',
+                    JSON.stringify(e.message),
+                  );
+                  this.log.debug(JSON.stringify(e));
+                }
+              } else if (device.deviceModel.startsWith('T5')) {
+                this.deviceinfo(device);
+                this.log.debug(JSON.stringify(device));
+                this.T5(device, locationId);
+              } else if (!device.DeviceModel) {
+                this.log.info(
+                  'A LLC Device has been discovered with a deviceModel that doesn\'t start with T5 or T9',
+                );
               }
-              this.deviceinfo(device);
-              this.log.debug(JSON.stringify(device));
-              this.T9(device, locationId, this.firmware);
-              try {
-                this.discoverRoomSensors();
-              } catch (e) {
-                this.log.error('Failed to Find Room Sensors.', JSON.stringify(e.message));
-                this.log.debug(JSON.stringify(e));
+            } else if (device.deviceID.startsWith('TCC')) {
+              if (device.deviceModel.startsWith('Round')) {
+                this.deviceinfo(device);
+                this.log.debug(JSON.stringify(device));
+                this.Round(device, locationId);
+              } else if (device.deviceModel.startsWith('Unknown')) {
+                this.deviceinfo(device);
+                this.log.debug(JSON.stringify(device));
+                this.TCC(device, locationId);
+              } else if (!device.deviceModel) {
+                this.log.info(
+                  'A TCC Device has been discovered with a deviceModel that doesn\'t start with Round or Unknown',
+                );
               }
-              try {
-                // this.discoverRoomPriority();
-              } catch (e) {
-                this.log.error('Failed to Find Room Priority.', JSON.stringify(e.message));
-                this.log.debug(JSON.stringify(e));
-              }
-            } else if (device.deviceModel.startsWith('T5')) {
-              this.deviceinfo(device);
-              this.log.debug(JSON.stringify(device));
-              this.T5(device, locationId);
-            } else if (!device.DeviceModel) {
+            } else {
               this.log.info(
-                'A LLC Device has been discovered with a deviceModel that doesn\'t start with T5 or T9',
+                'Your Device isn\'t supported, Please open Feature Request Here: https://git.io/JUWN2',
               );
             }
-          } else if (device.deviceID.startsWith('TCC')) {
-            if (device.deviceModel.startsWith('Round')) {
-              this.deviceinfo(device);
-              this.log.debug(JSON.stringify(device));
-              this.Round(device, locationId);
-            } else if (device.deviceModel.startsWith('Unknown')) {
-              this.deviceinfo(device);
-              this.log.debug(JSON.stringify(device));
-              this.TCC(device, locationId);
-            } else if (!device.deviceModel) {
-              this.log.info(
-                'A TCC Device has been discovered with a deviceModel that doesn\'t start with Round or Unknown',
-              );
-            }
-          } else {
-            this.log.info(
-              'Your Device isn\'t supported, Please open Feature Request Here: https://git.io/JUWN2',
-            );
           }
         }
       }
+    } else {
+      this.log.error(
+        'Failed to Discover Locations. Re-Link Your Honeywell Home Account.',
+      );
     }
   }
 
