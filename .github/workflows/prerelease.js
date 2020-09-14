@@ -1,12 +1,13 @@
 #!/bin/env node
 
-import { readFileSync, writeFileSync } from "fs";
-import { gt } from "semver";
-import { execSync } from "child_process";
+const fs = require("fs");
+const semver = require("semver");
+const child_process = require("child_process");
 
 function getTagVersionFromNpm(tag) {
   try {
-    return execSync(`npm info ${package.name} version --tag="${tag}"`)
+    return child_process
+      .execSync(`npm info ${package.name} version --tag="${tag}"`)
       .toString("utf8")
       .trim();
   } catch (e) {
@@ -15,17 +16,17 @@ function getTagVersionFromNpm(tag) {
 }
 
 // load package.json
-const package = JSON.parse(readFileSync("package.json", "utf8"));
+const package = JSON.parse(fs.readFileSync("package.json", "utf8"));
 
 // work out the correct tag
 const currentLatest = getTagVersionFromNpm("latest") || "0.0.0";
 const currentBeta = getTagVersionFromNpm("beta") || "0.0.0";
-const latestNpmTag = gt(currentBeta, currentLatest, {
+const latestNpmTag = semver.gt(currentBeta, currentLatest, {
   includePrerelease: true,
 })
   ? currentBeta
   : currentLatest;
-const publishTag = gt(package.version, latestNpmTag, {
+const publishTag = semver.gt(package.version, latestNpmTag, {
   includePrerelease: true,
 })
   ? package.version
@@ -33,4 +34,4 @@ const publishTag = gt(package.version, latestNpmTag, {
 
 // save the package.json
 package.version = publishTag;
-writeFileSync("package.json", JSON.stringify(package, null, 4));
+fs.writeFileSync("package.json", JSON.stringify(package, null, 4));
