@@ -170,7 +170,7 @@ export class T5 {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options.thermostat.hide_fan
+        !this.platform.config.options?.thermostat?.hide_fan
       ) {
         this.platform.log.debug(
           'Available FAN settings',
@@ -193,7 +193,7 @@ export class T5 {
       }
     } else if (
       this.fanService &&
-      this.platform.config.options.thermostat.hide_fan
+      this.platform.config.options?.thermostat?.hide_fan
     ) {
       accessory.removeService(this.fanService);
     }
@@ -202,7 +202,7 @@ export class T5 {
     this.refreshStatus();
 
     // Start an update interval
-    interval(this.platform.config.options.ttl * 1000)
+    interval(this.platform.config.options!.ttl! * 1000)
       .pipe(skipWhile(() => this.thermostatUpdateInProgress))
       .subscribe(() => {
         this.refreshStatus();
@@ -229,7 +229,7 @@ export class T5 {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options.thermostat.hide_fan
+        !this.platform.config.options?.thermostat?.hide_fan
       ) {
         this.doFanUpdate
           .pipe(
@@ -318,7 +318,7 @@ export class T5 {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options.thermostat.hide_fan
+        !this.platform.config.options?.thermostat?.hide_fan
       ) {
         if (this.deviceFan) {
           this.platform.log.debug(`${JSON.stringify(this.deviceFan)}`);
@@ -362,7 +362,7 @@ export class T5 {
       if (this.device.settings) {
         if (
           this.device.settings.fan &&
-          !this.platform.config.options.thermostat.hide_fan
+          !this.platform.config.options?.thermostat?.hide_fan
         ) {
           this.deviceFan = (
             await this.platform.axios.get(
@@ -494,7 +494,7 @@ export class T5 {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options.thermostat.hide_fan
+        !this.platform.config.options?.thermostat?.hide_fan
       ) {
         this.fanService.updateCharacteristic(
           this.platform.Characteristic.TargetFanState,
@@ -613,7 +613,7 @@ export class T5 {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options.thermostat.hide_fan
+        !this.platform.config.options?.thermostat?.hide_fan
       ) {
         this.platform.log.debug(
           `TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`,

@@ -176,7 +176,7 @@ export class TCC {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options.thermostat.hide_fan
+        !this.platform.config.options?.thermostat?.hide_fan
       ) {
         this.platform.log.debug(
           'Available FAN settings',
@@ -199,7 +199,7 @@ export class TCC {
       }
     } else if (
       this.fanService &&
-      this.platform.config.options.thermostat.hide_fan
+      this.platform.config.options?.thermostat?.hide_fan
     ) {
       accessory.removeService(this.fanService);
     }
@@ -208,7 +208,7 @@ export class TCC {
     this.refreshStatus();
 
     // Start an update interval
-    interval(this.platform.config.options.ttl * 1000)
+    interval(this.platform.config.options!.ttl! * 1000)
       .pipe(skipWhile(() => this.thermostatUpdateInProgress))
       .subscribe(() => {
         this.refreshStatus();
@@ -235,7 +235,7 @@ export class TCC {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options.thermostat.hide_fan
+        !this.platform.config.options?.thermostat?.hide_fan
       ) {
         this.doFanUpdate
           .pipe(
@@ -288,18 +288,27 @@ export class TCC {
     ];
 
     /**
-   * The CurrentHeatingCoolingState is either 'Heat', 'Cool', or 'Off'
-   * CurrentHeatingCoolingState =  OFF = 0, HEAT = 1, COOL = 2
-   */
+     * The CurrentHeatingCoolingState is either 'Heat', 'Cool', or 'Off'
+     * CurrentHeatingCoolingState =  OFF = 0, HEAT = 1, COOL = 2
+     */
     if (this.device.operationStatus.mode === 'Heat') {
       this.CurrentHeatingCoolingState = 1;
-      this.platform.log.debug('Device is Currently: ', this.CurrentHeatingCoolingState);
+      this.platform.log.debug(
+        'Device is Currently: ',
+        this.CurrentHeatingCoolingState,
+      );
     } else if (this.device.operationStatus.mode === 'Cool') {
       this.CurrentHeatingCoolingState = 2;
-      this.platform.log.debug('Device is Currently: ', this.CurrentHeatingCoolingState);
+      this.platform.log.debug(
+        'Device is Currently: ',
+        this.CurrentHeatingCoolingState,
+      );
     } else {
       this.CurrentHeatingCoolingState = 0;
-      this.platform.log.debug('Device is Currently: ', this.CurrentHeatingCoolingState);
+      this.platform.log.debug(
+        'Device is Currently: ',
+        this.CurrentHeatingCoolingState,
+      );
     }
 
     // Set the TargetTemperature value based on the current mode
@@ -330,7 +339,7 @@ export class TCC {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options.thermostat.hide_fan
+        !this.platform.config.options?.thermostat?.hide_fan
       ) {
         if (this.deviceFan) {
           this.platform.log.debug(`${JSON.stringify(this.deviceFan)}`);
@@ -374,7 +383,7 @@ export class TCC {
       if (this.device.settings) {
         if (
           this.device.settings.fan &&
-          !this.platform.config.options.thermostat.hide_fan
+          !this.platform.config.options?.thermostat?.hide_fan
         ) {
           this.deviceFan = (
             await this.platform.axios.get(
@@ -412,8 +421,8 @@ export class TCC {
   async pushChanges() {
     const payload = {
       mode: this.honeywellMode[this.TargetHeatingCoolingState],
-      thermostatSetpointStatus: this.platform.config.options.thermostat
-        .thermostatSetpointStatus,
+      thermostatSetpointStatus: this.platform.config.options?.thermostat
+        ?.thermostatSetpointStatus,
     } as any;
     // Set the heat and cool set point value based on the selected mode
     if (
@@ -509,7 +518,7 @@ export class TCC {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options.thermostat.hide_fan
+        !this.platform.config.options?.thermostat?.hide_fan
       ) {
         this.fanService.updateCharacteristic(
           this.platform.Characteristic.TargetFanState,
@@ -627,7 +636,7 @@ export class TCC {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options.thermostat.hide_fan
+        !this.platform.config.options?.thermostat?.hide_fan
       ) {
         this.platform.log.debug(
           `TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`,

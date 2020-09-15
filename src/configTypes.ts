@@ -1,3 +1,55 @@
+import {
+  PlatformConfig,
+} from 'homebridge';
+
+//Config
+export interface HoneywellPlatformConfig extends PlatformConfig {
+  credentials?: credentials;
+  devicediscovery?: boolean;
+  options?: options;
+}
+
+export type credentials = {
+  accessToken?: string;
+  consumerKey?: any;
+  consumerSecret?: any;
+  refreshToken?: any;
+};
+
+export type options = {
+  ttl?: number;
+  thermostat?: thermostat;
+  leaksensor?: leaksensor;
+  roomsensor?: roomsensor;
+  roompriority?: roompriority;
+};
+
+export type thermostat = {
+  hide?: boolean;
+  hide_fan?: boolean;
+  thermostatSetpointStatus?: string;
+};
+
+export type leaksensor = {
+  hide?: boolean;
+  hide_humidity?: boolean;
+  hide_temperature?: boolean;
+  hide_leak?: boolean;
+};
+
+export type roomsensor = {
+  hide?: boolean;
+  hide_temperature?: boolean;
+  hide_occupancy?: boolean;
+  hide_motion?: boolean;
+  hide_humidity?: boolean;
+};
+
+export type roompriority = {
+  thermostat?: boolean;
+  priorityType?: string;
+};
+
 // Location
 export type location = {
   locationID: number;

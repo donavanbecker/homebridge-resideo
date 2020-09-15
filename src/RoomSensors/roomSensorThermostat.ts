@@ -178,7 +178,7 @@ export class RoomSensorThermostat {
     this.refreshSensorStatus();
 
     // Start an update interval
-    interval(this.platform.config.options.ttl * 1000)
+    interval(this.platform.config.options!.ttl! * 1000)
       .pipe(skipWhile(() => this.thermostatUpdateInProgress))
       .subscribe(() => {
         this.refreshStatus();
@@ -187,7 +187,7 @@ export class RoomSensorThermostat {
 
     // Watch for thermostat change events
     // We put in a debounce of 100ms so we don't make duplicate calls
-    if (this.platform.config.options.roompriority.thermostat) {
+    if (this.platform.config.options?.roompriority?.thermostat) {
       this.doRoomUpdate
         .pipe(
           tap(() => {
@@ -330,7 +330,7 @@ export class RoomSensorThermostat {
    */
   async refreshSensorStatus() {
     try {
-      if (this.platform.config.options.roompriority.thermostat) {
+      if (this.platform.config.options?.roompriority?.thermostat) {
         if (this.device.deviceID.startsWith('LCC')) {
           if (this.device.deviceModel.startsWith('T9')) {
             if (this.device.groups) {
@@ -399,12 +399,12 @@ export class RoomSensorThermostat {
   async pushRoomChanges() {
     const payload = {
       currentPriority: {
-        priorityType: this.platform.config.options.roompriority.priorityType,
+        priorityType: this.platform.config.options?.roompriority?.priorityType,
       },
     } as any;
 
     if (
-      this.platform.config.options.roompriority.priorityType === 'PickARoom'
+      this.platform.config.options?.roompriority?.priorityType === 'PickARoom'
     ) {
       payload.currentPriority.selectedRooms = [
         this.sensoraccessory.accessoryId,
@@ -417,30 +417,30 @@ export class RoomSensorThermostat {
      * "TemporaryHold" will hold the set temperature until "nextPeriodTime".
      * "PermanentHold" will hold the setpoint until user requests another change.
      */
-    if (this.platform.config.options.roompriority.thermostat) {
+    if (this.platform.config.options?.roompriority?.thermostat) {
       if (
-        this.platform.config.options.roompriority.priorityType === 'FollowMe'
+        this.platform.config.options?.roompriority?.priorityType === 'FollowMe'
       ) {
         this.platform.log.info(
           'Sending request to Honeywell API. Room Priority: Priority Type: ',
-          this.platform.config.options.roompriority.priorityType,
+          this.platform.config.options?.roompriority?.priorityType,
           ', Built-in Motion/Occupancy Sensor(s) Will be used to set Priority Automatically.',
         );
       } else if (
-        this.platform.config.options.roompriority.priorityType === 'WholeHouse'
+        this.platform.config.options?.roompriority?.priorityType === 'WholeHouse'
       ) {
         this.platform.log.info(
           'Sending request to Honeywell API. Priority Type: ',
-          this.platform.config.options.roompriority.priorityType,
+          this.platform.config.options?.roompriority?.priorityType,
         );
       } else if (
-        this.platform.config.options.roompriority.priorityType === 'PickARoom'
+        this.platform.config.options?.roompriority?.priorityType === 'PickARoom'
       ) {
         this.platform.log.info(
           'Sending request to Honeywell API. Room Priority: ',
           this.sensoraccessory.accessoryId,
           ' Priority Type: ',
-          this.platform.config.options.roompriority.priorityType,
+          this.platform.config.options?.roompriority?.priorityType,
         );
       }
       this.platform.log.debug(JSON.stringify(payload));
