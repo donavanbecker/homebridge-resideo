@@ -10,14 +10,14 @@ export interface HoneywellPlatformConfig extends PlatformConfig {
 }
 
 export type credentials = {
-  accessToken?: string;
-  consumerKey?: any;
-  consumerSecret?: any;
-  refreshToken?: any;
+  accessToken: string;
+  consumerKey: any;
+  consumerSecret: any;
+  refreshToken: any;
 };
 
 export type options = {
-  ttl?: number;
+  ttl: number;
   thermostat?: thermostat;
   leaksensor?: leaksensor;
   roomsensor?: roomsensor;
@@ -25,29 +25,29 @@ export type options = {
 };
 
 export type thermostat = {
-  hide?: boolean;
-  hide_fan?: boolean;
-  thermostatSetpointStatus?: string;
+  hide: boolean;
+  hide_fan: boolean;
+  thermostatSetpointStatus: string;
 };
 
 export type leaksensor = {
-  hide?: boolean;
-  hide_humidity?: boolean;
-  hide_temperature?: boolean;
-  hide_leak?: boolean;
+  hide: boolean;
+  hide_humidity: boolean;
+  hide_temperature: boolean;
+  hide_leak: boolean;
 };
 
 export type roomsensor = {
   hide?: boolean;
-  hide_temperature?: boolean;
-  hide_occupancy?: boolean;
-  hide_motion?: boolean;
-  hide_humidity?: boolean;
+  hide_temperature: boolean;
+  hide_occupancy: boolean;
+  hide_motion: boolean;
+  hide_humidity: boolean;
 };
 
 export type roompriority = {
-  thermostat?: boolean;
-  priorityType?: string;
+  thermostat: boolean;
+  priorityType: string;
 };
 
 // Location
