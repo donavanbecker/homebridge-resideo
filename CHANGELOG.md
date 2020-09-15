@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
-## [Version 8.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v7.0.1...v8.0.0) (2020-09-**)
+## [Version 8.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v7.0.1...v8.0.0) (2020-09-\*\*)
 
 ### Major Changes
 
@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file. This projec
 
 - You can now set the Thermostat Setpoint Status to: NoHold, PermanentHold, or TemporaryHold.
 - You can now set the Room Priority Type to: PickARoom, WholeHouse, or FollowMe.
+- Fix for CurrentHeatingCoolingState not showing the correct state.
 
 ## [Version 7.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v7.0.0...v7.0.1) (2020-08-29)
 
