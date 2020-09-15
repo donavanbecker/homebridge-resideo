@@ -176,7 +176,7 @@ export class TCC {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options?.thermostat?.hide_fan
+        !this.platform.config.options!.thermostat!.hide_fan
       ) {
         this.platform.log.debug(
           'Available FAN settings',
@@ -199,7 +199,7 @@ export class TCC {
       }
     } else if (
       this.fanService &&
-      this.platform.config.options?.thermostat?.hide_fan
+      this.platform.config.options!.thermostat!.hide_fan
     ) {
       accessory.removeService(this.fanService);
     }
@@ -235,7 +235,7 @@ export class TCC {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options?.thermostat?.hide_fan
+        !this.platform.config.options!.thermostat!.hide_fan
       ) {
         this.doFanUpdate
           .pipe(
@@ -339,7 +339,7 @@ export class TCC {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options?.thermostat?.hide_fan
+        !this.platform.config.options!.thermostat!.hide_fan
       ) {
         if (this.deviceFan) {
           this.platform.log.debug(`${JSON.stringify(this.deviceFan)}`);
@@ -383,7 +383,7 @@ export class TCC {
       if (this.device.settings) {
         if (
           this.device.settings.fan &&
-          !this.platform.config.options?.thermostat?.hide_fan
+          !this.platform.config.options!.thermostat!.hide_fan
         ) {
           this.deviceFan = (
             await this.platform.axios.get(
@@ -421,8 +421,8 @@ export class TCC {
   async pushChanges() {
     const payload = {
       mode: this.honeywellMode[this.TargetHeatingCoolingState],
-      thermostatSetpointStatus: this.platform.config.options?.thermostat
-        ?.thermostatSetpointStatus,
+      thermostatSetpointStatus: this.platform.config.options!.thermostat!
+        .thermostatSetpointStatus,
     } as any;
     // Set the heat and cool set point value based on the selected mode
     if (
@@ -518,7 +518,7 @@ export class TCC {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options?.thermostat?.hide_fan
+        !this.platform.config.options!.thermostat!.hide_fan
       ) {
         this.fanService.updateCharacteristic(
           this.platform.Characteristic.TargetFanState,
@@ -636,7 +636,7 @@ export class TCC {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options?.thermostat?.hide_fan
+        !this.platform.config.options!.thermostat!.hide_fan
       ) {
         this.platform.log.debug(
           `TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`,
