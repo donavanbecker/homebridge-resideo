@@ -146,71 +146,43 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    * Verify the config passed to the plugin is valid
    */
   verifyConfig() {
-    if (!this.config.options || typeof this.config.options !== 'object') {
-      this.config.options = {};
-    }
-    if (
-      !this.config.options.thermostat ||
-      typeof this.config.options.thermostat !== 'object'
-    ) {
-      this.config.options.thermostat = {};
-    }
-    if (
-      !this.config.options.leaksensor ||
-      typeof this.config.options.leaksensor !== 'object'
-    ) {
-      this.config.options.leaksensor = {};
-    }
-    if (
-      !this.config.options.roomsensor ||
-      typeof this.config.options.roomsensor !== 'object'
-    ) {
-      this.config.options.roomsensor = {};
-    }
-    if (
-      !this.config.options.roompriority ||
-      typeof this.config.options.roompriority !== 'object'
-    ) {
-      this.config.options.roompriority = {};
-    }
-
     // Thermostat Config Options
-    this.config.options.thermostat.hide;
-    this.config.options.thermostat.hide_fan;
-    this.config.options.thermostat.thermostatSetpointStatus =
-      this.config.options.thermostat.thermostatSetpointStatus ||
+    this.config.options?.thermostat?.hide;
+    this.config.options?.thermostat?.hide_fan;
+    this.config.options!.thermostat!.thermostatSetpointStatus =
+      this.config.options?.thermostat?.thermostatSetpointStatus ||
       'PermanentHold';
 
     // Leak Sensor Config Options
-    this.config.options.leaksensor.hide;
-    this.config.options.leaksensor.hide_humidity;
-    this.config.options.leaksensor.hide_temperature;
-    this.config.options.leaksensor.hide_leak;
+    this.config.options?.leaksensor?.hide;
+    this.config.options?.leaksensor?.hide_humidity;
+    this.config.options?.leaksensor?.hide_temperature;
+    this.config.options?.leaksensor?.hide_leak;
 
     // Room Sensor Config Options
-    this.config.options.roomsensor.hide;
-    this.config.options.roomsensor.hide_temperature;
-    this.config.options.roomsensor.hide_occupancy;
-    this.config.options.roomsensor.hide_motion;
-    this.config.options.roomsensor.hide_humidity;
+    this.config.options?.roomsensor?.hide;
+    this.config.options?.roomsensor?.hide_temperature;
+    this.config.options?.roomsensor?.hide_occupancy;
+    this.config.options?.roomsensor?.hide_motion;
+    this.config.options?.roomsensor?.hide_humidity;
 
     // Room Priority Config Options
-    this.config.options.roompriority.thermostat;
-    this.config.options.roompriority.priorityType =
-      this.config.options.roompriority.priorityType || 'PickARoom';
+    this.config.options?.roompriority?.thermostat;
+    this.config.options!.roompriority!.priorityType =
+      this.config.options!.roompriority!.priorityType || 'PickARoom';
 
     /**
      * Room Priority
      * This will display what room priority option that has been selected.
      */
 
-    if (this.config.options.roompriority.thermostat) {
+    if (this.config.options?.roompriority?.thermostat) {
       this.log.warn('Displaying Room Sensors as Thermostat(s).');
       this.log.warn(
         'You will have a Thermostat for Each Room Sensor so that you can set the priority of that Room.',
       );
     }
-    if (!this.config.options.roompriority.thermostat) {
+    if (!this.config.options?.roompriority?.thermostat) {
       this.log.warn('Only Displaying Room Sensors.');
     }
 
@@ -220,16 +192,16 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
      */
     this.config.devicediscovery;
 
-    this.config.options.ttl = this.config.options.ttl || 1800; // default 1800 seconds
+    this.config.options!.ttl = this.config.options!.ttl || 1800; // default 1800 seconds
 
     if (
       !this.config.credentials?.consumerSecret &&
-      this.config.options.ttl < 1800
+      this.config.options!.ttl < 1800
     ) {
       this.log.debug(
         'TTL must be set to 1800 or higher unless you setup your own consumerSecret.',
       );
-      this.config.options.ttl = 1800;
+      this.config.options!.ttl = 1800;
     }
 
     if (!this.config.credentials) {
