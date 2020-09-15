@@ -310,7 +310,18 @@ export class T9 {
       this.device.changeableValues.mode
     ];
 
-    // If auto the CurrentHeatingCoolingState is either 'Heat' or 'Cool'
+    /**
+   * The CurrentHeatingCoolingState is either 'Heat', 'Cool', or 'Off'
+   * CurrentHeatingCoolingState =  OFF = 0, HEAT = 1, COOL = 2
+   */
+    if (this.device.operationStatus.mode === 'Heat') {
+      this.CurrentHeatingCoolingState = 1;
+    } else if (this.device.operationStatus.mode === 'Cool') {
+      this.CurrentHeatingCoolingState = 2;
+    } else if (this.device.operationStatus.mode === 'Off'){
+      this.CurrentHeatingCoolingState = 0;
+    }
+    /*// If auto the CurrentHeatingCoolingState is either 'Heat' or 'Cool'
     if (this.device.changeableValues.mode === 'Auto') {
       this.CurrentHeatingCoolingState = this.modes[
         this.device.changeableValues.heatCoolMode
@@ -319,7 +330,7 @@ export class T9 {
       this.CurrentHeatingCoolingState = this.modes[
         this.device.changeableValues.mode
       ];
-    }
+    }*/
 
     // Set the TargetTemperature value based on the current mode
     if (

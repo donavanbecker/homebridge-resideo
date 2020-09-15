@@ -25,9 +25,16 @@ export type T9Thermostat = {
   minCoolSetpoint: number;
   maxCoolSetpoint: number;
   changeableValues: T9changeableValues;
+  operationStatus: OperationStatusT9;
   indoorHumidity: number;
   deviceModel: string;
 };
+
+export type OperationStatusT9 = {
+  mode: string;
+  fanRequest: boolean;
+  circulationFanRequest: boolean;
+}
 
 export type T9groups = {
   id: number;
