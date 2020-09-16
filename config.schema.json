@@ -44,7 +44,8 @@
           "ttl": {
             "title": "TTL",
             "type": "number",
-            "minimum": 600,
+            "minimum": 300,
+            "placeholder": 300,
             "description": "Indicates the number of seconds between polls of the Honeywell Home service."
           },
           "thermostat": {
@@ -52,7 +53,7 @@
             "type": "object",
             "properties": {
               "hide": {
-                "title": "Hide Thermostat Device(s)",
+                "title": "Hide Thermostat(s)",
                 "type": "boolean",
                 "requried": false
               },
@@ -60,6 +61,27 @@
                 "title": "Hide Thermostat(s) Fan",
                 "type": "boolean",
                 "requried": false
+              },
+              "thermostatSetpointStatus": {
+                "title": "Thermostat Setpoint Status",
+                "type": "string",
+                "description": "For \"LCC-\" devices only. \"PermanentHold\" will hold the setpoint until user requests another change. \"NoHold\" will return to schedule. \"TemporaryHold\" will hold the set temperature until \"nextPeriodTime\".",
+                "required": true,
+                "default": "PermanentHold",
+                "oneOf": [
+                  {
+                    "title": "No Hold",
+                    "enum": ["NoHold"]
+                  },
+                  {
+                    "title": "Permanent Hold",
+                    "enum": ["PermanentHold"]
+                  },
+                  {
+                    "title": "Temporary Hold",
+                    "enum": ["TemporaryHold"]
+                  }
+                ]
               }
             }
           },
@@ -68,7 +90,7 @@
             "type": "object",
             "properties": {
               "hide": {
-                "title": "Hide Leak Sensor Device(s)",
+                "title": "Hide Leak Sensor(s)",
                 "type": "boolean",
                 "requried": false
               },
@@ -119,6 +141,37 @@
                 "requried": false
               }
             }
+          },
+          "roompriority": {
+            "title": "Room Priority",
+            "type": "object",
+            "properties": {
+              "thermostat": {
+                "title": "Thermostat Room Priority",
+                "type": "boolean",
+                "requried": false
+              },
+              "priorityType": {
+                "title": "Priority Type",
+                "type": "string",
+                "required": true,
+                "default": "PickARoom",
+                "oneOf": [
+                  {
+                    "title": "Pick A Room",
+                    "enum": ["PickARoom"]
+                  },
+                  {
+                    "title": "Whole House",
+                    "enum": ["WholeHouse"]
+                  },
+                  {
+                    "title": "Follow Me",
+                    "enum": ["FollowMe"]
+                  }
+                ]
+              }
+            }
           }
         }
       }
@@ -127,26 +180,26 @@
   "layout": [
     {
       "type": "fieldset",
-      "title": "Advanced Settings",
+      "title": "Honeywell Home Account Info",
       "expandable": true,
       "expanded": false,
       "items": [
         {
-          "type": "fieldset",
-          "title": "Manual Setup",
-          "expandable": true,
-          "expanded": false,
-          "items": [
-            {
-              "type": "help",
-              "helpvalue": "<h5></h5><em class='primary-text'>This is for Manual Setup Only.</em>"
-            },
-            "name",
-            "credentials.consumerKey",
-            "credentials.consumerSecret",
-            "credentials.refreshToken"
-          ]
+          "type": "help",
+          "helpvalue": "<h5></h5><em class='primary-text'>This is for Manual Setup Only.</em>"
         },
+        "name",
+        "credentials.consumerKey",
+        "credentials.consumerSecret",
+        "credentials.refreshToken"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Advanced Settings",
+      "expandable": true,
+      "expanded": false,
+      "items": [
         {
           "type": "help",
           "helpvalue": "<h5>TTL</h5><em class='primary-text'>TTL indicates the number of seconds between polls of the Honeywell Home service.</em>"
@@ -161,6 +214,7 @@
           "expandable": true,
           "expanded": false,
           "items": [
+            "options.thermostat.thermostatSetpointStatus",
             {
               "type": "help",
               "helpvalue": "<h5>Thermostat</h5><em class='primary-text'>Allows you to hide your Thermostat(s).</em>"
@@ -170,7 +224,42 @@
               "type": "help",
               "helpvalue": "<h5>Hide Thermostat Fan Service</h5><em class='primary-text'>Allows you to hide your Thermostat's Fan.</em>"
             },
-            "options.thermostat.hide_fan"
+            "options.thermostat.hide_fan",
+            {
+              "type": "fieldset",
+              "title": "Room Sensor Options",
+              "expandable": true,
+              "expanded": false,
+              "items": [
+                {
+                  "type": "help",
+                  "helpvalue": "<em class='primary-text'>Allows you to hide your Room Sensor(s).</em>"
+                },
+                "options.roomsensor.hide",
+                {
+                  "type": "help",
+                  "helpvalue": "<h5>Hide Room Sensor Services</h5><em class='primary-text'>Allows you to hide your tempeture sensor, occupancy sensor, motion sensor, or humidity sensor of your Room Sensor(s).</em>"
+                },
+                "options.roomsensor.hide_temperature",
+                "options.roomsensor.hide_occupancy",
+                "options.roomsensor.hide_motion",
+                "options.roomsensor.hide_humidity",
+                {
+                  "type": "fieldset",
+                  "title": "Room Priority Options",
+                  "expandable": true,
+                  "expanded": false,
+                  "items": [
+                    "options.roompriority.priorityType",
+                    {
+                      "type": "help",
+                      "helpvalue": "<em class='primary-text'>Allows you to set your Priority to your Room Sensor(s).</em>"
+                    },
+                    "options.roompriority.thermostat"
+                  ]
+                }
+              ]
+            }
           ]
         },
         {
@@ -191,27 +280,6 @@
             "options.leaksensor.hide_temperature",
             "options.leaksensor.hide_leak",
             "options.leaksensor.hide_humidity"
-          ]
-        },   
-        {
-          "type": "fieldset",
-          "title": "Room Sensor Options",
-          "expandable": true,
-          "expanded": false,
-          "items": [
-            {
-              "type": "help",
-              "helpvalue": "<h5>Room Sensors</h5><em class='primary-text'>Allows you to hide your Room Sensor(s).</em>"
-            },
-            "options.roomsensor.hide",
-            {
-              "type": "help",
-              "helpvalue": "<h5>Hide Room Sensor Services</h5><em class='primary-text'>Allows you to hide your Room Sensor's tempeture sensor, occupancy sensor, motion sensor, or humidity sensor.</em>"
-            },
-            "options.roomsensor.hide_temperature",
-            "options.roomsensor.hide_occupancy",
-            "options.roomsensor.hide_motion",
-            "options.roomsensor.hide_humidity"
           ]
         }
       ]

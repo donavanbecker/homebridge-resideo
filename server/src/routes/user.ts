@@ -33,7 +33,7 @@ router.post('/refresh', async (req: any, res, next) => {
     return res.status(400).json({ message: 'consumerKey missing' });
   }
   if (req.body.consumerKey !== process.env.HONEYWELL_OAUTH_KEY) {
-    return res.status(401).json({ message: 'consumerKey is not correct'});
+    return res.status(401).json({ message: 'consumerKey is not correct' });
   }
   try {
     const token = await rp.post('https://api.honeywell.com/oauth2/token', {

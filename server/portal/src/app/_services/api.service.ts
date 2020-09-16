@@ -5,12 +5,10 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApiService {
-  constructor(
-    private $http: HttpClient
-  ) { }
+  constructor(private $http: HttpClient) {}
 
   get(url: string, options?): Observable<any> {
     return this.$http.get(`${environment.api.base}${url}`, options);
@@ -31,5 +29,4 @@ export class ApiService {
   delete(url: string, options?): Observable<any> {
     return this.$http.delete(`${environment.api.base}${url}`, options);
   }
-
 }

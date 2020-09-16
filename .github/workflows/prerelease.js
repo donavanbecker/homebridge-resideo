@@ -18,8 +18,16 @@ const package = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 // work out the correct tag
 const currentLatest = getTagVersionFromNpm('latest') || '0.0.0';
 const currentBeta = getTagVersionFromNpm('beta') || '0.0.0';
-const latestNpmTag = semver.gt(currentBeta, currentLatest, { includePrerelease: true }) ? currentBeta : currentLatest;
-const publishTag = semver.gt(package.version, latestNpmTag, { includePrerelease: true }) ? package.version : latestNpmTag;
+const latestNpmTag = semver.gt(currentBeta, currentLatest, {
+  includePrerelease: true,
+})
+  ? currentBeta
+  : currentLatest;
+const publishTag = semver.gt(package.version, latestNpmTag, {
+  includePrerelease: true,
+})
+  ? package.version
+  : latestNpmTag;
 
 // save the package.json
 package.version = publishTag;

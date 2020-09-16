@@ -5,6 +5,6 @@ export const environment = {
   },
   honeywell: {
     redirectUrl: 'https://homebridge-honeywell.iot.oz.nu/link-account',
-    consumerKey: 'RTrCH5utygGV3vBymbbDdRI2yNh9aUj0'
-  }
+    consumerKey: 'RTrCH5utygGV3vBymbbDdRI2yNh9aUj0',
+  },
 };

@@ -8,17 +8,9 @@ import { HomeModule } from './home/home.module';
 import { LinkAccountModule } from './link-account/link-account.module';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    BrowserModule,
-    HttpClientModule,
-    HomeModule,
-    LinkAccountModule,
-    AppRoutingModule
-  ],
+  declarations: [AppComponent],
+  imports: [BrowserModule, HttpClientModule, HomeModule, LinkAccountModule, AppRoutingModule],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
