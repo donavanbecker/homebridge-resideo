@@ -37,7 +37,7 @@ app.use(
         connectSrc: [`'self'`],
       },
     },
-  })
+  }),
 );
 
 // parse json body
@@ -52,7 +52,7 @@ app.use(express.static(path.resolve(__dirname, '../static')));
 app.use(
   cors({
     origin: 'http://localhost:4500',
-  })
+  }),
 );
 
 // include routes

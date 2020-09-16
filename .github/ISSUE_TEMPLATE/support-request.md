@@ -4,15 +4,16 @@ about: Need help?
 title: ''
 labels: question
 assignees: ''
-
 ---
 
 <!-- You must use the issue template below when submitting a support request -->
 
 **Describe Your Problem:**
+
 <!-- A clear and concise description of what problem you are trying to solve. -->
 
 **Logs:**
+
 <!-- Support requests that do not contain logs may be closed without warning. -->
 
 ```
@@ -36,19 +37,20 @@ Remove any sensitive information, such as your homebridge-honeywell-home consume
 ```
 
 **Screenshots:**
+
 <!-- If applicable, add screenshots to help explain your problem. -->
 
 **Thermostat Model:**
+
 <!-- Provide your Thermostat Model. -->
 
 # **Environment:**
 
-* **Node.js Version**: <!-- node -v -->
-* **NPM Version**: <!-- npm -v -->
-* **Homebridge Version**: <!-- homebridge -V -->
-* **Homebridge Honeywell Home Plugin Version**:
-* **Homebridge Config UI X Plugin Version**:
-* **Operating System**: <!-- Raspbian / Ubuntu / Debian / Windows / macOS / Docker -->
-
+- **Node.js Version**: <!-- node -v -->
+- **NPM Version**: <!-- npm -v -->
+- **Homebridge Version**: <!-- homebridge -V -->
+- **Homebridge Honeywell Home Plugin Version**:
+- **Homebridge Config UI X Plugin Version**:
+- **Operating System**: <!-- Raspbian / Ubuntu / Debian / Windows / macOS / Docker -->
 
 <!-- Click the "Preview" tab before you submit to ensure the formatting is correct. -->

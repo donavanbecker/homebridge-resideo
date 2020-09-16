@@ -430,12 +430,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 this.log.info('A LLC Device has been discovered with a deviceModel that does not start with T5 or T9');
               }
             } else if (device.deviceID.startsWith('TCC')) {
-              this.log.info(
-                'A TCC Device has been discovered, Currently writing to Honeywell API does not work.',
-              );
-              this.log.info(
-                ' Feel free to open an issue on GitHub https://git.io/JURI5',
-              );
+              this.log.info('A TCC Device has been discovered, Currently writing to Honeywell API does not work.');
+              this.log.info(' Feel free to open an issue on GitHub https://git.io/JURI5');
               if (device.deviceModel.startsWith('Round')) {
                 this.deviceinfo(device);
                 this.log.debug(JSON.stringify(device));

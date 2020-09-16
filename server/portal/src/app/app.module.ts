@@ -9,13 +9,7 @@ import { LinkAccountModule } from './link-account/link-account.module';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [
-    BrowserModule,
-    HttpClientModule,
-    HomeModule,
-    LinkAccountModule,
-    AppRoutingModule,
-  ],
+  imports: [BrowserModule, HttpClientModule, HomeModule, LinkAccountModule, AppRoutingModule],
   providers: [],
   bootstrap: [AppComponent],
 })

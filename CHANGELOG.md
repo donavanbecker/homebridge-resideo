@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
-## [Version 8.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v7.0.1...v8.0.0) (2020-09-\*\*)
+## [Version 8.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v7.0.1...v8.0.0) (2020-09-16)
 
 ### Major Changes
 

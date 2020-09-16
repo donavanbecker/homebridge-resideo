@@ -65,7 +65,7 @@ export class LinkAccountComponent implements OnInit {
         },
         (err) => {
           this.authError = true;
-        }
+        },
       );
   }
 
@@ -77,7 +77,7 @@ export class LinkAccountComponent implements OnInit {
           this.parentOrigin = event.origin;
         }
       },
-      false
+      false,
     );
   }
 

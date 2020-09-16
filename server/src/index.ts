@@ -18,6 +18,4 @@ class Core {
   }
 }
 
-export const core = new Core(
-  parseInt(process.env.HONEYWELL_WORKER_PORT || '3000', 10)
-);
+export const core = new Core(parseInt(process.env.HONEYWELL_WORKER_PORT || '3000', 10));

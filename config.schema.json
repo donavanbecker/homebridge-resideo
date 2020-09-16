@@ -67,25 +67,19 @@
                 "type": "string",
                 "description": "For \"LCC-\" devices only. \"PermanentHold\" will hold the setpoint until user requests another change. \"NoHold\" will return to schedule. \"TemporaryHold\" will hold the set temperature until \"nextPeriodTime\".",
                 "required": true,
-                "default": "TemporaryHold", 
+                "default": "PermanentHold",
                 "oneOf": [
                   {
                     "title": "No Hold",
-                    "enum": [
-                      "NoHold"
-                    ]
+                    "enum": ["NoHold"]
                   },
                   {
                     "title": "Permanent Hold",
-                    "enum": [
-                      "PermanentHold"
-                    ]
+                    "enum": ["PermanentHold"]
                   },
                   {
                     "title": "Temporary Hold",
-                    "enum": [
-                      "TemporaryHold"
-                    ]
+                    "enum": ["TemporaryHold"]
                   }
                 ]
               }
@@ -161,25 +155,19 @@
                 "title": "Priority Type",
                 "type": "string",
                 "required": true,
-                "default": "PickARoom", 
+                "default": "PickARoom",
                 "oneOf": [
                   {
                     "title": "Pick A Room",
-                    "enum": [
-                      "PickARoom"
-                    ]
+                    "enum": ["PickARoom"]
                   },
                   {
                     "title": "Whole House",
-                    "enum": [
-                      "WholeHouse"
-                    ]
+                    "enum": ["WholeHouse"]
                   },
                   {
                     "title": "Follow Me",
-                    "enum": [
-                      "FollowMe"
-                    ]
+                    "enum": ["FollowMe"]
                   }
                 ]
               }
@@ -212,7 +200,6 @@
       "expandable": true,
       "expanded": false,
       "items": [
-        
         {
           "type": "help",
           "helpvalue": "<h5>TTL</h5><em class='primary-text'>TTL indicates the number of seconds between polls of the Honeywell Home service.</em>"
