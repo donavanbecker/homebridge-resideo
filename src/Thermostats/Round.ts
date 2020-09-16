@@ -3,7 +3,7 @@ import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
 import { DeviceURL } from '../settings';
-import * as configTypes from '../configTypes';
+import { location, RoundDevice } from '../configTypes';
 
 /**
  * Platform Accessory
@@ -37,8 +37,8 @@ export class Round {
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId: configTypes.location['locationID'],
-    public device: configTypes.RoundDevice,
+    public readonly locationId: location['locationID'],
+    public device: RoundDevice,
   ) {
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
@@ -172,7 +172,7 @@ export class Round {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options!.thermostat!.hide_fan
+        !this.platform.config.options?.thermostat?.hide_fan
       ) {
         this.platform.log.debug(
           'Available FAN settings',
@@ -195,7 +195,7 @@ export class Round {
       }
     } else if (
       this.fanService &&
-      this.platform.config.options!.thermostat!.hide_fan
+      this.platform.config.options?.thermostat?.hide_fan
     ) {
       accessory.removeService(this.fanService);
     }
@@ -223,14 +223,16 @@ export class Round {
         try {
           await this.pushChanges();
         } catch (e) {
-          this.platform.log.error(JSON.stringify(e.message));
-          this.platform.log.debug(JSON.stringify(e));
+          if(e instanceof Error) {
+            this.platform.log.error(JSON.stringify(e.message));
+            this.platform.log.debug(JSON.stringify(e));
+          }
         }
         this.thermostatUpdateInProgress = false;
       });
     if (
       this.device.settings.fan &&
-      !this.platform.config.options!.thermostat!.hide_fan
+      !this.platform.config.options?.thermostat?.hide_fan
     ) {
       this.doFanUpdate
         .pipe(
@@ -243,8 +245,10 @@ export class Round {
           try {
             await this.pushFanChanges();
           } catch (e) {
-            this.platform.log.error(JSON.stringify(e.message));
-            this.platform.log.debug(JSON.stringify(e));
+            if(e instanceof Error) {
+              this.platform.log.error(JSON.stringify(e.message));
+              this.platform.log.debug(JSON.stringify(e));
+            }
           }
           this.fanUpdateInProgress = false;
         });
@@ -326,7 +330,7 @@ export class Round {
     // Set the Target Fan State
     if (
       this.device.settings.fan &&
-      !this.platform.config.options!.thermostat!.hide_fan
+      !this.platform.config.options?.thermostat?.hide_fan
     ) {
       if (this.deviceFan) {
         this.platform.log.debug(`${JSON.stringify(this.deviceFan)}`);
@@ -370,7 +374,7 @@ export class Round {
       if (this.device.settings) {
         if (
           this.device.settings.fan &&
-          !this.platform.config.options!.thermostat!.hide_fan
+          !this.platform.config.options?.thermostat?.hide_fan
         ) {
           this.deviceFan = (
             await this.platform.axios.get(
@@ -394,11 +398,13 @@ export class Round {
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
-      this.platform.log.error(
-        `Failed to update status of ${this.device.name}`,
-        JSON.stringify(e.message),
-        this.platform.log.debug(JSON.stringify(e)),
-      );
+      if(e instanceof Error) {
+        this.platform.log.error(
+          `Failed to update status of ${this.device.name}`,
+          JSON.stringify(e.message),
+          this.platform.log.debug(JSON.stringify(e)),
+        );
+      }
     }
   }
 
@@ -408,8 +414,8 @@ export class Round {
   async pushChanges() {
     const payload = {
       mode: this.honeywellMode[this.TargetHeatingCoolingState],
-      thermostatSetpointStatus: this.platform.config.options!.thermostat!
-        .thermostatSetpointStatus,
+      thermostatSetpointStatus: this.platform.config.options?.thermostat
+        ?.thermostatSetpointStatus,
       autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
     } as any;
 
@@ -450,7 +456,10 @@ export class Round {
     }
 
     this.platform.log.info(
-      `Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}`,
+      'Sending request to Honeywell API. mode: ',
+      payload.mode, ', coolSetpoint: ',
+      payload.coolSetpoint, ', heatSetpoint: ',
+      payload.heatSetpoint,
     );
     this.platform.log.debug(JSON.stringify(payload));
 
@@ -507,7 +516,7 @@ export class Round {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options!.thermostat!.hide_fan
+        !this.platform.config.options?.thermostat?.hide_fan
       ) {
         this.fanService.updateCharacteristic(
           this.platform.Characteristic.TargetFanState,
@@ -624,7 +633,7 @@ export class Round {
     };
     if (
       this.device.settings.fan &&
-      !this.platform.config.options!.thermostat!.hide_fan
+      !this.platform.config.options?.thermostat?.hide_fan
     ) {
       this.platform.log.debug(
         `TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`,

@@ -3,7 +3,7 @@ import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
 import { DeviceURL } from '../settings';
-import * as configTypes from '../configTypes';
+import { location, TCCDevice } from '../configTypes';
 
 /**
  * Platform Accessory
@@ -12,7 +12,7 @@ import * as configTypes from '../configTypes';
  */
 export class TCC {
   private service: Service;
-  fanService: any;
+  fanService?: Service;
 
   private modes: { Off: number; Heat: number; Cool: number; Auto: number };
 
@@ -27,18 +27,18 @@ export class TCC {
   honeywellMode!: Array<string>;
   Active!: number;
   TargetFanState!: number;
-  deviceFan!: any;
+  deviceFan;
 
   thermostatUpdateInProgress!: boolean;
-  doThermostatUpdate!: any;
+  doThermostatUpdate;
   fanUpdateInProgress!: boolean;
-  doFanUpdate!: any;
+  doFanUpdate;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId: configTypes.location['locationID'],
-    public device: configTypes.TCCDevice,
+    public readonly locationId: location['locationID'],
+    public device: TCCDevice,
   ) {
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
@@ -176,7 +176,7 @@ export class TCC {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options!.thermostat!.hide_fan
+        !this.platform.config.options?.thermostat?.hide_fan
       ) {
         this.platform.log.debug(
           'Available FAN settings',
@@ -199,7 +199,7 @@ export class TCC {
       }
     } else if (
       this.fanService &&
-      this.platform.config.options!.thermostat!.hide_fan
+      this.platform.config.options?.thermostat?.hide_fan
     ) {
       accessory.removeService(this.fanService);
     }
@@ -227,15 +227,17 @@ export class TCC {
         try {
           await this.pushChanges();
         } catch (e) {
-          this.platform.log.error(JSON.stringify(e.message));
-          this.platform.log.debug(JSON.stringify(e));
+          if(e instanceof Error) {
+            this.platform.log.error(JSON.stringify(e.message));
+            this.platform.log.debug(JSON.stringify(e));
+          }
         }
         this.thermostatUpdateInProgress = false;
       });
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options!.thermostat!.hide_fan
+        !this.platform.config.options?.thermostat?.hide_fan
       ) {
         this.doFanUpdate
           .pipe(
@@ -248,8 +250,10 @@ export class TCC {
             try {
               await this.pushFanChanges();
             } catch (e) {
-              this.platform.log.error(JSON.stringify(e.message));
-              this.platform.log.debug(JSON.stringify(e));
+              if(e instanceof Error) {
+                this.platform.log.error(JSON.stringify(e.message));
+                this.platform.log.debug(JSON.stringify(e));
+              }
             }
             this.fanUpdateInProgress = false;
           });
@@ -383,7 +387,7 @@ export class TCC {
       if (this.device.settings) {
         if (
           this.device.settings.fan &&
-          !this.platform.config.options!.thermostat!.hide_fan
+          !this.platform.config.options?.thermostat?.hide_fan
         ) {
           this.deviceFan = (
             await this.platform.axios.get(
@@ -407,11 +411,13 @@ export class TCC {
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
-      this.platform.log.error(
-        `Failed to update status of ${this.device.name}`,
-        JSON.stringify(e.message),
-        this.platform.log.debug(JSON.stringify(e)),
-      );
+      if(e instanceof Error) {
+        this.platform.log.error(
+          `Failed to update status of ${this.device.name}`,
+          JSON.stringify(e.message),
+          this.platform.log.debug(JSON.stringify(e)),
+        );
+      }
     }
   }
 
@@ -421,9 +427,9 @@ export class TCC {
   async pushChanges() {
     const payload = {
       mode: this.honeywellMode[this.TargetHeatingCoolingState],
-      thermostatSetpointStatus: this.platform.config.options!.thermostat!
-        .thermostatSetpointStatus,
-    } as any;
+      thermostatSetpointStatus: this.platform.config.options?.thermostat
+        ?.thermostatSetpointStatus,
+    } as Record<string, unknown>;
     // Set the heat and cool set point value based on the selected mode
     if (
       this.TargetHeatingCoolingState ===
@@ -461,7 +467,10 @@ export class TCC {
     }
 
     this.platform.log.info(
-      `Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}`,
+      'Sending request to Honeywell API. mode: ',
+      payload.mode, ', coolSetpoint: ',
+      payload.coolSetpoint, ', heatSetpoint: ',
+      payload.heatSetpoint,
     );
     this.platform.log.debug(JSON.stringify(payload));
 
@@ -518,13 +527,13 @@ export class TCC {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options!.thermostat!.hide_fan
+        !this.platform.config.options?.thermostat?.hide_fan
       ) {
-        this.fanService.updateCharacteristic(
+        this.fanService?.updateCharacteristic(
           this.platform.Characteristic.TargetFanState,
           this.TargetFanState,
         );
-        this.fanService.updateCharacteristic(
+        this.fanService?.updateCharacteristic(
           this.platform.Characteristic.Active,
           this.Active,
         );
@@ -532,7 +541,7 @@ export class TCC {
     }
   }
 
-  setTargetHeatingCoolingState(value: any, callback: (arg0: null) => void) {
+  setTargetHeatingCoolingState(value, callback) {
     this.platform.log.debug(`Set TargetHeatingCoolingState: ${value}`);
 
     this.TargetHeatingCoolingState = value;
@@ -559,28 +568,28 @@ export class TCC {
     callback(null);
   }
 
-  setHeatingThresholdTemperature(value: any, callback: (arg0: null) => void) {
+  setHeatingThresholdTemperature(value, callback) {
     this.platform.log.debug(`Set HeatingThresholdTemperature: ${value}`);
     this.HeatingThresholdTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
-  setCoolingThresholdTemperature(value: any, callback: (arg0: null) => void) {
+  setCoolingThresholdTemperature(value, callback) {
     this.platform.log.debug(`Set CoolingThresholdTemperature: ${value}`);
     this.CoolingThresholdTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
-  setTargetTemperature(value: any, callback: (arg0: null) => void) {
+  setTargetTemperature(value, callback) {
     this.platform.log.debug(`Set TargetTemperature:': ${value}`);
     this.TargetTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
-  setTemperatureDisplayUnits(value: any, callback: (arg0: null) => void) {
+  setTemperatureDisplayUnits(value, callback) {
     this.platform.log.debug(`Set TemperatureDisplayUnits: ${value}`);
     this.platform.log.warn(
       'Changing the Hardware Display Units from HomeKit is not supported.',
@@ -600,7 +609,7 @@ export class TCC {
   /**
    * Converts the value to celsius if the temperature units are in Fahrenheit
    */
-  toCelsius(value: number) {
+  toCelsius(value) {
     if (
       this.TemperatureDisplayUnits ===
       this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS
@@ -615,7 +624,7 @@ export class TCC {
   /**
    * Converts the value to fahrenheit if the temperature units are in Fahrenheit
    */
-  toFahrenheit(value: number) {
+  toFahrenheit(value) {
     if (
       this.TemperatureDisplayUnits ===
       this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS
@@ -636,7 +645,7 @@ export class TCC {
     if (this.device.settings) {
       if (
         this.device.settings.fan &&
-        !this.platform.config.options!.thermostat!.hide_fan
+        !this.platform.config.options?.thermostat?.hide_fan
       ) {
         this.platform.log.debug(
           `TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`,
@@ -698,7 +707,7 @@ export class TCC {
     callback(null);
   }
 
-  setTargetFanState(value: number, callback: (arg0: null) => void) {
+  setTargetFanState(value, callback) {
     this.platform.log.debug(`Set Target Fan State: ${value}`);
     this.TargetFanState = value;
     this.doFanUpdate.next();

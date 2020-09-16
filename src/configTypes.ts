@@ -1,6 +1,4 @@
-import {
-  PlatformConfig,
-} from 'homebridge';
+import { PlatformConfig } from 'homebridge';
 
 //Config
 export interface HoneywellPlatformConfig extends PlatformConfig {
@@ -10,14 +8,14 @@ export interface HoneywellPlatformConfig extends PlatformConfig {
 }
 
 export type credentials = {
-  accessToken: string;
-  consumerKey: any;
-  consumerSecret: any;
-  refreshToken: any;
+  accessToken?: any;
+  consumerKey?: any;
+  consumerSecret?: any;
+  refreshToken?: any;
 };
 
 export type options = {
-  ttl: number;
+  ttl?: number;
   thermostat?: thermostat;
   leaksensor?: leaksensor;
   roomsensor?: roomsensor;
@@ -25,16 +23,16 @@ export type options = {
 };
 
 export type thermostat = {
-  hide: boolean;
-  hide_fan: boolean;
-  thermostatSetpointStatus: string;
+  hide?: boolean;
+  hide_fan?: boolean;
+  thermostatSetpointStatus?: string;
 };
 
 export type leaksensor = {
-  hide: boolean;
-  hide_humidity: boolean;
-  hide_temperature: boolean;
-  hide_leak: boolean;
+  hide?: boolean;
+  hide_humidity?: boolean;
+  hide_temperature?: boolean;
+  hide_leak?: boolean;
 };
 
 export type roomsensor = {
@@ -46,8 +44,8 @@ export type roomsensor = {
 };
 
 export type roompriority = {
-  thermostat: boolean;
-  priorityType: string;
+  thermostat?: boolean;
+  priorityType?: string;
 };
 
 // Location
@@ -86,7 +84,7 @@ export type OperationStatusT9 = {
   mode: string;
   fanRequest: boolean;
   circulationFanRequest: boolean;
-}
+};
 
 export type T9groups = {
   id: number;
@@ -153,7 +151,7 @@ export type OperationStatusT5 = {
   mode: string;
   fanRequest: boolean;
   circulationFanRequest: boolean;
-}
+};
 
 // TCC (Unknown) Thermostat
 export type TCCDevice = {
@@ -214,7 +212,7 @@ export type RoundDevice = {
   name: string;
   isAlive: boolean;
   macID: string;
-  deviceSettings: RoundDeviceSettings;
+  deviceSettings: Record<string, unknown>;
   service: Service;
   units: string;
   indoorTemperature: number;
@@ -238,10 +236,6 @@ export type RoundChangeableValues = {
   heatSetpoint: number;
   coolSetpoint: number;
   heatCoolMode: string;
-};
-
-export type RoundDeviceSettings = {
-
 };
 
 export type RoundSettings = {
@@ -319,16 +313,8 @@ export type DeviceSettings = {
 };
 
 export type Humidity = {
-  high: High2;
-  low: Low2;
-};
-
-export type High2 = {
-
-};
-
-export type Low2 = {
-
+  high: Record<string, unknown>;
+  low: Record<string, unknown>;
 };
 
 export type CurrentSensorReadings = {
@@ -336,17 +322,9 @@ export type CurrentSensorReadings = {
   humidity: number;
 };
 
-export type High = {
-
-};
-
-export type Low = {
-
-};
-
 export type Temp = {
-  high: High;
-  low: Low;
+  high: Record<string, unknown>;
+  low: Record<string, unknown>;
 };
 
 // T9 Room Sensors
@@ -392,12 +370,8 @@ export type Priority = {
 
 export type CurrentPriority = {
   priorityType: string;
-  selectedRooms: selectedRooms;
+  selectedRooms: Record<string, unknown>;
   rooms: PriorityRooms[];
-};
-
-export type selectedRooms = {
-  
 };
 
 export type PriorityRooms = {
@@ -422,3 +396,9 @@ export type Accessory = {
   status: string;
   detectMotion: boolean;
 };
+
+
+export interface AxiosRequestConfig {
+params?: Record<string, unknown>;
+headers?: any;
+}

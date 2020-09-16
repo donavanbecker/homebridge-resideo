@@ -3,7 +3,12 @@ import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
 import { DeviceURL } from '../settings';
-import * as configTypes from '../configTypes';
+import {
+  location,
+  sensoraccessory,
+  T9Thermostat,
+  T9groups,
+} from '../configTypes';
 
 /**
  * Platform Accessory
@@ -41,10 +46,10 @@ export class RoomSensorThermostat {
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId: configTypes.location['locationID'],
-    public device: configTypes.T9Thermostat,
-    public sensoraccessory: configTypes.sensoraccessory,
-    public readonly group: configTypes.T9groups,
+    public readonly locationId: location['locationID'],
+    public device: T9Thermostat,
+    public sensoraccessory: sensoraccessory,
+    public readonly group: T9groups,
   ) {
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
@@ -187,7 +192,7 @@ export class RoomSensorThermostat {
 
     // Watch for thermostat change events
     // We put in a debounce of 100ms so we don't make duplicate calls
-    if (this.platform.config.options!.roompriority!.thermostat) {
+    if (this.platform.config.options?.roompriority?.thermostat) {
       this.doRoomUpdate
         .pipe(
           tap(() => {
@@ -199,8 +204,10 @@ export class RoomSensorThermostat {
           try {
             await this.pushRoomChanges();
           } catch (e) {
-            this.platform.log.error(JSON.stringify(e.message));
-            this.platform.log.debug(JSON.stringify(e));
+            if(e instanceof Error) {
+              this.platform.log.error(JSON.stringify(e.message));
+              this.platform.log.debug(JSON.stringify(e));
+            }
           }
           this.roomUpdateInProgress = false;
         });
@@ -216,8 +223,10 @@ export class RoomSensorThermostat {
         try {
           await this.pushChanges();
         } catch (e) {
-          this.platform.log.error(JSON.stringify(e.message));
-          this.platform.log.debug(JSON.stringify(e));
+          if(e instanceof Error) {
+            this.platform.log.error(JSON.stringify(e.message));
+            this.platform.log.debug(JSON.stringify(e));
+          }
         }
         this.thermostatUpdateInProgress = false;
       });
@@ -325,12 +334,16 @@ export class RoomSensorThermostat {
       this.platform.log.debug(JSON.stringify(this.device));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
-    } catch (e) {
-      this.platform.log.error(
-        `Failed to update status of ${this.sensoraccessory.accessoryAttribute.name} ${this.sensoraccessory.accessoryAttribute.type} Thermostat`,
-        JSON.stringify(e.message),
-        this.platform.log.debug(JSON.stringify(e)),
-      );
+    } catch (e) { 
+      if(e instanceof Error) {
+        this.platform.log.error(
+          'Failed to update status of ',
+          this.sensoraccessory.accessoryAttribute.name, ' ',
+          this.sensoraccessory.accessoryAttribute.type, ' Thermostat',
+          JSON.stringify(e.message),
+          this.platform.log.debug(JSON.stringify(e)),
+        );
+      }
     }
   }
 
@@ -339,7 +352,7 @@ export class RoomSensorThermostat {
    */
   async refreshSensorStatus() {
     try {
-      if (this.platform.config.options!.roompriority!.thermostat) {
+      if (this.platform.config.options?.roompriority?.thermostat) {
         if (this.device.deviceID.startsWith('LCC')) {
           if (this.device.deviceModel.startsWith('T9')) {
             if (this.device.groups) {
@@ -394,11 +407,15 @@ export class RoomSensorThermostat {
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
-      this.platform.log.error(
-        `Failed to update status of ${this.sensoraccessory.accessoryAttribute.name} ${this.sensoraccessory.accessoryAttribute.type} Thermostat`,
-        JSON.stringify(e.message),
-        this.platform.log.debug(JSON.stringify(e)),
-      );
+      if(e instanceof Error) {
+        this.platform.log.error(
+          'Failed to update status of ',
+          this.sensoraccessory.accessoryAttribute.name, ' ',
+          this.sensoraccessory.accessoryAttribute.type, ' Thermostat',
+          JSON.stringify(e.message),
+          this.platform.log.debug(JSON.stringify(e)),
+        );
+      } 
     }
   }
 
@@ -408,12 +425,12 @@ export class RoomSensorThermostat {
   async pushRoomChanges() {
     const payload = {
       currentPriority: {
-        priorityType: this.platform.config.options!.roompriority!.priorityType,
+        priorityType: this.platform.config.options?.roompriority?.priorityType,
       },
     } as any;
 
     if (
-      this.platform.config.options!.roompriority!.priorityType === 'PickARoom'
+      this.platform.config.options?.roompriority?.priorityType === 'PickARoom'
     ) {
       payload.currentPriority.selectedRooms = [
         this.sensoraccessory.accessoryId,
@@ -426,31 +443,30 @@ export class RoomSensorThermostat {
      * "TemporaryHold" will hold the set temperature until "nextPeriodTime".
      * "PermanentHold" will hold the setpoint until user requests another change.
      */
-    if (this.platform.config.options!.roompriority!.thermostat) {
+    if (this.platform.config.options?.roompriority?.thermostat) {
       if (
-        this.platform.config.options!.roompriority!.priorityType === 'FollowMe'
+        this.platform.config.options.roompriority.priorityType === 'FollowMe'
       ) {
         this.platform.log.info(
           'Sending request to Honeywell API. Priority Type: ',
-          this.platform.config.options!.roompriority!.priorityType,
+          this.platform.config.options.roompriority.priorityType,
           ', Built-in Motion/Occupancy Sensor(s) Will be used to set Priority Automatically.',
         );
       } else if (
-        this.platform.config.options!.roompriority!.priorityType ===
-        'WholeHouse'
+        this.platform.config.options.roompriority.priorityType === 'WholeHouse'
       ) {
         this.platform.log.info(
           'Sending request to Honeywell API. Priority Type: ',
-          this.platform.config.options!.roompriority!.priorityType,
+          this.platform.config.options.roompriority.priorityType,
         );
       } else if (
-        this.platform.config.options!.roompriority!.priorityType === 'PickARoom'
+        this.platform.config.options.roompriority.priorityType === 'PickARoom'
       ) {
         this.platform.log.info(
           'Sending request to Honeywell API. Room Priority: ',
           this.sensoraccessory.accessoryAttribute.name,
           ' Priority Type: ',
-          this.platform.config.options!.roompriority!.priorityType,
+          this.platform.config.options.roompriority.priorityType,
         );
       }
       this.platform.log.debug(JSON.stringify(payload));
@@ -476,8 +492,8 @@ export class RoomSensorThermostat {
   async pushChanges() {
     const payload = {
       mode: this.honeywellMode[this.TargetHeatingCoolingState],
-      thermostatSetpointStatus: this.platform.config.options!.thermostat!
-        .thermostatSetpointStatus,
+      thermostatSetpointStatus: this.platform.config.options?.thermostat
+        ?.thermostatSetpointStatus,
       autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
     } as any;
 
@@ -518,7 +534,10 @@ export class RoomSensorThermostat {
     }
 
     this.platform.log.info(
-      `Sending request to Honeywell API. mode: ${payload.mode}, coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}`,
+      'Sending request to Honeywell API. mode: ',
+      payload.mode, ', coolSetpoint: ',
+      payload.coolSetpoint, ', heatSetpoint: ',
+      payload.heatSetpoint,
     );
     this.platform.log.debug(JSON.stringify(payload));
 
