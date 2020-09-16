@@ -56,14 +56,8 @@ export class LeakSensor {
     this.accessory
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
-      .setCharacteristic(
-        this.platform.Characteristic.Model,
-        this.device.deviceType,
-      )
-      .setCharacteristic(
-        this.platform.Characteristic.SerialNumber,
-        this.device.deviceID,
-      );
+      .setCharacteristic(this.platform.Characteristic.Model, this.device.deviceType)
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID);
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
@@ -95,51 +89,35 @@ export class LeakSensor {
       .on('get', this.handleBatteryLevelGet.bind(this));
 
     // Set Charging State
-    this.service.setCharacteristic(
-      this.platform.Characteristic.ChargingState,
-      2,
-    );
+    this.service.setCharacteristic(this.platform.Characteristic.ChargingState, 2);
 
     // Set Status Low Battery
     this.service
       .getCharacteristic(this.platform.Characteristic.StatusLowBattery)
       .on('get', this.handleStatusLowBatteryGet.bind(this));
 
-    // Leak Sensor
+    // Leak Sensor Service
     this.leakService = accessory.getService(this.platform.Service.LeakSensor);
-    if (
-      !this.leakService &&
-      !this.platform.config.options?.leaksensor?.hide_leak
-    ) {
+    if (!this.leakService && !this.platform.config.options?.leaksensor?.hide_leak) {
       this.leakService = accessory.addService(
         this.platform.Service.LeakSensor,
         `${this.device.userDefinedDeviceName} Leak Sensor`,
       );
 
-      // Set Humidity Sensor Current Relative Humidity
       this.leakService
         .getCharacteristic(this.platform.Characteristic.LeakDetected)
         .on('get', this.handleLeakDetectedGet.bind(this));
 
-      // Set Humidity Sensor Current Relative Humidity
       this.leakService
         .getCharacteristic(this.platform.Characteristic.StatusActive)
         .on('get', this.handleLeakStatusActiveGet.bind(this));
-    } else if (
-      this.leakService &&
-      this.platform.config.options?.leaksensor?.hide_leak
-    ) {
+    } else if (this.leakService && this.platform.config.options?.leaksensor?.hide_leak) {
       accessory.removeService(this.leakService);
     }
 
-    // Temperature Sensor
-    this.temperatureService = accessory.getService(
-      this.platform.Service.TemperatureSensor,
-    );
-    if (
-      !this.temperatureService &&
-      !this.platform.config.options?.leaksensor?.hide_temperature
-    ) {
+    // Temperature Sensor Service
+    this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor);
+    if (!this.temperatureService && !this.platform.config.options?.leaksensor?.hide_temperature) {
       this.temperatureService = accessory.addService(
         this.platform.Service.TemperatureSensor,
         `${this.device.userDefinedDeviceName} Temperature Sensor`,
@@ -154,21 +132,13 @@ export class LeakSensor {
       this.temperatureService
         .getCharacteristic(this.platform.Characteristic.StatusActive)
         .on('get', this.handleTempStatusActiveGet.bind(this));
-    } else if (
-      this.temperatureService &&
-      this.platform.config.options?.leaksensor?.hide_temperature
-    ) {
+    } else if (this.temperatureService && this.platform.config.options?.leaksensor?.hide_temperature) {
       accessory.removeService(this.temperatureService);
     }
 
-    // Humidity Sensor
-    this.humidityService = accessory.getService(
-      this.platform.Service.HumiditySensor,
-    );
-    if (
-      !this.humidityService &&
-      !this.platform.config.options?.leaksensor?.hide_humidity
-    ) {
+    // Humidity Sensor Service
+    this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
+    if (!this.humidityService && !this.platform.config.options?.leaksensor?.hide_humidity) {
       this.humidityService = accessory.addService(
         this.platform.Service.HumiditySensor,
         `${this.device.userDefinedDeviceName} Humidity Sensor`,
@@ -183,10 +153,7 @@ export class LeakSensor {
       this.humidityService
         .getCharacteristic(this.platform.Characteristic.StatusActive)
         .on('get', this.handleHumidityStatusActiveGet.bind(this));
-    } else if (
-      this.humidityService &&
-      this.platform.config.options?.leaksensor?.hide_humidity
-    ) {
+    } else if (this.humidityService && this.platform.config.options?.leaksensor?.hide_humidity) {
       accessory.removeService(this.humidityService);
     }
 
@@ -270,19 +237,15 @@ export class LeakSensor {
       this.sensor = sensor;
       this.device;
       this.platform.log.debug(JSON.stringify(this.device));
-      this.platform.log.debug(
-        JSON.stringify(this.device.currentSensorReadings),
-      );
+      this.platform.log.debug(JSON.stringify(this.device.currentSensorReadings));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
-      if(e instanceof Error) {
-        this.platform.log.error(
-          `Failed to update status of ${this.device.userDefinedDeviceName}`,
-          JSON.stringify(e.message),
-          this.platform.log.debug(JSON.stringify(e)),
-        );
-      }
+      this.platform.log.error(
+        `Failed to update status of ${this.device.userDefinedDeviceName}`,
+        JSON.stringify(e.message),
+        this.platform.log.debug(JSON.stringify(e)),
+      );
     }
   }
 
@@ -290,43 +253,25 @@ export class LeakSensor {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.BatteryLevel,
-      this.BatteryLevel,
-    );
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.StatusLowBattery,
-      this.StatusLowBattery,
-    );
+    this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
+    this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
     if (!this.platform.config.options?.leaksensor?.hide_leak) {
-      this.leakService.updateCharacteristic(
-        this.platform.Characteristic.StatusActive,
-        this.StatusActive,
-      );
-      this.leakService.updateCharacteristic(
-        this.platform.Characteristic.LeakDetected,
-        this.LeakDetected,
-      );
+      this.leakService.updateCharacteristic(this.platform.Characteristic.StatusActive, this.StatusActive);
+      this.leakService.updateCharacteristic(this.platform.Characteristic.LeakDetected, this.LeakDetected);
     }
     if (!this.platform.config.options?.leaksensor?.hide_temperature) {
       this.temperatureService.updateCharacteristic(
         this.platform.Characteristic.CurrentTemperature,
         this.CurrentTemperature,
       );
-      this.temperatureService.updateCharacteristic(
-        this.platform.Characteristic.StatusActive,
-        this.TempStatusActive,
-      );
+      this.temperatureService.updateCharacteristic(this.platform.Characteristic.StatusActive, this.TempStatusActive);
     }
     if (!this.platform.config.options?.leaksensor?.hide_humidity) {
       this.humidityService.updateCharacteristic(
         this.platform.Characteristic.CurrentRelativeHumidity,
         this.CurrentRelativeHumidity,
       );
-      this.humidityService.updateCharacteristic(
-        this.platform.Characteristic.StatusActive,
-        this.HumidityStatusActive,
-      );
+      this.humidityService.updateCharacteristic(this.platform.Characteristic.StatusActive, this.HumidityStatusActive);
     }
   }
 
@@ -357,9 +302,7 @@ export class LeakSensor {
    * Handle requests to get the current value of the "Occupancy Sensor" characteristics
    */
   handleCurrentTemperatureGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(
-      `Update Current Temperature: ${this.CurrentTemperature}`,
-    );
+    this.platform.log.debug(`Update Current Temperature: ${this.CurrentTemperature}`);
 
     // set this to a valid value for OccupancyDetected
     const currentValue = this.CurrentTemperature;
@@ -369,9 +312,7 @@ export class LeakSensor {
   }
 
   handleTempStatusActiveGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(
-      `Update Temperature Sensor Status Active: ${this.TempStatusActive}`,
-    );
+    this.platform.log.debug(`Update Temperature Sensor Status Active: ${this.TempStatusActive}`);
 
     // set this to a valid value for OccupancyDetected
     const currentValue = this.TempStatusActive;
@@ -384,9 +325,7 @@ export class LeakSensor {
    * Handle requests to get the current value of the "Humidity Sensor" characteristics
    */
   handleCurrentRelativeHumidityGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(
-      `Update Current Relative Humidity: ${this.CurrentRelativeHumidity}`,
-    );
+    this.platform.log.debug(`Update Current Relative Humidity: ${this.CurrentRelativeHumidity}`);
 
     // set this to a valid value for CurrentRelativeHumidity
     const currentValue = this.CurrentRelativeHumidity;
@@ -399,9 +338,7 @@ export class LeakSensor {
    * Handle requests to get the current value of the "Humidity Sensor" characteristics
    */
   handleHumidityStatusActiveGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(
-      `Update Humidity Status Active: ${this.HumidityStatusActive}`,
-    );
+    this.platform.log.debug(`Update Humidity Status Active: ${this.HumidityStatusActive}`);
 
     // set this to a valid value for CurrentRelativeHumidity
     const currentValue = this.HumidityStatusActive;
@@ -427,9 +364,7 @@ export class LeakSensor {
    * Handle requests to get the current value of the "Motion Sensor" characteristics
    */
   handleStatusLowBatteryGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(
-      `Update Low Battery Status: ${this.StatusLowBattery}`,
-    );
+    this.platform.log.debug(`Update Low Battery Status: ${this.StatusLowBattery}`);
 
     // set this to a valid value for Motion Detected
     const currentValue = this.StatusLowBattery;
@@ -442,10 +377,7 @@ export class LeakSensor {
    * Converts the value to celsius if the temperature units are in Fahrenheit
    */
   toCelsius(value: number) {
-    if (
-      this.TemperatureDisplayUnits ===
-      this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS
-    ) {
+    if (this.TemperatureDisplayUnits === this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS) {
       return value;
     }
 
@@ -457,10 +389,7 @@ export class LeakSensor {
    * Converts the value to fahrenheit if the temperature units are in Fahrenheit
    */
   toFahrenheit(value: number) {
-    if (
-      this.TemperatureDisplayUnits ===
-      this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS
-    ) {
+    if (this.TemperatureDisplayUnits === this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS) {
       return value;
     }
 

@@ -2,12 +2,7 @@ import { Service, PlatformAccessory } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
-import {
-  location,
-  sensoraccessory,
-  T9Thermostat,
-  T9groups,
-} from '../configTypes';
+import { location, sensoraccessory, T9Thermostat, T9groups } from '../configTypes';
 
 /**
  * Platform Accessory
@@ -54,14 +49,8 @@ export class RoomSensors {
     this.accessory
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
-      .setCharacteristic(
-        this.platform.Characteristic.Model,
-        this.device.deviceModel,
-      )
-      .setCharacteristic(
-        this.platform.Characteristic.SerialNumber,
-        this.device.deviceID,
-      )
+      .setCharacteristic(this.platform.Characteristic.Model, this.device.deviceModel)
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID)
       .setCharacteristic(
         this.platform.Characteristic.FirmwareRevision,
         this.sensoraccessory.accessoryAttribute.softwareRevision,
@@ -92,92 +81,74 @@ export class RoomSensors {
     this.parseStatus();
 
     // Set Charging State
-    this.service.setCharacteristic(
-      this.platform.Characteristic.ChargingState,
-      2,
-    );
-    
+    this.service.setCharacteristic(this.platform.Characteristic.ChargingState, 2);
+
     // Set Low Battery
     this.service
       .getCharacteristic(this.platform.Characteristic.StatusLowBattery)
       .on('get', this.handeStatusLowBatteryGet.bind(this));
 
-    // Temperature Sensor
-    if (this.platform.config.options?.roomsensor?.hide_temperature === false) {
-      this.temperatureService =
-        accessory.getService(this.platform.Service.TemperatureSensor) ||
-        accessory.addService(
-          this.platform.Service.TemperatureSensor,
-          `${this.sensoraccessory.accessoryAttribute.name} Temperature Sensor`,
-        );
+    // Temperature Sensor Service
+    this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor);
+    if (!this.temperatureService && !this.platform.config.options?.roomsensor?.hide_temperature) {
+      this.temperatureService = accessory.addService(
+        this.platform.Service.TemperatureSensor,
+        `${this.sensoraccessory.accessoryAttribute.name} Temperature Sensor`,
+      );
 
-      // Set Temperature Sensor
+      // Set Temperature Sensor - Current Temperature
       this.temperatureService
         .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
         .on('get', this.handleCurrentTemperatureGet.bind(this));
-    } else if (
-      this.temperatureService === undefined &&
-      this.platform.config.options?.roomsensor?.hide_temperature
-    ) {
-      accessory.removeService(this.temperatureService!);
+    } else if (this.temperatureService && this.platform.config.options?.roomsensor?.hide_temperature) {
+      accessory.removeService(this.temperatureService);
     }
 
-    // Occupancy Sensor
-    if (this.platform.config.options?.roomsensor?.hide_occupancy === false) {
-      this.occupancyService =
-        accessory.getService(this.platform.Service.OccupancySensor) ||
-        accessory.addService(
-          this.platform.Service.OccupancySensor,
-          `${this.sensoraccessory.accessoryAttribute.name} Occupancy Sensor`,
-        );
+    // Occupancy Sensor Service
+    this.occupancyService = accessory.getService(this.platform.Service.OccupancySensor);
+    if (!this.occupancyService && !this.platform.config.options?.roomsensor?.hide_occupancy) {
+      this.occupancyService = accessory.addService(
+        this.platform.Service.OccupancySensor,
+        `${this.sensoraccessory.accessoryAttribute.name} Occupancy Sensor`,
+      );
 
       // Set Occupancy Sensor
       this.occupancyService
         .getCharacteristic(this.platform.Characteristic.OccupancyDetected)
         .on('get', this.handleOccupancyDetectedGet.bind(this));
-    } else if (
-      this.occupancyService === undefined &&
-      (this.platform.config.options?.roomsensor?.hide_occupancy === true)
-    ) {
-      accessory.removeService(this.occupancyService!);
+    } else if (this.occupancyService && this.platform.config.options?.roomsensor?.hide_occupancy) {
+      accessory.removeService(this.occupancyService);
     }
 
-    // Humidity Sensor
-    if (this.platform.config.options?.roomsensor?.hide_humidity === false) {
-      this.humidityService =
-        accessory.getService(this.platform.Service.HumiditySensor) ||
-        accessory.addService(
-          this.platform.Service.HumiditySensor,
-          `${this.sensoraccessory.accessoryAttribute.name} Humidity Sensor`,
-        );
+    // Humidity Sensor Service
+    this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
+    if (!this.humidityService && !this.platform.config.options?.roomsensor?.hide_humidity) {
+      this.humidityService = accessory.addService(
+        this.platform.Service.HumiditySensor,
+        `${this.sensoraccessory.accessoryAttribute.name} Humidity Sensor`,
+      );
 
       // Set Humidity Sensor Current Relative Humidity
       this.humidityService
         .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
         .on('get', this.handleCurrentRelativeHumidityGet.bind(this));
-    } else if (
-      this.humidityService === undefined &&
-      (this.platform.config.options?.roomsensor?.hide_humidity === true)
-    ) {
-      accessory.removeService(this.humidityService!);
+    } else if (this.humidityService && this.platform.config.options?.roomsensor?.hide_humidity) {
+      accessory.removeService(this.humidityService);
     }
 
-    // Motion Sensor
-    if (this.platform.config.options?.roomsensor?.hide_motion === false) {
-      this.motionService =
-      accessory.getService(this.platform.Service.MotionSensor) ||
-        accessory.addService(
-          this.platform.Service.MotionSensor,
-          `${this.sensoraccessory.accessoryAttribute.name} Motion Sensor`,
-        );
+    // Motion Sensor Service
+    this.motionService = accessory.getService(this.platform.Service.MotionSensor);
+    if (!this.motionService && !this.platform.config.options?.roomsensor?.hide_motion) {
+      this.motionService = accessory.addService(
+        this.platform.Service.MotionSensor,
+        `${this.sensoraccessory.accessoryAttribute.name} Motion Sensor`,
+      );
 
       // Set Motion Sensor Detected
       this.motionService
         ?.getCharacteristic(this.platform.Characteristic.MotionDetected)
         .on('get', this.handleMotionDetectedGet.bind(this));
-    } else if (
-      this.motionService && this.platform.config.options?.roomsensor?.hide_motion === true
-    ) {
+    } else if (this.motionService && this.platform.config.options?.roomsensor?.hide_motion) {
       accessory.removeService(this.motionService);
     }
 
@@ -217,14 +188,12 @@ export class RoomSensors {
     }
 
     // Set Temperature Sensor State
-    if (this.platform.config.options?.roomsensor?.hide_temperature === false) {
-      this.CurrentTemperature = this.toCelsius(
-        this.sensoraccessory.accessoryValue.indoorTemperature,
-      );
+    if (!this.platform.config.options?.roomsensor?.hide_temperature) {
+      this.CurrentTemperature = this.toCelsius(this.sensoraccessory.accessoryValue.indoorTemperature);
     }
 
     // Set Occupancy Sensor State
-    if (this.platform.config.options?.roomsensor?.hide_occupancy === false) {
+    if (!this.platform.config.options?.roomsensor?.hide_occupancy) {
       if (this.sensoraccessory.accessoryValue.occupancyDet) {
         this.OccupancyDetected = 1;
       } else {
@@ -233,12 +202,12 @@ export class RoomSensors {
     }
 
     // Set Humidity Sensor State
-    if (this.platform.config.options?.roomsensor?.hide_humidity === false) {
+    if (!this.platform.config.options?.roomsensor?.hide_humidity) {
       this.CurrentRelativeHumidity = this.sensoraccessory.accessoryValue.indoorHumidity;
     }
 
     // Set Motion Sensor State
-    if (this.platform.config.options?.roomsensor?.hide_motion === false) {
+    if (!this.platform.config.options?.roomsensor?.hide_motion) {
       this.MotionDetected = this.sensoraccessory.accessoryValue.motionDet;
     }
   }
@@ -253,11 +222,7 @@ export class RoomSensors {
           if (this.device.groups) {
             const groups = this.device.groups;
             for (const group of groups) {
-              const roomsensors = await this.platform.Sensors(
-                this.device,
-                group,
-                this.locationId,
-              );
+              const roomsensors = await this.platform.Sensors(this.device, group, this.locationId);
               if (roomsensors.rooms) {
                 const rooms = roomsensors.rooms;
                 this.platform.log.debug(JSON.stringify(roomsensors));
@@ -267,23 +232,12 @@ export class RoomSensors {
                     for (const accessory of accessories.accessories) {
                       if (accessory.accessoryAttribute) {
                         if (accessory.accessoryAttribute.type) {
-                          if (
-                            accessory.accessoryAttribute.type.startsWith(
-                              'IndoorAirSensor',
-                            )
-                          ) {
+                          if (accessory.accessoryAttribute.type.startsWith('IndoorAirSensor')) {
                             this.sensoraccessory = accessory;
+                            this.platform.log.debug(JSON.stringify(this.sensoraccessory));
+                            this.platform.log.debug(JSON.stringify(this.sensoraccessory));
                             this.platform.log.debug(
-                              JSON.stringify(this.sensoraccessory),
-                            );
-                            this.platform.log.debug(
-                              JSON.stringify(this.sensoraccessory),
-                            );
-                            this.platform.log.debug(
-                              JSON.stringify(
-                                this.sensoraccessory.accessoryAttribute
-                                  .softwareRevision,
-                              ),
+                              JSON.stringify(this.sensoraccessory.accessoryAttribute.softwareRevision),
                             );
                           }
                         }
@@ -299,13 +253,11 @@ export class RoomSensors {
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
-      if(e instanceof Error) {
-        this.platform.log.error(
-          `Failed to update status of ${this.sensoraccessory.accessoryAttribute.name} ${this.sensoraccessory.accessoryAttribute.type}`,
-          JSON.stringify(e.message),
-          this.platform.log.debug(JSON.stringify(e)),
-        );
-      }
+      this.platform.log.error(
+        `Failed to update status of ${this.sensoraccessory.accessoryAttribute.name} ${this.sensoraccessory.accessoryAttribute.type}`,
+        JSON.stringify(e.message),
+        this.platform.log.debug(JSON.stringify(e)),
+      );
     }
   }
 
@@ -313,33 +265,27 @@ export class RoomSensors {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.StatusLowBattery,
-      this.StatusLowBattery,
-    );
-    if (this.platform.config.options?.roomsensor?.hide_temperature === false) {
+    this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
+    if (!this.platform.config.options?.roomsensor?.hide_temperature) {
       this.temperatureService?.updateCharacteristic(
         this.platform.Characteristic.CurrentTemperature,
         this.CurrentTemperature,
       );
     }
-    if (this.platform.config.options?.roomsensor?.hide_occupancy === false) {
+    if (!this.platform.config.options?.roomsensor?.hide_occupancy) {
       this.occupancyService?.updateCharacteristic(
         this.platform.Characteristic.OccupancyDetected,
         this.OccupancyDetected,
       );
     }
-    if (this.platform.config.options?.roomsensor?.hide_humidity === false) {
+    if (!this.platform.config.options?.roomsensor?.hide_humidity) {
       this.humidityService?.updateCharacteristic(
         this.platform.Characteristic.CurrentRelativeHumidity,
         this.CurrentRelativeHumidity,
       );
     }
-    if (this.platform.config.options?.roomsensor?.hide_motion === false) {
-      this.motionService?.updateCharacteristic(
-        this.platform.Characteristic.MotionDetected,
-        this.MotionDetected,
-      );
+    if (!this.platform.config.options?.roomsensor?.hide_motion) {
+      this.motionService?.updateCharacteristic(this.platform.Characteristic.MotionDetected, this.MotionDetected);
     }
   }
 
@@ -357,9 +303,7 @@ export class RoomSensors {
   }
 
   handleCurrentTemperatureGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(
-      `Update Current Temperature: ${this.CurrentTemperature}`,
-    );
+    this.platform.log.debug(`Update Current Temperature: ${this.CurrentTemperature}`);
 
     // set this to a valid value for CurrentTemperature
     const currentValue = this.CurrentTemperature;
@@ -385,9 +329,7 @@ export class RoomSensors {
    * Handle requests to get the current value of the "Humidity Sensor" characteristics
    */
   handleCurrentRelativeHumidityGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(
-      `Update Current Relative Humidity: ${this.CurrentRelativeHumidity}`,
-    );
+    this.platform.log.debug(`Update Current Relative Humidity: ${this.CurrentRelativeHumidity}`);
 
     // set this to a valid value for CurrentRelativeHumidity
     const currentValue = this.CurrentRelativeHumidity;
@@ -413,10 +355,7 @@ export class RoomSensors {
    * Converts the value to celsius if the temperature units are in Fahrenheit
    */
   toCelsius(value: number) {
-    if (
-      this.TemperatureDisplayUnits ===
-      this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS
-    ) {
+    if (this.TemperatureDisplayUnits === this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS) {
       return value;
     }
 
@@ -428,10 +367,7 @@ export class RoomSensors {
    * Converts the value to fahrenheit if the temperature units are in Fahrenheit
    */
   toFahrenheit(value: number) {
-    if (
-      this.TemperatureDisplayUnits ===
-      this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS
-    ) {
+    if (this.TemperatureDisplayUnits === this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS) {
       return value;
     }
 

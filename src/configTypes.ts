@@ -397,8 +397,7 @@ export type Accessory = {
   detectMotion: boolean;
 };
 
-
 export interface AxiosRequestConfig {
-params?: Record<string, unknown>;
-headers?: any;
+  params?: Record<string, unknown>;
+  headers?: any;
 }
