@@ -2,7 +2,7 @@
   "displayName": "Homebridge Honeywell Home",
   "name": "homebridge-honeywell-home",
   "version": "7.2.2",
-  "description": "A Honeywell Home https://honeywellhome.com plugin for Homebridge: https://github.com/homebridge/homebridge.",
+  "description": "The [Homebridge](https://homebridge.io) Honeywell Home plugin allows you to access your [Honeywell Home](https://honeywellhome.com) thermostat from HomeKit.",
   "author": "donavanbecker",
   "license": "Apache-2.0",
   "repository": {
@@ -18,7 +18,6 @@
   },
   "main": "dist/index.js",
   "scripts": {
-    "developer": "DEBUG=honeywell-home homebridge -D -U `pwd` -P `pwd`",
     "lint": "eslint src/**.ts",
     "watch": "npm run build && npm link && nodemon",
     "build": "rimraf ./dist && tsc",
@@ -42,7 +41,19 @@
     "homebridge-plugin",
     "honeywell",
     "honeywell-home",
-    "thermostat"
+    "thermostat",
+    "roomsensor",
+    "leaksensor",
+    "room sensor",
+    "leak sensor",
+    "lcc",
+    "tcc",
+    "resideo",
+    "honeywellhome",
+    "honeywell home",
+    "temperature",
+    "humidity",
+    "leak"
   ],
   "dependencies": {
     "axios": "^0.19.2",

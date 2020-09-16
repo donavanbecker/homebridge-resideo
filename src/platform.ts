@@ -195,17 +195,12 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       }
     }
 
-    this.config.options!.ttl = this.config.options?.ttl || 1800; // default 1800 seconds
+    this.config.options!.ttl = this.config.options?.ttl || 300; // default 300 seconds
 
-    /*{if (
-      !this.config.credentials?.consumerSecret &&
-          this.config.options.ttl < 1800
-    ) {
-      this.log.debug(
-        "TTL must be set to 1800 or higher unless you setup your own consumerSecret.",
-      );
-      this.config.options.ttl = 1800;
-    }}*/
+    if (!this.config.credentials?.consumerSecret && this.config.options!.ttl! < 300) {
+      this.log.debug('TTL must be set to 300 or higher unless you setup your own consumerSecret.');
+      this.config.options!.ttl! = 300;
+    }
 
     if (!this.config.credentials) {
       throw new Error('Missing Credentials');
@@ -432,9 +427,15 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 this.log.debug(JSON.stringify(device));
                 this.T5(device, locationId);
               } else if (!device.DeviceModel) {
-                this.log.info('A LLC Device has been discovered with a deviceModel that doesn\'t start with T5 or T9');
+                this.log.info('A LLC Device has been discovered with a deviceModel that does not start with T5 or T9');
               }
             } else if (device.deviceID.startsWith('TCC')) {
+              this.log.info(
+                'A TCC Device has been discovered, Currently writing to Honeywell API does not work.',
+              );
+              this.log.info(
+                ' Feel free to open an issue on GitHub https://git.io/JURI5',
+              );
               if (device.deviceModel.startsWith('Round')) {
                 this.deviceinfo(device);
                 this.log.debug(JSON.stringify(device));
@@ -445,13 +446,13 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 this.TCC(device, locationId);
               } else if (!device.deviceModel) {
                 this.log.info(
-                  'A TCC Device has been discovered with a deviceModel that doesn\'t start with Round or Unknown',
+                  'A TCC Device has been discovered with a deviceModel that does not start with Round or Unknown',
                 );
               }
             } else {
               this.log.info(
                 'A Device was found that is not supported, ',
-                'Please open Feature Request Here: https://git.io/JUWN2, ',
+                'Please open Feature Request Here: https://git.io/JURLY, ',
                 'If you would like to see support.',
               );
             }
