@@ -123,33 +123,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
      */
     this.config.devicediscovery;
 
-    /* if (!this.config.options || typeof this.config.options !== "object") {
-      this.config.options = {};
-    }
-    if (
-      !this.config.options.thermostat ||
-      typeof this.config.options.thermostat !== "object"
-    ) {
-      this.config.options.thermostat = {};
-    }
-    if (
-      !this.config.options.leaksensor ||
-      typeof this.config.options.leaksensor !== "object"
-    ) {
-      this.config.options.leaksensor = {};
-    }
-    if (
-      !this.config.options.roomsensor ||
-      typeof this.config.options.roomsensor !== "object"
-    ) {
-      this.config.options.roomsensor = {};
-    }
-    if (
-      !this.config.options.roompriority ||
-      typeof this.config.options.roompriority !== "object"
-    ) {
-      this.config.options.roompriority = {};
-    }*/
+    this.config.options = this.config.options || {};
 
     if (this.config.options?.thermostat) {
       // Thermostat Config Options
@@ -195,7 +169,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       }
     }
 
-    this.config.options!.ttl = this.config.options?.ttl || 300; // default 300 seconds
+    if (this.config.options) {
+      this.config.options.ttl = this.config.options!.ttl || 300; // default 300 seconds
+    }
 
     if (!this.config.credentials?.consumerSecret && this.config.options!.ttl! < 300) {
       this.log.debug('TTL must be set to 300 or higher unless you setup your own consumerSecret.');
