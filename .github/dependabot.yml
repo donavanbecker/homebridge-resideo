@@ -9,19 +9,15 @@ updates:
     directory: '/' # Location of package manifests
     schedule:
       interval: 'daily'
-    target-branch: 'beta'
   - package-ecosystem: 'github-actions' # See documentation for possible values
     directory: '/' # Location of package manifests
     schedule:
-      interval: daily
-    target-branch: 'beta'
+      interval: 'daily'
   - package-ecosystem: 'npm' # See documentation for possible values
     directory: '/server' # Location of package manifests
     schedule:
       interval: 'daily'
-    target-branch: 'beta'
   - package-ecosystem: 'npm' # See documentation for possible values
     directory: '/server/portal' # Location of package manifests
     schedule:
       interval: 'daily'
-    target-branch: 'beta'
