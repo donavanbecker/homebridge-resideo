@@ -25,6 +25,7 @@ export class RoomSensors {
   SensorUpdateInProgress!: boolean;
   doSensorUpdate!: any;
   TemperatureDisplayUnits!: number;
+  BatteryLevel!: number;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
@@ -82,7 +83,6 @@ export class RoomSensors {
 
     // Set Charging State
     this.service.setCharacteristic(this.platform.Characteristic.ChargingState, 2);
-
     // Temperature Sensor Service
     this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor);
     if (!this.temperatureService && !this.platform.config.options?.roomsensor?.hide_temperature) {
@@ -157,28 +157,33 @@ export class RoomSensors {
   parseStatus() {
     // Set Room Sensor State
     if (this.sensoraccessory.accessoryValue.batteryStatus.startsWith('Ok')) {
-      this.StatusLowBattery === 0;
+      this.BatteryLevel = 100;
     } else {
-      this.StatusLowBattery === 1;
+      this.BatteryLevel = 10;
+    }
+    if (this.BatteryLevel > 15 ) {
+      this.StatusLowBattery = 0;
+    } else {
+      this.StatusLowBattery = 1;
     }
 
     // Set Temperature Sensor State
     if (!this.platform.config.options?.roomsensor?.hide_temperature) {
-      this.CurrentTemperature === this.toCelsius(this.sensoraccessory.accessoryValue.indoorTemperature);
+      this.CurrentTemperature = this.toCelsius(this.sensoraccessory.accessoryValue.indoorTemperature);
     }
 
     // Set Occupancy Sensor State
     if (!this.platform.config.options?.roomsensor?.hide_occupancy) {
       if (this.sensoraccessory.accessoryValue.occupancyDet) {
-        this.OccupancyDetected === 1;
+        this.OccupancyDetected = 1;
       } else {
-        this.OccupancyDetected === 0;
+        this.OccupancyDetected = 0;
       }
     }
 
     // Set Humidity Sensor State
     if (!this.platform.config.options?.roomsensor?.hide_humidity) {
-      this.CurrentRelativeHumidity === this.sensoraccessory.accessoryValue.indoorHumidity;
+      this.CurrentRelativeHumidity = this.sensoraccessory.accessoryValue.indoorHumidity;
     }
 
     // Set Motion Sensor State
@@ -241,6 +246,7 @@ export class RoomSensors {
    */
   updateHomeKitCharacteristics() {
     this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
+    this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
     if (!this.platform.config.options?.roomsensor?.hide_temperature) {
       this.temperatureService?.updateCharacteristic(
         this.platform.Characteristic.CurrentTemperature,
