@@ -83,11 +83,6 @@ export class RoomSensors {
     // Set Charging State
     this.service.setCharacteristic(this.platform.Characteristic.ChargingState, 2);
 
-    // Set Low Battery
-    this.service
-      .getCharacteristic(this.platform.Characteristic.StatusLowBattery)
-      .on('get', this.handeStatusLowBatteryGet.bind(this));
-
     // Temperature Sensor Service
     this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor);
     if (!this.temperatureService && !this.platform.config.options?.roomsensor?.hide_temperature) {
@@ -95,11 +90,6 @@ export class RoomSensors {
         this.platform.Service.TemperatureSensor,
         `${this.sensoraccessory.accessoryAttribute.name} Temperature Sensor`,
       );
-
-      // Set Temperature Sensor - Current Temperature
-      this.temperatureService
-        .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
-        .on('get', this.handleCurrentTemperatureGet.bind(this));
     } else if (this.temperatureService && this.platform.config.options?.roomsensor?.hide_temperature) {
       accessory.removeService(this.temperatureService);
     }
@@ -111,11 +101,6 @@ export class RoomSensors {
         this.platform.Service.OccupancySensor,
         `${this.sensoraccessory.accessoryAttribute.name} Occupancy Sensor`,
       );
-
-      // Set Occupancy Sensor
-      this.occupancyService
-        .getCharacteristic(this.platform.Characteristic.OccupancyDetected)
-        .on('get', this.handleOccupancyDetectedGet.bind(this));
     } else if (this.occupancyService && this.platform.config.options?.roomsensor?.hide_occupancy) {
       accessory.removeService(this.occupancyService);
     }
@@ -127,11 +112,6 @@ export class RoomSensors {
         this.platform.Service.HumiditySensor,
         `${this.sensoraccessory.accessoryAttribute.name} Humidity Sensor`,
       );
-
-      // Set Humidity Sensor Current Relative Humidity
-      this.humidityService
-        .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
-        .on('get', this.handleCurrentRelativeHumidityGet.bind(this));
     } else if (this.humidityService && this.platform.config.options?.roomsensor?.hide_humidity) {
       accessory.removeService(this.humidityService);
     }
@@ -143,11 +123,6 @@ export class RoomSensors {
         this.platform.Service.MotionSensor,
         `${this.sensoraccessory.accessoryAttribute.name} Motion Sensor`,
       );
-
-      // Set Motion Sensor Detected
-      this.motionService
-        ?.getCharacteristic(this.platform.Characteristic.MotionDetected)
-        .on('get', this.handleMotionDetectedGet.bind(this));
     } else if (this.motionService && this.platform.config.options?.roomsensor?.hide_motion) {
       accessory.removeService(this.motionService);
     }
@@ -182,33 +157,33 @@ export class RoomSensors {
   parseStatus() {
     // Set Room Sensor State
     if (this.sensoraccessory.accessoryValue.batteryStatus.startsWith('Ok')) {
-      this.StatusLowBattery = 0;
+      this.StatusLowBattery === 0;
     } else {
-      this.StatusLowBattery = 1;
+      this.StatusLowBattery === 1;
     }
 
     // Set Temperature Sensor State
     if (!this.platform.config.options?.roomsensor?.hide_temperature) {
-      this.CurrentTemperature = this.toCelsius(this.sensoraccessory.accessoryValue.indoorTemperature);
+      this.CurrentTemperature === this.toCelsius(this.sensoraccessory.accessoryValue.indoorTemperature);
     }
 
     // Set Occupancy Sensor State
     if (!this.platform.config.options?.roomsensor?.hide_occupancy) {
       if (this.sensoraccessory.accessoryValue.occupancyDet) {
-        this.OccupancyDetected = 1;
+        this.OccupancyDetected === 1;
       } else {
-        this.OccupancyDetected = 0;
+        this.OccupancyDetected === 0;
       }
     }
 
     // Set Humidity Sensor State
     if (!this.platform.config.options?.roomsensor?.hide_humidity) {
-      this.CurrentRelativeHumidity = this.sensoraccessory.accessoryValue.indoorHumidity;
+      this.CurrentRelativeHumidity === this.sensoraccessory.accessoryValue.indoorHumidity;
     }
 
     // Set Motion Sensor State
     if (!this.platform.config.options?.roomsensor?.hide_motion) {
-      this.MotionDetected = this.sensoraccessory.accessoryValue.motionDet;
+      this.MotionDetected !== this.sensoraccessory.accessoryValue.motionDet;
     }
   }
 
@@ -287,68 +262,6 @@ export class RoomSensors {
     if (!this.platform.config.options?.roomsensor?.hide_motion) {
       this.motionService?.updateCharacteristic(this.platform.Characteristic.MotionDetected, this.MotionDetected);
     }
-  }
-
-  /**
-   * Handle requests to get the current value of the "Tempeture Sensor" characteristics
-   */
-  handeStatusLowBatteryGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(`Update Battery Status: ${this.StatusLowBattery}`);
-
-    // set this to a valid value for StatusLowBattery
-    const currentValue = this.StatusLowBattery;
-
-    this.doSensorUpdate.next();
-    callback(null, currentValue);
-  }
-
-  handleCurrentTemperatureGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(`Update Current Temperature: ${this.CurrentTemperature}`);
-
-    // set this to a valid value for CurrentTemperature
-    const currentValue = this.CurrentTemperature;
-
-    this.doSensorUpdate.next();
-    callback(null, currentValue);
-  }
-
-  /**
-   * Handle requests to get the current value of the "Occupancy Sensor" characteristics
-   */
-  handleOccupancyDetectedGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(`Update Occupancy: ${this.OccupancyDetected}`);
-
-    // set this to a valid value for OccupancyDetected
-    const currentValue = this.OccupancyDetected;
-
-    this.doSensorUpdate.next();
-    callback(null, currentValue);
-  }
-
-  /**
-   * Handle requests to get the current value of the "Humidity Sensor" characteristics
-   */
-  handleCurrentRelativeHumidityGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(`Update Current Relative Humidity: ${this.CurrentRelativeHumidity}`);
-
-    // set this to a valid value for CurrentRelativeHumidity
-    const currentValue = this.CurrentRelativeHumidity;
-
-    this.doSensorUpdate.next();
-    callback(null, currentValue);
-  }
-
-  /**
-   * Handle requests to get the current value of the "Motion Sensor" characteristics
-   */
-  handleMotionDetectedGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(`Update Motion: ${this.MotionDetected}`);
-
-    // set this to a valid value for Motion Detected
-    const currentValue = this.MotionDetected;
-
-    this.doSensorUpdate.next();
-    callback(null, currentValue);
   }
 
   /**
