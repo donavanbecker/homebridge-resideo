@@ -402,8 +402,12 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 this.deviceinfo(device);
                 this.log.debug(JSON.stringify(device));
                 this.T5(device, locationId);
+              } else if (device.deviceModel.startsWith('D6 ')) {
+                this.deviceinfo(device);
+                this.log.debug(JSON.stringify(device));
+                this.T5(device, locationId);
               } else if (!device.DeviceModel) {
-                this.log.info('A LLC Device has been discovered with a deviceModel that does not start with T5 or T9');
+                this.log.info('A LLC Device has been discovered with a deviceModel that does not start with T5, D6 or T9');
               }
             } else if (device.deviceID.startsWith('TCC')) {
               this.log.info('A TCC Device has been discovered, Currently writing to Honeywell API does not work.');
