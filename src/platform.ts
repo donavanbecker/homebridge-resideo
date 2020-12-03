@@ -389,7 +389,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 this.deviceinfo(device);
                 this.log.debug(JSON.stringify(device));
                 this.T5(device, locationId);
-              } else if (device.deviceModel.startsWith('D6 ')) {
+              } else if (device.deviceModel.startsWith('D6')) {
                 this.deviceinfo(device);
                 this.log.debug(JSON.stringify(device));
                 this.T5(device, locationId);
