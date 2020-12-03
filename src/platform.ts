@@ -154,19 +154,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       // Room Priority Config Options
       this.config.options.roompriority.thermostat;
       this.config.options.roompriority.priorityType = this.config.options.roompriority.priorityType || 'PickARoom';
-
-      /**
-       * Room Priority
-       * This will display what room priority option that has been selected.
-       */
-
-      if (this.config.options.roompriority.thermostat) {
-        this.log.warn('Displaying Room Sensors as Thermostat(s).');
-        this.log.warn('You will have a Thermostat for Each Room Sensor so that you can set the priority of that Room.');
-      }
-      if (!this.config.options.roompriority.thermostat) {
-        this.log.warn('Only Displaying Room Sensors.');
-      }
     }
 
     if (this.config.options) {
@@ -447,6 +434,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       for (const device of location.devices) {
         if (device.deviceID.startsWith('LCC')) {
           if (device.deviceModel.startsWith('T9')) {
+            this.roomsensordisplaymethod();
             if (device.groups) {
               const groups = device.groups;
               for (const group of groups) {
@@ -481,6 +469,22 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
             }
           }
         }
+      }
+    }
+  }
+
+  private roomsensordisplaymethod() {
+    if (this.config.options?.roompriority) {
+      /**
+       * Room Priority
+       * This will display what room priority option that has been selected.
+       */
+      if (this.config.options.roompriority.thermostat) {
+        this.log.warn('Displaying Room Sensors as Thermostat(s).');
+        this.log.warn('You will have a Thermostat for Each Room Sensor so that you can set the priority of that Room.');
+      }
+      if (!this.config.options.roompriority.thermostat) {
+        this.log.warn('Only Displaying Room Sensors.');
       }
     }
   }
