@@ -205,18 +205,17 @@ export class RoomSensors {
               const roomsensors = await this.platform.Sensors(this.device, group, this.locationId);
               if (roomsensors.rooms) {
                 const rooms = roomsensors.rooms;
-                this.platform.log.debug(JSON.stringify(roomsensors));
+                this.platform.log.debug('RS %s - ', this.accessory.displayName, JSON.stringify(roomsensors));
                 for (const accessories of rooms) {
                   if (accessories) {
-                    this.platform.log.debug(JSON.stringify(accessories));
+                    this.platform.log.debug('RS %s - ', this.accessory.displayName, JSON.stringify(accessories));
                     for (const accessory of accessories.accessories) {
                       if (accessory.accessoryAttribute) {
                         if (accessory.accessoryAttribute.type) {
                           if (accessory.accessoryAttribute.type.startsWith('IndoorAirSensor')) {
                             this.sensoraccessory = accessory;
-                            this.platform.log.debug(JSON.stringify(this.sensoraccessory));
-                            this.platform.log.debug(JSON.stringify(this.sensoraccessory));
-                            this.platform.log.debug(
+                            this.platform.log.debug('RS %s - ', this.accessory.displayName, JSON.stringify(this.sensoraccessory));
+                            this.platform.log.debug('RS %s - ', this.accessory.displayName,
                               JSON.stringify(this.sensoraccessory.accessoryAttribute.softwareRevision),
                             );
                           }
@@ -236,7 +235,7 @@ export class RoomSensors {
       this.platform.log.error(
         `Failed to update status of ${this.sensoraccessory.accessoryAttribute.name} ${this.sensoraccessory.accessoryAttribute.type}`,
         JSON.stringify(e.message),
-        this.platform.log.debug(JSON.stringify(e)),
+        this.platform.log.debug('RS %s - ', this.accessory.displayName, JSON.stringify(e)),
       );
     }
   }

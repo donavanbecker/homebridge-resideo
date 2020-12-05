@@ -112,14 +112,14 @@ export class RoomSensorThermostat {
 
     // Set Min and Max
     if (this.device.changeableValues.heatCoolMode === 'Heat') {
-      this.platform.log.debug('Device is in "Heat" mode');
+      this.platform.log.debug('RST %s - ', this.accessory.displayName, 'Device is in "Heat" mode');
       this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature).setProps({
         minValue: this.toCelsius(device.minHeatSetpoint),
         maxValue: this.toCelsius(device.maxHeatSetpoint),
         minStep: 0.5,
       });
     } else {
-      this.platform.log.debug('Device is in "Cool" mode');
+      this.platform.log.debug('RST %s - ', this.accessory.displayName, 'Device is in "Cool" mode');
       this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature).setProps({
         minValue: this.toCelsius(device.minCoolSetpoint),
         maxValue: this.toCelsius(device.maxCoolSetpoint),
@@ -186,7 +186,7 @@ export class RoomSensorThermostat {
             await this.pushRoomChanges();
           } catch (e) {
             this.platform.log.error(JSON.stringify(e.message));
-            this.platform.log.debug(JSON.stringify(e));
+            this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(e));
           }
           this.roomUpdateInProgress = false;
         });
@@ -203,7 +203,7 @@ export class RoomSensorThermostat {
           await this.pushChanges();
         } catch (e) {
           this.platform.log.error(JSON.stringify(e.message));
-          this.platform.log.debug(JSON.stringify(e));
+          this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(e));
         }
         this.thermostatUpdateInProgress = false;
       });
@@ -243,13 +243,13 @@ export class RoomSensorThermostat {
      */
     if (this.device.operationStatus.mode === 'Heat') {
       this.CurrentHeatingCoolingState = 1;
-      this.platform.log.debug('Device is Currently: ', this.CurrentHeatingCoolingState);
+      this.platform.log.debug('RST %s - ', this.accessory.displayName, 'Device is Currently: ', this.CurrentHeatingCoolingState);
     } else if (this.device.operationStatus.mode === 'Cool') {
       this.CurrentHeatingCoolingState = 2;
-      this.platform.log.debug('Device is Currently: ', this.CurrentHeatingCoolingState);
+      this.platform.log.debug('RST %s - ', this.accessory.displayName, 'Device is Currently: ', this.CurrentHeatingCoolingState);
     } else {
       this.CurrentHeatingCoolingState = 0;
-      this.platform.log.debug('Device is Currently: ', this.CurrentHeatingCoolingState);
+      this.platform.log.debug('RST %s - ', this.accessory.displayName, 'Device is Currently: ', this.CurrentHeatingCoolingState);
     }
 
     // Set the TargetTemperature value based on the current mode
@@ -276,10 +276,10 @@ export class RoomSensorThermostat {
           },
         })
       ).data;
-      this.platform.log.debug(
+      this.platform.log.debug('RST %s - ', this.accessory.displayName,
         `Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`,
       );
-      this.platform.log.debug(JSON.stringify(this.device));
+      this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(this.device));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
@@ -290,7 +290,7 @@ export class RoomSensorThermostat {
         this.sensoraccessory.accessoryAttribute.type,
         ' Thermostat',
         JSON.stringify(e.message),
-        this.platform.log.debug(JSON.stringify(e)),
+        this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(e)),
       );
     }
   }
@@ -309,18 +309,18 @@ export class RoomSensorThermostat {
                 const roomsensors = await this.platform.Sensors(this.device, group, this.locationId);
                 if (roomsensors.rooms) {
                   const rooms = roomsensors.rooms;
-                  this.platform.log.debug(JSON.stringify(roomsensors));
+                  this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(roomsensors));
                   for (const accessories of rooms) {
                     if (accessories) {
-                      this.platform.log.debug(JSON.stringify(accessories));
+                      this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(accessories));
                       for (const accessory of accessories.accessories) {
                         if (accessory.accessoryAttribute) {
                           if (accessory.accessoryAttribute.type) {
                             if (accessory.accessoryAttribute.type.startsWith('IndoorAirSensor')) {
                               this.sensoraccessory = accessory;
-                              this.platform.log.debug(JSON.stringify(this.sensoraccessory));
-                              this.platform.log.debug(JSON.stringify(this.sensoraccessory.accessoryAttribute.name));
-                              this.platform.log.debug(
+                              this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(this.sensoraccessory));
+                              this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(this.sensoraccessory.accessoryAttribute.name));
+                              this.platform.log.debug('RST %s - ', this.accessory.displayName,
                                 JSON.stringify(this.sensoraccessory.accessoryAttribute.softwareRevision),
                               );
                             }
@@ -345,7 +345,7 @@ export class RoomSensorThermostat {
         this.sensoraccessory.accessoryAttribute.type,
         ' Thermostat',
         JSON.stringify(e.message),
-        this.platform.log.debug(JSON.stringify(e)),
+        this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(e)),
       );
     }
   }
@@ -390,7 +390,7 @@ export class RoomSensorThermostat {
           this.platform.config.options.roompriority.priorityType,
         );
       }
-      this.platform.log.debug(JSON.stringify(payload));
+      this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(payload));
 
       // Make the API request
       await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
@@ -435,7 +435,7 @@ export class RoomSensorThermostat {
       `${payload.heatSetpoint}, thermostatSetpointStatus:`,
       this.platform.config.options?.thermostat?.thermostatSetpointStatus,
     );
-    this.platform.log.debug(JSON.stringify(payload));
+    this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(payload));
 
     // Make the API request
     await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
@@ -480,7 +480,7 @@ export class RoomSensorThermostat {
   }
 
   setTargetHeatingCoolingState(value: any, callback: (arg0: null) => void) {
-    this.platform.log.debug(`Set TargetHeatingCoolingState: ${value}`);
+    this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set TargetHeatingCoolingState: ${value}`);
 
     this.TargetHeatingCoolingState = value;
 
@@ -497,28 +497,28 @@ export class RoomSensorThermostat {
   }
 
   setHeatingThresholdTemperature(value: any, callback: (arg0: null) => void) {
-    this.platform.log.debug(`Set HeatingThresholdTemperature: ${value}`);
+    this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set HeatingThresholdTemperature: ${value}`);
     this.HeatingThresholdTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
   setCoolingThresholdTemperature(value: any, callback: (arg0: null) => void) {
-    this.platform.log.debug(`Set CoolingThresholdTemperature: ${value}`);
+    this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set CoolingThresholdTemperature: ${value}`);
     this.CoolingThresholdTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
   setTargetTemperature(value: any, callback: (arg0: null) => void) {
-    this.platform.log.debug(`Set TargetTemperature:': ${value}`);
+    this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set TargetTemperature:': ${value}`);
     this.TargetTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
   setTemperatureDisplayUnits(value: any, callback: (arg0: null) => void) {
-    this.platform.log.debug(`Set TemperatureDisplayUnits: ${value}`);
+    this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set TemperatureDisplayUnits: ${value}`);
     this.platform.log.warn('Changing the Hardware Display Units from HomeKit is not supported.');
 
     // change the temp units back to the one the Honeywell API said the thermostat was set to
@@ -556,7 +556,7 @@ export class RoomSensorThermostat {
   }
 
   private TargetState() {
-    this.platform.log.debug(this.device.allowedModes);
+    this.platform.log.debug('RST %s - ', this.accessory.displayName, this.device.allowedModes);
 
     const TargetState = [4];
     TargetState.pop();
@@ -572,7 +572,7 @@ export class RoomSensorThermostat {
     if (this.device.allowedModes.includes('Auto')) {
       TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.AUTO);
     }
-    this.platform.log.debug('Only Show These Modes:', JSON.stringify(TargetState));
+    this.platform.log.debug('RST %s - ', this.accessory.displayName, 'Only Show These Modes:', JSON.stringify(TargetState));
     return TargetState;
   }
 }

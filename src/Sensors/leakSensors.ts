@@ -233,18 +233,18 @@ export class LeakSensor {
           },
         })
       ).data;
-      this.platform.log.debug(JSON.stringify(sensor));
+      this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(sensor));
       this.sensor = sensor;
       this.device;
-      this.platform.log.debug(JSON.stringify(this.device));
-      this.platform.log.debug(JSON.stringify(this.device.currentSensorReadings));
+      this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(this.device));
+      this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(this.device.currentSensorReadings));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
       this.platform.log.error(
         `Failed to update status of ${this.device.userDefinedDeviceName}`,
         JSON.stringify(e.message),
-        this.platform.log.debug(JSON.stringify(e)),
+        this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(e)),
       );
     }
   }
@@ -279,7 +279,7 @@ export class LeakSensor {
    * Handle requests to get the current value of the "Tempeture Sensor" characteristics
    */
   handleLeakDetectedGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(`Update Leak Detected: ${this.LeakDetected}`);
+    this.platform.log.debug('LS %s - ', this.accessory.displayName, `Update Leak Detected: ${this.LeakDetected}`);
 
     // set this to a valid value for StatusLowBattery
     const currentValue = this.LeakDetected;
@@ -289,7 +289,7 @@ export class LeakSensor {
   }
 
   handleLeakStatusActiveGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(`Update Leak Status Active: ${this.StatusActive}`);
+    this.platform.log.debug('LS %s - ', this.accessory.displayName, `Update Leak Status Active: ${this.StatusActive}`);
 
     // set this to a valid value for StatusLowBattery
     const currentValue = this.StatusActive;
@@ -302,7 +302,7 @@ export class LeakSensor {
    * Handle requests to get the current value of the "Occupancy Sensor" characteristics
    */
   handleCurrentTemperatureGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(`Update Current Temperature: ${this.CurrentTemperature}`);
+    this.platform.log.debug('LS %s - ', this.accessory.displayName, `Update Current Temperature: ${this.CurrentTemperature}`);
 
     // set this to a valid value for OccupancyDetected
     const currentValue = this.CurrentTemperature;
@@ -312,7 +312,7 @@ export class LeakSensor {
   }
 
   handleTempStatusActiveGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(`Update Temperature Sensor Status Active: ${this.TempStatusActive}`);
+    this.platform.log.debug('LS %s - ', this.accessory.displayName, `Update Temperature Sensor Status Active: ${this.TempStatusActive}`);
 
     // set this to a valid value for OccupancyDetected
     const currentValue = this.TempStatusActive;
@@ -325,7 +325,7 @@ export class LeakSensor {
    * Handle requests to get the current value of the "Humidity Sensor" characteristics
    */
   handleCurrentRelativeHumidityGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(`Update Current Relative Humidity: ${this.CurrentRelativeHumidity}`);
+    this.platform.log.debug('LS %s - ', this.accessory.displayName, `Update Current Relative Humidity: ${this.CurrentRelativeHumidity}`);
 
     // set this to a valid value for CurrentRelativeHumidity
     const currentValue = this.CurrentRelativeHumidity;
@@ -338,7 +338,7 @@ export class LeakSensor {
    * Handle requests to get the current value of the "Humidity Sensor" characteristics
    */
   handleHumidityStatusActiveGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(`Update Humidity Status Active: ${this.HumidityStatusActive}`);
+    this.platform.log.debug('LS %s - ', this.accessory.displayName, `Update Humidity Status Active: ${this.HumidityStatusActive}`);
 
     // set this to a valid value for CurrentRelativeHumidity
     const currentValue = this.HumidityStatusActive;
@@ -351,7 +351,7 @@ export class LeakSensor {
    * Handle requests to get the current value of the "Motion Sensor" characteristics
    */
   handleBatteryLevelGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(`Update Battery Level: ${this.BatteryLevel}`);
+    this.platform.log.debug('LS %s - ', this.accessory.displayName, `Update Battery Level: ${this.BatteryLevel}`);
 
     // set this to a valid value for Motion Detected
     const currentValue = this.BatteryLevel;
@@ -364,7 +364,7 @@ export class LeakSensor {
    * Handle requests to get the current value of the "Motion Sensor" characteristics
    */
   handleStatusLowBatteryGet(callback: (arg0: null, arg1: any) => void) {
-    this.platform.log.debug(`Update Low Battery Status: ${this.StatusLowBattery}`);
+    this.platform.log.debug('LS %s - ', this.accessory.displayName, `Update Low Battery Status: ${this.StatusLowBattery}`);
 
     // set this to a valid value for Motion Detected
     const currentValue = this.StatusLowBattery;
