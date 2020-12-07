@@ -24,7 +24,7 @@
     "@auth0/angular-jwt": "^5.0.2",
     "@fortawesome/fontawesome-free": "^5.15.1",
     "bootstrap": "^4.5.3",
-    "core-js": "^3.7.0",
+    "core-js": "^3.8.1",
     "jquery": "^3.5.1",
     "popper.js": "1.16.1",
     "rxjs": "6.6.3",
