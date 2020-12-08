@@ -326,8 +326,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     return this.sensorData[device.deviceID].data;
   }
 
-  const normalizeSensorDate(sensorRoomData) {
-    let normalized = [] as any;
+  private normalizeSensorDate(sensorRoomData) {
+    const normalized = [] as any;
     for (const room of sensorRoomData.rooms) {
       normalized[room.id] = [] as any;
         // this.log.debug(room.id);
