@@ -301,11 +301,13 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   public async getCurrentSensorData(device: T9Thermostat, group: T9groups, locationId: location['locationID']) {
     if (!this.sensorData[device.deviceID] || this.sensorData[device.deviceID].timestamp < Date.now()) {
       // this.log.info('getCurrentSensorData Read %s %s - %s', device.deviceType, device.deviceModel, device.userDefinedDeviceName);
+      /*
       const thermostats = await this.axios.get(`${DeviceURL}/thermostats`, {
         params: {
           locationId: locationId,
         },
       });
+      */
       // this.log.info('getCurrentSensorData Thermostats %s %s - %s', device.deviceType, device.deviceModel, device.userDefinedDeviceName);
       const response = await this.axios.get(`${DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
         params: {
@@ -324,7 +326,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     return this.sensorData[device.deviceID].data;
   }
 
-  private normalizeSensorDate(sensorRoomData) {
+  const normalizeSensorDate(sensorRoomData) {
     let normalized = [] as any;
     for (const room of sensorRoomData.rooms) {
       normalized[room.id] = [] as any;
@@ -483,11 +485,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
           //if (this.config.options ?.roompriority ?.thermostat) {
           //  this.log.info(`Total Rooms Found: ${roomsensors.rooms.length}`);
           //}
-          for (let accessories of roomsensors) {
+          for (const accessories of roomsensors) {
             if (accessories) {
               // this.log.debug(JSON.stringify(accessories));
-              for (let key in accessories) {
-                let sensorAccessory = accessories[key];
+              for (const key in accessories) {
+                const sensorAccessory = accessories[key];
                 // this.log.debug('sensorAccessory', JSON.stringify(sensorAccessory));
                 if (sensorAccessory.accessoryAttribute) {
                   if (sensorAccessory.accessoryAttribute.type) {
