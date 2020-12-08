@@ -3,7 +3,7 @@ import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
 import { DeviceURL } from '../settings';
-import { location, sensoraccessory, T9Thermostat, T9groups } from '../configTypes';
+import { location, sensorAccessory, T9Thermostat, T9groups } from '../configTypes';
 
 /**
  * Platform Accessory
@@ -43,7 +43,7 @@ export class RoomSensorThermostat {
     private accessory: PlatformAccessory,
     public readonly locationId: location['locationID'],
     public device: T9Thermostat,
-    public sensoraccessory: sensoraccessory,
+    public sensorAccessory: sensorAccessory,
     public readonly group: T9groups,
   ) {
     // Map Honeywell Modes to HomeKit Modes
@@ -79,11 +79,11 @@ export class RoomSensorThermostat {
     this.accessory
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
-      .setCharacteristic(this.platform.Characteristic.Model, this.sensoraccessory.accessoryAttribute.model)
+      .setCharacteristic(this.platform.Characteristic.Model, this.sensorAccessory.accessoryAttribute.model)
       .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID)
       .setCharacteristic(
         this.platform.Characteristic.FirmwareRevision,
-        this.sensoraccessory.accessoryAttribute.softwareRevision,
+        this.sensorAccessory.accessoryAttribute.softwareRevision,
       );
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
@@ -91,7 +91,7 @@ export class RoomSensorThermostat {
     (this.service =
       this.accessory.getService(this.platform.Service.Thermostat) ||
       this.accessory.addService(this.platform.Service.Thermostat)),
-    `${this.sensoraccessory.accessoryAttribute.name} ${this.sensoraccessory.accessoryAttribute.type} Thermostat`;
+    `${this.sensorAccessory.accessoryAttribute.name} ${this.sensorAccessory.accessoryAttribute.type} Thermostat`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -101,7 +101,7 @@ export class RoomSensorThermostat {
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
     this.service.setCharacteristic(
       this.platform.Characteristic.Name,
-      `${this.sensoraccessory.accessoryAttribute.name} ${this.sensoraccessory.accessoryAttribute.type} Thermostat`,
+      `${this.sensorAccessory.accessoryAttribute.name} ${this.sensorAccessory.accessoryAttribute.type} Thermostat`,
     );
 
     // each service must implement at-minimum the "required characteristics" for the given service type
@@ -224,8 +224,8 @@ export class RoomSensorThermostat {
     this.TemperatureDisplayUnits = this.device.units === 'Fahrenheit' ? this.platform.Characteristic.TemperatureDisplayUnits.FAHRENHEIT :
       this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS;*/
 
-    this.CurrentTemperature = this.toCelsius(this.sensoraccessory.accessoryValue.indoorTemperature);
-    this.CurrentRelativeHumidity = this.sensoraccessory.accessoryValue.indoorHumidity;
+    this.CurrentTemperature = this.toCelsius(this.sensorAccessory.accessoryValue.indoorTemperature);
+    this.CurrentRelativeHumidity = this.sensorAccessory.accessoryValue.indoorHumidity;
 
     if (this.device.changeableValues.heatSetpoint > 0) {
       this.HeatingThresholdTemperature = this.toCelsius(this.device.changeableValues.heatSetpoint);
@@ -279,15 +279,15 @@ export class RoomSensorThermostat {
       this.platform.log.debug('RST %s - ', this.accessory.displayName,
         `Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`,
       );
-      this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(this.device));
+      // this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(this.device));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
       this.platform.log.error(
-        'Failed to update status of ',
-        this.sensoraccessory.accessoryAttribute.name,
+        'RST - Failed to update status of ',
+        this.sensorAccessory.accessoryAttribute.name,
         ' ',
-        this.sensoraccessory.accessoryAttribute.type,
+        this.sensorAccessory.accessoryAttribute.type,
         ' Thermostat',
         JSON.stringify(e.message),
         this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(e)),
@@ -306,7 +306,7 @@ export class RoomSensorThermostat {
             if (this.device.groups) {
               const groups = this.device.groups;
               for (const group of groups) {
-                const roomsensors = await this.platform.Sensors(this.device, group, this.locationId);
+                const roomsensors = await this.platform.getCurrentSensorData(this.device, group, this.locationId);
                 if (roomsensors.rooms) {
                   const rooms = roomsensors.rooms;
                   this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(roomsensors));
@@ -317,11 +317,11 @@ export class RoomSensorThermostat {
                         if (accessory.accessoryAttribute) {
                           if (accessory.accessoryAttribute.type) {
                             if (accessory.accessoryAttribute.type.startsWith('IndoorAirSensor')) {
-                              this.sensoraccessory = accessory;
-                              this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(this.sensoraccessory));
-                              this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(this.sensoraccessory.accessoryAttribute.name));
+                              this.sensorAccessory = accessory;
+                              this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(this.sensorAccessory));
+                              this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(this.sensorAccessory.accessoryAttribute.name));
                               this.platform.log.debug('RST %s - ', this.accessory.displayName,
-                                JSON.stringify(this.sensoraccessory.accessoryAttribute.softwareRevision),
+                                JSON.stringify(this.sensorAccessory.accessoryAttribute.softwareRevision),
                               );
                             }
                           }
@@ -340,9 +340,9 @@ export class RoomSensorThermostat {
     } catch (e) {
       this.platform.log.error(
         'Failed to update status of ',
-        this.sensoraccessory.accessoryAttribute.name,
+        this.sensorAccessory.accessoryAttribute.name,
         ' ',
-        this.sensoraccessory.accessoryAttribute.type,
+        this.sensorAccessory.accessoryAttribute.type,
         ' Thermostat',
         JSON.stringify(e.message),
         this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(e)),
@@ -361,7 +361,7 @@ export class RoomSensorThermostat {
     } as any;
 
     if (this.platform.config.options?.roompriority?.priorityType === 'PickARoom') {
-      payload.currentPriority.selectedRooms = [this.sensoraccessory.accessoryId];
+      payload.currentPriority.selectedRooms = [this.sensorAccessory.accessoryId];
     }
 
     /**
@@ -385,7 +385,7 @@ export class RoomSensorThermostat {
       } else if (this.platform.config.options.roompriority.priorityType === 'PickARoom') {
         this.platform.log.info(
           'Sending request to Honeywell API. Room Priority:',
-          this.sensoraccessory.accessoryAttribute.name,
+          this.sensorAccessory.accessoryAttribute.name,
           ' Priority Type:',
           this.platform.config.options.roompriority.priorityType,
         );

@@ -236,13 +236,13 @@ export class LeakSensor {
       this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(sensor));
       this.sensor = sensor;
       this.device;
-      this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(this.device));
-      this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(this.device.currentSensorReadings));
+      // this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(this.device));
+      // this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(this.device.currentSensorReadings));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
       this.platform.log.error(
-        `Failed to update status of ${this.device.userDefinedDeviceName}`,
+        `LS - Failed to update status of ${this.device.userDefinedDeviceName}`,
         JSON.stringify(e.message),
         this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(e)),
       );

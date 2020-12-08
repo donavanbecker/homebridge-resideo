@@ -3,16 +3,16 @@ import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
 import { DeviceURL } from '../settings';
-import { location, TCCDevice } from '../configTypes';
+import { location, RoundDevice } from '../configTypes';
 
 /**
  * Platform Accessory
  * An instance of this class is created for each accessory your platform registers
  * Each accessory may expose multiple services of different service types.
  */
-export class TCC {
+export class RoundThermostat {
   private service: Service;
-  fanService?: Service;
+  fanService: any;
 
   private modes: { Off: number; Heat: number; Cool: number; Auto: number };
 
@@ -27,18 +27,18 @@ export class TCC {
   honeywellMode!: Array<string>;
   Active!: number;
   TargetFanState!: number;
-  deviceFan;
+  deviceFan!: any;
 
   thermostatUpdateInProgress!: boolean;
-  doThermostatUpdate;
+  doThermostatUpdate!: any;
   fanUpdateInProgress!: boolean;
-  doFanUpdate;
+  doFanUpdate!: any;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
     public readonly locationId: location['locationID'],
-    public device: TCCDevice,
+    public device: RoundDevice,
   ) {
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
@@ -101,14 +101,14 @@ export class TCC {
 
     // Set Min and Max
     if (this.device.changeableValues.heatCoolMode === 'Heat') {
-      this.platform.log.debug('TCC %s -', this.accessory.displayName,'Device is in "Heat" mode');
+      this.platform.log.debug('Round %s -', this.accessory.displayName,'Device is in "Heat" mode');
       this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature).setProps({
         minValue: this.toCelsius(device.minHeatSetpoint),
         maxValue: this.toCelsius(device.maxHeatSetpoint),
         minStep: 0.5,
       });
     } else if (this.device.changeableValues.heatCoolMode === 'Cool') {
-      this.platform.log.debug('TCC %s -', this.accessory.displayName,'Device is in "Cool" mode');
+      this.platform.log.debug('Round %s -', this.accessory.displayName,'Device is in "Cool" mode');
       this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature).setProps({
         minValue: this.toCelsius(device.minCoolSetpoint),
         maxValue: this.toCelsius(device.maxCoolSetpoint),
@@ -120,14 +120,12 @@ export class TCC {
     //AUTO = 3; HEAT = 1; COOL = 2; OFF = 0;
     // Set control bindings
     const TargetState = this.TargetState();
-    {
-      this.service
-        .getCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState)
-        .setProps({
-          validValues: TargetState,
-        })
-        .on('set', this.setTargetHeatingCoolingState.bind(this));
-    }
+    this.service
+      .getCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState)
+      .setProps({
+        validValues: TargetState,
+      })
+      .on('set', this.setTargetHeatingCoolingState.bind(this));
 
     this.service.setCharacteristic(
       this.platform.Characteristic.CurrentHeatingCoolingState,
@@ -153,7 +151,7 @@ export class TCC {
     // Fan Controls
     this.fanService = accessory.getService(this.platform.Service.Fanv2);
     if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
-      this.platform.log.debug('TCC %s -', this.accessory.displayName,'Available FAN settings', this.device.settings.fan);
+      this.platform.log.debug('Round %s -', this.accessory.displayName,'Available FAN settings', this.device.settings.fan);
       this.fanService =
         accessory.getService(this.platform.Service.Fanv2) ||
         accessory.addService(this.platform.Service.Fanv2, `${this.device.name} ${this.device.deviceClass} Fan`);
@@ -191,7 +189,7 @@ export class TCC {
           await this.pushChanges();
         } catch (e) {
           this.platform.log.error(JSON.stringify(e.message));
-          this.platform.log.debug('TCC %s -', this.accessory.displayName,JSON.stringify(e));
+          this.platform.log.debug('Round %s -', this.accessory.displayName,JSON.stringify(e));
         }
         this.thermostatUpdateInProgress = false;
       });
@@ -208,7 +206,7 @@ export class TCC {
             await this.pushFanChanges();
           } catch (e) {
             this.platform.log.error(JSON.stringify(e.message));
-            this.platform.log.debug('TCC %s -', this.accessory.displayName,JSON.stringify(e));
+            this.platform.log.debug('Round %s -', this.accessory.displayName,JSON.stringify(e));
           }
           this.fanUpdateInProgress = false;
         });
@@ -245,40 +243,41 @@ export class TCC {
      */
     if (this.device.operationStatus.mode === 'Heat') {
       this.CurrentHeatingCoolingState = 1;
-      this.platform.log.debug('TCC %s -', this.accessory.displayName,'Device is Currently: ', this.CurrentHeatingCoolingState);
+      this.platform.log.debug('Round %s -', this.accessory.displayName,'Device is Currently: ', this.CurrentHeatingCoolingState);
     } else if (this.device.operationStatus.mode === 'Cool') {
       this.CurrentHeatingCoolingState = 2;
-      this.platform.log.debug('TCC %s -', this.accessory.displayName,'Device is Currently: ', this.CurrentHeatingCoolingState);
+      this.platform.log.debug('Round %s -', this.accessory.displayName,'Device is Currently: ', this.CurrentHeatingCoolingState);
     } else {
       this.CurrentHeatingCoolingState = 0;
-      this.platform.log.debug('TCC %s -', this.accessory.displayName,'Device is Currently: ', this.CurrentHeatingCoolingState);
+      this.platform.log.debug('Round %s -', this.accessory.displayName,'Device is Currently: ', this.CurrentHeatingCoolingState);
     }
 
     // Set the TargetTemperature value based on the current mode
     if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
-      if (this.device.changeableValues.heatSetpoint > 0 || this.device.minHeatSetpoint) {
+      if (this.device.changeableValues.heatSetpoint > 0) {
         this.TargetTemperature = this.toCelsius(this.device.changeableValues.heatSetpoint);
       }
     } else {
-      if (this.device.changeableValues.coolSetpoint > 0 || this.device.minCoolSetpoint) {
+      if (this.device.changeableValues.coolSetpoint > 0) {
         this.TargetTemperature = this.toCelsius(this.device.changeableValues.coolSetpoint);
       }
     }
 
     // Set the Target Fan State
-    if (this.device.settings?.fan && !this.platform.config.options!.thermostat!.hide_fan) {
+    if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
       if (this.deviceFan) {
-        this.platform.log.debug('TCC %s -', this.accessory.displayName,`${JSON.stringify(this.deviceFan)}`);
-
-        if (this.deviceFan.mode === 'Auto') {
-          this.TargetFanState = this.platform.Characteristic.TargetFanState.AUTO;
-          this.Active = this.platform.Characteristic.Active.INACTIVE;
-        } else if (this.deviceFan.mode === 'On') {
-          this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
-          this.Active = this.platform.Characteristic.Active.ACTIVE;
-        } else if (this.deviceFan.mode === 'Circulate') {
-          this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
-          this.Active = this.platform.Characteristic.Active.INACTIVE;
+        this.platform.log.debug('Round %s -', this.accessory.displayName,`${JSON.stringify(this.deviceFan)}`);
+        if (this.deviceFan) {
+          if (this.deviceFan.mode === 'Auto') {
+            this.TargetFanState = this.platform.Characteristic.TargetFanState.AUTO;
+            this.Active = this.platform.Characteristic.Active.INACTIVE;
+          } else if (this.deviceFan.mode === 'On') {
+            this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
+            this.Active = this.platform.Characteristic.Active.ACTIVE;
+          } else if (this.deviceFan.mode === 'Circulate') {
+            this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
+            this.Active = this.platform.Characteristic.Active.INACTIVE;
+          }
         }
       }
     }
@@ -296,10 +295,10 @@ export class TCC {
           },
         })
       ).data;
-      this.platform.log.debug('TCC %s -', this.accessory.displayName,
+      this.platform.log.debug('Round %s -', this.accessory.displayName,
         `Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`,
       );
-      this.platform.log.debug('TCC %s -', this.accessory.displayName,JSON.stringify(this.device));
+      this.platform.log.debug('Round %s -', this.accessory.displayName,JSON.stringify(this.device));
       if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
         this.deviceFan = (
           await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
@@ -308,9 +307,9 @@ export class TCC {
             },
           })
         ).data;
-        this.platform.log.debug('TCC %s -', this.accessory.displayName,JSON.stringify(this.device.settings?.fan));
-        this.platform.log.debug('TCC %s -', this.accessory.displayName,JSON.stringify(this.deviceFan));
-        this.platform.log.debug('TCC %s -', this.accessory.displayName,
+        this.platform.log.debug('Round %s -', this.accessory.displayName,JSON.stringify(this.device.settings?.fan));
+        this.platform.log.debug('Round %s -', this.accessory.displayName,JSON.stringify(this.deviceFan));
+        this.platform.log.debug('Round %s -', this.accessory.displayName,
           `Fetched update for ${this.device.name} Fan from Honeywell Fan API: ${JSON.stringify(this.deviceFan)}`,
         );
       }
@@ -318,9 +317,9 @@ export class TCC {
       this.updateHomeKitCharacteristics();
     } catch (e) {
       this.platform.log.error(
-        `Failed to update status of ${this.device.name}`,
+        `Round - Failed to update status of ${this.device.name}`,
         JSON.stringify(e.message),
-        this.platform.log.debug('TCC %s -', this.accessory.displayName,JSON.stringify(e)),
+        this.platform.log.debug('Round %s -', this.accessory.displayName,JSON.stringify(e)),
       );
     }
   }
@@ -332,7 +331,9 @@ export class TCC {
     const payload = {
       mode: this.honeywellMode[this.TargetHeatingCoolingState],
       thermostatSetpointStatus: this.platform.config.options?.thermostat?.thermostatSetpointStatus,
-    } as Record<string, unknown>;
+      autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
+    } as any;
+
     // Set the heat and cool set point value based on the selected mode
     if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
       payload.heatSetpoint = this.toFahrenheit(this.TargetTemperature);
@@ -355,7 +356,7 @@ export class TCC {
       `${payload.heatSetpoint}, thermostatSetpointStatus:`,
       this.platform.config.options?.thermostat?.thermostatSetpointStatus,
     );
-    this.platform.log.debug('TCC %s -', this.accessory.displayName,JSON.stringify(payload));
+    this.platform.log.debug('Round %s -', this.accessory.displayName,JSON.stringify(payload));
 
     // Make the API request
     await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
@@ -398,13 +399,13 @@ export class TCC {
       this.CurrentHeatingCoolingState,
     );
     if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
-      this.fanService?.updateCharacteristic(this.platform.Characteristic.TargetFanState, this.TargetFanState);
-      this.fanService?.updateCharacteristic(this.platform.Characteristic.Active, this.Active);
+      this.fanService.updateCharacteristic(this.platform.Characteristic.TargetFanState, this.TargetFanState);
+      this.fanService.updateCharacteristic(this.platform.Characteristic.Active, this.Active);
     }
   }
 
-  setTargetHeatingCoolingState(value, callback) {
-    this.platform.log.debug('TCC %s -', this.accessory.displayName,`Set TargetHeatingCoolingState: ${value}`);
+  setTargetHeatingCoolingState(value: any, callback: (arg0: null) => void) {
+    this.platform.log.debug('Round %s -', this.accessory.displayName,`Set TargetHeatingCoolingState: ${value}`);
 
     this.TargetHeatingCoolingState = value;
 
@@ -420,29 +421,29 @@ export class TCC {
     callback(null);
   }
 
-  setHeatingThresholdTemperature(value, callback) {
-    this.platform.log.debug('TCC %s -', this.accessory.displayName,`Set HeatingThresholdTemperature: ${value}`);
+  setHeatingThresholdTemperature(value: any, callback: (arg0: null) => void) {
+    this.platform.log.debug('Round %s -', this.accessory.displayName,`Set HeatingThresholdTemperature: ${value}`);
     this.HeatingThresholdTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
-  setCoolingThresholdTemperature(value, callback) {
-    this.platform.log.debug('TCC %s -', this.accessory.displayName,`Set CoolingThresholdTemperature: ${value}`);
+  setCoolingThresholdTemperature(value: any, callback: (arg0: null) => void) {
+    this.platform.log.debug('Round %s -', this.accessory.displayName,`Set CoolingThresholdTemperature: ${value}`);
     this.CoolingThresholdTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
-  setTargetTemperature(value, callback) {
-    this.platform.log.debug('TCC %s -', this.accessory.displayName,`Set TargetTemperature:': ${value}`);
+  setTargetTemperature(value: any, callback: (arg0: null) => void) {
+    this.platform.log.debug('Round %s -', this.accessory.displayName,`Set TargetTemperature:': ${value}`);
     this.TargetTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
-  setTemperatureDisplayUnits(value, callback) {
-    this.platform.log.debug('TCC %s -', this.accessory.displayName,`Set TemperatureDisplayUnits: ${value}`);
+  setTemperatureDisplayUnits(value: any, callback: (arg0: null) => void) {
+    this.platform.log.debug('Round %s -', this.accessory.displayName,`Set TemperatureDisplayUnits: ${value}`);
     this.platform.log.warn('Changing the Hardware Display Units from HomeKit is not supported.');
 
     // change the temp units back to the one the Honeywell API said the thermostat was set to
@@ -459,7 +460,7 @@ export class TCC {
   /**
    * Converts the value to celsius if the temperature units are in Fahrenheit
    */
-  toCelsius(value) {
+  toCelsius(value: number) {
     if (this.TemperatureDisplayUnits === this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS) {
       return value;
     }
@@ -471,7 +472,7 @@ export class TCC {
   /**
    * Converts the value to fahrenheit if the temperature units are in Fahrenheit
    */
-  toFahrenheit(value) {
+  toFahrenheit(value: number) {
     if (this.TemperatureDisplayUnits === this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS) {
       return value;
     }
@@ -487,7 +488,7 @@ export class TCC {
       mode: 'Auto', // default to Auto
     };
     if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
-      this.platform.log.debug('TCC %s -', this.accessory.displayName,`TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`);
+      this.platform.log.debug('Round %s -', this.accessory.displayName,`TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`);
 
       if (this.TargetFanState === this.platform.Characteristic.TargetFanState.AUTO) {
         payload = {
@@ -510,7 +511,7 @@ export class TCC {
       }
 
       this.platform.log.info(`Sending request to Honeywell API. Fan Mode: ${payload.mode}`);
-      this.platform.log.debug('TCC %s -', this.accessory.displayName,JSON.stringify(payload));
+      this.platform.log.debug('Round %s -', this.accessory.displayName,JSON.stringify(payload));
 
       // Make the API request
       await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, payload, {
@@ -526,22 +527,22 @@ export class TCC {
   /**
    * Updates the status for each of the HomeKit Characteristics
    */
-  setActive(value, callback) {
-    this.platform.log.debug('TCC %s -', this.accessory.displayName,`Set Active State: ${value}`);
+  setActive(value: any, callback: (arg0: null) => void) {
+    this.platform.log.debug('Round %s -', this.accessory.displayName,`Set Active State: ${value}`);
     this.Active = value;
     this.doFanUpdate.next();
     callback(null);
   }
 
-  setTargetFanState(value, callback) {
-    this.platform.log.debug('TCC %s -', this.accessory.displayName,`Set Target Fan State: ${value}`);
+  setTargetFanState(value: any, callback: (arg0: null) => void) {
+    this.platform.log.debug('Round %s -', this.accessory.displayName,`Set Target Fan State: ${value}`);
     this.TargetFanState = value;
     this.doFanUpdate.next();
     callback(null);
   }
 
   private TargetState() {
-    this.platform.log.debug('TCC %s -', this.accessory.displayName,this.device.allowedModes);
+    this.platform.log.debug('Round %s -', this.accessory.displayName,this.device.allowedModes);
 
     const TargetState = [4];
     TargetState.pop();
@@ -557,7 +558,7 @@ export class TCC {
     if (this.device.allowedModes.includes('Auto')) {
       TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.AUTO);
     }
-    this.platform.log.debug('TCC %s -', this.accessory.displayName,'Only Show These Modes:', JSON.stringify(TargetState));
+    this.platform.log.debug('Round %s -', this.accessory.displayName,'Only Show These Modes:', JSON.stringify(TargetState));
     return TargetState;
   }
 }
