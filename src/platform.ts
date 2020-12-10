@@ -47,6 +47,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   sensorAccessory!: sensorAccessory;
 
   public sensorData = [];
+  private refreshInterval;
 
   constructor(public readonly log: Logger, public readonly config: HoneywellPlatformConfig, public readonly api: API) {
     this.log.debug('Finished initializing platform:', this.config.name);
@@ -81,14 +82,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     this.api.on('didFinishLaunching', async () => {
       log.debug('Executed didFinishLaunching callback');
       // run the method to discover / register your devices as accessories
-      interval((1800 / 3) * 1000).subscribe(async () => {
-        try {
-          await this.getAccessToken();
-        } catch (e) {
-          this.log.error('Failed to refresh access token.', JSON.stringify(e.message));
-          this.log.debug(JSON.stringify(e));
-        }
-      });
+      await this.refreshAccessToken();
       try {
         this.locations = await this.discoverlocations();
       } catch (e) {
@@ -178,58 +172,72 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     }
   }
 
+  async refreshAccessToken() {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+    }
+    this.refreshInterval = setInterval(() => this.getAccessToken(), (1800 / 3) * 1000);
+    await this.getAccessToken();
+  }
+
   /**
    * Exchange the refresh token for an access token
    */
   async getAccessToken() {
-    let result;
+    try {
+      let result;
 
-    if (this.config.credentials!.consumerSecret) {
-      result = (
-        await axios({
-          url: AuthURL,
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          auth: {
-            username: this.config.credentials!.consumerKey,
-            password: this.config.credentials!.consumerSecret,
-          },
-          data: qs.stringify({
-            grant_type: 'refresh_token',
-            refresh_token: this.config.credentials!.refreshToken,
-          }),
-          responseType: 'json',
-        })
-      ).data;
-    } else {
-      this.log.warn('Please re-link your account in the Homebridge UI.');
-      // if no consumerSecret is defined, attempt to use the shared consumerSecret
-      try {
+      if (this.config.credentials!.consumerSecret) {
+        // this.log.debug('Logging into honeywell', new Error());
         result = (
-          await axios.post(UIurl, {
-            consumerKey: this.config.credentials!.consumerKey,
-            refresh_token: this.config.credentials!.refreshToken,
+          await axios({
+            url: AuthURL,
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            auth: {
+              username: this.config.credentials!.consumerKey,
+              password: this.config.credentials!.consumerSecret,
+            },
+            data: qs.stringify({
+              grant_type: 'refresh_token',
+              refresh_token: this.config.credentials!.refreshToken,
+            }),
+            responseType: 'json',
           })
         ).data;
-      } catch (e) {
-        this.log.error('Failed to exchange refresh token for an access token.', JSON.stringify(e.message));
-        this.log.debug(JSON.stringify(e));
-        throw e;
+      } else {
+        this.log.warn('Please re-link your account in the Homebridge UI.');
+        // if no consumerSecret is defined, attempt to use the shared consumerSecret
+        try {
+          result = (
+            await axios.post(UIurl, {
+              consumerKey: this.config.credentials!.consumerKey,
+              refresh_token: this.config.credentials!.refreshToken,
+            })
+          ).data;
+        } catch (e) {
+          this.log.error('Failed to exchange refresh token for an access token.', JSON.stringify(e.message));
+          this.log.debug(JSON.stringify(e));
+          throw e;
+        }
       }
+
+      this.config.credentials!.accessToken = result.access_token;
+      this.log.warn('Got access token:', this.config.credentials!.accessToken);
+
+      // check if the refresh token has changed
+      if (result.refresh_token !== this.config.credentials!.refreshToken) {
+        this.log.warn('New refresh token:', result.refresh_token);
+        await this.updateRefreshToken(result.refresh_token);
+      }
+
+      this.config.credentials!.refreshToken = result.refresh_token;
+    } catch (e) {
+      this.log.error('Failed to refresh access token.', JSON.stringify(e.message));
+      this.log.debug(JSON.stringify(e));
     }
-
-    this.config.credentials!.accessToken = result.access_token;
-    this.log.warn('Got access token:', this.config.credentials!.accessToken);
-
-    // check if the refresh token has changed
-    if (result.refresh_token !== this.config.credentials!.refreshToken) {
-      this.log.warn('New refresh token:', result.refresh_token);
-      await this.updateRefreshToken(result.refresh_token);
-    }
-
-    this.config.credentials!.refreshToken = result.refresh_token;
   }
 
   /**
@@ -282,13 +290,14 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    */
   async discoverlocations() {
     // try and get the access token. If it fails stop here.
+    /*
     try {
       await this.getAccessToken();
     } catch (e) {
       this.log.error('Failed to refresh access token.', JSON.stringify(e.message));
       this.log.debug(JSON.stringify(e));
       return;
-    }
+    } */
     const locations = (await this.axios.get(LocationURL)).data;
     this.log.info(`Total Locations Found: ${locations.length}`);
     // this.log.error('Locations - ', JSON.stringify(locations, null, 2));
@@ -330,13 +339,13 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     const normalized = [] as any;
     for (const room of sensorRoomData.rooms) {
       normalized[room.id] = [] as any;
-        // this.log.debug(room.id);
-        for (const sensorAccessory of room.accessories) {
-          // this.log.debug(room.id, sensorAccessory.accessoryId);
-          sensorAccessory.roomId = room.id;
-          normalized[room.id][sensorAccessory.accessoryId] = sensorAccessory;
-        }
+      // this.log.debug(room.id);
+      for (const sensorAccessory of room.accessories) {
+        // this.log.debug(room.id, sensorAccessory.accessoryId);
+        sensorAccessory.roomId = room.id;
+        normalized[room.id][sensorAccessory.accessoryId] = sensorAccessory;
       }
+    }
     // this.log.debug(JSON.stringify(normalized, null, 2));
     return normalized;
   }
@@ -480,31 +489,31 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       for (const group of device.groups) {
         const roomsensors = await this.getCurrentSensorData(device, group, locationId);
         // if (roomsensors.rooms) {
-          // const rooms = roomsensors.rooms;
-          // this.log.error('discoverRoomSensors', JSON.stringify(roomsensors, null, 2));
-          //if (this.config.options ?.roompriority ?.thermostat) {
-          //  this.log.info(`Total Rooms Found: ${roomsensors.rooms.length}`);
-          //}
-          for (const accessories of roomsensors) {
-            if (accessories) {
-              // this.log.debug(JSON.stringify(accessories));
-              for (const key in accessories) {
-                const sensorAccessory = accessories[key];
-                // this.log.debug('sensorAccessory', JSON.stringify(sensorAccessory));
-                if (sensorAccessory.accessoryAttribute) {
-                  if (sensorAccessory.accessoryAttribute.type) {
-                    if (sensorAccessory.accessoryAttribute.type.startsWith('IndoorAirSensor')) {
-                      // this.log.debug(JSON.stringify(sensorAccessory));
-                      // this.log.debug(JSON.stringify(sensorAccessory.accessoryAttribute.name));
-                      // this.log.debug(JSON.stringify(sensorAccessory.accessoryAttribute.softwareRevision));
-                      this.log.info('Discovered Room Sensor groupId: %s, roomId: %s, accessoryId: %s', group.id, sensorAccessory.roomId, sensorAccessory.accessoryId, sensorAccessory.accessoryAttribute.name)
-                      this.createRoomSensors(device, locationId, sensorAccessory, group);
-                      this.createRoomSensorThermostat(device, locationId, sensorAccessory, group);
-                    }
+        // const rooms = roomsensors.rooms;
+        // this.log.error('discoverRoomSensors', JSON.stringify(roomsensors, null, 2));
+        //if (this.config.options ?.roompriority ?.thermostat) {
+        //  this.log.info(`Total Rooms Found: ${roomsensors.rooms.length}`);
+        //}
+        for (const accessories of roomsensors) {
+          if (accessories) {
+            // this.log.debug(JSON.stringify(accessories));
+            for (const key in accessories) {
+              const sensorAccessory = accessories[key];
+              // this.log.debug('sensorAccessory', JSON.stringify(sensorAccessory));
+              if (sensorAccessory.accessoryAttribute) {
+                if (sensorAccessory.accessoryAttribute.type) {
+                  if (sensorAccessory.accessoryAttribute.type.startsWith('IndoorAirSensor')) {
+                    // this.log.debug(JSON.stringify(sensorAccessory));
+                    // this.log.debug(JSON.stringify(sensorAccessory.accessoryAttribute.name));
+                    // this.log.debug(JSON.stringify(sensorAccessory.accessoryAttribute.softwareRevision));
+                    this.log.info('Discovered Room Sensor groupId: %s, roomId: %s, accessoryId: %s', group.id, sensorAccessory.roomId, sensorAccessory.accessoryId, sensorAccessory.accessoryAttribute.name)
+                    this.createRoomSensors(device, locationId, sensorAccessory, group);
+                    this.createRoomSensorThermostat(device, locationId, sensorAccessory, group);
                   }
                 }
               }
             }
+          }
           //}
         }
       }
