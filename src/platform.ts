@@ -380,7 +380,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
           }
       }
     } else {
-      this.log.info('Not a T9 LCC', device.deviceID.startsWith('LCC') , device.deviceModel.startsWith('T9') , device.groups);
+      this.log.info('Not a T9 LCC', device.deviceID.startsWith('LCC'), device.deviceModel.startsWith('T9'), device.groups);
     }
   }
 
