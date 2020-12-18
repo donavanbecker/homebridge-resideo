@@ -327,7 +327,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       // this.log.error('getCurrentSensorData - Result', `${DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`, JSON.stringify(response.data, null, 2));
       this.sensorData[device.deviceID] = {
         timestamp: Date.now() + 45000,
-        data: this.normalizeSensorDate(response.data)
+        data: this.normalizeSensorDate(response.data),
       };
     } else {
       // this.log.info('getCurrentSensorData Cache %s %s - %s', device.deviceType, device.deviceModel, device.userDefinedDeviceName);
@@ -360,24 +360,24 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     if (device.deviceID.startsWith('LCC') && device.deviceModel.startsWith('T9') && device.groups) {
       for (const group of device.groups) {
         const roomsensors = await this.getCurrentSensorData(device, group, locationId);
-          if (this.config.options ?.roompriority ?.thermostat) {
-            this.log.info(`Total Rooms Found: ${roomsensors.length}`);
-          }
-          for (const accessories of roomsensors) {
-            if (accessories) {
-              for (const key in accessories) {
-                const sensorAccessory = accessories[key];
-                if (sensorAccessory.accessoryAttribute && sensorAccessory.accessoryAttribute.type && sensorAccessory.accessoryAttribute.type.startsWith('Thermostat')) {
-                  this.log.debug('Software Revision', group.id, sensorAccessory.roomId, sensorAccessory.accessoryId, sensorAccessory.accessoryAttribute.name, JSON.stringify(sensorAccessory.accessoryAttribute.softwareRevision));
-                  return sensorAccessory.accessoryAttribute.softwareRevision;
-                } else {
-                  this.log.info('No Thermostat', device, group, locationId);
-                }
+        if (this.config.options ?.roompriority ?.thermostat) {
+          this.log.info(`Total Rooms Found: ${roomsensors.length}`);
+        }
+        for (const accessories of roomsensors) {
+          if (accessories) {
+            for (const key in accessories) {
+              const sensorAccessory = accessories[key];
+              if (sensorAccessory.accessoryAttribute && sensorAccessory.accessoryAttribute.type && sensorAccessory.accessoryAttribute.type.startsWith('Thermostat')) {
+                this.log.debug('Software Revision', group.id, sensorAccessory.roomId, sensorAccessory.accessoryId, sensorAccessory.accessoryAttribute.name, JSON.stringify(sensorAccessory.accessoryAttribute.softwareRevision));
+                return sensorAccessory.accessoryAttribute.softwareRevision;
+              } else {
+                this.log.info('No Thermostat', device, group, locationId);
               }
-            } else {
-              this.log.info('No accessories', device, group, locationId);
             }
+          } else {
+            this.log.info('No accessories', device, group, locationId);
           }
+        }
       }
     } else {
       this.log.info('Not a T9 LCC', device.deviceID.startsWith('LCC'), device.deviceModel.startsWith('T9'), device.groups);
@@ -493,7 +493,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                     // this.log.debug(JSON.stringify(sensorAccessory));
                     // this.log.debug(JSON.stringify(sensorAccessory.accessoryAttribute.name));
                     // this.log.debug(JSON.stringify(sensorAccessory.accessoryAttribute.softwareRevision));
-                    this.log.info('Discovered Room Sensor groupId: %s, roomId: %s, accessoryId: %s', group.id, sensorAccessory.roomId, sensorAccessory.accessoryId, sensorAccessory.accessoryAttribute.name)
+                    this.log.info('Discovered Room Sensor groupId: %s, roomId: %s, accessoryId: %s', group.id, sensorAccessory.roomId, sensorAccessory.accessoryId, sensorAccessory.accessoryAttribute.name);
                     this.createRoomSensors(device, locationId, sensorAccessory, group);
                     this.createRoomSensorThermostat(device, locationId, sensorAccessory, group);
                   }
