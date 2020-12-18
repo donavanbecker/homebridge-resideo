@@ -356,44 +356,31 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   /**
    * this method discovers the firmware Veriosn for T9 Thermostats
    */
-  public async Firmware() {
-    // get the devices at each location
-    for (const location of this.locations) {
-      const locationId = location.locationID;
-      for (const device of location.devices) {
-        if (device.deviceID.startsWith('LCC')) {
-          if (device.deviceModel.startsWith('T9')) {
-            if (device.groups) {
-              const groups = device.groups;
-              for (const group of groups) {
-                const roomsensors = await this.getCurrentSensorData(device, group, locationId);
-                if (roomsensors.rooms) {
-                  const rooms = roomsensors.rooms;
-                  if (this.config.options ?.roompriority ?.thermostat) {
-                    this.log.info(`Total Rooms Found: ${rooms.length}`);
-                  }
-                  for (const accessories of rooms) {
-                    if (accessories) {
-                      for (const accessory of accessories.accessories) {
-                        const sensorAccessory = accessory;
-                        if (sensorAccessory.accessoryAttribute) {
-                          if (sensorAccessory.accessoryAttribute.type) {
-                            if (sensorAccessory.accessoryAttribute.type.startsWith('Thermostat')) {
-                              this.log.debug(JSON.stringify(sensorAccessory.accessoryAttribute.softwareRevision));
-                              const softwareRevision = sensorAccessory.accessoryAttribute.softwareRevision;
-                              return softwareRevision;
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
+  public async getSoftwareRevision(locationId, device) {
+    if (device.deviceID.startsWith('LCC') && device.deviceModel.startsWith('T9') && device.groups) {
+      for (const group of device.groups) {
+        const roomsensors = await this.getCurrentSensorData(device, group, locationId);
+          if (this.config.options ?.roompriority ?.thermostat) {
+            this.log.info(`Total Rooms Found: ${roomsensors.length}`);
+          }
+          for (const accessories of roomsensors) {
+            if (accessories) {
+              for (const key in accessories) {
+                const sensorAccessory = accessories[key];
+                if (sensorAccessory.accessoryAttribute && sensorAccessory.accessoryAttribute.type && sensorAccessory.accessoryAttribute.type.startsWith('Thermostat')) {
+                  this.log.debug('Software Revision', group.id, sensorAccessory.roomId, sensorAccessory.accessoryId, sensorAccessory.accessoryAttribute.name, JSON.stringify(sensorAccessory.accessoryAttribute.softwareRevision));
+                  return sensorAccessory.accessoryAttribute.softwareRevision;
+                } else {
+                  this.log.info('No Thermostat', device, group, locationId);
                 }
               }
+            } else {
+              this.log.info('No accessories', device, group, locationId);
             }
           }
-        }
       }
+    } else {
+      this.log.info('Not a T9 LCC', device.deviceID.startsWith('LCC') , device.deviceModel.startsWith('T9') , device.groups);
     }
   }
 
@@ -419,12 +406,12 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
           } else if (device.isAlive && device.deviceClass === 'Thermostat') {
             if (device.deviceID.startsWith('LCC')) {
               if (device.deviceModel.startsWith('T9')) {
-                /* try {
-                  this.firmware = await this.Firmware();
+                try {
+                  this.firmware = await this.getSoftwareRevision(location.locationID, device);
                 } catch (e) {
                   this.log.error('Failed to Get T9 Firmware Version.', JSON.stringify(e.message));
                   this.log.debug(JSON.stringify(e));
-                } */
+                }
                 // this.deviceinfo(device);
                 // this.log.debug(JSON.stringify(device));
                 this.log.info('Discovered %s %s - %s', device.deviceType, device.deviceModel, location.name, device.userDefinedDeviceName);
