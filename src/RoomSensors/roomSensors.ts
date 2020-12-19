@@ -14,13 +14,11 @@ export class RoomSensors {
   temperatureService?: any;
   occupancyService?: any;
   humidityService?: any;
-  motionService?: Service;
 
   CurrentTemperature!: number;
   StatusLowBattery!: number;
   OccupancyDetected!: number;
   CurrentRelativeHumidity!: number;
-  MotionDetected!: any;
   accessoryId!: number;
   roomId!: number;
 
@@ -42,7 +40,6 @@ export class RoomSensors {
     this.StatusLowBattery;
     this.OccupancyDetected;
     this.CurrentRelativeHumidity;
-    this.MotionDetected;
     this.accessoryId = this.sensorAccessory.accessoryId;
     this.roomId = this.sensorAccessory.roomId;
 
@@ -120,17 +117,6 @@ export class RoomSensors {
       accessory.removeService(this.humidityService);
     }
 
-    // Motion Sensor Service
-    this.motionService = accessory.getService(this.platform.Service.MotionSensor);
-    if (!this.motionService && !this.platform.config.options?.roomsensor?.hide_motion) {
-      this.motionService = accessory.addService(
-        this.platform.Service.MotionSensor,
-        `${this.sensorAccessory.accessoryAttribute.name} Motion Sensor`,
-      );
-    } else if (this.motionService && this.platform.config.options?.roomsensor?.hide_motion) {
-      accessory.removeService(this.motionService);
-    }
-
     // Retrieve initial values and updateHomekit
     // this.refreshStatus();
 
@@ -189,12 +175,8 @@ export class RoomSensors {
     if (!this.platform.config.options?.roomsensor?.hide_humidity) {
       this.CurrentRelativeHumidity = this.sensorAccessory.accessoryValue.indoorHumidity;
     }
-
-    // Set Motion Sensor State
-    if (!this.platform.config.options?.roomsensor?.hide_motion) {
-      this.MotionDetected !== this.sensorAccessory.accessoryValue.motionDet;
-    }
-    this.platform.log.debug('Room Sensor %s - %s°c, %s%', this.accessory.displayName, this.CurrentTemperature, this.CurrentRelativeHumidity);
+    this.platform.log.debug('Room Sensor %s - %s°c, %s%', this.accessory.displayName,
+      this.CurrentTemperature, this.CurrentRelativeHumidity);
   }
 
   /**
@@ -275,9 +257,6 @@ export class RoomSensors {
         this.platform.Characteristic.CurrentRelativeHumidity,
         this.CurrentRelativeHumidity,
       );
-    }
-    if (!this.platform.config.options?.roomsensor?.hide_motion) {
-      this.motionService?.updateCharacteristic(this.platform.Characteristic.MotionDetected, this.MotionDetected);
     }
   }
 

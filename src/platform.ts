@@ -142,7 +142,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       this.config.options.roomsensor.hide;
       this.config.options.roomsensor.hide_temperature;
       this.config.options.roomsensor.hide_occupancy;
-      this.config.options.roomsensor.hide_motion;
       this.config.options.roomsensor.hide_humidity;
     }
 

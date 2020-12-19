@@ -90,7 +90,7 @@ export class T9thermostat {
     (this.service =
       this.accessory.getService(this.platform.Service.Thermostat) ||
       this.accessory.addService(this.platform.Service.Thermostat)),
-      `${this.device.name} ${this.device.deviceClass}`;
+    `${this.device.name} ${this.device.deviceClass}`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -192,7 +192,7 @@ export class T9thermostat {
             this.roomUpdateInProgress = true;
           }),
           debounceTime(100),
-      )
+        )
         .subscribe(async () => {
           try {
             await this.pushRoomChanges();
@@ -210,7 +210,7 @@ export class T9thermostat {
           this.thermostatUpdateInProgress = true;
         }),
         debounceTime(100),
-    )
+      )
       .subscribe(async () => {
         try {
           await this.pushChanges();
@@ -228,7 +228,7 @@ export class T9thermostat {
             this.fanUpdateInProgress = true;
           }),
           debounceTime(100),
-      )
+        )
         .subscribe(async () => {
           try {
             await this.pushFanChanges();
@@ -437,7 +437,7 @@ export class T9thermostat {
         this.platform.log.info(
           'Sending request to Honeywell API. Room Priority: Priority Type:',
           this.platform.config.options.roompriority.priorityType,
-          ', Built-in Motion/Occupancy Sensor(s) Will be used to set Priority Automatically.',
+          ', Built-in Occupancy Sensor(s) Will be used to set Priority Automatically.',
         );
       } else if (this.platform.config.options.roompriority.priorityType === 'WholeHouse') {
         this.platform.log.info(

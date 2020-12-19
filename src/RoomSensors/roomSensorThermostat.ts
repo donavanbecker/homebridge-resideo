@@ -375,7 +375,7 @@ export class RoomSensorThermostat {
         this.platform.log.info(
           'Sending request to Honeywell API. Priority Type:',
           this.platform.config.options.roompriority.priorityType,
-          ', Built-in Motion/Occupancy Sensor(s) Will be used to set Priority Automatically.',
+          ', Built-in Occupancy Sensor(s) Will be used to set Priority Automatically.',
         );
       } else if (this.platform.config.options.roompriority.priorityType === 'WholeHouse') {
         this.platform.log.info(
