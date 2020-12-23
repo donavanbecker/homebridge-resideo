@@ -17,6 +17,7 @@
     "homebridge-honeywell-server": "dist/index.js"
   },
   "scripts": {
+    "update": "npm update && npm install",
     "watch": "concurrently \"npm run watch:server\" \"npm run watch:portal\"",
     "watch:server": "nodemon",
     "watch:portal": "npm run watch --prefix portal",
