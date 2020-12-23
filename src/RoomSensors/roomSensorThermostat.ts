@@ -162,6 +162,8 @@ export class RoomSensorThermostat {
     // Retrieve initial values and updateHomekit
     this.refreshStatus();
     this.refreshSensorStatus();
+    // this.refreshStatus();
+    this.updateHomeKitCharacteristics();
 
     // Start an update interval
     interval(this.platform.config.options!.ttl! * 1000)

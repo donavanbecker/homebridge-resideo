@@ -252,10 +252,6 @@ export class T9thermostat {
     if (this.device.units === 'Celsius') {
       this.TemperatureDisplayUnits = this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS;
     }
-    /*this.TemperatureDisplayUnits = this.device.units === 'Fahrenheit' ? this.platform.Characteristic.TemperatureDisplayUnits.FAHRENHEIT :
-      this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS;
-    this.TemperatureDisplayUnits = this.device.units === 'Fahrenheit' ? this.platform.Characteristic.TemperatureDisplayUnits.FAHRENHEIT :
-      this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS;*/
 
     this.CurrentTemperature = this.toCelsius(this.device.indoorTemperature);
     this.CurrentRelativeHumidity = this.device.indoorHumidity;
@@ -400,7 +396,7 @@ export class T9thermostat {
       `${payload.heatSetpoint}, thermostatSetpointStatus:`,
       this.platform.config.options ?.thermostat ?.thermostatSetpointStatus,
     );
-    this.platform.log.error('T9 %s pushChanges -', this.accessory.displayName, JSON.stringify(payload));
+    this.platform.log.debug('T9 %s pushChanges -', this.accessory.displayName, JSON.stringify(payload));
 
     // Make the API request
     await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
@@ -452,7 +448,7 @@ export class T9thermostat {
           this.platform.config.options.roompriority.priorityType,
         );
       }
-      this.platform.log.error('T9 %s pushRoomChanges -', this.accessory.displayName, JSON.stringify(payload));
+      this.platform.log.debug('T9 %s pushRoomChanges -', this.accessory.displayName, JSON.stringify(payload));
 
       // Make the API request
       await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
@@ -473,12 +469,18 @@ export class T9thermostat {
       this.platform.Characteristic.TemperatureDisplayUnits,
       this.TemperatureDisplayUnits,
     );
-    this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
+    this.service.updateCharacteristic(
+      this.platform.Characteristic.CurrentTemperature, 
+      this.CurrentTemperature,
+    );
     this.service.updateCharacteristic(
       this.platform.Characteristic.CurrentRelativeHumidity,
       this.CurrentRelativeHumidity,
     );
-    this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
+    this.service.updateCharacteristic(
+      this.platform.Characteristic.TargetTemperature,
+      this.TargetTemperature,
+    );
     this.service.updateCharacteristic(
       this.platform.Characteristic.HeatingThresholdTemperature,
       this.HeatingThresholdTemperature,
@@ -659,34 +661,3 @@ export class T9thermostat {
     return TargetState;
   }
 }
-/*
-    if (this.device.settings) {
-      if (
-        this.device.settings?.fan &&
-        !this.platform.config.options?.thermostat?.hide_fan
-      ) {
-        this.platform.log.debug('T9 %s -', this.accessory.displayName,
-          'Available FAN settings',
-          JSON.stringify(this.device.settings?.fan),
-        );
-        this.fanService =
-          accessory.getService(this.platform.Service.Fanv2) ||
-          accessory.addService(
-            this.platform.Service.Fanv2,
-            `${this.device.name} ${this.device.deviceClass} Fan`,
-          );
-
-        this.fanService
-          .getCharacteristic(this.platform.Characteristic.Active)
-          .on('set', this.setActive.bind(this));
-
-        this.fanService
-          .getCharacteristic(this.platform.Characteristic.TargetFanState)
-          .on('set', this.setTargetFanState.bind(this));
-      }
-    } else if (
-      this.fanService &&
-      this.platform.config.options?.thermostat?.hide_fan
-    ) {
-      accessory.removeService(this.fanService);
-    }*/

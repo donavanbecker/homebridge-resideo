@@ -119,6 +119,7 @@ export class RoomSensors {
 
     // Retrieve initial values and updateHomekit
     // this.refreshStatus();
+    this.updateHomeKitCharacteristics();
 
     // Start an update interval
     interval(this.platform.config.options!.ttl! * 1000)

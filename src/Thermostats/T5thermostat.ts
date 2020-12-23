@@ -102,14 +102,14 @@ export class T5thermostat {
 
     // Set Min and Max
     if (this.device.changeableValues.heatCoolMode === 'Heat') {
-      this.platform.log.debug('T5 %s -', this.accessory.displayName,'Device is in "Heat" mode');
+      this.platform.log.debug('T5 %s -', this.accessory.displayName, 'Device is in "Heat" mode');
       this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature).setProps({
         minValue: this.toCelsius(device.minHeatSetpoint),
         maxValue: this.toCelsius(device.maxHeatSetpoint),
         minStep: 0.5,
       });
     } else if (this.device.changeableValues.heatCoolMode === 'Cool') {
-      this.platform.log.debug('T5 %s -', this.accessory.displayName,'Device is in "Cool" mode');
+      this.platform.log.debug('T5 %s -', this.accessory.displayName, 'Device is in "Cool" mode');
       this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature).setProps({
         minValue: this.toCelsius(device.minCoolSetpoint),
         maxValue: this.toCelsius(device.maxCoolSetpoint),
@@ -152,7 +152,7 @@ export class T5thermostat {
     // Fan Controls
     this.fanService = accessory.getService(this.platform.Service.Fanv2);
     if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
-      this.platform.log.debug('T5 %s -', this.accessory.displayName,'Available FAN settings', this.device.settings.fan);
+      this.platform.log.debug('T5 %s -', this.accessory.displayName, 'Available FAN settings', this.device.settings.fan);
       this.fanService =
         accessory.getService(this.platform.Service.Fanv2) ||
         accessory.addService(this.platform.Service.Fanv2, `${this.device.name} ${this.device.deviceClass} Fan`);
@@ -191,7 +191,7 @@ export class T5thermostat {
           await this.pushChanges();
         } catch (e) {
           this.platform.log.error(JSON.stringify(e.message));
-          this.platform.log.debug('T5 %s -', this.accessory.displayName,JSON.stringify(e));
+          this.platform.log.debug('T5 %s -', this.accessory.displayName, JSON.stringify(e));
         }
         this.thermostatUpdateInProgress = false;
       });
@@ -208,7 +208,7 @@ export class T5thermostat {
             await this.pushFanChanges();
           } catch (e) {
             this.platform.log.error(JSON.stringify(e.message));
-            this.platform.log.debug('T5 %s -', this.accessory.displayName,JSON.stringify(e));
+            this.platform.log.debug('T5 %s -', this.accessory.displayName, JSON.stringify(e));
           }
           this.fanUpdateInProgress = false;
         });
@@ -243,16 +243,17 @@ export class T5thermostat {
      * The CurrentHeatingCoolingState is either 'Heat', 'Cool', or 'Off'
      * CurrentHeatingCoolingState =  OFF = 0, HEAT = 1, COOL = 2
      */
-    if (this.device.operationStatus.mode === 'Heat') {
-      this.CurrentHeatingCoolingState = 1;
-      this.platform.log.debug('T5 %s -', this.accessory.displayName,'Device is Currently: ', this.CurrentHeatingCoolingState);
-    } else if (this.device.operationStatus.mode === 'Cool') {
-      this.CurrentHeatingCoolingState = 2;
-      this.platform.log.debug('T5 %s -', this.accessory.displayName,'Device is Currently: ', this.CurrentHeatingCoolingState);
-    } else {
-      this.CurrentHeatingCoolingState = 0;
-      this.platform.log.debug('T5 %s -', this.accessory.displayName,'Device is Currently: ', this.CurrentHeatingCoolingState);
+    switch (this.device.operationStatus.mode) {
+      case 'Heat':
+        this.CurrentHeatingCoolingState = 1;
+        break;
+      case 'Cool':
+        this.CurrentHeatingCoolingState = 2;
+        break;
+      default:
+        this.CurrentHeatingCoolingState = 0;
     }
+    this.platform.log.debug('T5 %s Heat -', this.accessory.displayName, 'Device is Currently: ', this.CurrentHeatingCoolingState);
 
     // Set the TargetTemperature value based on the current mode
     if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
@@ -268,7 +269,7 @@ export class T5thermostat {
     // Set the Target Fan State
     if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
       if (this.deviceFan) {
-        this.platform.log.debug('T5 %s -', this.accessory.displayName,`${JSON.stringify(this.deviceFan)}`);
+        this.platform.log.debug('T5 %s -', this.accessory.displayName, `${JSON.stringify(this.deviceFan)}`);
 
         if (this.deviceFan.mode === 'Auto') {
           this.TargetFanState = this.platform.Characteristic.TargetFanState.AUTO;
@@ -308,8 +309,8 @@ export class T5thermostat {
             },
           })
         ).data;
-        this.platform.log.debug('T5 %s -', this.accessory.displayName,JSON.stringify(this.device.settings?.fan));
-        this.platform.log.debug('T5 %s -', this.accessory.displayName,JSON.stringify(this.deviceFan));
+        this.platform.log.debug('T5 %s -', this.accessory.displayName, JSON.stringify(this.device.settings?.fan));
+        // this.platform.log.debug('T5 %s -', this.accessory.displayName, JSON.stringify(this.deviceFan));
         this.platform.log.debug('T5 %s -', this.accessory.displayName,
           `Fetched update for ${this.device.name} Fan from Honeywell Fan API: ${JSON.stringify(this.deviceFan)}`,
         );
@@ -320,8 +321,9 @@ export class T5thermostat {
       this.platform.log.error(
         `T5 - Failed to update status of ${this.device.name}`,
         JSON.stringify(e.message),
-        this.platform.log.debug('T5 %s -', this.accessory.displayName,JSON.stringify(e)),
+        this.platform.log.debug('T5 %s -', this.accessory.displayName, JSON.stringify(e)),
       );
+      this.platform.refreshAccessToken();
     }
   }
 
@@ -357,7 +359,7 @@ export class T5thermostat {
       `${payload.heatSetpoint}, thermostatSetpointStatus:`,
       this.platform.config.options?.thermostat?.thermostatSetpointStatus,
     );
-    this.platform.log.debug('T5 %s -', this.accessory.displayName,JSON.stringify(payload));
+    this.platform.log.debug('T5 %s -', this.accessory.displayName, JSON.stringify(payload));
 
     // Make the API request
     await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
@@ -377,8 +379,14 @@ export class T5thermostat {
       this.platform.Characteristic.TemperatureDisplayUnits,
       this.TemperatureDisplayUnits,
     );
-    this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
-    this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
+    this.service.updateCharacteristic(
+      this.platform.Characteristic.CurrentTemperature, 
+      this.CurrentTemperature,
+    );
+    this.service.updateCharacteristic(
+      this.platform.Characteristic.TargetTemperature,
+      this.TargetTemperature,
+    );
     this.service.updateCharacteristic(
       this.platform.Characteristic.HeatingThresholdTemperature,
       this.HeatingThresholdTemperature,
@@ -403,7 +411,7 @@ export class T5thermostat {
   }
 
   setTargetHeatingCoolingState(value: any, callback: (arg0: null) => void) {
-    this.platform.log.debug('T5 %s -', this.accessory.displayName,`Set TargetHeatingCoolingState: ${value}`);
+    this.platform.log.debug('T5 %s -', this.accessory.displayName, `Set TargetHeatingCoolingState: ${value}`);
 
     this.TargetHeatingCoolingState = value;
 
@@ -420,28 +428,28 @@ export class T5thermostat {
   }
 
   setHeatingThresholdTemperature(value: any, callback: (arg0: null) => void) {
-    this.platform.log.debug('T5 %s -', this.accessory.displayName,`Set HeatingThresholdTemperature: ${value}`);
+    this.platform.log.debug('T5 %s -', this.accessory.displayName, `Set HeatingThresholdTemperature: ${value}`);
     this.HeatingThresholdTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
   setCoolingThresholdTemperature(value: any, callback: (arg0: null) => void) {
-    this.platform.log.debug('T5 %s -', this.accessory.displayName,`Set CoolingThresholdTemperature: ${value}`);
+    this.platform.log.debug('T5 %s -', this.accessory.displayName, `Set CoolingThresholdTemperature: ${value}`);
     this.CoolingThresholdTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
   setTargetTemperature(value: any, callback: (arg0: null) => void) {
-    this.platform.log.debug('T5 %s -', this.accessory.displayName,`Set TargetTemperature:': ${value}`);
+    this.platform.log.debug('T5 %s -', this.accessory.displayName, `Set TargetTemperature:': ${value}`);
     this.TargetTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
   setTemperatureDisplayUnits(value: any, callback: (arg0: null) => void) {
-    this.platform.log.debug('T5 %s -', this.accessory.displayName,`Set TemperatureDisplayUnits: ${value}`);
+    this.platform.log.debug('T5 %s -', this.accessory.displayName, `Set TemperatureDisplayUnits: ${value}`);
     this.platform.log.warn('Changing the Hardware Display Units from HomeKit is not supported.');
 
     // change the temp units back to the one the Honeywell API said the thermostat was set to
@@ -486,7 +494,7 @@ export class T5thermostat {
       mode: 'Auto', // default to Auto
     };
     if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
-      this.platform.log.debug('T5 %s -', this.accessory.displayName,`TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`);
+      this.platform.log.debug('T5 %s -', this.accessory.displayName, `TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`);
 
       if (this.TargetFanState === this.platform.Characteristic.TargetFanState.AUTO) {
         payload = {
@@ -509,7 +517,7 @@ export class T5thermostat {
       }
 
       this.platform.log.info(`Sending request to Honeywell API. Fan Mode: ${payload.mode}`);
-      this.platform.log.debug('T5 %s -', this.accessory.displayName,JSON.stringify(payload));
+      this.platform.log.debug('T5 %s -', this.accessory.displayName, JSON.stringify(payload));
 
       // Make the API request
       await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, payload, {
@@ -526,21 +534,21 @@ export class T5thermostat {
    * Updates the status for each of the HomeKit Characteristics
    */
   setActive(value: any, callback: (arg0: null) => void) {
-    this.platform.log.debug('T5 %s -', this.accessory.displayName,`Set Active State: ${value}`);
+    this.platform.log.debug('T5 %s -', this.accessory.displayName, `Set Active State: ${value}`);
     this.Active = value;
     this.doFanUpdate.next();
     callback(null);
   }
 
   setTargetFanState(value: any, callback: (arg0: null) => void) {
-    this.platform.log.debug('T5 %s -', this.accessory.displayName,`Set Target Fan State: ${value}`);
+    this.platform.log.debug('T5 %s -', this.accessory.displayName, `Set Target Fan State: ${value}`);
     this.TargetFanState = value;
     this.doFanUpdate.next();
     callback(null);
   }
 
   private TargetState() {
-    this.platform.log.debug('T5 %s -', this.accessory.displayName,this.device.allowedModes);
+    this.platform.log.debug('T5 %s -', this.accessory.displayName, this.device.allowedModes);
 
     const TargetState = [4];
     TargetState.pop();
@@ -556,7 +564,7 @@ export class T5thermostat {
     if (this.device.allowedModes.includes('Auto')) {
       TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.AUTO);
     }
-    this.platform.log.debug('T5 %s -', this.accessory.displayName,'Only Show These Modes:', JSON.stringify(TargetState));
+    this.platform.log.debug('T5 %s -', this.accessory.displayName, 'Only Show These Modes:', JSON.stringify(TargetState));
     return TargetState;
   }
 }
