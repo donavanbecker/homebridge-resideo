@@ -169,6 +169,6 @@ dist
 .yarn/build-state.yml
 .pnp.\*
 
-# Plugin Logos
-
+# Plugin Folder
+server/
 honeywell/
