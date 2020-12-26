@@ -1,7 +1,0 @@
-node_modules
-.env
-dist
-static
-homebridge-honeywell-home-server-**.tgz
-.secret.json
-load-test.ts

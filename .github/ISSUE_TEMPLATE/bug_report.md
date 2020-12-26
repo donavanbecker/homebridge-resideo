@@ -3,7 +3,7 @@ name: Bug Report
 about: Create a report to help us improve
 title: ''
 labels: bug
-assignees: ''
+assignees: 'donavanbecker'
 ---
 
 <!-- You must use the issue template below when submitting a bug -->
@@ -48,7 +48,7 @@ Remove any sensitive information, such as your homebridge-honeywell-home consume
 
 <!-- If applicable, add screenshots to help explain your problem. -->
 
-**Thermostat Model:**
+**Device & Model:**
 
 <!-- Provide your Thermostat Model. -->
 

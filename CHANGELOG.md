@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 8.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.1.1...v8.2.0) (2020-12-25)
+
+### Changes
+
+- Refractored Plugin to reported respond to API better. Thanks [NorthernMan54](https://github.com/NorthernMan54).
+- For T9 Users, Room Sensors display their own info, instead of display only 1 Room Sensors info. Thanks [NorthernMan54](https://github.com/NorthernMan54).
+- For T9 Users, Motion Sensor has been removed. Since data cannot be pulled quick enough, and has been inaccurate from API.
+- Updated other dependencies.
+
 ## [Version 8.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.1.0...v8.1.1) (2020-11-18)
 
 ### Changes

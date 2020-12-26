@@ -71,15 +71,21 @@
                 "oneOf": [
                   {
                     "title": "No Hold",
-                    "enum": ["NoHold"]
+                    "enum": [
+                      "NoHold"
+                    ]
                   },
                   {
                     "title": "Permanent Hold",
-                    "enum": ["PermanentHold"]
+                    "enum": [
+                      "PermanentHold"
+                    ]
                   },
                   {
                     "title": "Temporary Hold",
-                    "enum": ["TemporaryHold"]
+                    "enum": [
+                      "TemporaryHold"
+                    ]
                   }
                 ]
               }
@@ -154,15 +160,21 @@
                 "oneOf": [
                   {
                     "title": "Pick A Room",
-                    "enum": ["PickARoom"]
+                    "enum": [
+                      "PickARoom"
+                    ]
                   },
                   {
                     "title": "Whole House",
-                    "enum": ["WholeHouse"]
+                    "enum": [
+                      "WholeHouse"
+                    ]
                   },
                   {
                     "title": "Follow Me",
-                    "enum": ["FollowMe"]
+                    "enum": [
+                      "FollowMe"
+                    ]
                   }
                 ]
               }

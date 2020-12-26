@@ -33,7 +33,7 @@ export class RoomSensors {
     public readonly locationId: location['locationID'],
     public device: T9Thermostat,
     public sensorAccessory: sensorAccessory,
-    public readonly group: T9groups,  // Unused
+    public readonly group: T9groups, // Unused
   ) {
     // default placeholders
     this.CurrentTemperature;
@@ -58,7 +58,7 @@ export class RoomSensors {
         this.sensorAccessory.accessoryAttribute.softwareRevision,
       );
 
-    // get the LightBulb service if it exists, otherwise create a new LightBulb service
+    // get the BatteryService service if it exists, otherwise create a new BatteryService service
     // you can create multiple services for each accessory
     (this.service =
       this.accessory.getService(this.platform.Service.BatteryService) ||
@@ -67,7 +67,7 @@ export class RoomSensors {
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
-    // this.accessory.getService('NAME') ?? this.accessory.addService(this.platform.Service.Lightbulb, 'NAME', 'USER_DEFINED_SUBTYPE');
+    // this.accessory.getService('NAME') ?? this.accessory.addService(this.platform.Service.BatteryService, 'NAME', 'USER_DEFINED_SUBTYPE');
 
     // set the service name, this is what is displayed as the default name on the Home app
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
@@ -152,7 +152,7 @@ export class RoomSensors {
     } else {
       this.BatteryLevel = 10;
     }
-    if (this.BatteryLevel > 15 ) {
+    if (this.BatteryLevel > 15) {
       this.StatusLowBattery = 0;
     } else {
       this.StatusLowBattery = 1;
@@ -176,8 +176,12 @@ export class RoomSensors {
     if (!this.platform.config.options?.roomsensor?.hide_humidity) {
       this.CurrentRelativeHumidity = this.sensorAccessory.accessoryValue.indoorHumidity;
     }
-    this.platform.log.debug('Room Sensor %s - %s°c, %s%', this.accessory.displayName,
-      this.CurrentTemperature, this.CurrentRelativeHumidity);
+    this.platform.log.debug(
+      'Room Sensor %s - %s°c, %s%',
+      this.accessory.displayName,
+      this.CurrentTemperature,
+      this.CurrentRelativeHumidity,
+    );
   }
 
   /**
@@ -188,42 +192,6 @@ export class RoomSensors {
       const roomsensors = await this.platform.getCurrentSensorData(this.device, this.group, this.locationId);
       this.sensorAccessory = roomsensors[this.roomId][this.accessoryId];
 
-
-      /*
-      if (this.device.deviceID.startsWith('LCC')) {
-        if (this.device.deviceModel.startsWith('T9')) {
-          if (this.device.groups) {
-            const groups = this.device.groups;
-            for (const group of groups) {
-              this.platform.log.debug('sensorAccessory', this.sensorAccessory);
-              const roomsensors = await this.platform.getCurrentSensorData(this.device, group, this.locationId);
-              if (roomsensors.rooms) {
-                const rooms = roomsensors.rooms;
-                // this.platform.log.debug('RS %s - ', this.accessory.displayName, JSON.stringify(roomsensors));
-                for (const accessories of rooms) {
-                  if (accessories) {
-                    // this.platform.log.debug('RS %s - ', this.accessory.displayName, JSON.stringify(accessories));
-                    for (const accessory of accessories.accessories) {
-                      if (accessory.accessoryAttribute) {
-                        if (accessory.accessoryAttribute.type) {
-                          if (accessory.accessoryAttribute.type.startsWith('IndoorAirSensor')) {
-                            this.sensorAccessory = accessory;
-                            this.platform.log.debug('RS %s - ', this.accessory.displayName, JSON.stringify(this.sensorAccessory));
-                            // this.platform.log.debug('RS %s - ', this.accessory.displayName,
-                            //  JSON.stringify(this.sensorAccessory.accessoryAttribute.softwareRevision),
-                            // );
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      */
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
@@ -239,8 +207,14 @@ export class RoomSensors {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-    this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
-    this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
+    this.service.updateCharacteristic(
+      this.platform.Characteristic.StatusLowBattery,
+      this.StatusLowBattery,
+    );
+    this.service.updateCharacteristic(
+      this.platform.Characteristic.BatteryLevel,
+      this.BatteryLevel,
+    );
     if (!this.platform.config.options?.roomsensor?.hide_temperature) {
       this.temperatureService?.updateCharacteristic(
         this.platform.Characteristic.CurrentTemperature,
@@ -271,16 +245,5 @@ export class RoomSensors {
 
     // celsius should be to the nearest 0.5 degree
     return Math.round((5 / 9) * (value - 32) * 2) / 2;
-  }
-
-  /**
-   * Converts the value to fahrenheit if the temperature units are in Fahrenheit
-   */
-  toFahrenheit(value: number) {
-    if (this.TemperatureDisplayUnits === this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS) {
-      return value;
-    }
-
-    return Math.round((value * 9) / 5 + 32);
   }
 }

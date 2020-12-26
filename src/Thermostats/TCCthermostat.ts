@@ -153,7 +153,12 @@ export class TCCthermostat {
     // Fan Controls
     this.fanService = accessory.getService(this.platform.Service.Fanv2);
     if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
-      this.platform.log.debug('TCC %s -', this.accessory.displayName, 'Available FAN settings', this.device.settings.fan);
+      this.platform.log.debug(
+        'TCC %s -',
+        this.accessory.displayName,
+        'Available FAN settings',
+        this.device.settings.fan,
+      );
       this.fanService =
         accessory.getService(this.platform.Service.Fanv2) ||
         accessory.addService(this.platform.Service.Fanv2, `${this.device.name} ${this.device.deviceClass} Fan`);
@@ -254,7 +259,12 @@ export class TCCthermostat {
       default:
         this.CurrentHeatingCoolingState = 0;
     }
-    this.platform.log.debug('TTC %s Heat -', this.accessory.displayName, 'Device is Currently: ', this.CurrentHeatingCoolingState);
+    this.platform.log.debug(
+      'TTC %s Heat -',
+      this.accessory.displayName,
+      'Device is Currently: ',
+      this.CurrentHeatingCoolingState,
+    );
 
     // Set the TargetTemperature value based on the current mode
     if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
@@ -298,7 +308,9 @@ export class TCCthermostat {
           },
         })
       ).data;
-      this.platform.log.debug('TCC %s -', this.accessory.displayName,
+      this.platform.log.debug(
+        'TCC %s -',
+        this.accessory.displayName,
         `Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`,
       );
       this.platform.log.debug('TCC %s -', this.accessory.displayName, JSON.stringify(this.device));
@@ -312,7 +324,9 @@ export class TCCthermostat {
         ).data;
         this.platform.log.debug('TCC %s -', this.accessory.displayName, JSON.stringify(this.device.settings?.fan));
         //this.platform.log.debug('TCC %s -', this.accessory.displayName, JSON.stringify(this.deviceFan));
-        this.platform.log.debug('TCC %s -', this.accessory.displayName,
+        this.platform.log.debug(
+          'TCC %s -',
+          this.accessory.displayName,
           `Fetched update for ${this.device.name} Fan from Honeywell Fan API: ${JSON.stringify(this.deviceFan)}`,
         );
       }
@@ -377,18 +391,12 @@ export class TCCthermostat {
       this.platform.Characteristic.TemperatureDisplayUnits,
       this.TemperatureDisplayUnits,
     );
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.CurrentTemperature,
-      this.CurrentTemperature,
-    );
+    this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
     this.service.updateCharacteristic(
       this.platform.Characteristic.CurrentRelativeHumidity,
       this.CurrentRelativeHumidity,
     );
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.TargetTemperature,
-      this.TargetTemperature,
-    );
+    this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
     this.service.updateCharacteristic(
       this.platform.Characteristic.HeatingThresholdTemperature,
       this.HeatingThresholdTemperature,
@@ -495,7 +503,11 @@ export class TCCthermostat {
       mode: 'Auto', // default to Auto
     };
     if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
-      this.platform.log.debug('TCC %s -', this.accessory.displayName, `TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`);
+      this.platform.log.debug(
+        'TCC %s -',
+        this.accessory.displayName,
+        `TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`,
+      );
 
       if (this.TargetFanState === this.platform.Characteristic.TargetFanState.AUTO) {
         payload = {
@@ -565,7 +577,12 @@ export class TCCthermostat {
     if (this.device.allowedModes.includes('Auto')) {
       TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.AUTO);
     }
-    this.platform.log.debug('TCC %s -', this.accessory.displayName, 'Only Show These Modes:', JSON.stringify(TargetState));
+    this.platform.log.debug(
+      'TCC %s -',
+      this.accessory.displayName,
+      'Only Show These Modes:',
+      JSON.stringify(TargetState),
+    );
     return TargetState;
   }
 }
