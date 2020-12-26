@@ -1,6 +1,6 @@
 # Close issues that don't conform to the issue templates.
 #
-name: Close Non-Conforming Issues
+name: Validate-Issues
 
 on:
   issues:
