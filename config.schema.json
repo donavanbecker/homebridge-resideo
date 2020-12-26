@@ -71,15 +71,21 @@
                 "oneOf": [
                   {
                     "title": "No Hold",
-                    "enum": ["NoHold"]
+                    "enum": [
+                      "NoHold"
+                    ]
                   },
                   {
                     "title": "Permanent Hold",
-                    "enum": ["PermanentHold"]
+                    "enum": [
+                      "PermanentHold"
+                    ]
                   },
                   {
                     "title": "Temporary Hold",
-                    "enum": ["TemporaryHold"]
+                    "enum": [
+                      "TemporaryHold"
+                    ]
                   }
                 ]
               }
@@ -134,11 +140,6 @@
                 "title": "Hide Occupancy Service",
                 "type": "boolean",
                 "requried": false
-              },
-              "hide_motion": {
-                "title": "Hide Motion Service",
-                "type": "boolean",
-                "requried": false
               }
             }
           },
@@ -159,15 +160,21 @@
                 "oneOf": [
                   {
                     "title": "Pick A Room",
-                    "enum": ["PickARoom"]
+                    "enum": [
+                      "PickARoom"
+                    ]
                   },
                   {
                     "title": "Whole House",
-                    "enum": ["WholeHouse"]
+                    "enum": [
+                      "WholeHouse"
+                    ]
                   },
                   {
                     "title": "Follow Me",
-                    "enum": ["FollowMe"]
+                    "enum": [
+                      "FollowMe"
+                    ]
                   }
                 ]
               }
@@ -238,11 +245,10 @@
                 "options.roomsensor.hide",
                 {
                   "type": "help",
-                  "helpvalue": "<h5>Hide Room Sensor Services</h5><em class='primary-text'>Allows you to hide your tempeture sensor, occupancy sensor, motion sensor, or humidity sensor of your Room Sensor(s).</em>"
+                  "helpvalue": "<h5>Hide Room Sensor Services</h5><em class='primary-text'>Allows you to hide your tempeture sensor, occupancy sensor, or humidity sensor of your Room Sensor(s).</em>"
                 },
                 "options.roomsensor.hide_temperature",
                 "options.roomsensor.hide_occupancy",
-                "options.roomsensor.hide_motion",
                 "options.roomsensor.hide_humidity",
                 {
                   "type": "fieldset",

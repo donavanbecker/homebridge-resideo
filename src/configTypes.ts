@@ -328,10 +328,11 @@ export type Temp = {
 };
 
 // T9 Room Sensors
-export type sensoraccessory = {
+export type sensorAccessory = {
   accessoryId: number;
   accessoryAttribute: accessoryAttribute;
   accessoryValue: accessoryValue;
+  roomId: number;
 };
 
 export type accessoryAttribute = {
