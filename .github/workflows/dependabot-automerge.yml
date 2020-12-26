@@ -1,6 +1,6 @@
 # Automerge dependency updates identified by dependabot.
 #
-name: Automerge Dependabot Version Updates
+name: Dependabot-Automerge
 
 on:
   pull_request:
