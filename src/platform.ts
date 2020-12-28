@@ -494,7 +494,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         // this is imported from `platformAccessory.ts`
         new T9thermostat(this, existingAccessory, locationId, device, firmware);
         this.log.debug(`T9 UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
-      } else if (!device.isAlive || this.config.options ?.thermostat ?.hide) {
+      } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
     } else if (!this.config.options ?.thermostat ?.hide) {
@@ -520,6 +520,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       // link the accessory to your platform
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       this.accessories.push(accessory);
+    } else {
+      this.log.debug(`Unable to Register new device: ${device.name} ${device.deviceModel} ${device.deviceType} - ${device.deviceID}`);
     }
   }
 
@@ -542,7 +544,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         // this is imported from `platformAccessory.ts`
         new T5thermostat(this, existingAccessory, locationId, device);
         this.log.debug(`T5 UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
-      } else if (!device.isAlive || this.config.options ?.thermostat ?.hide) {
+      } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
     } else if (!this.config.options ?.thermostat ?.hide) {
@@ -567,6 +569,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       // link the accessory to your platform
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       this.accessories.push(accessory);
+    } else {
+      this.log.debug(`Unable to Register new device: ${device.name} ${device.deviceModel} ${device.deviceType} - ${device.deviceID}`);
     }
   }
 
@@ -589,7 +593,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         // this is imported from `platformAccessory.ts`
         new RoundThermostat(this, existingAccessory, locationId, device);
         this.log.debug(`Round UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
-      } else if (!device.isAlive || this.config.options ?.thermostat ?.hide) {
+      } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
     } else if (!this.config.options ?.thermostat ?.hide) {
@@ -614,6 +618,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       // link the accessory to your platform
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       this.accessories.push(accessory);
+    } else {
+      this.log.debug(`Unable to Register new device: ${device.name} ${device.deviceModel} ${device.deviceType} - ${device.deviceID}`);
     }
   }
 
@@ -636,7 +642,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         // this is imported from `platformAccessory.ts`
         new TCCthermostat(this, existingAccessory, locationId, device);
         this.log.debug(`TCC UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
-      } else if (!device.isAlive || this.config.options ?.thermostat ?.hide) {
+      } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
     } else if (!this.config.options ?.thermostat ?.hide) {
@@ -661,6 +667,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       // link the accessory to your platform
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       this.accessories.push(accessory);
+    } else {
+      this.log.debug(`Unable to Register new device: ${device.name} ${device.deviceModel} ${device.deviceType} - ${device.deviceID}`);
     }
   }
 
@@ -684,7 +692,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         // this is imported from `platformAccessory.ts`
         new LeakSensor(this, existingAccessory, locationId, device);
         this.log.debug(`Leak Sensor UDID: ${device.userDefinedDeviceName}-${device.deviceID}-${device.deviceClass}`);
-      } else if (!device.isAlive || this.config.options ?.leaksensor ?.hide) {
+      } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
     } else if (!this.config.options ?.leaksensor ?.hide) {
@@ -709,6 +717,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       // link the accessory to your platform
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       this.accessories.push(accessory);
+    } else {
+      this.log.debug(`Unable to Register new device: ${device.userDefinedDeviceName} ${device.deviceClass} - ${device.deviceID}`);
     }
   }
 
@@ -737,7 +747,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         // this is imported from `platformAccessory.ts`
         new RoomSensors(this, existingAccessory, locationId, device, sensorAccessory, group);
 
-      } else if (!device.isAlive || this.config.options ?.roomsensor ?.hide) {
+      } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
     } else if (device.isAlive && !this.config.options ?.roomsensor ?.hide) {
@@ -764,6 +774,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       // link the accessory to your platform
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       this.accessories.push(accessory);
+    } else {
+      this.log.debug(`Unable to Register new device: ${sensorAccessory.accessoryAttribute.name} 
+      ${sensorAccessory.accessoryAttribute.type}`);
     }
   }
 
@@ -800,7 +813,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
           // eslint-disable-next-line max-len
           `Room Sensor Thermostat UDID: ${sensorAccessory.accessoryAttribute.name}-${sensorAccessory.accessoryAttribute.type}-${sensorAccessory.accessoryId}-RoomSensorThermostat-${device.deviceID}`,
         );
-      } else if (!device.isAlive || !this.config.options ?.roompriority ?.thermostat) {
+      } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
     } else if (device.isAlive && this.config.options ?.roompriority ?.thermostat) {
@@ -839,6 +852,15 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       // link the accessory to your platform
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       this.accessories.push(accessory);
+    } else {
+      this.log.debug(
+        'Unable to Register new device: ',
+        sensorAccessory.accessoryAttribute.name,
+        ' ',
+        sensorAccessory.accessoryAttribute.type,
+        ' Thermostat - ',
+        device.deviceID,
+      );
     }
   }
 
