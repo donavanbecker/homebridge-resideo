@@ -4,7 +4,7 @@ import { PlatformConfig } from 'homebridge';
 export interface HoneywellPlatformConfig extends PlatformConfig {
   credentials?: credentials;
   devicediscovery?: boolean;
-  options?: options;
+  options?: options | Record<string, never>;
 }
 
 export type credentials = {
@@ -16,6 +16,7 @@ export type credentials = {
 
 export type options = {
   ttl?: number;
+  hide_device: string[];
   thermostat?: thermostat;
   leaksensor?: leaksensor;
   roomsensor?: roomsensor;
@@ -23,20 +24,17 @@ export type options = {
 };
 
 export type thermostat = {
-  hide?: boolean;
   hide_fan?: boolean;
   thermostatSetpointStatus?: string;
 };
 
 export type leaksensor = {
-  hide?: boolean;
   hide_humidity?: boolean;
   hide_temperature?: boolean;
   hide_leak?: boolean;
 };
 
 export type roomsensor = {
-  hide?: boolean;
   hide_temperature: boolean;
   hide_occupancy: boolean;
   hide_motion: boolean;

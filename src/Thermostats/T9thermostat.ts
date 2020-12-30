@@ -326,7 +326,6 @@ export class T9thermostat {
    */
   async refreshStatus() {
     try {
-      // this.platform.log.error('T9 - Reading', `${DeviceURL}/thermostats/${this.device.deviceID}`);
       this.device = (
         await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
           params: {

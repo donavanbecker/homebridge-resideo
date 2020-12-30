@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 8.3.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.2.0...v8.3.0) (2020-12-XX)
+
+### Changes
+
+- Allow for Hiding Devices based off of `DeviceID` instead of `DeviceType`.
+- Fix issue with Leak Sensors not updating new sensor data.
+- Code Clean up.
+
 ## [Version 8.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.1.1...v8.2.0) (2020-12-25)
 
 ### Changes
