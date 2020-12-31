@@ -187,13 +187,13 @@ export class LeakSensor {
   async refreshStatus() {
     try {
       this.device = (
-        await this.platform.axios.get(DeviceURL, {
+        await this.platform.axios.get(`${DeviceURL}/waterLeakDetectors/${this.device.deviceID}`, {
           params: {
             locationId: this.locationId,
           },
         })
       ).data;
-      this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(this.device.currentSensorReadings));
+      this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(this.device));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {

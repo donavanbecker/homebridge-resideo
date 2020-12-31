@@ -16,12 +16,12 @@ export const AuthURL = 'https://api.honeywell.com/oauth2/token';
 /**
  * This is the main url used to access honeywell API
  */
-export const DeviceURL = 'https://api.honeywell.com/v2/devices';
+export const LocationURL = 'https://api.honeywell.com/v2/locations';
 
 /**
  * This is the main url used to access honeywell API
  */
-export const LocationURL = 'https://api.honeywell.com/v2/locations';
+export const DeviceURL = 'https://api.honeywell.com/v2/devices';
 
 /**
  * This is the url used to access UI Login to honeywell API

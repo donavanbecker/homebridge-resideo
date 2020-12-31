@@ -46,6 +46,11 @@ export type roompriority = {
   priorityType?: string;
 };
 
+// Logger
+//export interface warnDebugLog extends Logger {
+// debugWarn: Logger['warn'];
+//}
+
 // Location
 export type location = {
   locationID: number;
