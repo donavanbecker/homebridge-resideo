@@ -47,6 +47,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
   public sensorData = [];
   private refreshInterval;
+  debugMode!: boolean;
 
   constructor(public readonly log: Logger, public readonly config: HoneywellPlatformConfig, public readonly api: API) {
     this.log.debug('Finished initializing platform:', this.config.name);
@@ -65,6 +66,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       return;
     }
 
+    this.debugMode = process.argv.includes('-D') || process.argv.includes('--debug');
+    
     // setup axios interceptor to add headers / api key to each request
     this.axios.interceptors.request.use((request: AxiosRequestConfig) => {
       request.headers.Authorization = `Bearer ${this.config.credentials?.accessToken}`;
@@ -221,12 +224,16 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         }
       }
 
+      
       this.config.credentials!.accessToken = result.access_token;
-      this.log.warn('Got access token:', this.config.credentials!.accessToken);
-
+      if (this.debugMode) {
+        this.log.warn('Got access token:', this.config.credentials!.accessToken);
+      }
       // check if the refresh token has changed
       if (result.refresh_token !== this.config.credentials!.refreshToken) {
-        this.log.warn('New refresh token:', result.refresh_token);
+        if (this.debugMode) {
+          this.log.warn('New refresh token:', result.refresh_token);
+        }
         await this.updateRefreshToken(result.refresh_token);
       }
 
@@ -274,8 +281,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
       // save the config, ensuring we maintain pretty json
       writeFileSync(this.api.user.configPath(), JSON.stringify(currentConfig, null, 4));
-
-      this.log.warn('Homebridge config.json has been updated with new refresh token.');
+      if (this.debugMode) {
+        this.log.warn('Homebridge config.json has been updated with new refresh token.');
+      }
     } catch (e) {
       this.log.error('Failed to update refresh token in config:', JSON.stringify(e.message));
       this.log.debug(JSON.stringify(e));
