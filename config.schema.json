@@ -41,8 +41,8 @@
       "options": {
         "type": "object",
         "properties": {
-          "ttl": {
-            "title": "TTL",
+          "refreshRate": {
+            "title": "Refresh Rate",
             "type": "number",
             "minimum": 300,
             "placeholder": 300,
@@ -201,10 +201,10 @@
       "items": [
         {
           "type": "help",
-          "helpvalue": "<h5>TTL</h5><em class='primary-text'>TTL indicates the number of seconds between polls of the Honeywell Home service.</em>"
+          "helpvalue": "<h5>Refresh Rate</h5><em class='primary-text'>Refresh Rate indicates the number of seconds between polls of the Honeywell Home service.</em>"
         },
         {
-          "key": "options.ttl",
+          "key": "options.refreshRate",
           "notitle": true
         },
         {

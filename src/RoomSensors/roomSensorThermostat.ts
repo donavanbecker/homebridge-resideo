@@ -168,7 +168,7 @@ export class RoomSensorThermostat {
     this.updateHomeKitCharacteristics();
 
     // Start an update interval
-    interval(this.platform.config.options!.ttl! * 1000)
+    interval(this.platform.config.options!.refreshRate! * 1000)
       .pipe(skipWhile(() => this.thermostatUpdateInProgress))
       .subscribe(() => {
         this.refreshStatus();

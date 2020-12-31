@@ -15,7 +15,7 @@ export type credentials = {
 };
 
 export type options = {
-  ttl?: number;
+  refreshRate?: number;
   hide_device: string[];
   thermostat?: thermostat;
   leaksensor?: leaksensor;

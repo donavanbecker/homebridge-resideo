@@ -154,11 +154,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         this.config.options.roompriority.priorityType = this.config.options.roompriority.priorityType || 'PickARoom';
       }
 
-      this.config.options.ttl = this.config.options!.ttl || 300; // default 300 seconds
+      this.config.options.refreshRate = this.config.options!.refreshRate || 300; // default 300 seconds
 
-      if (!this.config.credentials?.consumerSecret && this.config.options!.ttl! < 300) {
-        this.log.debug('TTL must be set to 300 or higher unless you setup your own consumerSecret.');
-        this.config.options!.ttl! = 300;
+      if (!this.config.credentials?.consumerSecret && this.config.options!.refreshRate! < 300) {
+        this.log.debug('Refresh Rate must be set to 300 or higher unless you setup your own consumerSecret.');
+        this.config.options!.refreshRate! = 300;
       }
     }
 
@@ -314,12 +314,14 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         data: this.normalizeSensorDate(response.data),
       };
     } else {
-      this.log.info(
-        'getCurrentSensorData Cache %s %s - %s',
-        device.deviceType,
-        device.deviceModel,
-        device.userDefinedDeviceName,
-      );
+      if (this.debugMode) {
+        this.log.info(
+          'getCurrentSensorData Cache %s %s - %s',
+          device.deviceType,
+          device.deviceModel,
+          device.userDefinedDeviceName,
+        );
+      }
     }
     return this.sensorData[device.deviceID].data;
   }

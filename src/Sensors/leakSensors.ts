@@ -124,7 +124,7 @@ export class LeakSensor {
     this.updateHomeKitCharacteristics();
 
     // Start an update interval
-    interval(this.platform.config.options!.ttl! * 1000)
+    interval(this.platform.config.options!.refreshRate! * 1000)
       .pipe(skipWhile(() => this.SensorUpdateInProgress))
       .subscribe(() => {
         this.refreshStatus();
