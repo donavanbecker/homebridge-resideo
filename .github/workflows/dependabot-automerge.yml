@@ -1,18 +1,15 @@
 # Automerge dependency updates identified by dependabot.
-name: Dependabot-AutoMerge
-on: [push, pull_request]
+name: auto-merge
+
+on:
+  pull_request:
 
 jobs:
-  build:
+  auto-merge:
     runs-on: ubuntu-latest
     steps:
-      ...
-
-  automerge:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: fastify/github-action-merge-dependabot@v1
-        if: ${{ github.actor == 'dependabot[bot]' && github.event_name == 'pull_request' }}
+      - uses: actions/checkout@v2
+      - uses: ahmadnassri/action-dependabot-auto-merge@v2
         with:
-          github-token: ${{secrets.github_token}}
+          target: minor
+          github-token: ${{ secrets.github_token }}
