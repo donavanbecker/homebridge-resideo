@@ -122,7 +122,7 @@ export class RoomSensors {
     this.updateHomeKitCharacteristics();
 
     // Start an update interval
-    interval(this.platform.config.options!.ttl! * 1000)
+    interval(this.platform.config.options!.refreshRate! * 1000)
       .pipe(skipWhile(() => this.SensorUpdateInProgress))
       .subscribe(() => {
         this.refreshStatus();
@@ -152,10 +152,10 @@ export class RoomSensors {
     } else {
       this.BatteryLevel = 10;
     }
-    if (this.BatteryLevel > 15) {
-      this.StatusLowBattery = 0;
-    } else {
+    if (this.BatteryLevel < 15) {
       this.StatusLowBattery = 1;
+    } else {
+      this.StatusLowBattery = 0;
     }
 
     // Set Temperature Sensor State
@@ -207,14 +207,8 @@ export class RoomSensors {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.StatusLowBattery,
-      this.StatusLowBattery,
-    );
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.BatteryLevel,
-      this.BatteryLevel,
-    );
+    this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
+    this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
     if (!this.platform.config.options?.roomsensor?.hide_temperature) {
       this.temperatureService?.updateCharacteristic(
         this.platform.Characteristic.CurrentTemperature,

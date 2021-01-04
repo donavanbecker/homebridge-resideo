@@ -41,22 +41,24 @@
       "options": {
         "type": "object",
         "properties": {
-          "ttl": {
-            "title": "TTL",
+          "refreshRate": {
+            "title": "Refresh Rate",
             "type": "number",
             "minimum": 300,
             "placeholder": 300,
             "description": "Indicates the number of seconds between polls of the Honeywell Home service."
           },
+          "hide_device": {
+            "title": "Hide Device",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "thermostat": {
             "title": "Thermostat",
             "type": "object",
             "properties": {
-              "hide": {
-                "title": "Hide Thermostat(s)",
-                "type": "boolean",
-                "requried": false
-              },
               "hide_fan": {
                 "title": "Hide Thermostat(s) Fan",
                 "type": "boolean",
@@ -95,11 +97,6 @@
             "title": "Leak Sensor",
             "type": "object",
             "properties": {
-              "hide": {
-                "title": "Hide Leak Sensor(s)",
-                "type": "boolean",
-                "requried": false
-              },
               "hide_leak": {
                 "title": "Hide Leak Service",
                 "type": "boolean",
@@ -121,11 +118,6 @@
             "title": "Room Sensor",
             "type": "object",
             "properties": {
-              "hide": {
-                "title": "Hide Room Sensor(s)",
-                "type": "boolean",
-                "requried": false
-              },
               "hide_temperature": {
                 "title": "Hide Temperature Service",
                 "type": "boolean",
@@ -209,11 +201,34 @@
       "items": [
         {
           "type": "help",
-          "helpvalue": "<h5>TTL</h5><em class='primary-text'>TTL indicates the number of seconds between polls of the Honeywell Home service.</em>"
+          "helpvalue": "<h5>Refresh Rate</h5><em class='primary-text'>Refresh Rate indicates the number of seconds between polls of the Honeywell Home service.</em>"
         },
         {
-          "key": "options.ttl",
+          "key": "options.refreshRate",
           "notitle": true
+        },
+        {
+          "type": "help",
+          "helpvalue": "<h5>Hide Device</h5><em class='primary-text'>Hide Device allows you to hide a device using it's deviceID.</em>"
+        },
+        {
+          "key": "options.hide_device",
+          "notitle": true,
+          "add": "Add Another Device",
+          "type": "array",
+          "items": [
+            {
+              "type": "div",
+              "displayFlex": true,
+              "flex-direction": "row",
+              "items": [
+                {
+                  "key": "options.hide_device[]",
+                  "placeholder": "LLC-81F3UT59513F"
+                }
+              ]
+            }
+          ]
         },
         {
           "type": "fieldset",
@@ -222,11 +237,6 @@
           "expanded": false,
           "items": [
             "options.thermostat.thermostatSetpointStatus",
-            {
-              "type": "help",
-              "helpvalue": "<h5>Thermostat</h5><em class='primary-text'>Allows you to hide your Thermostat(s).</em>"
-            },
-            "options.thermostat.hide",
             {
               "type": "help",
               "helpvalue": "<h5>Hide Thermostat Fan Service</h5><em class='primary-text'>Allows you to hide your Thermostat's Fan.</em>"
@@ -238,11 +248,6 @@
               "expandable": true,
               "expanded": false,
               "items": [
-                {
-                  "type": "help",
-                  "helpvalue": "<em class='primary-text'>Allows you to hide your Room Sensor(s).</em>"
-                },
-                "options.roomsensor.hide",
                 {
                   "type": "help",
                   "helpvalue": "<h5>Hide Room Sensor Services</h5><em class='primary-text'>Allows you to hide your tempeture sensor, occupancy sensor, or humidity sensor of your Room Sensor(s).</em>"
@@ -274,11 +279,6 @@
           "expandable": true,
           "expanded": false,
           "items": [
-            {
-              "type": "help",
-              "helpvalue": "<h5>Leak Sensors</h5><em class='primary-text'>Allows you to hide your Leak Sensor(s).</em>"
-            },
-            "options.leaksensor.hide",
             {
               "type": "help",
               "helpvalue": "<h5>Hide Leak Sensor Services</h5><em class='primary-text'>Allows you to hide your Leak Sensor's tempeture sensor, leak sensor, or humidity sensor.</em>"
