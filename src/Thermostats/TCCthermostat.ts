@@ -365,10 +365,15 @@ export class TCCthermostat {
     }
 
     this.platform.log.info(
-      'Sending request to Honeywell API. mode:',
-      `${payload.mode}, coolSetpoint:`,
-      `${payload.coolSetpoint}, heatSetpoint:`,
-      `${payload.heatSetpoint}, thermostatSetpointStatus:`,
+      'Sending request for',
+      this.accessory.displayName,
+      'to Honeywell API. mode:',
+      payload.mode,
+      'coolSetpoint:',
+      payload.coolSetpoint,
+      'heatSetpoint:',
+      payload.heatSetpoint,
+      'thermostatSetpointStatus:',
       this.platform.config.options?.thermostat?.thermostatSetpointStatus,
     );
     this.platform.log.debug('TCC %s -', this.accessory.displayName, JSON.stringify(payload));
@@ -529,7 +534,12 @@ export class TCCthermostat {
         };
       }
 
-      this.platform.log.info(`Sending request to Honeywell API. Fan Mode: ${payload.mode}`);
+      this.platform.log.info(
+        'Sending request for',
+        this.accessory.displayName,
+        'to Honeywell API. Fan Mode:',
+        payload.mode,
+      );
       this.platform.log.debug('TCC %s -', this.accessory.displayName, JSON.stringify(payload));
 
       // Make the API request

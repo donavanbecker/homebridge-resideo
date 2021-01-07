@@ -178,7 +178,7 @@ export class T9thermostat {
     }
 
     // Retrieve initial values and updateHomekit
-    // this.refreshStatus();
+    this.refreshStatus();
     this.updateHomeKitCharacteristics();
 
     // Start an update interval
@@ -403,10 +403,15 @@ export class T9thermostat {
     }
 
     this.platform.log.info(
-      'Sending request to Honeywell API. mode:',
-      `${payload.mode}, coolSetpoint:`,
-      `${payload.coolSetpoint}, heatSetpoint:`,
-      `${payload.heatSetpoint}, thermostatSetpointStatus:`,
+      'Sending request for',
+      this.accessory.displayName,
+      'to Honeywell API. mode:',
+      payload.mode,
+      'coolSetpoint:',
+      payload.coolSetpoint,
+      'heatSetpoint:',
+      payload.heatSetpoint,
+      'thermostatSetpointStatus:',
       this.platform.config.options?.thermostat?.thermostatSetpointStatus,
     );
     this.platform.log.debug('T9 %s pushChanges -', this.accessory.displayName, JSON.stringify(payload));
@@ -444,18 +449,24 @@ export class T9thermostat {
     if (this.platform.config.options?.roompriority?.thermostat) {
       if (this.platform.config.options.roompriority.priorityType === 'FollowMe') {
         this.platform.log.info(
-          'Sending request to Honeywell API. Room Priority: Priority Type:',
+          'Sending request for',
+          this.accessory.displayName,
+          'to Honeywell API. Priority Type:',
           this.platform.config.options.roompriority.priorityType,
           ', Built-in Occupancy Sensor(s) Will be used to set Priority Automatically.',
         );
       } else if (this.platform.config.options.roompriority.priorityType === 'WholeHouse') {
         this.platform.log.info(
-          'Sending request to Honeywell API. Priority Type:',
+          'Sending request for',
+          this.accessory.displayName,
+          'to Honeywell API. Priority Type:',
           this.platform.config.options.roompriority.priorityType,
         );
       } else if (this.platform.config.options.roompriority.priorityType === 'PickARoom') {
         this.platform.log.info(
-          'Sending request to Honeywell API. Room Priority:',
+          'Sending request for',
+          this.accessory.displayName,
+          'to Honeywell API. Room Priority:',
           this.device.inBuiltSensorState.roomName,
           ', Priority Type:',
           this.platform.config.options.roompriority.priorityType,
@@ -620,7 +631,12 @@ export class T9thermostat {
         };
       }
 
-      this.platform.log.info(`Sending request to Honeywell API. Fan Mode: ${payload.mode}`);
+      this.platform.log.info(
+        'Sending request for',
+        this.accessory.displayName,
+        'to Honeywell API. Fan Mode:',
+        payload.mode,
+      );
       this.platform.log.debug('T9 %s Fan Mode -', this.accessory.displayName, JSON.stringify(payload));
 
       // Make the API request

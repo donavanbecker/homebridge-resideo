@@ -173,6 +173,10 @@
             }
           }
         }
+      },
+      "devicediscovery": {
+        "name": "Device Discovery",
+        "type": "boolean"
       }
     }
   },
@@ -287,6 +291,14 @@
             "options.leaksensor.hide_leak",
             "options.leaksensor.hide_humidity"
           ]
+        },
+        {
+          "type": "Device Discovery",
+          "helpvalue": "<h5>Device Discovery</h5><em class='primary-text'>Enables Device Info Logging.</em>"
+        },
+        {
+          "key": "devicediscovery",
+          "notitle": true
         }
       ]
     }

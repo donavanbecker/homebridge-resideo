@@ -170,5 +170,4 @@ dist
 .pnp.\*
 
 # Plugin Folder
-server/
 honeywell/
