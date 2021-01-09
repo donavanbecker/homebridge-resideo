@@ -67,7 +67,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     }
 
     this.debugMode = process.argv.includes('-D') || process.argv.includes('--debug');
-    
+
     // setup axios interceptor to add headers / api key to each request
     this.axios.interceptors.request.use((request: AxiosRequestConfig) => {
       request.headers.Authorization = `Bearer ${this.config.credentials?.accessToken}`;
@@ -224,7 +224,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         }
       }
 
-      
       this.config.credentials!.accessToken = result.access_token;
       if (this.debugMode) {
         this.log.warn('Got access token:', this.config.credentials!.accessToken);
@@ -295,7 +294,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    */
   async discoverlocations() {
     const locations = (await this.axios.get(LocationURL)).data;
-    this.log.info(`Total Locations Found: ${locations.length}`);
+    this.log.info('Total Locations Found:', locations.length);
     return locations;
   }
 
@@ -346,7 +345,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       for (const group of device.groups) {
         const roomsensors = await this.getCurrentSensorData(device, group, locationId);
         if (this.config.options?.roompriority?.thermostat) {
-          this.log.info(`Total Rooms Found: ${roomsensors.length}`);
+          this.log.info('Total Rooms Found:', roomsensors.length);
         }
         for (const accessories of roomsensors) {
           if (accessories) {
@@ -393,7 +392,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     if (this.locations) {
       // get the devices at each location
       for (const location of this.locations) {
-        this.log.info(`Total Devices Found at ${location.name}: ${location.devices.length}`);
+        this.log.info('Total Devices Found at ', location.name, ':', location.devices.length);
         const locationId = location.locationID;
         this.locationinfo(location);
         for (const device of location.devices) {
@@ -604,9 +603,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         'DeviceID:',
         device.deviceID,
       );
-      this.log.error(
-        'Check Config to see if DeviceID is being Hidden.',
-      );
+      this.log.error('Check Config to see if DeviceID is being Hidden.');
     }
   }
 
@@ -674,9 +671,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         'DeviceID:',
         device.deviceID,
       );
-      this.log.error(
-        'Check Config to see if DeviceID is being Hidden.',
-      );
+      this.log.error('Check Config to see if DeviceID is being Hidden.');
     }
   }
 
@@ -744,9 +739,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         'DeviceID:',
         device.deviceID,
       );
-      this.log.error(
-        'Check Config to see if DeviceID is being Hidden.',
-      );
+      this.log.error('Check Config to see if DeviceID is being Hidden.');
     }
   }
 
@@ -814,9 +807,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         'DeviceID:',
         device.deviceID,
       );
-      this.log.error(
-        'Check Config to see if DeviceID is being Hidden.',
-      );
+      this.log.error('Check Config to see if DeviceID is being Hidden.');
     }
   }
 
@@ -881,9 +872,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         'DeviceID:',
         device.deviceID,
       );
-      this.log.error(
-        'Check Config to see if DeviceID is being Hidden.',
-      );
+      this.log.error('Check Config to see if DeviceID is being Hidden.');
     }
   }
 
@@ -954,9 +943,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         'DeviceID:',
         device.deviceID,
       );
-      this.log.error(
-        'Check Config to see if DeviceID is being Hidden.',
-      );
+      this.log.error('Check Config to see if DeviceID is being Hidden.');
     }
   }
 
@@ -977,7 +964,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
     if (existingAccessory) {
       // the accessory already exists
-      if (device.isAlive && this.config.options ?.roompriority ?.thermostat) {
+      if (device.isAlive && this.config.options?.roompriority?.thermostat) {
         this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
@@ -996,7 +983,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
-    } else if (device.isAlive && this.config.options ?.roompriority ?.thermostat) {
+    } else if (device.isAlive && this.config.options?.roompriority?.thermostat) {
       // the accessory does not yet exist, so we need to create it
       this.log.info(
         'Adding new accessory:',

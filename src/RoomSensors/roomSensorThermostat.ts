@@ -1,9 +1,15 @@
-import { Service, PlatformAccessory } from 'homebridge';
+import {
+  Service,
+  PlatformAccessory,
+  CharacteristicValue,
+  CharacteristicSetCallback,
+  CharacteristicEventTypes,
+} from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
 import { DeviceURL } from '../settings';
-import { location, sensorAccessory, T9Thermostat, T9groups } from '../configTypes';
+import { location, sensorAccessory, T9Thermostat, T9groups, FanChangeableValues } from '../configTypes';
 
 /**
  * Platform Accessory
@@ -26,7 +32,7 @@ export class RoomSensorThermostat {
   TemperatureDisplayUnits!: number;
   honeywellMode!: Array<string>;
   roompriority!: any;
-  deviceFan!: any;
+  deviceFan!: FanChangeableValues;
 
   roomUpdateInProgress!: boolean;
   doRoomUpdate!: any;
@@ -34,11 +40,6 @@ export class RoomSensorThermostat {
   doThermostatUpdate!: any;
   fanUpdateInProgress!: boolean;
   doFanUpdate!: any;
-
-  ApiRequest: any;
-  RoomChanges: any;
-  accessoryId!: number;
-  roomId!: number;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
@@ -138,7 +139,7 @@ export class RoomSensorThermostat {
       .setProps({
         validValues: TargetState,
       })
-      .on('set', this.setTargetHeatingCoolingState.bind(this));
+      .on(CharacteristicEventTypes.SET, this.setTargetHeatingCoolingState.bind(this));
 
     this.service.setCharacteristic(
       this.platform.Characteristic.CurrentHeatingCoolingState,
@@ -147,24 +148,21 @@ export class RoomSensorThermostat {
 
     this.service
       .getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature)
-      .on('set', this.setHeatingThresholdTemperature.bind(this));
+      .on(CharacteristicEventTypes.SET, this.setHeatingThresholdTemperature.bind(this));
 
     this.service
       .getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
-      .on('set', this.setCoolingThresholdTemperature.bind(this));
+      .on(CharacteristicEventTypes.SET, this.setCoolingThresholdTemperature.bind(this));
 
     this.service
       .getCharacteristic(this.platform.Characteristic.TargetTemperature)
-      .on('set', this.setTargetTemperature.bind(this));
+      .on(CharacteristicEventTypes.SET, this.setTargetTemperature.bind(this));
 
     this.service
       .getCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits)
-      .on('set', this.setTemperatureDisplayUnits.bind(this));
+      .on(CharacteristicEventTypes.SET, this.setTemperatureDisplayUnits.bind(this));
 
     // Retrieve initial values and updateHomekit
-    //this.refreshStatus();
-    //this.refreshSensorStatus();
-    // this.refreshStatus();
     this.updateHomeKitCharacteristics();
 
     // Start an update interval
@@ -245,31 +243,22 @@ export class RoomSensorThermostat {
      * The CurrentHeatingCoolingState is either 'Heat', 'Cool', or 'Off'
      * CurrentHeatingCoolingState =  OFF = 0, HEAT = 1, COOL = 2
      */
-    if (this.device.operationStatus.mode === 'Heat') {
-      this.CurrentHeatingCoolingState = 1;
-      this.platform.log.debug(
-        'RST %s - ',
-        this.accessory.displayName,
-        'Device is Currently: ',
-        this.CurrentHeatingCoolingState,
-      );
-    } else if (this.device.operationStatus.mode === 'Cool') {
-      this.CurrentHeatingCoolingState = 2;
-      this.platform.log.debug(
-        'RST %s - ',
-        this.accessory.displayName,
-        'Device is Currently: ',
-        this.CurrentHeatingCoolingState,
-      );
-    } else {
-      this.CurrentHeatingCoolingState = 0;
-      this.platform.log.debug(
-        'RST %s - ',
-        this.accessory.displayName,
-        'Device is Currently: ',
-        this.CurrentHeatingCoolingState,
-      );
+    switch (this.device.operationStatus.mode) {
+      case 'Heat':
+        this.CurrentHeatingCoolingState = 1;
+        break;
+      case 'Cool':
+        this.CurrentHeatingCoolingState = 2;
+        break;
+      default:
+        this.CurrentHeatingCoolingState = 0;
     }
+    this.platform.log.debug(
+      'T9 %s Heat -',
+      this.accessory.displayName,
+      'Device is Currently: ',
+      this.CurrentHeatingCoolingState,
+    );
 
     // Set the TargetTemperature value based on the current mode
     if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
@@ -298,18 +287,19 @@ export class RoomSensorThermostat {
       this.platform.log.debug(
         'RST %s - ',
         this.accessory.displayName,
-        `Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`,
+        'Fetched update for',
+        this.device.name,
+        'from Honeywell API:',
+        JSON.stringify(this.device.changeableValues),
       );
       // this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(this.device));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
       this.platform.log.error(
-        'RST - Failed to update status of ',
+        'RST - Failed to update status of %s %s Thermostat',
         this.sensorAccessory.accessoryAttribute.name,
-        ' ',
         this.sensorAccessory.accessoryAttribute.type,
-        ' Thermostat',
         JSON.stringify(e.message),
         this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(e)),
       );
@@ -370,11 +360,9 @@ export class RoomSensorThermostat {
       this.updateHomeKitCharacteristics();
     } catch (e) {
       this.platform.log.error(
-        'Failed to update status of ',
+        'RST - Failed to update status of %s %s Thermostat',
         this.sensorAccessory.accessoryAttribute.name,
-        ' ',
         this.sensorAccessory.accessoryAttribute.type,
-        ' Thermostat',
         JSON.stringify(e.message),
         this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(e)),
       );
@@ -515,7 +503,7 @@ export class RoomSensorThermostat {
     );
   }
 
-  setTargetHeatingCoolingState(value: any, callback: (arg0: null) => void) {
+  setTargetHeatingCoolingState(value: any, callback: CharacteristicSetCallback) {
     this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set TargetHeatingCoolingState: ${value}`);
 
     this.TargetHeatingCoolingState = value;
@@ -532,28 +520,28 @@ export class RoomSensorThermostat {
     callback(null);
   }
 
-  setHeatingThresholdTemperature(value: any, callback: (arg0: null) => void) {
+  setHeatingThresholdTemperature(value: any, callback: CharacteristicSetCallback) {
     this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set HeatingThresholdTemperature: ${value}`);
     this.HeatingThresholdTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
-  setCoolingThresholdTemperature(value: any, callback: (arg0: null) => void) {
+  setCoolingThresholdTemperature(value: any, callback: CharacteristicSetCallback) {
     this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set CoolingThresholdTemperature: ${value}`);
     this.CoolingThresholdTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
-  setTargetTemperature(value: any, callback: (arg0: null) => void) {
+  setTargetTemperature(value: any, callback: CharacteristicSetCallback) {
     this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set TargetTemperature:': ${value}`);
     this.TargetTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
-  setTemperatureDisplayUnits(value: any, callback: (arg0: null) => void) {
+  setTemperatureDisplayUnits(value: CharacteristicValue, callback: CharacteristicSetCallback) {
     this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set TemperatureDisplayUnits: ${value}`);
     this.platform.log.warn('Changing the Hardware Display Units from HomeKit is not supported.');
 

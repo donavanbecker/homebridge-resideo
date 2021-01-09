@@ -16,16 +16,13 @@ export class LeakSensor {
   humidityService: any;
   leakService: any;
 
-  StatusActive: any;
-  LeakDetected: any;
-  CurrentTemperature: any;
-  TempStatusActive: any;
-  CurrentRelativeHumidity: any;
-  HumidityStatusActive: any;
-  BatteryLevel: any;
-  ChargingState: any;
-  StatusLowBattery: any;
-  sensor!: any;
+  StatusActive!: boolean;
+  LeakDetected!: number;
+  CurrentTemperature!: number;
+  CurrentRelativeHumidity!: number;
+  BatteryLevel!: number;
+  ChargingState!: number;
+  StatusLowBattery!: number;
 
   SensorUpdateInProgress!: boolean;
   doSensorUpdate!: any;
@@ -41,9 +38,7 @@ export class LeakSensor {
     this.StatusActive;
     this.LeakDetected;
     this.CurrentTemperature;
-    this.TempStatusActive;
     this.CurrentRelativeHumidity;
-    this.HumidityStatusActive;
     this.BatteryLevel;
     this.ChargingState;
     this.StatusLowBattery;
@@ -198,7 +193,8 @@ export class LeakSensor {
       this.updateHomeKitCharacteristics();
     } catch (e) {
       this.platform.log.error(
-        `LS - Failed to update status of ${this.device.userDefinedDeviceName}`,
+        'LS - Failed to update status of',
+        this.device.userDefinedDeviceName,
         JSON.stringify(e.message),
         this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(e)),
       );

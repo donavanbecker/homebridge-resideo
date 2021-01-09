@@ -71,8 +71,8 @@ export class T9thermostat {
     this.HeatingThresholdTemperature;
     this.CurrentRelativeHumidity;
     this.TemperatureDisplayUnits;
-    this.Active = 0 || 1;
-    this.TargetFanState = 0 || 1;
+    this.Active = this.platform.Characteristic.Active.INACTIVE;
+    this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
     this.roompriority;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
@@ -186,7 +186,6 @@ export class T9thermostat {
     }
 
     // Retrieve initial values and updateHomekit
-    this.refreshStatus();
     this.updateHomeKitCharacteristics();
 
     // Start an update interval
@@ -314,7 +313,7 @@ export class T9thermostat {
     // Set the Target Fan State
     if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
       if (this.deviceFan) {
-        // this.platform.log.debug('T9 %s Fan -', this.accessory.displayName, `${JSON.stringify(this.deviceFan)}`);
+        this.platform.log.debug('T9 %s Fan -', this.accessory.displayName, `${JSON.stringify(this.deviceFan)}`);
         if (this.deviceFan.mode === 'Auto') {
           this.TargetFanState = this.platform.Characteristic.TargetFanState.AUTO;
           this.Active = this.platform.Characteristic.Active.INACTIVE;
@@ -342,11 +341,13 @@ export class T9thermostat {
         })
       ).data;
       this.platform.log.debug(
-        'T9 %s Heat -',
+        'T9 %s -',
         this.accessory.displayName,
-        `Fetched update for ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`,
+        'Fetched update for',
+        this.device.name,
+        'from Honeywell API:',
+        JSON.stringify(this.device.changeableValues),
       );
-      this.platform.log.debug('T9 %s refreshStatus -', this.accessory.displayName, JSON.stringify(this.device));
       if (this.platform.config.options?.roompriority?.thermostat) {
         this.roompriority = (
           await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
@@ -365,19 +366,21 @@ export class T9thermostat {
             },
           })
         ).data;
-        this.platform.log.debug('T9 %s Fan -', this.accessory.displayName, JSON.stringify(this.device.settings?.fan));
-        this.platform.log.debug('T9 %s -', this.accessory.displayName, JSON.stringify(this.deviceFan));
         this.platform.log.debug(
           'T9 %s Fan -',
           this.accessory.displayName,
-          `Fetched update for ${this.device.name} from Honeywell Fan API: ${JSON.stringify(this.deviceFan)}`,
+          'Fetched update for',
+          this.device.name,
+          'from Honeywell Fan API:',
+          JSON.stringify(this.deviceFan),
         );
       }
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e) {
       this.platform.log.error(
-        `T9 - Failed to update status of ${this.device.name}`,
+        'T9 - Failed to update status of',
+        this.device.name,
         JSON.stringify(e.message),
         this.platform.log.debug('T9 %s -', this.accessory.displayName, JSON.stringify(e)),
       );
@@ -530,7 +533,7 @@ export class T9thermostat {
   }
 
   setTargetHeatingCoolingState(value: any, callback: CharacteristicSetCallback) {
-    this.platform.log.debug('T9 %s -', this.accessory.displayName, `Set TargetHeatingCoolingState: ${value}`);
+    this.platform.log.debug('T9 %s -', this.accessory.displayName, 'Set TargetHeatingCoolingState:', value);
 
     this.TargetHeatingCoolingState = value;
 
@@ -547,28 +550,28 @@ export class T9thermostat {
   }
 
   setHeatingThresholdTemperature(value: any, callback: CharacteristicSetCallback) {
-    this.platform.log.debug('T9 %s -', this.accessory.displayName, `Set HeatingThresholdTemperature: ${value}`);
+    this.platform.log.debug('T9 %s -', this.accessory.displayName, 'Set HeatingThresholdTemperature:', value);
     this.HeatingThresholdTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
   setCoolingThresholdTemperature(value: any, callback: CharacteristicSetCallback) {
-    this.platform.log.debug('T9 %s -', this.accessory.displayName, `Set CoolingThresholdTemperature: ${value}`);
+    this.platform.log.debug('T9 %s -', this.accessory.displayName, 'Set CoolingThresholdTemperature:', value);
     this.CoolingThresholdTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
   setTargetTemperature(value: any, callback: CharacteristicSetCallback) {
-    this.platform.log.debug('T9 %s -', this.accessory.displayName, `Set TargetTemperature:': ${value}`);
+    this.platform.log.debug('T9 %s -', this.accessory.displayName, 'Set TargetTemperature:', value);
     this.TargetTemperature = value;
     this.doThermostatUpdate.next();
     callback(null);
   }
 
   setTemperatureDisplayUnits(value: CharacteristicValue, callback: CharacteristicSetCallback) {
-    this.platform.log.debug('T9 %s -', this.accessory.displayName, `Set TemperatureDisplayUnits: ${value}`);
+    this.platform.log.debug('T9 %s -', this.accessory.displayName, 'Set TemperatureDisplayUnits:', value);
     this.platform.log.warn('Changing the Hardware Display Units from HomeKit is not supported.');
 
     // change the temp units back to the one the Honeywell API said the thermostat was set to
@@ -616,7 +619,10 @@ export class T9thermostat {
       this.platform.log.debug(
         'T9 %s -',
         this.accessory.displayName,
-        `TargetFanState' ${this.TargetFanState} 'Active' ${this.Active}`,
+        'TargetFanState',
+        this.TargetFanState,
+        'Active',
+        this.Active,
       );
 
       if (this.TargetFanState === this.platform.Characteristic.TargetFanState.AUTO) {
@@ -661,15 +667,15 @@ export class T9thermostat {
   /**
    * Updates the status for each of the HomeKit Characteristics
    */
-  setActive(value, callback: CharacteristicSetCallback) {
-    this.platform.log.debug('T9 %s -', this.accessory.displayName, `Set Active State: ${value}`);
+  setActive(value: any, callback: CharacteristicSetCallback) {
+    this.platform.log.debug('T9 %s -', this.accessory.displayName, 'Set Active State:', value);
     this.Active = value;
     this.doFanUpdate.next();
     callback(null);
   }
 
-  setTargetFanState(value, callback: CharacteristicSetCallback) {
-    this.platform.log.debug('T9 %s -', this.accessory.displayName, `Set Target Fan State: ${value}`);
+  setTargetFanState(value: any, callback: CharacteristicSetCallback) {
+    this.platform.log.debug('T9 %s -', this.accessory.displayName, 'Set Target Fan State:', value);
     this.TargetFanState = value;
     this.doFanUpdate.next();
     callback(null);

@@ -33,7 +33,7 @@ export class RoomSensors {
     public readonly locationId: location['locationID'],
     public device: T9Thermostat,
     public sensorAccessory: sensorAccessory,
-    public readonly group: T9groups, // Unused
+    public readonly group: T9groups,
   ) {
     // default placeholders
     this.CurrentTemperature;
@@ -58,7 +58,7 @@ export class RoomSensors {
         this.sensorAccessory.accessoryAttribute.softwareRevision,
       );
 
-    // get the BatteryService service if it exists, otherwise create a new BatteryService service
+    // get the BatteryService service if it exists, otherwise create a new Battery service
     // you can create multiple services for each accessory
     (this.service =
       this.accessory.getService(this.platform.Service.BatteryService) ||
@@ -67,7 +67,7 @@ export class RoomSensors {
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
-    // this.accessory.getService('NAME') ?? this.accessory.addService(this.platform.Service.BatteryService, 'NAME', 'USER_DEFINED_SUBTYPE');
+    // this.accessory.getService('NAME') ?? this.accessory.addService(this.platform.Service.Battery, 'NAME', 'USER_DEFINED_SUBTYPE');
 
     // set the service name, this is what is displayed as the default name on the Home app
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
@@ -196,7 +196,9 @@ export class RoomSensors {
       this.updateHomeKitCharacteristics();
     } catch (e) {
       this.platform.log.error(
-        `RS - Failed to update status of ${this.sensorAccessory.accessoryAttribute.name} ${this.sensorAccessory.accessoryAttribute.type}`,
+        'RS - Failed to update status of',
+        this.sensorAccessory.accessoryAttribute.name,
+        this.sensorAccessory.accessoryAttribute.type,
         JSON.stringify(e.message),
         this.platform.log.debug('RS %s - ', this.accessory.displayName, JSON.stringify(e)),
       );
