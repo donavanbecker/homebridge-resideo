@@ -22,6 +22,7 @@ plugin allows you to access your Honeywell Home Thermostat(s) from HomeKit.
 ## Configuration
 
 1. Login / create an account at https://developer.honeywellhome.com/user
+    - Your Honeywell Home Developer Account, this account is different then your Honeywell Home Account that you log into the Honeywell Home App with
 2. Click **Create New App**
 3. Give your application a name, and enter the Callback URL as `https://homebridge-honeywell.iot.oz.nu/link-account`
 4. Enter the generated consumer key and secret into the plugin settings screen of [Homebridge Config UI X](https://github.com/oznu/homebridge-config-ui-x)
@@ -32,6 +33,16 @@ plugin allows you to access your Honeywell Home Thermostat(s) from HomeKit.
 <img src="https://user-images.githubusercontent.com/3979615/88920827-d5b97680-d2b0-11ea-9002-15209eebd995.png" width="600px">
 
 </p>
+
+6. Login to your [https://www.honeywellhome.com](https://account.honeywellhome.com).
+7. Click Allow
+8. Select Devices
+    - I would recommend selecting all devices since you can restrict the devices you don't want in the Home app later, by DeviceID.
+9. Click Connect
+10. Click Confirm
+11. Click Save
+12. Restart Homebridge
+
 
 ## Other Homebridge Honeywell Home Plugins
 
