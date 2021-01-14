@@ -19,13 +19,13 @@ export class RoomSensors {
   StatusLowBattery!: number;
   OccupancyDetected!: number;
   CurrentRelativeHumidity!: number;
+  TemperatureDisplayUnits!: number;
+  BatteryLevel!: number;
   accessoryId!: number;
   roomId!: number;
 
   SensorUpdateInProgress!: boolean;
   doSensorUpdate!: any;
-  TemperatureDisplayUnits!: number;
-  BatteryLevel!: number;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
@@ -118,7 +118,6 @@ export class RoomSensors {
     }
 
     // Retrieve initial values and updateHomekit
-    // this.refreshStatus();
     this.updateHomeKitCharacteristics();
 
     // Start an update interval
@@ -128,7 +127,7 @@ export class RoomSensors {
         this.refreshStatus();
       });
 
-    // Watch for thermostat change events
+    // Watch for roomsensor change events
     // We put in a debounce of 100ms so we don't make duplicate calls
     this.doSensorUpdate
       .pipe(
