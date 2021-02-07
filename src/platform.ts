@@ -594,16 +594,18 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       this.accessories.push(accessory);
     } else {
-      this.log.error(
-        'Unable to Register new device:',
-        device.name,
-        'T9',
-        device.deviceModel,
-        device.deviceType,
-        'DeviceID:',
-        device.deviceID,
-      );
-      this.log.error('Check Config to see if DeviceID is being Hidden.');
+      if (this.config.devicediscovery) {
+        this.log.error(
+          'Unable to Register new device:',
+          device.name,
+          'T9',
+          device.deviceModel,
+          device.deviceType,
+          'DeviceID:',
+          device.deviceID,
+        );
+        this.log.error('Check Config to see if DeviceID is being Hidden.');
+      }
     }
   }
 
@@ -662,16 +664,18 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       this.accessories.push(accessory);
     } else {
-      this.log.error(
-        'Unable to Register new device:',
-        device.name,
-        'T5',
-        device.deviceModel,
-        device.deviceType,
-        'DeviceID:',
-        device.deviceID,
-      );
-      this.log.error('Check Config to see if DeviceID is being Hidden.');
+      if (this.config.devicediscovery) {
+        this.log.error(
+          'Unable to Register new device:',
+          device.name,
+          'T5',
+          device.deviceModel,
+          device.deviceType,
+          'DeviceID:',
+          device.deviceID,
+        );
+        this.log.error('Check Config to see if DeviceID is being Hidden.');
+      }
     }
   }
 
@@ -730,16 +734,18 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       this.accessories.push(accessory);
     } else {
-      this.log.error(
-        'Unable to Register new device:',
-        device.name,
-        'Round',
-        device.deviceModel,
-        device.deviceType,
-        'DeviceID:',
-        device.deviceID,
-      );
-      this.log.error('Check Config to see if DeviceID is being Hidden.');
+      if (this.config.devicediscovery) {
+        this.log.error(
+          'Unable to Register new device:',
+          device.name,
+          'Round',
+          device.deviceModel,
+          device.deviceType,
+          'DeviceID:',
+          device.deviceID,
+        );
+        this.log.error('Check Config to see if DeviceID is being Hidden.');
+      }
     }
   }
 
@@ -798,16 +804,18 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       this.accessories.push(accessory);
     } else {
-      this.log.error(
-        'Unable to Register new device:',
-        device.name,
-        'TCC',
-        device.deviceModel,
-        device.deviceType,
-        'DeviceID:',
-        device.deviceID,
-      );
-      this.log.error('Check Config to see if DeviceID is being Hidden.');
+      if (this.config.devicediscovery) {
+        this.log.error(
+          'Unable to Register new device:',
+          device.name,
+          'TCC',
+          device.deviceModel,
+          device.deviceType,
+          'DeviceID:',
+          device.deviceID,
+        );
+        this.log.error('Check Config to see if DeviceID is being Hidden.');
+      }
     }
   }
 
@@ -865,14 +873,16 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       this.accessories.push(accessory);
     } else {
-      this.log.error(
-        'Unable to Register new device:',
-        device.userDefinedDeviceName,
-        device.deviceClass,
-        'DeviceID:',
-        device.deviceID,
-      );
-      this.log.error('Check Config to see if DeviceID is being Hidden.');
+      if (this.config.devicediscovery) {
+        this.log.error(
+          'Unable to Register new device:',
+          device.userDefinedDeviceName,
+          device.deviceClass,
+          'DeviceID:',
+          device.deviceID,
+        );
+        this.log.error('Check Config to see if DeviceID is being Hidden.');
+      }
     }
   }
 
@@ -936,14 +946,16 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       this.accessories.push(accessory);
     } else {
-      this.log.error(
-        'Unable to Register new device:',
-        sensorAccessory.accessoryAttribute.name,
-        sensorAccessory.accessoryAttribute.type,
-        'DeviceID:',
-        device.deviceID,
-      );
-      this.log.error('Check Config to see if DeviceID is being Hidden.');
+      if (this.config.devicediscovery) {
+        this.log.error(
+          'Unable to Register new device:',
+          sensorAccessory.accessoryAttribute.name,
+          sensorAccessory.accessoryAttribute.type,
+          'DeviceID:',
+          device.deviceID,
+        );
+        this.log.error('Check Config to see if DeviceID is being Hidden.');
+      }
     }
   }
 
@@ -1016,14 +1028,16 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
       this.accessories.push(accessory);
     } else {
-      this.log.warn(
-        'Room Priority is not set, New device will not be Registered: ',
-        sensorAccessory.accessoryAttribute.name,
-        sensorAccessory.accessoryAttribute.type,
-        'Thermostat',
-        'DeviceID:',
-        device.deviceID,
-      );
+      if (this.config.devicediscovery) {
+        this.log.warn(
+          'Room Priority is not set, New device will not be Registered: ',
+          sensorAccessory.accessoryAttribute.name,
+          sensorAccessory.accessoryAttribute.type,
+          'Thermostat',
+          'DeviceID:',
+          device.deviceID,
+        );
+      }
     }
   }
 
