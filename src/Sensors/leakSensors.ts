@@ -198,6 +198,7 @@ export class LeakSensor {
         JSON.stringify(e.message),
         this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(e)),
       );
+      this.apiError(e);
     }
   }
 
@@ -222,6 +223,21 @@ export class LeakSensor {
         this.platform.Characteristic.CurrentRelativeHumidity,
         this.CurrentRelativeHumidity,
       );
+    }
+  }
+
+  public apiError(e: any) {
+    this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, e);
+    if (!this.platform.config.options?.leaksensor?.hide_leak) {
+      this.leakService.updateCharacteristic(this.platform.Characteristic.LeakDetected, e);
+      this.leakService.updateCharacteristic(this.platform.Characteristic.StatusActive, e);
+    }
+    if (!this.platform.config.options?.leaksensor?.hide_temperature) {
+      this.temperatureService.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
+    }
+    if (!this.platform.config.options?.leaksensor?.hide_humidity) {
+      this.humidityService.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
     }
   }
 

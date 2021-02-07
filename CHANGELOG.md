@@ -2,11 +2,19 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 8.4.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.3.2...v8.4.0) (2021-02-14)
+
+### Changes
+
+- Fixed Issue with `config.schema.json` displaying issue.
+- Added API Errror Handling to update Characteristics in HomeKit.
+- Update Dependencies.
+
 ## [Version 8.3.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.3.1...v8.3.2) (2021-01-14)
 
 ### Changes
 
-- Update Dependencies
+- Update Dependencies.
 
 ## [Version 8.3.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.3.0...v8.3.1) (2021-01-08)
 

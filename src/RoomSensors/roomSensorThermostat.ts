@@ -189,6 +189,7 @@ export class RoomSensorThermostat {
           } catch (e) {
             this.platform.log.error(JSON.stringify(e.message));
             this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(e));
+            this.apiError(e);
           }
           this.roomUpdateInProgress = false;
         });
@@ -206,6 +207,7 @@ export class RoomSensorThermostat {
         } catch (e) {
           this.platform.log.error(JSON.stringify(e.message));
           this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(e));
+          this.apiError(e);
         }
         this.thermostatUpdateInProgress = false;
       });
@@ -303,6 +305,7 @@ export class RoomSensorThermostat {
         JSON.stringify(e.message),
         this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(e)),
       );
+      this.apiError(e);
     }
   }
 
@@ -366,6 +369,7 @@ export class RoomSensorThermostat {
         JSON.stringify(e.message),
         this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(e)),
       );
+      this.apiError(e);
     }
   }
 
@@ -418,8 +422,9 @@ export class RoomSensorThermostat {
         },
       });
     }
+    this.parseStatus();
     // Refresh the status from the API
-    await this.refreshSensorStatus();
+    //await this.refreshSensorStatus();
   }
 
   /**
@@ -467,8 +472,9 @@ export class RoomSensorThermostat {
         locationId: this.locationId,
       },
     });
+    this.parseStatus();
     // Refresh the status from the API
-    await this.refreshStatus();
+    //await this.refreshStatus();
   }
 
   /**
@@ -501,6 +507,17 @@ export class RoomSensorThermostat {
       this.platform.Characteristic.CurrentHeatingCoolingState,
       this.CurrentHeatingCoolingState,
     );
+  }
+
+  public apiError(e: any) {
+    this.service.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, e);
   }
 
   setTargetHeatingCoolingState(value: any, callback: CharacteristicSetCallback) {

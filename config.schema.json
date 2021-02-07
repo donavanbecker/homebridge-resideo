@@ -212,23 +212,31 @@
           "notitle": true
         },
         {
-          "type": "help",
-          "helpvalue": "<h5>Hide Device</h5><em class='primary-text'>Hide Device allows you to hide a device using it's deviceID.</em>"
-        },
-        {
-          "key": "options.hide_device",
-          "notitle": true,
-          "add": "Add Another Device",
-          "type": "array",
+          "type": "fieldset",
+          "title": "Hidden Devices",
+          "expandable": true,
+          "expanded": false,
           "items": [
             {
-              "type": "div",
-              "displayFlex": true,
-              "flex-direction": "row",
+              "type": "help",
+              "helpvalue": "<h5>Hide Device</h5><em class='primary-text'>Hide Device allows you to hide a device using it's deviceID.</em>"
+            },
+            {
+              "key": "options.hide_device",
+              "notitle": true,
+              "add": "Add Another Device",
+              "type": "array",
               "items": [
                 {
-                  "key": "options.hide_device[]",
-                  "placeholder": "LLC-81F3UT59513F"
+                  "type": "div",
+                  "displayFlex": true,
+                  "flex-direction": "row",
+                  "items": [
+                    {
+                      "key": "options.hide_device[]",
+                      "placeholder": "LLC-81F3UT59513F"
+                    }
+                  ]
                 }
               ]
             }
@@ -293,12 +301,12 @@
           ]
         },
         {
-          "type": "Device Discovery",
+          "type": "help",
           "helpvalue": "<h5>Device Discovery</h5><em class='primary-text'>Enables Device Info Logging.</em>"
         },
         {
           "key": "devicediscovery",
-          "notitle": true
+          "title": "Device Discovery"
         }
       ]
     }

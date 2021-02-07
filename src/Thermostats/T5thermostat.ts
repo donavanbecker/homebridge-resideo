@@ -203,6 +203,7 @@ export class T5thermostat {
         } catch (e) {
           this.platform.log.error(JSON.stringify(e.message));
           this.platform.log.debug('T5 %s -', this.accessory.displayName, JSON.stringify(e));
+          this.apiError(e);
         }
         this.thermostatUpdateInProgress = false;
       });
@@ -220,6 +221,7 @@ export class T5thermostat {
           } catch (e) {
             this.platform.log.error(JSON.stringify(e.message));
             this.platform.log.debug('T5 %s -', this.accessory.displayName, JSON.stringify(e));
+            this.apiError(e);
           }
           this.fanUpdateInProgress = false;
         });
@@ -347,6 +349,7 @@ export class T5thermostat {
         this.platform.log.debug('T5 %s -', this.accessory.displayName, JSON.stringify(e)),
       );
       this.platform.refreshAccessToken();
+      this.apiError(e);
     }
   }
 
@@ -395,8 +398,9 @@ export class T5thermostat {
         locationId: this.locationId,
       },
     });
+    this.parseStatus();
     // Refresh the status from the API
-    await this.refreshStatus();
+    //await this.refreshStatus();
   }
 
   /**
@@ -430,6 +434,20 @@ export class T5thermostat {
       this.fanService.updateCharacteristic(this.platform.Characteristic.Active, this.Active);
     }
     // this.service.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
+  }
+
+  public apiError(e: any) {
+    this.service.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, e);
+    if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan && this.fanService) {
+      this.fanService.updateCharacteristic(this.platform.Characteristic.TargetFanState, e);
+      this.fanService.updateCharacteristic(this.platform.Characteristic.Active, e);
+    }
   }
 
   setTargetHeatingCoolingState(value: any, callback: CharacteristicSetCallback) {

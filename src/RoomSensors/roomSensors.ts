@@ -201,6 +201,7 @@ export class RoomSensors {
         JSON.stringify(e.message),
         this.platform.log.debug('RS %s - ', this.accessory.displayName, JSON.stringify(e)),
       );
+      this.apiError(e);
     }
   }
 
@@ -227,6 +228,20 @@ export class RoomSensors {
         this.platform.Characteristic.CurrentRelativeHumidity,
         this.CurrentRelativeHumidity,
       );
+    }
+  }
+
+  public apiError(e: any) {
+    this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, e);
+    if (!this.platform.config.options?.roomsensor?.hide_temperature) {
+      this.temperatureService.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
+    }
+    if (!this.platform.config.options?.roomsensor?.hide_occupancy) {
+      this.occupancyService.updateCharacteristic(this.platform.Characteristic.OccupancyDetected, e);
+    }
+    if (!this.platform.config.options?.roomsensor?.hide_humidity) {
+      this.humidityService.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
     }
   }
 
