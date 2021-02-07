@@ -207,6 +207,7 @@ export class T9thermostat {
         )
         .subscribe(async () => {
           try {
+            await this.refreshRoomPriority();
             await this.pushRoomChanges();
           } catch (e) {
             this.platform.log.error(JSON.stringify(e.message));
@@ -351,16 +352,7 @@ export class T9thermostat {
         'from Honeywell API:',
         JSON.stringify(this.device.changeableValues),
       );
-      if (this.platform.config.options?.roompriority?.thermostat) {
-        this.roompriority = (
-          await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
-            params: {
-              locationId: this.locationId,
-            },
-          })
-        ).data;
-        this.platform.log.debug('T9 %s priority -', this.accessory.displayName, JSON.stringify(this.roompriority));
-      }
+      await this.refreshRoomPriority();
       if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
         this.deviceFan = (
           await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
@@ -389,6 +381,19 @@ export class T9thermostat {
       );
       this.platform.refreshAccessToken();
       this.apiError(e);
+    }
+  }
+
+  public async refreshRoomPriority() {
+    if (this.platform.config.options?.roompriority?.thermostat) {
+      this.roompriority = (
+        await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
+          params: {
+            locationId: this.locationId,
+          },
+        })
+      ).data;
+      this.platform.log.debug('T9 %s priority -', this.accessory.displayName, JSON.stringify(this.roompriority));
     }
   }
 
@@ -458,59 +463,66 @@ export class T9thermostat {
    * Pushes the requested changes for Room Priority to the Honeywell API
    */
   async pushRoomChanges() {
-    const payload = {
-      currentPriority: {
-        priorityType: this.platform.config.options?.roompriority?.priorityType,
-      },
-    } as any;
+    this.platform.log.debug('T9 Room Priority %s Current Room: %s, Changing Room: %s',
+      this.accessory.displayName,
+      JSON.stringify(this.roompriority.currentPriority.selectedRooms),
+      `[${this.device.inBuiltSensorState.roomId}]`,
+    );
+    if (`[${this.device.inBuiltSensorState.roomId}]` !== `[${this.roompriority.currentPriority.selectedRooms}]`) {
+      const payload = {
+        currentPriority: {
+          priorityType: this.platform.config.options?.roompriority?.priorityType,
+        },
+      } as any;
 
-    if (this.platform.config.options?.roompriority?.priorityType === 'PickARoom') {
-      payload.currentPriority.selectedRooms = [this.device.inBuiltSensorState.roomId];
-    }
+      if (this.platform.config.options?.roompriority?.priorityType === 'PickARoom') {
+        payload.currentPriority.selectedRooms = [this.device.inBuiltSensorState.roomId];
+      }
 
-    /**
+      /**
      * For "LCC-" devices only.
      * "NoHold" will return to schedule.
      * "TemporaryHold" will hold the set temperature until "nextPeriodTime".
      * "PermanentHold" will hold the setpoint until user requests another change.
      */
-    if (this.platform.config.options?.roompriority?.thermostat) {
-      if (this.platform.config.options.roompriority.priorityType === 'FollowMe') {
-        this.platform.log.info(
-          'Sending request for',
-          this.accessory.displayName,
-          'to Honeywell API. Priority Type:',
-          this.platform.config.options.roompriority.priorityType,
-          ', Built-in Occupancy Sensor(s) Will be used to set Priority Automatically.',
-        );
-      } else if (this.platform.config.options.roompriority.priorityType === 'WholeHouse') {
-        this.platform.log.info(
-          'Sending request for',
-          this.accessory.displayName,
-          'to Honeywell API. Priority Type:',
-          this.platform.config.options.roompriority.priorityType,
-        );
-      } else if (this.platform.config.options.roompriority.priorityType === 'PickARoom') {
-        this.platform.log.info(
-          'Sending request for',
-          this.accessory.displayName,
-          'to Honeywell API. Room Priority:',
-          this.device.inBuiltSensorState.roomName,
-          ', Priority Type:',
-          this.platform.config.options.roompriority.priorityType,
-        );
-      }
-      this.platform.log.debug('T9 %s pushRoomChanges -', this.accessory.displayName, JSON.stringify(payload));
+      if (this.platform.config.options?.roompriority?.thermostat) {
+        if (this.platform.config.options.roompriority.priorityType === 'FollowMe') {
+          this.platform.log.info(
+            'Sending request for',
+            this.accessory.displayName,
+            'to Honeywell API. Priority Type:',
+            this.platform.config.options.roompriority.priorityType,
+            ', Built-in Occupancy Sensor(s) Will be used to set Priority Automatically.',
+          );
+        } else if (this.platform.config.options.roompriority.priorityType === 'WholeHouse') {
+          this.platform.log.info(
+            'Sending request for',
+            this.accessory.displayName,
+            'to Honeywell API. Priority Type:',
+            this.platform.config.options.roompriority.priorityType,
+          );
+        } else if (this.platform.config.options.roompriority.priorityType === 'PickARoom') {
+          this.platform.log.info(
+            'Sending request for',
+            this.accessory.displayName,
+            'to Honeywell API. Room Priority:',
+            this.device.inBuiltSensorState.roomName,
+            ', Priority Type:',
+            this.platform.config.options.roompriority.priorityType,
+          );
+        }
+        this.platform.log.debug('T9 %s pushRoomChanges -', this.accessory.displayName, JSON.stringify(payload));
 
-      // Make the API request
-      await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
-        params: {
-          locationId: this.locationId,
-        },
-      });
+        // Make the API request
+        await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
+          params: {
+            locationId: this.locationId,
+          },
+        });
+      }
+      // Refresh the status from the API
+      await this.refreshStatus();
     }
-    // Refresh the status from the API
-    //await this.refreshStatus();
   }
 
   /**

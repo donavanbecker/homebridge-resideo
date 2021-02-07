@@ -46,6 +46,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   sensorAccessory!: sensorAccessory;
 
   public sensorData = [];
+  public roomPriorityData: any;
   private refreshInterval;
   debugMode!: boolean;
 
