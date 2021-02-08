@@ -46,7 +46,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   sensorAccessory!: sensorAccessory;
 
   public sensorData = [];
-  public roomPriorityData: any;
   private refreshInterval;
   debugMode!: boolean;
 
@@ -315,7 +314,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       };
     } else {
       if (this.debugMode) {
-        this.log.info(
+        this.log.warn(
           'getCurrentSensorData Cache %s %s - %s',
           device.deviceType,
           device.deviceModel,
@@ -399,7 +398,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         for (const device of location.devices) {
           this.deviceinfo(device);
           if (device.isAlive && device.deviceClass === 'LeakDetector') {
-            this.log.info('Discovered %s - %s', device.deviceType, location.name, device.userDefinedDeviceName);
+            if (this.config.devicediscovery) {
+              this.log.info('Discovered %s - %s', device.deviceType, location.name, device.userDefinedDeviceName);
+            }
             this.Leak(device, locationId);
           } else if (device.isAlive && device.deviceClass === 'Thermostat') {
             if (device.deviceID.startsWith('LCC')) {
@@ -410,13 +411,15 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                   this.log.error('Failed to Get T9 Firmware Version.', JSON.stringify(e.message));
                   this.log.debug(JSON.stringify(e));
                 }
-                this.log.info(
-                  'Discovered %s %s - %s',
-                  device.deviceType,
-                  device.deviceModel,
-                  location.name,
-                  device.userDefinedDeviceName,
-                );
+                if (this.config.devicediscovery) {
+                  this.log.info(
+                    'Discovered %s %s - %s',
+                    device.deviceType,
+                    device.deviceModel,
+                    location.name,
+                    device.userDefinedDeviceName,
+                  );
+                }
                 await this.createT9(device, locationId, this.firmware);
                 try {
                   await this.discoverRoomSensors(location.locationID, device);
@@ -425,22 +428,26 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                   this.log.debug(JSON.stringify(e));
                 }
               } else if (device.deviceModel.startsWith('T5')) {
-                this.log.info(
-                  'Discovered %s %s - %s',
-                  device.deviceType,
-                  device.deviceModel,
-                  location.name,
-                  device.userDefinedDeviceName,
-                );
+                if (this.config.devicediscovery) {
+                  this.log.info(
+                    'Discovered %s %s - %s',
+                    device.deviceType,
+                    device.deviceModel,
+                    location.name,
+                    device.userDefinedDeviceName,
+                  );
+                }
                 this.createT5(device, locationId);
               } else if (device.deviceModel.startsWith('D6')) {
-                this.log.info(
-                  'Discovered %s %s - %s',
-                  device.deviceType,
-                  device.deviceModel,
-                  location.name,
-                  device.userDefinedDeviceName,
-                );
+                if (this.config.devicediscovery) {
+                  this.log.info(
+                    'Discovered %s %s - %s',
+                    device.deviceType,
+                    device.deviceModel,
+                    location.name,
+                    device.userDefinedDeviceName,
+                  );
+                }
                 this.createT5(device, locationId);
               } else if (!device.DeviceModel) {
                 this.log.info(
@@ -448,25 +455,27 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 );
               }
             } else if (device.deviceID.startsWith('TCC')) {
-              this.log.info('A TCC Device has been discovered, Currently writing to Honeywell API does not work.');
-              this.log.info(' Feel free to open an issue on GitHub https://git.io/JURI5');
               if (device.deviceModel.startsWith('Round')) {
-                this.log.info(
-                  'Discovered %s %s - %s',
-                  device.deviceType,
-                  device.deviceModel,
-                  location.name,
-                  device.userDefinedDeviceName,
-                );
+                if (this.config.devicediscovery) {
+                  this.log.info(
+                    'Discovered %s %s - %s',
+                    device.deviceType,
+                    device.deviceModel,
+                    location.name,
+                    device.userDefinedDeviceName,
+                  );
+                }
                 this.createRound(device, locationId);
               } else if (device.deviceModel.startsWith('Unknown')) {
-                this.log.info(
-                  'Discovered %s %s - %s',
-                  device.deviceType,
-                  device.deviceModel,
-                  location.name,
-                  device.userDefinedDeviceName,
-                );
+                if (this.config.devicediscovery) {
+                  this.log.info(
+                    'Discovered %s %s - %s',
+                    device.deviceType,
+                    device.deviceModel,
+                    location.name,
+                    device.userDefinedDeviceName,
+                  );
+                }
                 this.createTCC(device, locationId);
               } else if (!device.deviceModel) {
                 this.log.info(
