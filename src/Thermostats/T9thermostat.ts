@@ -207,11 +207,13 @@ export class T9thermostat {
         )
         .subscribe(async () => {
           try {
+            await this.refreshRoomPriority();
             await this.pushRoomChanges();
           } catch (e) {
             this.platform.log.error(JSON.stringify(e.message));
             this.platform.log.debug('T9 %s -', this.accessory.displayName, JSON.stringify(e));
             this.platform.refreshAccessToken();
+            this.apiError(e);
           }
           this.roomUpdateInProgress = false;
         });
@@ -230,6 +232,7 @@ export class T9thermostat {
           this.platform.log.error(JSON.stringify(e.message));
           this.platform.log.debug('T9 %s -', this.accessory.displayName, JSON.stringify(e));
           this.platform.refreshAccessToken();
+          this.apiError(e);
         }
         this.thermostatUpdateInProgress = false;
       });
@@ -248,6 +251,7 @@ export class T9thermostat {
             this.platform.log.error(JSON.stringify(e.message));
             this.platform.log.debug('T9 %s -', this.accessory.displayName, JSON.stringify(e));
             this.platform.refreshAccessToken();
+            this.apiError(e);
           }
           this.fanUpdateInProgress = false;
         });
@@ -348,16 +352,7 @@ export class T9thermostat {
         'from Honeywell API:',
         JSON.stringify(this.device.changeableValues),
       );
-      if (this.platform.config.options?.roompriority?.thermostat) {
-        this.roompriority = (
-          await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
-            params: {
-              locationId: this.locationId,
-            },
-          })
-        ).data;
-        this.platform.log.debug('T9 %s priority -', this.accessory.displayName, JSON.stringify(this.roompriority));
-      }
+      await this.refreshRoomPriority();
       if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
         this.deviceFan = (
           await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
@@ -385,6 +380,20 @@ export class T9thermostat {
         this.platform.log.debug('T9 %s -', this.accessory.displayName, JSON.stringify(e)),
       );
       this.platform.refreshAccessToken();
+      this.apiError(e);
+    }
+  }
+
+  public async refreshRoomPriority() {
+    if (this.platform.config.options?.roompriority?.thermostat) {
+      this.roompriority = (
+        await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
+          params: {
+            locationId: this.locationId,
+          },
+        })
+      ).data;
+      this.platform.log.debug('T9 %s priority -', this.accessory.displayName, JSON.stringify(this.roompriority));
     }
   }
 
@@ -392,108 +401,128 @@ export class T9thermostat {
    * Pushes the requested changes to the Honeywell API
    */
   async pushChanges() {
-    const payload = {
-      mode: this.honeywellMode[this.TargetHeatingCoolingState],
-      thermostatSetpointStatus: this.platform.config.options?.thermostat?.thermostatSetpointStatus,
-      autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
-    } as any;
-
-    // Set the heat and cool set point value based on the selected mode
-    if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
-      payload.heatSetpoint = this.toFahrenheit(this.TargetTemperature);
-      payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
-    } else if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.COOL) {
-      payload.coolSetpoint = this.toFahrenheit(this.TargetTemperature);
-      payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
-    } else if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.AUTO) {
-      payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
-      payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
-    } else {
-      payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
-      payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
-    }
-
-    this.platform.log.info(
-      'Sending request for',
+    this.platform.log.debug('T9 %s Current Mode: %s, Changing Mode: %s, Current Heat: %s, Changing Heat: %s, Current Cool: %s, Changing Cool: %s',
       this.accessory.displayName,
-      'to Honeywell API. mode:',
-      payload.mode,
-      'coolSetpoint:',
-      payload.coolSetpoint,
-      'heatSetpoint:',
-      payload.heatSetpoint,
-      'thermostatSetpointStatus:',
-      this.platform.config.options?.thermostat?.thermostatSetpointStatus,
+      this.modes[this.device.changeableValues.mode],
+      this.TargetHeatingCoolingState,
+      this.toCelsius(this.device.changeableValues.heatSetpoint),
+      this.HeatingThresholdTemperature,
+      this.toCelsius(this.device.changeableValues.coolSetpoint),
+      this.CoolingThresholdTemperature,
     );
-    this.platform.log.debug('T9 %s pushChanges -', this.accessory.displayName, JSON.stringify(payload));
+    if (this.toCelsius(this.device.changeableValues.heatSetpoint) !== this.HeatingThresholdTemperature
+      || this.toCelsius(this.device.changeableValues.coolSetpoint) !== this.CoolingThresholdTemperature
+      || this.modes[this.device.changeableValues.mode] !== this.TargetHeatingCoolingState) {
+      const payload = {
+        mode: this.honeywellMode[this.TargetHeatingCoolingState],
+        thermostatSetpointStatus: this.platform.config.options?.thermostat?.thermostatSetpointStatus,
+        autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
+      } as any;
 
-    // Make the API request
-    await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
-      params: {
-        locationId: this.locationId,
-      },
-    });
-    // Refresh the status from the API
-    await this.refreshStatus();
+      // Set the heat and cool set point value based on the selected mode
+      if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
+        payload.heatSetpoint = this.toFahrenheit(this.TargetTemperature);
+        payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
+      } else if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.COOL) {
+        payload.coolSetpoint = this.toFahrenheit(this.TargetTemperature);
+        payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
+      } else if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.AUTO) {
+        payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
+        payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
+      } else {
+        payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
+        payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
+      }
+
+      this.platform.log.info(
+        'Sending request for',
+        this.accessory.displayName,
+        'to Honeywell API. mode:',
+        payload.mode,
+        'coolSetpoint:',
+        payload.coolSetpoint,
+        'heatSetpoint:',
+        payload.heatSetpoint,
+        'thermostatSetpointStatus:',
+        this.platform.config.options?.thermostat?.thermostatSetpointStatus,
+      );
+      this.platform.log.debug('T9 %s pushChanges -', this.accessory.displayName, JSON.stringify(payload));
+
+      // Make the API request
+      await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
+        params: {
+          locationId: this.locationId,
+        },
+      });
+      // Refresh the status from the API
+      await this.refreshStatus();
+    }
   }
 
   /**
    * Pushes the requested changes for Room Priority to the Honeywell API
    */
   async pushRoomChanges() {
-    const payload = {
-      currentPriority: {
-        priorityType: this.platform.config.options?.roompriority?.priorityType,
-      },
-    } as any;
+    this.platform.log.debug('T9 Room Priority %s Current Room: %s, Changing Room: %s',
+      this.accessory.displayName,
+      JSON.stringify(this.roompriority.currentPriority.selectedRooms),
+      `[${this.device.inBuiltSensorState.roomId}]`,
+    );
+    if (`[${this.device.inBuiltSensorState.roomId}]` !== `[${this.roompriority.currentPriority.selectedRooms}]`) {
+      const payload = {
+        currentPriority: {
+          priorityType: this.platform.config.options?.roompriority?.priorityType,
+        },
+      } as any;
 
-    if (this.platform.config.options?.roompriority?.priorityType === 'PickARoom') {
-      payload.currentPriority.selectedRooms = [this.device.inBuiltSensorState.roomId];
-    }
+      if (this.platform.config.options?.roompriority?.priorityType === 'PickARoom') {
+        payload.currentPriority.selectedRooms = [this.device.inBuiltSensorState.roomId];
+      }
 
-    /**
+      /**
      * For "LCC-" devices only.
      * "NoHold" will return to schedule.
      * "TemporaryHold" will hold the set temperature until "nextPeriodTime".
      * "PermanentHold" will hold the setpoint until user requests another change.
      */
-    if (this.platform.config.options?.roompriority?.thermostat) {
-      if (this.platform.config.options.roompriority.priorityType === 'FollowMe') {
-        this.platform.log.info(
-          'Sending request for',
-          this.accessory.displayName,
-          'to Honeywell API. Priority Type:',
-          this.platform.config.options.roompriority.priorityType,
-          ', Built-in Occupancy Sensor(s) Will be used to set Priority Automatically.',
-        );
-      } else if (this.platform.config.options.roompriority.priorityType === 'WholeHouse') {
-        this.platform.log.info(
-          'Sending request for',
-          this.accessory.displayName,
-          'to Honeywell API. Priority Type:',
-          this.platform.config.options.roompriority.priorityType,
-        );
-      } else if (this.platform.config.options.roompriority.priorityType === 'PickARoom') {
-        this.platform.log.info(
-          'Sending request for',
-          this.accessory.displayName,
-          'to Honeywell API. Room Priority:',
-          this.device.inBuiltSensorState.roomName,
-          ', Priority Type:',
-          this.platform.config.options.roompriority.priorityType,
-        );
-      }
-      this.platform.log.debug('T9 %s pushRoomChanges -', this.accessory.displayName, JSON.stringify(payload));
+      if (this.platform.config.options?.roompriority?.thermostat) {
+        if (this.platform.config.options.roompriority.priorityType === 'FollowMe') {
+          this.platform.log.info(
+            'Sending request for',
+            this.accessory.displayName,
+            'to Honeywell API. Priority Type:',
+            this.platform.config.options.roompriority.priorityType,
+            ', Built-in Occupancy Sensor(s) Will be used to set Priority Automatically.',
+          );
+        } else if (this.platform.config.options.roompriority.priorityType === 'WholeHouse') {
+          this.platform.log.info(
+            'Sending request for',
+            this.accessory.displayName,
+            'to Honeywell API. Priority Type:',
+            this.platform.config.options.roompriority.priorityType,
+          );
+        } else if (this.platform.config.options.roompriority.priorityType === 'PickARoom') {
+          this.platform.log.info(
+            'Sending request for',
+            this.accessory.displayName,
+            'to Honeywell API. Room Priority:',
+            this.device.inBuiltSensorState.roomName,
+            ', Priority Type:',
+            this.platform.config.options.roompriority.priorityType,
+          );
+        }
+        this.platform.log.debug('T9 %s pushRoomChanges -', this.accessory.displayName, JSON.stringify(payload));
 
-      // Make the API request
-      await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
-        params: {
-          locationId: this.locationId,
-        },
-      });
+        // Make the API request
+        await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
+          params: {
+            locationId: this.locationId,
+          },
+        });
+      }
+      // Refresh the status from the API
+      await this.refreshStatus();
     }
-    // Refresh the status from the API
-    await this.refreshStatus();
   }
 
   /**
@@ -529,6 +558,21 @@ export class T9thermostat {
     if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
       this.fanService.updateCharacteristic(this.platform.Characteristic.TargetFanState, this.TargetFanState);
       this.fanService.updateCharacteristic(this.platform.Characteristic.Active, this.Active);
+    }
+  }
+
+  public apiError(e: any) {
+    this.service.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, e);
+    if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan && this.fanService) {
+      this.fanService.updateCharacteristic(this.platform.Characteristic.TargetFanState, e);
+      this.fanService.updateCharacteristic(this.platform.Characteristic.Active, e);
     }
   }
 
