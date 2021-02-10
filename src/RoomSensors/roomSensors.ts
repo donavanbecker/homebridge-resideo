@@ -11,9 +11,9 @@ import { location, sensorAccessory, T9Thermostat, T9groups } from '../configType
  */
 export class RoomSensors {
   private service: Service;
-  temperatureService?: any;
-  occupancyService?: any;
-  humidityService?: any;
+  temperatureService?: Service;
+  occupancyService?: Service;
+  humidityService?: Service;
 
   CurrentTemperature!: number;
   StatusLowBattery!: number;
@@ -235,13 +235,13 @@ export class RoomSensors {
     this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, e);
     this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, e);
     if (!this.platform.config.options?.roomsensor?.hide_temperature) {
-      this.temperatureService.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
+      this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
     }
     if (!this.platform.config.options?.roomsensor?.hide_occupancy) {
-      this.occupancyService.updateCharacteristic(this.platform.Characteristic.OccupancyDetected, e);
+      this.occupancyService?.updateCharacteristic(this.platform.Characteristic.OccupancyDetected, e);
     }
     if (!this.platform.config.options?.roomsensor?.hide_humidity) {
-      this.humidityService.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
+      this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
     }
   }
 

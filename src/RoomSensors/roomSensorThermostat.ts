@@ -18,7 +18,6 @@ import { location, sensorAccessory, T9Thermostat, T9groups, FanChangeableValues 
  */
 export class RoomSensorThermostat {
   private service: Service;
-  fanService: any;
 
   private modes: { Off: number; Heat: number; Cool: number; Auto: number };
 
@@ -31,8 +30,9 @@ export class RoomSensorThermostat {
   CurrentRelativeHumidity!: number;
   TemperatureDisplayUnits!: number;
   honeywellMode!: Array<string>;
-  deviceFan!: FanChangeableValues;
   roompriority: any;
+  deviceFan!: FanChangeableValues;
+  
 
   roomUpdateInProgress!: boolean;
   doRoomUpdate!: any;
@@ -323,7 +323,7 @@ export class RoomSensorThermostat {
                 const roomsensors = await this.platform.getCurrentSensorData(this.device, group, this.locationId);
                 if (roomsensors.rooms) {
                   const rooms = roomsensors.rooms;
-                  this.platform.log.warn('RST %s - ', this.accessory.displayName, JSON.stringify(roomsensors));
+                  this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(roomsensors));
                   for (const accessories of rooms) {
                     if (accessories) {
                       this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(accessories));
@@ -390,7 +390,8 @@ export class RoomSensorThermostat {
    * Pushes the requested changes for Room Priority to the Honeywell API
    */
   async pushRoomChanges() {
-    this.platform.log.debug('RST Room Priority %s Current Room: %s, Changing Room: %s',
+    this.platform.log.debug(
+      'RST Room Priority %s Current Room: %s, Changing Room: %s',
       this.accessory.displayName,
       JSON.stringify(this.roompriority.currentPriority.selectedRooms),
       `[${this.sensorAccessory.accessoryId}]`,
@@ -407,11 +408,11 @@ export class RoomSensorThermostat {
       }
 
       /**
-     * For "LCC-" devices only.
-     * "NoHold" will return to schedule.
-     * "TemporaryHold" will hold the set temperature until "nextPeriodTime".
-     * "PermanentHold" will hold the setpoint until user requests another change.
-     */
+       * For "LCC-" devices only.
+       * "NoHold" will return to schedule.
+       * "TemporaryHold" will hold the set temperature until "nextPeriodTime".
+       * "PermanentHold" will hold the setpoint until user requests another change.
+       */
       if (this.platform.config.options?.roompriority?.thermostat) {
         if (this.platform.config.options.roompriority.priorityType === 'FollowMe') {
           this.platform.log.info(
@@ -450,7 +451,8 @@ export class RoomSensorThermostat {
    * Pushes the requested changes to the Honeywell API
    */
   async pushChanges() {
-    this.platform.log.debug('T9 %s Current Mode: %s, Changing Mode: %s, Current Heat: %s, Changing Heat: %s, Current Cool: %s, Changing Cool: %s',
+    this.platform.log.debug(
+      'T9 %s Current Mode: %s, Changing Mode: %s, Current Heat: %s, Changing Heat: %s, Current Cool: %s, Changing Cool: %s',
       this.accessory.displayName,
       this.modes[this.device.changeableValues.mode],
       this.TargetHeatingCoolingState,
@@ -459,9 +461,11 @@ export class RoomSensorThermostat {
       this.toCelsius(this.device.changeableValues.coolSetpoint),
       this.CoolingThresholdTemperature,
     );
-    if (this.toCelsius(this.device.changeableValues.heatSetpoint) !== this.HeatingThresholdTemperature
-      || this.toCelsius(this.device.changeableValues.coolSetpoint) !== this.CoolingThresholdTemperature
-      || this.modes[this.device.changeableValues.mode] !== this.TargetHeatingCoolingState) {
+    if (
+      this.HeatingThresholdTemperature !== this.toCelsius(this.device.changeableValues.heatSetpoint) ||
+      this.CoolingThresholdTemperature !== this.toCelsius(this.device.changeableValues.coolSetpoint) ||
+      this.TargetHeatingCoolingState !== this.modes[this.device.changeableValues.mode]
+    ) {
       const payload = {
         mode: this.honeywellMode[this.TargetHeatingCoolingState],
         thermostatSetpointStatus: this.platform.config.options?.thermostat?.thermostatSetpointStatus,

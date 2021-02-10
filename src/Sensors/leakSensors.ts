@@ -12,9 +12,9 @@ import { location, LeakDevice } from '../configTypes';
  */
 export class LeakSensor {
   private service: Service;
-  temperatureService: any;
-  humidityService: any;
-  leakService: any;
+  temperatureService?: Service;
+  humidityService?: Service;
+  leakService?: Service;
 
   StatusActive!: boolean;
   LeakDetected!: number;
@@ -26,7 +26,6 @@ export class LeakSensor {
 
   SensorUpdateInProgress!: boolean;
   doSensorUpdate!: any;
-  TemperatureDisplayUnits!: number;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
@@ -209,17 +208,17 @@ export class LeakSensor {
     this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
     this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
     if (!this.platform.config.options?.leaksensor?.hide_leak) {
-      this.leakService.updateCharacteristic(this.platform.Characteristic.LeakDetected, this.LeakDetected);
-      this.leakService.updateCharacteristic(this.platform.Characteristic.StatusActive, this.StatusActive);
+      this.leakService?.updateCharacteristic(this.platform.Characteristic.LeakDetected, this.LeakDetected);
+      this.leakService?.updateCharacteristic(this.platform.Characteristic.StatusActive, this.StatusActive);
     }
     if (!this.platform.config.options?.leaksensor?.hide_temperature) {
-      this.temperatureService.updateCharacteristic(
+      this.temperatureService?.updateCharacteristic(
         this.platform.Characteristic.CurrentTemperature,
         this.CurrentTemperature,
       );
     }
     if (!this.platform.config.options?.leaksensor?.hide_humidity) {
-      this.humidityService.updateCharacteristic(
+      this.humidityService?.updateCharacteristic(
         this.platform.Characteristic.CurrentRelativeHumidity,
         this.CurrentRelativeHumidity,
       );
@@ -230,26 +229,14 @@ export class LeakSensor {
     this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, e);
     this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, e);
     if (!this.platform.config.options?.leaksensor?.hide_leak) {
-      this.leakService.updateCharacteristic(this.platform.Characteristic.LeakDetected, e);
-      this.leakService.updateCharacteristic(this.platform.Characteristic.StatusActive, e);
+      this.leakService?.updateCharacteristic(this.platform.Characteristic.LeakDetected, e);
+      this.leakService?.updateCharacteristic(this.platform.Characteristic.StatusActive, e);
     }
     if (!this.platform.config.options?.leaksensor?.hide_temperature) {
-      this.temperatureService.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
+      this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
     }
     if (!this.platform.config.options?.leaksensor?.hide_humidity) {
-      this.humidityService.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
+      this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
     }
-  }
-
-  /**
-   * Converts the value to celsius if the temperature units are in Fahrenheit
-   */
-  toCelsius(value: number) {
-    if (this.TemperatureDisplayUnits === this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS) {
-      return value;
-    }
-
-    // celsius should be to the nearest 0.5 degree
-    return Math.round((5 / 9) * (value - 32) * 2) / 2;
   }
 }

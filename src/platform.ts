@@ -510,13 +510,15 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               if (sensorAccessory.accessoryAttribute) {
                 if (sensorAccessory.accessoryAttribute.type) {
                   if (sensorAccessory.accessoryAttribute.type.startsWith('IndoorAirSensor')) {
-                    this.log.info(
-                      'Discovered Room Sensor groupId: %s, roomId: %s, accessoryId: %s',
-                      group.id,
-                      sensorAccessory.roomId,
-                      sensorAccessory.accessoryId,
-                      sensorAccessory.accessoryAttribute.name,
-                    );
+                    if (this.config.devicediscovery) {
+                      this.log.info(
+                        'Discovered Room Sensor groupId: %s, roomId: %s, accessoryId: %s',
+                        group.id,
+                        sensorAccessory.roomId,
+                        sensorAccessory.accessoryId,
+                        sensorAccessory.accessoryAttribute.name,
+                      );
+                    }
                     this.createRoomSensors(device, locationId, sensorAccessory, group);
                     this.createRoomSensorThermostat(device, locationId, sensorAccessory, group);
                   }

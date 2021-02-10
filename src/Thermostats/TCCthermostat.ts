@@ -362,7 +362,8 @@ export class TCCthermostat {
    * Pushes the requested changes to the Honeywell API
    */
   async pushChanges() {
-    this.platform.log.debug('T9 %s Current Mode: %s, Changing Mode: %s, Current Heat: %s, Changing Heat: %s, Current Cool: %s, Changing Cool: %s',
+    this.platform.log.debug(
+      'T9 %s Current Mode: %s, Changing Mode: %s, Current Heat: %s, Changing Heat: %s, Current Cool: %s, Changing Cool: %s',
       this.accessory.displayName,
       this.modes[this.device.changeableValues.mode],
       this.TargetHeatingCoolingState,
@@ -371,9 +372,11 @@ export class TCCthermostat {
       this.toCelsius(this.device.changeableValues.coolSetpoint),
       this.CoolingThresholdTemperature,
     );
-    if (this.toCelsius(this.device.changeableValues.heatSetpoint) !== this.HeatingThresholdTemperature
-      || this.toCelsius(this.device.changeableValues.coolSetpoint) !== this.CoolingThresholdTemperature
-      || this.modes[this.device.changeableValues.mode] !== this.TargetHeatingCoolingState) {
+    if (
+      this.HeatingThresholdTemperature !== this.toCelsius(this.device.changeableValues.heatSetpoint) ||
+      this.CoolingThresholdTemperature !== this.toCelsius(this.device.changeableValues.coolSetpoint) ||
+      this.TargetHeatingCoolingState !== this.modes[this.device.changeableValues.mode]
+    ) {
       const payload = {
         mode: this.honeywellMode[this.TargetHeatingCoolingState],
         thermostatSetpointStatus: this.platform.config.options?.thermostat?.thermostatSetpointStatus,
@@ -463,9 +466,9 @@ export class TCCthermostat {
     this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, e);
     this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, e);
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, e);
-    if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan && this.fanService) {
-      this.fanService.updateCharacteristic(this.platform.Characteristic.TargetFanState, e);
-      this.fanService.updateCharacteristic(this.platform.Characteristic.Active, e);
+    if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
+      this.fanService?.updateCharacteristic(this.platform.Characteristic.TargetFanState, e);
+      this.fanService?.updateCharacteristic(this.platform.Characteristic.Active, e);
     }
   }
 
