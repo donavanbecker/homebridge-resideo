@@ -3,10 +3,10 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import * as qs from 'querystring';
 import { readFileSync, writeFileSync } from 'fs';
 import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl } from './settings';
-import { Thermostats } from './Devices/thermostats';
-import { LeakSensor } from './Devices/leakSensors';
-import { RoomSensors } from './Devices/roomSensors';
-import { RoomSensorThermostat } from './Devices/roomSensorThermostat';
+import { Thermostats } from './devices/thermostats';
+import { LeakSensor } from './devices/leaksensors';
+import { RoomSensors } from './devices/roomsensors';
+import { RoomSensorThermostat } from './devices/roomsensorthermostats';
 import {
   location,
   sensorAccessory,
@@ -35,7 +35,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     responseType: 'json',
   });
 
-  locations?;
+  locations?: any;
   firmware!: accessoryAttribute['softwareRevision'];
   sensorAccessory!: sensorAccessory;
 

@@ -51,7 +51,7 @@ export type roompriority = {
 export type location = {
   locationID: number;
   name: string;
-  devices: Thermostat | T9Thermostat | T5Device | LeakDevice | TCCDevice | RoundDevice;
+  devices: Thermostat;
 };
 
 export type Thermostat = {
@@ -133,185 +133,6 @@ export type Service = {
   mode: string;
 };
 
-// T9 Thermostat
-export type T9Thermostat = {
-  groups: Array<T9groups>;
-  inBuiltSensorState: inBuiltSensorState;
-  settings: T9Settings;
-  deviceClass: string;
-  deviceType: string;
-  deviceID: string;
-  userDefinedDeviceName: string;
-  name: string;
-  isAlive: boolean;
-  priorityType: string;
-  units: string;
-  indoorTemperature: number;
-  allowedModes: string;
-  minHeatSetpoint: number;
-  maxHeatSetpoint: number;
-  minCoolSetpoint: number;
-  maxCoolSetpoint: number;
-  changeableValues: T9changeableValues;
-  operationStatus: OperationStatusT9;
-  indoorHumidity: number;
-  deviceModel: string;
-};
-
-export type OperationStatusT9 = {
-  mode: string;
-  fanRequest: boolean;
-  circulationFanRequest: boolean;
-};
-
-export type T9changeableValues = {
-  mode: string;
-  autoChangeoverActive: boolean;
-  heatSetpoint: number;
-  coolSetpoint: number;
-  thermostatSetpointStatus: string;
-  nextPeriodTime: string;
-  endHeatSetpoint: number;
-  endCoolSetpoint: number;
-  heatCoolMode: string;
-};
-
-// T5 Thermostat
-export type T5Device = {
-  displayedOutdoorHumidity: number;
-  scheduleStatus: string;
-  allowedTimeIncrements: number;
-  settings: T9Settings;
-  deviceClass: string;
-  deviceType: string;
-  deviceID: string;
-  userDefinedDeviceName: string;
-  name: string;
-  isAlive: boolean;
-  isUpgrading: boolean;
-  isProvisioned: boolean;
-  macID: string;
-  dataSyncStatus: string;
-  units: string;
-  indoorTemperature: number;
-  outdoorTemperature: number;
-  allowedModes: string;
-  deadband: number;
-  hasDualSetpointStatus: boolean;
-  minHeatSetpoint: number;
-  maxHeatSetpoint: number;
-  minCoolSetpoint: number;
-  maxCoolSetpoint: number;
-  changeableValues: T5ChangeableValues;
-  operationStatus: OperationStatusT5;
-  deviceModel: string;
-};
-
-export type T5ChangeableValues = {
-  mode: string;
-  autoChangeoverActive: boolean;
-  heatSetpoint: number;
-  coolSetpoint: number;
-  thermostatSetpointStatus: string;
-  heatCoolMode: string;
-};
-
-export type OperationStatusT5 = {
-  mode: string;
-  fanRequest: boolean;
-  circulationFanRequest: boolean;
-};
-
-// TCC (Unknown) Thermostat
-export type TCCDevice = {
-  thermostatVersion: string;
-  scheduleStatus: string;
-  settings: T9Settings;
-  deviceClass: string;
-  deviceType: string;
-  deviceID: string;
-  userDefinedDeviceName: string;
-  name: string;
-  isAlive: boolean;
-  isUpgrading: boolean;
-  isProvisioned: boolean;
-  macID: string;
-  parentDeviceId: number;
-  service: Service;
-  units: string;
-  indoorTemperature: number;
-  outdoorTemperature: number;
-  allowedModes: string;
-  hasDualSetpointStatus: boolean;
-  minHeatSetpoint: number;
-  maxHeatSetpoint: number;
-  minCoolSetpoint: number;
-  maxCoolSetpoint: number;
-  changeableValues: TCC_ChangeableValues;
-  operationStatus: OperationStatusTCC;
-  indoorHumidity: number;
-  deviceModel: string;
-};
-
-export type OperationStatusTCC = {
-  mode: string;
-};
-
-export type TCC_ChangeableValues = {
-  mode: string;
-  heatSetpoint: number;
-  coolSetpoint: number;
-  thermostatSetpointStatus: string;
-  nextPeriodTime: string;
-  heatCoolMode: string;
-};
-
-
-// Round Thermostat
-export type RoundDevice = {
-  thermostatVersion: string;
-  settings: RoundSettings;
-  deviceClass: string;
-  deviceType: string;
-  deviceID: string;
-  userDefinedDeviceName: string;
-  name: string;
-  isAlive: boolean;
-  macID: string;
-  deviceSettings: Record<string, unknown>;
-  service: Service;
-  units: string;
-  indoorTemperature: number;
-  outdoorTemperature: number;
-  allowedModes: string;
-  hasDualSetpointStatus: boolean;
-  minHeatSetpoint: number;
-  maxHeatSetpoint: number;
-  minCoolSetpoint: number;
-  maxCoolSetpoint: number;
-  changeableValues: RoundChangeableValues;
-  operationStatus: OperationStatusTCC;
-  indoorHumidity: number;
-  deviceModel: string;
-};
-
-export type RoundChangeableValues = {
-  mode: string;
-  autoChangeoverActive: boolean;
-  emergencyHeatActive: boolean;
-  heatSetpoint: number;
-  coolSetpoint: number;
-  heatCoolMode: string;
-};
-
-export type RoundSettings = {
-  homeSetPoints: HomeSetPoints;
-  awaySetPoints: AwaySetPoints;
-  fan: Fan;
-  temperatureMode: TemperatureMode;
-  specialMode: SpecialMode;
-};
-
 export type AwaySetPoints = {
   awayHeatSP: number;
   awayCoolSP: number;
@@ -335,11 +156,6 @@ export type TemperatureMode = {
 export type SpecialMode = {
   autoChangeoverActive: boolean;
   emergencyHeatActive: boolean;
-};
-
-// Fan Settings
-export type T9Settings = {
-  fan: Fan;
 };
 
 export type Fan = {
