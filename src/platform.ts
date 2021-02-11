@@ -3,22 +3,16 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import * as qs from 'querystring';
 import { readFileSync, writeFileSync } from 'fs';
 import { PLATFORM_NAME, PLUGIN_NAME, AuthURL, LocationURL, DeviceURL, UIurl } from './settings';
-import { T9thermostat } from './Thermostats/T9thermostat';
-import { T5thermostat } from './Thermostats/T5thermostat';
-import { RoundThermostat } from './Thermostats/RoundThermostat';
-import { TCCthermostat } from './Thermostats/TCCthermostat';
-import { LeakSensor } from './Sensors/leakSensors';
-import { RoomSensors } from './RoomSensors/roomSensors';
-import { RoomSensorThermostat } from './RoomSensors/roomSensorThermostat';
+import { Thermostats } from './Devices/thermostats';
+import { LeakSensor } from './Devices/leakSensors';
+import { RoomSensors } from './Devices/roomSensors';
+import { RoomSensorThermostat } from './Devices/roomSensorThermostat';
 import {
   location,
   sensorAccessory,
   accessoryAttribute,
-  T9Thermostat,
+  Thermostat,
   T9groups,
-  T5Device,
-  RoundDevice,
-  TCCDevice,
   LeakDevice,
   inBuiltSensorState,
   Settings,
@@ -155,6 +149,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       }
 
       this.config.options.refreshRate = this.config.options!.refreshRate || 300; // default 300 seconds
+      this.config.options.pushRate = this.config.options!.pushRate || 0.1; // default 100 milliseconds
 
       if (!this.config.credentials?.consumerSecret && this.config.options!.refreshRate! < 300) {
         this.log.debug('Refresh Rate must be set to 300 or higher unless you setup your own consumerSecret.');
@@ -301,7 +296,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   /**
    * this method discovers the rooms at each location
    */
-  public async getCurrentSensorData(device: T9Thermostat, group: T9groups, locationId: location['locationID']) {
+  public async getCurrentSensorData(device: Thermostat, group: T9groups, locationId: location['locationID']) {
     if (!this.sensorData[device.deviceID] || this.sensorData[device.deviceID].timestamp < Date.now()) {
       const response = await this.axios.get(`${DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
         params: {
@@ -340,8 +335,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   /**
    * this method discovers the firmware Veriosn for T9 Thermostats
    */
-  public async getSoftwareRevision(locationId, device) {
-    if (device.deviceID.startsWith('LCC') && device.deviceModel.startsWith('T9') && device.groups) {
+  public async getSoftwareRevision(locationId: location['locationID'], device: Thermostat) {
+    if (device.deviceModel.startsWith('T9') && device.groups) {
       for (const group of device.groups) {
         const roomsensors = await this.getCurrentSensorData(device, group, locationId);
         if (this.config.options?.roompriority?.thermostat) {
@@ -376,8 +371,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       }
     } else {
       this.log.info(
-        'Not a T9 LCC',
-        device.deviceID.startsWith('LCC'),
+        'Not a T9 Thermostat',
         device.deviceModel.startsWith('T9'),
         device.groups,
       );
@@ -403,92 +397,28 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
             }
             this.Leak(device, locationId);
           } else if (device.isAlive && device.deviceClass === 'Thermostat') {
-            if (device.deviceID.startsWith('LCC')) {
-              if (device.deviceModel.startsWith('T9')) {
-                try {
-                  this.firmware = await this.getSoftwareRevision(location.locationID, device);
-                } catch (e) {
-                  this.log.error('Failed to Get T9 Firmware Version.', JSON.stringify(e.message));
-                  this.log.debug(JSON.stringify(e));
-                }
-                if (this.config.devicediscovery) {
-                  this.log.info(
-                    'Discovered %s %s - %s',
-                    device.deviceType,
-                    device.deviceModel,
-                    location.name,
-                    device.userDefinedDeviceName,
-                  );
-                }
-                await this.createT9(device, locationId, this.firmware);
-                try {
-                  await this.discoverRoomSensors(location.locationID, device);
-                } catch (e) {
-                  this.log.error('Failed to Find Room Sensor(s).', JSON.stringify(e.message));
-                  this.log.debug(JSON.stringify(e));
-                }
-              } else if (device.deviceModel.startsWith('T5')) {
-                if (this.config.devicediscovery) {
-                  this.log.info(
-                    'Discovered %s %s - %s',
-                    device.deviceType,
-                    device.deviceModel,
-                    location.name,
-                    device.userDefinedDeviceName,
-                  );
-                }
-                this.createT5(device, locationId);
-              } else if (device.deviceModel.startsWith('D6')) {
-                if (this.config.devicediscovery) {
-                  this.log.info(
-                    'Discovered %s %s - %s',
-                    device.deviceType,
-                    device.deviceModel,
-                    location.name,
-                    device.userDefinedDeviceName,
-                  );
-                }
-                this.createT5(device, locationId);
-              } else if (!device.DeviceModel) {
-                this.log.info(
-                  'A LLC Device has been discovered with a deviceModel that does not start with T5, D6 or T9',
-                );
-              }
-            } else if (device.deviceID.startsWith('TCC')) {
-              if (device.deviceModel.startsWith('Round')) {
-                if (this.config.devicediscovery) {
-                  this.log.info(
-                    'Discovered %s %s - %s',
-                    device.deviceType,
-                    device.deviceModel,
-                    location.name,
-                    device.userDefinedDeviceName,
-                  );
-                }
-                this.createRound(device, locationId);
-              } else if (device.deviceModel.startsWith('Unknown')) {
-                if (this.config.devicediscovery) {
-                  this.log.info(
-                    'Discovered %s %s - %s',
-                    device.deviceType,
-                    device.deviceModel,
-                    location.name,
-                    device.userDefinedDeviceName,
-                  );
-                }
-                this.createTCC(device, locationId);
-              } else if (!device.deviceModel) {
-                this.log.info(
-                  'A TCC Device has been discovered with a deviceModel that does not start with Round or Unknown',
-                );
-              }
-            } else {
+            if (this.config.devicediscovery) {
               this.log.info(
-                'A Device was found that is not supported, ',
-                'Please open Feature Request Here: https://git.io/JURLY, ',
-                'If you would like to see support.',
+                'Discovered %s %s - %s',
+                device.deviceType,
+                device.deviceModel,
+                location.name,
+                device.userDefinedDeviceName,
               );
             }
+            await this.createThermostat(location, device, locationId);
+            if (device.deviceModel.startsWith('T9')) {
+              try {
+                await this.discoverRoomSensors(location.locationID, device);
+              } catch (e) {
+                this.log.error('Failed to Find Room Sensor(s).', JSON.stringify(e.message));
+                this.log.debug(JSON.stringify(e));
+              }
+            }
+          } else {
+            this.log.info(
+              'Unsupported Device found, Please open Feature Request Here: https://git.io/JURLY',
+            );
           }
         }
       }
@@ -497,7 +427,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     }
   }
 
-  private async discoverRoomSensors(locationId: location['locationID'], device: T9Thermostat) {
+  private async discoverRoomSensors(locationId: location['locationID'], device: Thermostat) {
     // get the devices at each location
     this.roomsensordisplaymethod();
     if (device.groups) {
@@ -546,10 +476,10 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     }
   }
 
-  private async createT9(
-    device: T9Thermostat,
+  private async createThermostat(
+    location,
+    device: Thermostat,
     locationId: location['locationID'],
-    firmware: accessoryAttribute['softwareRevision'],
   ) {
     const uuid = this.api.hap.uuid.generate(`${device.name}-${device.deviceID}-${device.deviceModel}`);
 
@@ -568,12 +498,12 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         );
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-        existingAccessory.context.firmwareRevision = firmware;
+        existingAccessory.context.firmwareRevision = this.firmware;
         this.api.updatePlatformAccessories([existingAccessory]);
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
-        new T9thermostat(this, existingAccessory, locationId, device, firmware);
-        this.log.debug(`T9 UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
+        new Thermostats(this, existingAccessory, locationId, device);
+        this.log.debug(`Thermostat UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
@@ -582,7 +512,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       this.log.info(
         'Adding new accessory:',
         device.name,
-        'T9',
+        'Thermostat',
         device.deviceModel,
         device.deviceType,
         'DeviceID:',
@@ -594,13 +524,19 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
-      accessory.context.firmwareRevision = firmware;
+      if (device.deviceModel.startsWith('T9')) {
+        try {
+          accessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
+        } catch (e) {
+          this.log.error('Failed to Get T9 Firmware Version.', JSON.stringify(e.message));
+          this.log.debug(JSON.stringify(e));
+        }
+      }
       accessory.context.device = device;
-      // accessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
-      new T9thermostat(this, accessory, locationId, device, firmware);
-      this.log.debug(`T9 UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
+      new Thermostats(this, accessory, locationId, device);
+      this.log.debug(`Thermostat UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
 
       // link the accessory to your platform
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
@@ -610,217 +546,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         this.log.error(
           'Unable to Register new device:',
           device.name,
-          'T9',
-          device.deviceModel,
-          device.deviceType,
-          'DeviceID:',
-          device.deviceID,
-        );
-        this.log.error('Check Config to see if DeviceID is being Hidden.');
-      }
-    }
-  }
-
-  private createT5(device: T5Device, locationId: location['locationID']) {
-    const uuid = this.api.hap.uuid.generate(`${device.name}-${device.deviceID}-${device.deviceModel}`);
-
-    // see if an accessory with the same uuid has already been registered and restored from
-    // the cached devices we stored in the `configureAccessory` method above
-    const existingAccessory = this.accessories.find((accessory) => accessory.UUID === uuid);
-
-    if (existingAccessory) {
-      // the accessory already exists
-      if (!this.config.options?.hide_device.includes(device.deviceID) && device.isAlive) {
-        this.log.info(
-          'Restoring existing accessory from cache:',
-          existingAccessory.displayName,
-          'DeviceID:',
-          device.deviceID,
-        );
-
-        // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-        //existingAccessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
-        //this.api.updatePlatformAccessories([existingAccessory]);
-        // create the accessory handler for the restored accessory
-        // this is imported from `platformAccessory.ts`
-        new T5thermostat(this, existingAccessory, locationId, device);
-        this.log.debug(`T5 UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
-      } else {
-        this.unregisterPlatformAccessories(existingAccessory);
-      }
-    } else if (!this.config.options?.hide_device.includes(device.deviceID)) {
-      // the accessory does not yet exist, so we need to create it
-      this.log.info(
-        'Adding new accessory:',
-        device.name,
-        'T5',
-        device.deviceModel,
-        device.deviceType,
-        'DeviceID:',
-        device.deviceID,
-      );
-
-      // create a new accessory
-      const accessory = new this.api.platformAccessory(`${device.name} ${device.deviceType}`, uuid);
-
-      // store a copy of the device object in the `accessory.context`
-      // the `context` property can be used to store any data about the accessory you may need
-      accessory.context.device = device;
-      // accessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
-      // create the accessory handler for the newly create accessory
-      // this is imported from `platformAccessory.ts`
-      new T5thermostat(this, accessory, locationId, device);
-      this.log.debug(`T5 UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
-
-      // link the accessory to your platform
-      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
-      this.accessories.push(accessory);
-    } else {
-      if (this.config.devicediscovery) {
-        this.log.error(
-          'Unable to Register new device:',
-          device.name,
-          'T5',
-          device.deviceModel,
-          device.deviceType,
-          'DeviceID:',
-          device.deviceID,
-        );
-        this.log.error('Check Config to see if DeviceID is being Hidden.');
-      }
-    }
-  }
-
-  private createRound(device: RoundDevice, locationId: location['locationID']) {
-    const uuid = this.api.hap.uuid.generate(`${device.name}-${device.deviceID}-${device.deviceModel}`);
-
-    // see if an accessory with the same uuid has already been registered and restored from
-    // the cached devices we stored in the `configureAccessory` method above
-    const existingAccessory = this.accessories.find((accessory) => accessory.UUID === uuid);
-
-    if (existingAccessory) {
-      // the accessory already exists
-      if (!this.config.options?.hide_device.includes(device.deviceID) && device.isAlive) {
-        this.log.info(
-          'Restoring existing accessory from cache:',
-          existingAccessory.displayName,
-          'DeviceID:',
-          device.deviceID,
-        );
-
-        // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-        existingAccessory.context.firmwareRevision = device.thermostatVersion;
-        this.api.updatePlatformAccessories([existingAccessory]);
-        // create the accessory handler for the restored accessory
-        // this is imported from `platformAccessory.ts`
-        new RoundThermostat(this, existingAccessory, locationId, device);
-        this.log.debug(`Round UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
-      } else {
-        this.unregisterPlatformAccessories(existingAccessory);
-      }
-    } else if (!this.config.options?.hide_device.includes(device.deviceID)) {
-      // the accessory does not yet exist, so we need to create it
-      this.log.info(
-        'Adding new accessory:',
-        device.name,
-        'Round',
-        device.deviceModel,
-        device.deviceType,
-        'DeviceID:',
-        device.deviceID,
-      );
-
-      // create a new accessory
-      const accessory = new this.api.platformAccessory(`${device.name} ${device.deviceType}`, uuid);
-
-      // store a copy of the device object in the `accessory.context`
-      // the `context` property can be used to store any data about the accessory you may need
-      accessory.context.device = device;
-      accessory.context.firmwareRevision = device.thermostatVersion;
-      // create the accessory handler for the newly create accessory
-      // this is imported from `platformAccessory.ts`
-      new RoundThermostat(this, accessory, locationId, device);
-      this.log.debug(`Round UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
-
-      // link the accessory to your platform
-      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
-      this.accessories.push(accessory);
-    } else {
-      if (this.config.devicediscovery) {
-        this.log.error(
-          'Unable to Register new device:',
-          device.name,
-          'Round',
-          device.deviceModel,
-          device.deviceType,
-          'DeviceID:',
-          device.deviceID,
-        );
-        this.log.error('Check Config to see if DeviceID is being Hidden.');
-      }
-    }
-  }
-
-  private createTCC(device: TCCDevice, locationId: location['locationID']) {
-    const uuid = this.api.hap.uuid.generate(`${device.name}-${device.deviceID}-${device.deviceModel}`);
-
-    // see if an accessory with the same uuid has already been registered and restored from
-    // the cached devices we stored in the `configureAccessory` method above
-    const existingAccessory = this.accessories.find((accessory) => accessory.UUID === uuid);
-
-    if (existingAccessory) {
-      // the accessory already exists
-      if (!this.config.options?.hide_device.includes(device.deviceID) && device.isAlive) {
-        this.log.info(
-          'Restoring existing accessory from cache:',
-          existingAccessory.displayName,
-          'DeviceID:',
-          device.deviceID,
-        );
-
-        // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-        existingAccessory.context.firmwareRevision = device.thermostatVersion;
-        this.api.updatePlatformAccessories([existingAccessory]);
-        // create the accessory handler for the restored accessory
-        // this is imported from `platformAccessory.ts`
-        new TCCthermostat(this, existingAccessory, locationId, device);
-        this.log.debug(`TCC UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
-      } else {
-        this.unregisterPlatformAccessories(existingAccessory);
-      }
-    } else if (!this.config.options?.hide_device.includes(device.deviceID)) {
-      // the accessory does not yet exist, so we need to create it
-      this.log.info(
-        'Adding new accessory:',
-        device.name,
-        'TCC',
-        device.deviceModel,
-        device.deviceType,
-        'DeviceID:',
-        device.deviceID,
-      );
-
-      // create a new accessory
-      const accessory = new this.api.platformAccessory(`${device.name} ${device.deviceType}`, uuid);
-
-      // store a copy of the device object in the `accessory.context`
-      // the `context` property can be used to store any data about the accessory you may need
-      accessory.context.device = device;
-      accessory.context.firmwareRevision = device.thermostatVersion;
-      // create the accessory handler for the newly create accessory
-      // this is imported from `platformAccessory.ts`
-      new TCCthermostat(this, accessory, locationId, device);
-      this.log.debug(`TCC UDID: ${device.name}-${device.deviceID}-${device.deviceModel}`);
-
-      // link the accessory to your platform
-      this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
-      this.accessories.push(accessory);
-    } else {
-      if (this.config.devicediscovery) {
-        this.log.error(
-          'Unable to Register new device:',
-          device.name,
-          'TCC',
+          'Thermostat',
           device.deviceModel,
           device.deviceType,
           'DeviceID:',
@@ -899,7 +625,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   }
 
   private createRoomSensors(
-    device: T9Thermostat,
+    device: Thermostat,
     locationId: location['locationID'],
     sensorAccessory: sensorAccessory,
     group: T9groups,
@@ -972,7 +698,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   }
 
   private createRoomSensorThermostat(
-    device: T9Thermostat,
+    device: Thermostat,
     locationId: location['locationID'],
     sensorAccessory: sensorAccessory,
     group: T9groups,
@@ -1075,7 +801,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     priorityType: string;
     settings: Settings;
     inBuiltSensorState: inBuiltSensorState;
-    groups: T9Thermostat['groups'];
+    groups: Thermostat['groups'];
   }) {
     if (this.config.devicediscovery) {
       this.log.warn(JSON.stringify(device));

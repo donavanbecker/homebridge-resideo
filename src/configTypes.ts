@@ -16,6 +16,7 @@ export type credentials = {
 
 export type options = {
   refreshRate?: number;
+  pushRate?: number;
   hide_device: string[];
   thermostat?: thermostat;
   leaksensor?: leaksensor;
@@ -46,23 +47,97 @@ export type roompriority = {
   priorityType?: string;
 };
 
-// Logger
-//export interface warnDebugLog extends Logger {
-// debugWarn: Logger['warn'];
-//}
-
 // Location
 export type location = {
   locationID: number;
   name: string;
-  devices: T9Thermostat | T5Device | LeakDevice | TCCDevice | RoundDevice;
+  devices: Thermostat | T9Thermostat | T5Device | LeakDevice | TCCDevice | RoundDevice;
+};
+
+export type Thermostat = {
+  groups?: Array<T9groups>;
+  inBuiltSensorState?: inBuiltSensorState;
+  settings: Settings;
+  deviceClass: string;
+  deviceType: string;
+  deviceID: string;
+  userDefinedDeviceName: string;
+  name: string;
+  isAlive: boolean;
+  priorityType?: string;
+  units: string;
+  indoorTemperature: number;
+  allowedModes: string;
+  minHeatSetpoint: number;
+  maxHeatSetpoint: number;
+  minCoolSetpoint: number;
+  maxCoolSetpoint: number;
+  changeableValues: ChangeableValues;
+  operationStatus: OperationStatus;
+  indoorHumidity?: number;
+  deviceModel: string;
+  displayedOutdoorHumidity?: number;
+  scheduleStatus?: string;
+  allowedTimeIncrements?: number;
+  isUpgrading?: boolean;
+  isProvisioned?: boolean;
+  macID?: string;
+  dataSyncStatus?: string;
+  outdoorTemperature?: number;
+  deadband?: number;
+  hasDualSetpointStatus?: boolean;
+  thermostatVersion?: string;
+  parentDeviceId?: number;
+  service?: Service;
+  deviceSettings?: Record<string, unknown>;
+};
+
+export type T9groups = {
+  id: number;
+};
+
+export type inBuiltSensorState = {
+  roomId: number;
+  roomName: string;
+};
+
+// Fan Settings
+export type Settings = {
+  homeSetPoints?: HomeSetPoints;
+  awaySetPoints?: AwaySetPoints;
+  fan: Fan;
+  temperatureMode?: TemperatureMode;
+  specialMode?: SpecialMode;
+};
+
+export type ChangeableValues = {
+  mode: string;
+  autoChangeoverActive?: boolean;
+  heatSetpoint: number;
+  coolSetpoint: number;
+  thermostatSetpointStatus?: string;
+  nextPeriodTime?: string;
+  endHeatSetpoint?: number;
+  endCoolSetpoint?: number;
+  heatCoolMode: string;
+  emergencyHeatActive?: boolean;
+};
+
+export type OperationStatus = {
+  mode: string;
+  fanRequest?: boolean;
+  circulationFanRequest?: boolean;
+};
+
+export type Service = {
+  mode: string;
 };
 
 // T9 Thermostat
 export type T9Thermostat = {
   groups: Array<T9groups>;
   inBuiltSensorState: inBuiltSensorState;
-  settings: Settings;
+  settings: T9Settings;
   deviceClass: string;
   deviceType: string;
   deviceID: string;
@@ -89,15 +164,6 @@ export type OperationStatusT9 = {
   circulationFanRequest: boolean;
 };
 
-export type T9groups = {
-  id: number;
-};
-
-export type inBuiltSensorState = {
-  roomId: number;
-  roomName: string;
-};
-
 export type T9changeableValues = {
   mode: string;
   autoChangeoverActive: boolean;
@@ -115,7 +181,7 @@ export type T5Device = {
   displayedOutdoorHumidity: number;
   scheduleStatus: string;
   allowedTimeIncrements: number;
-  settings: Settings;
+  settings: T9Settings;
   deviceClass: string;
   deviceType: string;
   deviceID: string;
@@ -160,7 +226,7 @@ export type OperationStatusT5 = {
 export type TCCDevice = {
   thermostatVersion: string;
   scheduleStatus: string;
-  settings: Settings;
+  settings: T9Settings;
   deviceClass: string;
   deviceType: string;
   deviceID: string;
@@ -200,9 +266,6 @@ export type TCC_ChangeableValues = {
   heatCoolMode: string;
 };
 
-export type Service = {
-  mode: string;
-};
 
 // Round Thermostat
 export type RoundDevice = {
@@ -275,7 +338,7 @@ export type SpecialMode = {
 };
 
 // Fan Settings
-export type Settings = {
+export type T9Settings = {
   fan: Fan;
 };
 

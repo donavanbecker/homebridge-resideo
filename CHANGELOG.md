@@ -2,11 +2,11 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
-## [Version 8.4.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.4.0...v8.4.1) (2021-02-09)
+## [9.0.0-Beta](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.4.0...v9.0.0) (2021-02-XX)
 
 ### Changes
 
-- Housekeeping.
+- Refractoring of Thermostat Files.
 
 ## [Version 8.4.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.3.2...v8.4.0) (2021-02-08)
 

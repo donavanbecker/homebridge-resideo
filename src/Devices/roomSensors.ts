@@ -2,7 +2,7 @@ import { Service, PlatformAccessory } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
-import { location, sensorAccessory, T9Thermostat, T9groups } from '../configTypes';
+import { location, sensorAccessory, Thermostat, T9groups } from '../configTypes';
 
 /**
  * Platform Accessory
@@ -31,7 +31,7 @@ export class RoomSensors {
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
     public readonly locationId: location['locationID'],
-    public device: T9Thermostat,
+    public device: Thermostat,
     public sensorAccessory: sensorAccessory,
     public readonly group: T9groups,
   ) {
