@@ -400,32 +400,35 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         this.locationinfo(location);
         for (const device of location.devices) {
           this.deviceinfo(device);
-          if (device.isAlive && device.deviceClass === 'LeakDetector') {
-            if (this.config.devicediscovery) {
-              this.log.info('Discovered %s - %s', device.deviceType, location.name, device.userDefinedDeviceName);
-            }
-            this.Leak(device, locationId);
-          } else if (device.isAlive && device.deviceClass === 'Thermostat') {
-            if (this.config.devicediscovery) {
-              this.log.info(
-                'Discovered %s %s - %s',
-                device.deviceType,
-                device.deviceModel,
-                location.name,
-                device.userDefinedDeviceName,
-              );
-            }
-            await this.createThermostat(location, device, locationId);
-            if (device.deviceModel.startsWith('T9')) {
-              try {
-                await this.discoverRoomSensors(location.locationID, device);
-              } catch (e) {
-                this.log.error('Failed to Find Room Sensor(s).', JSON.stringify(e.message));
-                this.log.debug(JSON.stringify(e));
+          switch (device.deviceClass && device.isAlive) {
+            case 'LeakDetector':
+              if (this.config.devicediscovery) {
+                this.log.info('Discovered %s - %s', device.deviceType, location.name, device.userDefinedDeviceName);
               }
-            }
-          } else {
-            this.log.info('Unsupported Device found, Please open Feature Request Here: https://git.io/JURLY');
+              this.Leak(device, locationId);
+              break;
+            case 'Thermostat':
+              if (this.config.devicediscovery) {
+                this.log.info(
+                  'Discovered %s %s - %s',
+                  device.deviceType,
+                  device.deviceModel,
+                  location.name,
+                  device.userDefinedDeviceName,
+                );
+              }
+              await this.createThermostat(location, device, locationId);
+              if (device.deviceModel.startsWith('T9')) {
+                try {
+                  await this.discoverRoomSensors(location.locationID, device);
+                } catch (e) {
+                  this.log.error('Failed to Find Room Sensor(s).', JSON.stringify(e.message));
+                  this.log.debug(JSON.stringify(e));
+                }
+              }
+              break;
+            default:
+              this.log.info('Unsupported Device found, Please open Feature Request Here: https://git.io/JURLY');
           }
         }
       }

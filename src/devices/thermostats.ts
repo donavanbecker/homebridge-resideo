@@ -569,7 +569,7 @@ export class Thermostats {
     }
   }
 
-  setTargetHeatingCoolingState(value: any, callback: CharacteristicSetCallback) {
+  async setTargetHeatingCoolingState(value: any, callback: CharacteristicSetCallback) {
     this.platform.log.debug('Thermostat %s -', this.accessory.displayName, 'Set TargetHeatingCoolingState:', value);
 
     this.TargetHeatingCoolingState = value;
@@ -582,7 +582,7 @@ export class Thermostats {
     }
     this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
     if (this.platform.config.options?.roompriority?.thermostat && this.device.deviceModel === 'T9-T10') {
-      this.doRoomUpdate.next();
+      await this.doRoomUpdate.next();
     }
     this.doThermostatUpdate.next();
     callback(null);
