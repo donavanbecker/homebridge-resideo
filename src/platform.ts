@@ -506,7 +506,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         );
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-        existingAccessory.context.firmwareRevision = this.firmware;
+        await this.thermostatFirmwareExistingwAccessory(device, existingAccessory, location);
         this.api.updatePlatformAccessories([existingAccessory]);
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
@@ -532,14 +532,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
-      if (device.deviceModel.startsWith('T9')) {
-        try {
-          accessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
-        } catch (e) {
-          this.log.error('Failed to Get T9 Firmware Version.', JSON.stringify(e.message));
-          this.log.debug(JSON.stringify(e));
-        }
-      }
+      await this.thermostatFirmwareNewAccessory(device, accessory, location);
+      accessory.context.deviceID = device.deviceID;
       accessory.context.device = device;
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
@@ -608,6 +602,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
+      accessory.context.deviceID = device.deviceID;
       accessory.context.device = device;
       // accessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
       // create the accessory handler for the newly create accessory
@@ -682,6 +677,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
+      accessory.context.accessoryId = sensorAccessory.accessoryId;
       accessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision;
 
       // create the accessory handler for the newly create accessory
@@ -760,6 +756,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
+      accessory.context.accessoryId = sensorAccessory.accessoryId;
       accessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision;
 
       // create the accessory handler for the newly create accessory
@@ -784,6 +781,37 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
           device.deviceID,
         );
       }
+    }
+  }
+
+
+  private async thermostatFirmwareNewAccessory(device: Thermostat, accessory: PlatformAccessory, location: any) {
+    if (device.deviceModel.startsWith('T9')) {
+      try {
+        accessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
+      } catch (e) {
+        this.log.error('Failed to Get T9 Firmware Version.', JSON.stringify(e.message));
+        this.log.debug(JSON.stringify(e));
+      }
+    } else if (device.deviceModel.startsWith('Round') || device.deviceModel.startsWith('Unknown')) {
+      accessory.context.firmwareRevision = device.thermostatVersion;
+    } else {
+      accessory.context.firmwareRevision = '9.0.0';
+    }
+  }
+
+  private async thermostatFirmwareExistingwAccessory(device: Thermostat, existingAccessory: PlatformAccessory, location: any) {
+    if (device.deviceModel.startsWith('T9')) {
+      try {
+        existingAccessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
+      } catch (e) {
+        this.log.error('Failed to Get T9 Firmware Version.', JSON.stringify(e.message));
+        this.log.debug(JSON.stringify(e));
+      }
+    } else if (device.deviceModel.startsWith('Round') || device.deviceModel.startsWith('Unknown')) {
+      existingAccessory.context.firmwareRevision = device.thermostatVersion;
+    } else {
+      existingAccessory.context.firmwareRevision = '9.0.0';
     }
   }
 

@@ -29,7 +29,7 @@ export class Thermostats {
   TargetHeatingCoolingState!: number;
   CoolingThresholdTemperature!: number;
   HeatingThresholdTemperature!: number;
-  CurrentRelativeHumidity!: number;
+  CurrentRelativeHumidity?: number;
   TemperatureDisplayUnits!: number;
   //Fan Characteristics
   Active!: number;
@@ -89,7 +89,7 @@ export class Thermostats {
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(this.platform.Characteristic.Model, device.deviceModel)
       .setCharacteristic(this.platform.Characteristic.SerialNumber, device.deviceID)
-      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, device.thermostatVersion || accessory.context.firmwareRevision );
+      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
 
     //Thermostat Service
     (this.service =
@@ -157,7 +157,12 @@ export class Thermostats {
     // Fan Controls
     this.fanService = accessory.getService(this.platform.Service.Fanv2);
     if (device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
-      this.platform.log.debug('Thermostat %s -', this.accessory.displayName, 'Available FAN settings', JSON.stringify(device.settings.fan));
+      this.platform.log.debug(
+        'Thermostat %s -',
+        this.accessory.displayName,
+        'Available FAN settings',
+        JSON.stringify(device.settings.fan),
+      );
       this.fanService =
         accessory.getService(this.platform.Service.Fanv2) ||
         accessory.addService(this.platform.Service.Fanv2, `${device.name} ${this.device.deviceClass} Fan`);
@@ -258,9 +263,11 @@ export class Thermostats {
     }
 
     this.CurrentTemperature = this.toCelsius(this.device.indoorTemperature);
-    
+
     if (this.device.indoorHumidity) {
       this.CurrentRelativeHumidity = this.device.indoorHumidity;
+    } else {
+      this.CurrentRelativeHumidity = 0;
     }
 
     if (this.device.changeableValues.heatSetpoint > 0) {
@@ -384,7 +391,11 @@ export class Thermostats {
           },
         })
       ).data;
-      this.platform.log.debug('Thermostat %s priority -', this.accessory.displayName, JSON.stringify(this.roompriority));
+      this.platform.log.debug(
+        'Thermostat %s priority -',
+        this.accessory.displayName,
+        JSON.stringify(this.roompriority),
+      );
     }
   }
 
@@ -513,7 +524,7 @@ export class Thermostats {
       this.TemperatureDisplayUnits,
     );
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
-    if (this.device.indoorHumidity) {
+    if (this.device.indoorHumidity && this.CurrentRelativeHumidity) {
       this.service.updateCharacteristic(
         this.platform.Characteristic.CurrentRelativeHumidity,
         this.CurrentRelativeHumidity,
