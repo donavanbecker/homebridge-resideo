@@ -1,7 +1,7 @@
 import { Service, PlatformAccessory } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
-import { debounceTime, skipWhile, tap } from 'rxjs/operators';
+import { skipWhile } from 'rxjs/operators';
 import { DeviceURL } from '../settings';
 import { location, LeakDevice } from '../configTypes';
 
@@ -122,19 +122,6 @@ export class LeakSensor {
       .pipe(skipWhile(() => this.SensorUpdateInProgress))
       .subscribe(() => {
         this.refreshStatus();
-      });
-
-    // Watch for thermostat change events
-    // We put in a debounce of 100ms so we don't make duplicate calls
-    this.doSensorUpdate
-      .pipe(
-        tap(() => {
-          this.SensorUpdateInProgress = true;
-        }),
-        debounceTime(100),
-      )
-      .subscribe(async () => {
-        this.SensorUpdateInProgress = false;
       });
   }
 

@@ -392,20 +392,6 @@ export class Thermostats {
    * Pushes the requested changes to the Honeywell API
    */
   async pushChanges() {
-    /*const HeatingThreshold = this.HeatingThresholdTemperature !== this.heatSetpointThreshold();
-    const CoolingThreshold = this.CoolingThresholdTemperature !== this.coolSetpointThreshold();
-    const TargetHeatingCooling = this.TargetHeatingCoolingState !== this.modes[this.device.changeableValues.mode];
-    this.platform.log.debug(
-      'Thermostat %s Current Mode: %s, Changing Mode: %s, Current Heat: %s, Changing Heat: %s, Current Cool: %s, Changing Cool: %s',
-      this.accessory.displayName,
-      this.modes[this.device.changeableValues.mode],
-      this.TargetHeatingCoolingState,
-      this.toCelsius(this.device.changeableValues.heatSetpoint),
-      this.HeatingThresholdTemperature,
-      this.toCelsius(this.device.changeableValues.coolSetpoint),
-      this.CoolingThresholdTemperature,
-    );
-    if (HeatingThreshold || CoolingThreshold || TargetHeatingCooling) {*/
     const payload = {
       mode: this.honeywellMode[this.TargetHeatingCoolingState],
       thermostatSetpointStatus: this.platform.config.options?.thermostat?.thermostatSetpointStatus,
@@ -449,25 +435,6 @@ export class Thermostats {
     });
     // Refresh the status from the API
     await this.refreshStatus();
-    //}
-  }
-
-  private heatSetpointThreshold() {
-    if (this.TemperatureDisplayUnits === this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS) {
-      this.heatSetpoint = this.device.changeableValues.heatSetpoint;
-    } else {
-      this.heatSetpoint = this.toCelsius(this.device.changeableValues.heatSetpoint);
-    }
-    return this.heatSetpoint;
-  }
-
-  private coolSetpointThreshold() {
-    if (this.TemperatureDisplayUnits === this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS) {
-      this.coolSetpoint = this.device.changeableValues.coolSetpoint;
-    } else {
-      this.coolSetpoint = this.toCelsius(this.device.changeableValues.coolSetpoint);
-    }
-    return this.coolSetpoint;
   }
 
   /**

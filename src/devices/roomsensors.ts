@@ -1,7 +1,7 @@
 import { Service, PlatformAccessory } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
-import { debounceTime, skipWhile, tap } from 'rxjs/operators';
+import { skipWhile } from 'rxjs/operators';
 import { location, sensorAccessory, Thermostat, T9groups } from '../configTypes';
 
 /**
@@ -125,19 +125,6 @@ export class RoomSensors {
       .pipe(skipWhile(() => this.SensorUpdateInProgress))
       .subscribe(() => {
         this.refreshStatus();
-      });
-
-    // Watch for roomsensor change events
-    // We put in a debounce of 100ms so we don't make duplicate calls
-    this.doSensorUpdate
-      .pipe(
-        tap(() => {
-          this.SensorUpdateInProgress = true;
-        }),
-        debounceTime(100),
-      )
-      .subscribe(async () => {
-        this.SensorUpdateInProgress = false;
       });
   }
 
