@@ -49,15 +49,15 @@ export class LeakSensor {
     this.accessory
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
-      .setCharacteristic(this.platform.Characteristic.Model, this.device.deviceType)
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID);
+      .setCharacteristic(this.platform.Characteristic.Model, device.deviceType)
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, device.deviceID);
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
     (this.service =
       this.accessory.getService(this.platform.Service.BatteryService) ||
       this.accessory.addService(this.platform.Service.BatteryService)),
-    `${this.device.userDefinedDeviceName} Sensor`;
+    `${device.userDefinedDeviceName} Sensor`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -67,7 +67,7 @@ export class LeakSensor {
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
     this.service.setCharacteristic(
       this.platform.Characteristic.Name,
-      `${this.device.userDefinedDeviceName} ${this.device.deviceType}`,
+      `${device.userDefinedDeviceName} ${device.deviceType}`,
     );
 
     // each service must implement at-minimum the "required characteristics" for the given service type
@@ -84,7 +84,7 @@ export class LeakSensor {
     if (!this.leakService && !this.platform.config.options?.leaksensor?.hide_leak) {
       this.leakService = accessory.addService(
         this.platform.Service.LeakSensor,
-        `${this.device.userDefinedDeviceName} Leak Sensor`,
+        `${device.userDefinedDeviceName} Leak Sensor`,
       );
     } else if (this.leakService && this.platform.config.options?.leaksensor?.hide_leak) {
       accessory.removeService(this.leakService);
@@ -95,7 +95,7 @@ export class LeakSensor {
     if (!this.temperatureService && !this.platform.config.options?.leaksensor?.hide_temperature) {
       this.temperatureService = accessory.addService(
         this.platform.Service.TemperatureSensor,
-        `${this.device.userDefinedDeviceName} Temperature Sensor`,
+        `${device.userDefinedDeviceName} Temperature Sensor`,
       );
     } else if (this.temperatureService && this.platform.config.options?.leaksensor?.hide_temperature) {
       accessory.removeService(this.temperatureService);
@@ -106,7 +106,7 @@ export class LeakSensor {
     if (!this.humidityService && !this.platform.config.options?.leaksensor?.hide_humidity) {
       this.humidityService = accessory.addService(
         this.platform.Service.HumiditySensor,
-        `${this.device.userDefinedDeviceName} Humidity Sensor`,
+        `${device.userDefinedDeviceName} Humidity Sensor`,
       );
     } else if (this.humidityService && this.platform.config.options?.leaksensor?.hide_humidity) {
       accessory.removeService(this.humidityService);

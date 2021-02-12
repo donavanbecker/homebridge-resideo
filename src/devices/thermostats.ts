@@ -105,7 +105,7 @@ export class Thermostats {
     this.parseStatus();
 
     // Set Min and Max
-    if (this.device.changeableValues.heatCoolMode === 'Heat') {
+    if (device.changeableValues.heatCoolMode === 'Heat') {
       this.platform.log.debug('Thermostat %s -', this.accessory.displayName, 'Device is in "Heat" mode');
       this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature).setProps({
         minValue: this.toCelsius(device.minHeatSetpoint),
@@ -164,7 +164,7 @@ export class Thermostats {
       );
       this.fanService =
         accessory.getService(this.platform.Service.Fanv2) ||
-        accessory.addService(this.platform.Service.Fanv2, `${device.name} ${this.device.deviceClass} Fan`);
+        accessory.addService(this.platform.Service.Fanv2, `${device.name} ${device.deviceClass} Fan`);
 
       this.fanService
         .getCharacteristic(this.platform.Characteristic.Active)
