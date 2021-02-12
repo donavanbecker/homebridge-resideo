@@ -8,8 +8,7 @@ import {
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
-import { DeviceURL } from '../settings';
-import { location, sensorAccessory, Thermostat, T9groups, FanChangeableValues } from '../configTypes';
+import { DeviceURL, location, sensorAccessory, Thermostat, T9groups, FanChangeableValues } from '../settings';
 
 /**
  * Platform Accessory
@@ -32,7 +31,6 @@ export class RoomSensorThermostat {
   honeywellMode!: Array<string>;
   roompriority: any;
   deviceFan!: FanChangeableValues;
-  
 
   roomUpdateInProgress!: boolean;
   doRoomUpdate!: any;
@@ -81,11 +79,11 @@ export class RoomSensorThermostat {
     this.accessory
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
-      .setCharacteristic(this.platform.Characteristic.Model, this.sensorAccessory.accessoryAttribute.model)
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID)
+      .setCharacteristic(this.platform.Characteristic.Model, sensorAccessory.accessoryAttribute.model)
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, sensorAccessory.deviceID)
       .setCharacteristic(
         this.platform.Characteristic.FirmwareRevision,
-        this.sensorAccessory.accessoryAttribute.softwareRevision,
+        sensorAccessory.accessoryAttribute.softwareRevision || accessory.context.firmwareRevision,
       );
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
@@ -93,7 +91,7 @@ export class RoomSensorThermostat {
     (this.service =
       this.accessory.getService(this.platform.Service.Thermostat) ||
       this.accessory.addService(this.platform.Service.Thermostat)),
-    `${this.sensorAccessory.accessoryAttribute.name} ${this.sensorAccessory.accessoryAttribute.type} Thermostat`;
+    `${sensorAccessory.accessoryAttribute.name} ${sensorAccessory.accessoryAttribute.type} Thermostat`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -103,7 +101,7 @@ export class RoomSensorThermostat {
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
     this.service.setCharacteristic(
       this.platform.Characteristic.Name,
-      `${this.sensorAccessory.accessoryAttribute.name} ${this.sensorAccessory.accessoryAttribute.type} Thermostat`,
+      `${sensorAccessory.accessoryAttribute.name} ${sensorAccessory.accessoryAttribute.type} Thermostat`,
     );
 
     // each service must implement at-minimum the "required characteristics" for the given service type
@@ -113,7 +111,7 @@ export class RoomSensorThermostat {
     this.parseStatus();
 
     // Set Min and Max
-    if (this.device.changeableValues.heatCoolMode === 'Heat') {
+    if (device.changeableValues.heatCoolMode === 'Heat') {
       this.platform.log.debug('RST %s - ', this.accessory.displayName, 'Device is in "Heat" mode');
       this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature).setProps({
         minValue: this.toCelsius(device.minHeatSetpoint),

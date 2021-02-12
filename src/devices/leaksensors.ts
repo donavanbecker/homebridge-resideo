@@ -2,8 +2,7 @@ import { Service, PlatformAccessory } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { skipWhile } from 'rxjs/operators';
-import { DeviceURL } from '../settings';
-import { location, LeakDevice } from '../configTypes';
+import { DeviceURL, location, LeakDevice } from '../settings';
 
 /**
  * Platform Accessory

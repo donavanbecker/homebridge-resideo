@@ -8,8 +8,7 @@ import {
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
-import { DeviceURL } from '../settings';
-import { location, Thermostat, FanChangeableValues } from '../configTypes';
+import { DeviceURL, location, Thermostat, FanChangeableValues } from '../settings';
 
 /**
  * Platform Accessory

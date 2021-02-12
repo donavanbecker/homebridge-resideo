@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file. This projec
 ### Changes
 
 - Refractoring of Thermostat Files.
+- Created DeviceIDs for Roomsensors and Roomsensor Thermostats so that they can be removed.
 
 ## [Version 8.4.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.3.2...v8.4.0) (2021-02-08)
 
