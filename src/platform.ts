@@ -457,6 +457,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                         sensorAccessory.accessoryAttribute.name,
                       );
                     }
+                    device.deviceID = `${sensorAccessory.accessoryId}${sensorAccessory.roomId}${sensorAccessory.accessoryAttribute.model}`;
                     this.createRoomSensors(device, locationId, sensorAccessory, group);
                     this.createRoomSensorThermostat(device, locationId, sensorAccessory, group);
                   }
@@ -756,7 +757,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
-      accessory.context.accessoryId = sensorAccessory.accessoryId;
       accessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision;
 
       // create the accessory handler for the newly create accessory
