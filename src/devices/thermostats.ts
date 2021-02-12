@@ -195,7 +195,7 @@ export class Thermostats {
           tap(() => {
             this.roomUpdateInProgress = true;
           }),
-          debounceTime(this.platform.config.options!.pushRate! * 1000),
+          debounceTime(this.platform.config.options!.pushRate! * 990),
         )
         .subscribe(async () => {
           try {
