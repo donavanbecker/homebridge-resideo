@@ -178,7 +178,7 @@ export class RoomSensorThermostat {
           tap(() => {
             this.roomUpdateInProgress = true;
           }),
-          debounceTime(this.platform.config.options!.pushRate! * 990),
+          debounceTime(this.platform.config.options!.pushRate! * 500),
         )
         .subscribe(async () => {
           try {
