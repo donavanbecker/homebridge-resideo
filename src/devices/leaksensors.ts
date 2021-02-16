@@ -97,6 +97,10 @@ export class LeakSensor {
         this.platform.Service.TemperatureSensor,
         `${device.userDefinedDeviceName} Temperature Sensor`,
       );
+      this.service.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+        .setProps({
+          minStep: 0.5,
+        });
     } else if (this.temperatureService && this.platform.config.options?.leaksensor?.hide_temperature) {
       accessory.removeService(this.temperatureService);
     }
@@ -108,6 +112,11 @@ export class LeakSensor {
         this.platform.Service.HumiditySensor,
         `${device.userDefinedDeviceName} Humidity Sensor`,
       );
+
+      this.service.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
+        .setProps({
+          minStep: 0.5,
+        });
     } else if (this.humidityService && this.platform.config.options?.leaksensor?.hide_humidity) {
       accessory.removeService(this.humidityService);
     }
