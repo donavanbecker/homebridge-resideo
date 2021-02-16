@@ -70,6 +70,11 @@
                 "type": "boolean",
                 "requried": false
               },
+              "hide_temperature": {
+                "title": "Hide Temperature Service",
+                "type": "boolean",
+                "required": false
+              },
               "thermostatSetpointStatus": {
                 "title": "Thermostat Setpoint Status",
                 "type": "string",
@@ -268,6 +273,7 @@
               "helpvalue": "<h5>Hide Thermostat Fan Service</h5><em class='primary-text'>Allows you to hide your Thermostat's Fan.</em>"
             },
             "options.thermostat.hide_fan",
+            "options.thermostat.hide_humidity",
             {
               "type": "fieldset",
               "title": "Room Sensor Options",

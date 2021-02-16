@@ -18,6 +18,7 @@ import { DeviceURL, location, Thermostat, FanChangeableValues } from '../setting
 export class Thermostats {
   private service: Service;
   fanService?: Service;
+  humidityService?: Service;
 
   private modes: { Off: number; Heat: number; Cool: number; Auto: number };
 
@@ -175,6 +176,17 @@ export class Thermostats {
         .on(CharacteristicEventTypes.SET, this.setTargetFanState.bind(this));
     } else if (this.fanService && this.platform.config.options?.thermostat?.hide_fan) {
       accessory.removeService(this.fanService);
+    }
+
+    // Humidity Sensor Service
+    this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
+    if (!this.humidityService && !this.platform.config.options?.thermostat?.hide_humidity) {
+      this.humidityService = accessory.addService(
+        this.platform.Service.HumiditySensor,
+        `${device.name} ${device.deviceClass} Humidity Sensor`,
+      );
+    } else if (this.humidityService && this.platform.config.options?.thermostat?.hide_humidity) {
+      accessory.removeService(this.humidityService);
     }
 
     // Retrieve initial values and updateHomekit
@@ -521,8 +533,8 @@ export class Thermostats {
       this.TemperatureDisplayUnits,
     );
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
-    if (this.device.indoorHumidity) {
-      this.service.updateCharacteristic(
+    if (this.device.indoorHumidity && !this.platform.config.options?.thermostat?.hide_humidity) {
+      this.humidityService?.updateCharacteristic(
         this.platform.Characteristic.CurrentRelativeHumidity,
         this.CurrentRelativeHumidity!,
       );
@@ -553,8 +565,8 @@ export class Thermostats {
   public apiError(e: any) {
     this.service.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, e);
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
-    if (this.device.indoorHumidity) {
-      this.service.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
+    if (this.device.indoorHumidity && !this.platform.config.options?.thermostat?.hide_humidity) {
+      this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
     }
     this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, e);
     this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, e);

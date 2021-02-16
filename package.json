@@ -18,8 +18,7 @@
   },
   "main": "dist/index.js",
   "scripts": {
-    "audit": "npm audit fix",
-    "update": "npm update",
+    "audit": "npm update && npm audit fix",
     "lint": "eslint src/**.ts",
     "watch": "npm run build && npm link && nodemon",
     "build": "rimraf ./dist && tsc",
