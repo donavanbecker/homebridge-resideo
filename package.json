@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge Honeywell Home",
   "name": "homebridge-honeywell-home",
-  "version": "8.5.0",
+  "version": "9.0.0",
   "description": "The [Homebridge](https://homebridge.io) Honeywell Home plugin allows you to access your [Honeywell Home](https://honeywellhome.com) thermostat from HomeKit.",
   "author": "donavanbecker",
   "license": "Apache-2.0",
