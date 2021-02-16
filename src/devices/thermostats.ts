@@ -28,7 +28,7 @@ export class Thermostats {
   TargetHeatingCoolingState!: number;
   CoolingThresholdTemperature!: number;
   HeatingThresholdTemperature!: number;
-  CurrentRelativeHumidity?: number;
+  CurrentRelativeHumidity!: number;
   TemperatureDisplayUnits!: number;
   //Fan Characteristics
   Active!: number;
@@ -265,8 +265,6 @@ export class Thermostats {
 
     if (this.device.indoorHumidity) {
       this.CurrentRelativeHumidity = this.device.indoorHumidity;
-    } else {
-      this.CurrentRelativeHumidity = 0;
     }
 
     if (this.device.changeableValues.heatSetpoint > 0) {
