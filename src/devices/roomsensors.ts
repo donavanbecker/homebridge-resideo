@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory } from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicEventTypes, CharacteristicGetCallback } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { skipWhile } from 'rxjs/operators';
@@ -91,6 +91,13 @@ export class RoomSensors {
         this.platform.Service.TemperatureSensor,
         `${sensorAccessory.accessoryAttribute.name} Temperature Sensor`,
       );
+      this.service.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+        .setProps({
+          minValue: -50,
+          maxValue: 212,
+          minStep: 0.5,
+        })
+        .on(CharacteristicEventTypes.GET, this.handleCurrentTemperatureGet.bind(this));
     } else if (this.temperatureService && this.platform.config.options?.roomsensor?.hide_temperature) {
       accessory.removeService(this.temperatureService);
     }
@@ -242,5 +249,20 @@ export class RoomSensors {
 
     // celsius should be to the nearest 0.5 degree
     return Math.round((5 / 9) * (value - 32) * 2) / 2;
+  }
+
+
+  /**
+   * Handle requests to get the current value of the "Current Temperature" characteristic
+   */
+  handleCurrentTemperatureGet(callback: CharacteristicGetCallback) {
+    if (!this.platform.config.options?.roomsensor?.hide_temperature) {
+      this.platform.log.debug('RS %s - Get CurrentTemperature', this.accessory.displayName);
+
+      const currentValue = this.CurrentTemperature;
+
+      callback(null, currentValue);
+      this.platform.log.info('RS %s - CurrentTemperature: %s', this.accessory.displayName, currentValue);
+    }
   }
 }
