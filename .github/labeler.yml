@@ -1,7 +1,3 @@
-# Add 'server' to any changes within 'server' folder or any subfolders
-server:
-  - server/**/*
-
 # Add 'branding' to any file changes within 'honeywell' folder
 branding: honeywell/*
 

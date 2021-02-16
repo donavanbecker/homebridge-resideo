@@ -1,9 +1,8 @@
 import { Service, PlatformAccessory } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
-import { debounceTime, skipWhile, tap } from 'rxjs/operators';
-import { DeviceURL } from '../settings';
-import { location, LeakDevice } from '../configTypes';
+import { skipWhile } from 'rxjs/operators';
+import { DeviceURL, location, LeakDevice } from '../settings';
 
 /**
  * Platform Accessory
@@ -12,9 +11,9 @@ import { location, LeakDevice } from '../configTypes';
  */
 export class LeakSensor {
   private service: Service;
-  temperatureService: any;
-  humidityService: any;
-  leakService: any;
+  temperatureService?: Service;
+  humidityService?: Service;
+  leakService?: Service;
 
   StatusActive!: boolean;
   LeakDetected!: number;
@@ -26,7 +25,6 @@ export class LeakSensor {
 
   SensorUpdateInProgress!: boolean;
   doSensorUpdate!: any;
-  TemperatureDisplayUnits!: number;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
@@ -51,15 +49,15 @@ export class LeakSensor {
     this.accessory
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
-      .setCharacteristic(this.platform.Characteristic.Model, this.device.deviceType)
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID);
+      .setCharacteristic(this.platform.Characteristic.Model, device.deviceType)
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, device.deviceID);
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
     (this.service =
       this.accessory.getService(this.platform.Service.BatteryService) ||
       this.accessory.addService(this.platform.Service.BatteryService)),
-    `${this.device.userDefinedDeviceName} Sensor`;
+    `${device.userDefinedDeviceName} Sensor`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -69,7 +67,7 @@ export class LeakSensor {
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
     this.service.setCharacteristic(
       this.platform.Characteristic.Name,
-      `${this.device.userDefinedDeviceName} ${this.device.deviceType}`,
+      `${device.userDefinedDeviceName} ${device.deviceType}`,
     );
 
     // each service must implement at-minimum the "required characteristics" for the given service type
@@ -86,7 +84,7 @@ export class LeakSensor {
     if (!this.leakService && !this.platform.config.options?.leaksensor?.hide_leak) {
       this.leakService = accessory.addService(
         this.platform.Service.LeakSensor,
-        `${this.device.userDefinedDeviceName} Leak Sensor`,
+        `${device.userDefinedDeviceName} Leak Sensor`,
       );
     } else if (this.leakService && this.platform.config.options?.leaksensor?.hide_leak) {
       accessory.removeService(this.leakService);
@@ -97,7 +95,7 @@ export class LeakSensor {
     if (!this.temperatureService && !this.platform.config.options?.leaksensor?.hide_temperature) {
       this.temperatureService = accessory.addService(
         this.platform.Service.TemperatureSensor,
-        `${this.device.userDefinedDeviceName} Temperature Sensor`,
+        `${device.userDefinedDeviceName} Temperature Sensor`,
       );
     } else if (this.temperatureService && this.platform.config.options?.leaksensor?.hide_temperature) {
       accessory.removeService(this.temperatureService);
@@ -108,7 +106,7 @@ export class LeakSensor {
     if (!this.humidityService && !this.platform.config.options?.leaksensor?.hide_humidity) {
       this.humidityService = accessory.addService(
         this.platform.Service.HumiditySensor,
-        `${this.device.userDefinedDeviceName} Humidity Sensor`,
+        `${device.userDefinedDeviceName} Humidity Sensor`,
       );
     } else if (this.humidityService && this.platform.config.options?.leaksensor?.hide_humidity) {
       accessory.removeService(this.humidityService);
@@ -123,19 +121,6 @@ export class LeakSensor {
       .pipe(skipWhile(() => this.SensorUpdateInProgress))
       .subscribe(() => {
         this.refreshStatus();
-      });
-
-    // Watch for thermostat change events
-    // We put in a debounce of 100ms so we don't make duplicate calls
-    this.doSensorUpdate
-      .pipe(
-        tap(() => {
-          this.SensorUpdateInProgress = true;
-        }),
-        debounceTime(100),
-      )
-      .subscribe(async () => {
-        this.SensorUpdateInProgress = false;
       });
   }
 
@@ -209,17 +194,17 @@ export class LeakSensor {
     this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
     this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
     if (!this.platform.config.options?.leaksensor?.hide_leak) {
-      this.leakService.updateCharacteristic(this.platform.Characteristic.LeakDetected, this.LeakDetected);
-      this.leakService.updateCharacteristic(this.platform.Characteristic.StatusActive, this.StatusActive);
+      this.leakService?.updateCharacteristic(this.platform.Characteristic.LeakDetected, this.LeakDetected);
+      this.leakService?.updateCharacteristic(this.platform.Characteristic.StatusActive, this.StatusActive);
     }
     if (!this.platform.config.options?.leaksensor?.hide_temperature) {
-      this.temperatureService.updateCharacteristic(
+      this.temperatureService?.updateCharacteristic(
         this.platform.Characteristic.CurrentTemperature,
         this.CurrentTemperature,
       );
     }
     if (!this.platform.config.options?.leaksensor?.hide_humidity) {
-      this.humidityService.updateCharacteristic(
+      this.humidityService?.updateCharacteristic(
         this.platform.Characteristic.CurrentRelativeHumidity,
         this.CurrentRelativeHumidity,
       );
@@ -230,26 +215,14 @@ export class LeakSensor {
     this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, e);
     this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, e);
     if (!this.platform.config.options?.leaksensor?.hide_leak) {
-      this.leakService.updateCharacteristic(this.platform.Characteristic.LeakDetected, e);
-      this.leakService.updateCharacteristic(this.platform.Characteristic.StatusActive, e);
+      this.leakService?.updateCharacteristic(this.platform.Characteristic.LeakDetected, e);
+      this.leakService?.updateCharacteristic(this.platform.Characteristic.StatusActive, e);
     }
     if (!this.platform.config.options?.leaksensor?.hide_temperature) {
-      this.temperatureService.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
+      this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
     }
     if (!this.platform.config.options?.leaksensor?.hide_humidity) {
-      this.humidityService.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
+      this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
     }
-  }
-
-  /**
-   * Converts the value to celsius if the temperature units are in Fahrenheit
-   */
-  toCelsius(value: number) {
-    if (this.TemperatureDisplayUnits === this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS) {
-      return value;
-    }
-
-    // celsius should be to the nearest 0.5 degree
-    return Math.round((5 / 9) * (value - 32) * 2) / 2;
   }
 }

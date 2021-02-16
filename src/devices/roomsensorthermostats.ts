@@ -8,8 +8,7 @@ import {
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
-import { DeviceURL } from '../settings';
-import { location, sensorAccessory, T9Thermostat, T9groups, FanChangeableValues } from '../configTypes';
+import { DeviceURL, location, sensorAccessory, Thermostat, T9groups, FanChangeableValues } from '../settings';
 
 /**
  * Platform Accessory
@@ -18,7 +17,6 @@ import { location, sensorAccessory, T9Thermostat, T9groups, FanChangeableValues 
  */
 export class RoomSensorThermostat {
   private service: Service;
-  fanService: any;
 
   private modes: { Off: number; Heat: number; Cool: number; Auto: number };
 
@@ -31,8 +29,8 @@ export class RoomSensorThermostat {
   CurrentRelativeHumidity!: number;
   TemperatureDisplayUnits!: number;
   honeywellMode!: Array<string>;
-  deviceFan!: FanChangeableValues;
   roompriority: any;
+  deviceFan!: FanChangeableValues;
 
   roomUpdateInProgress!: boolean;
   doRoomUpdate!: any;
@@ -45,7 +43,7 @@ export class RoomSensorThermostat {
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
     public readonly locationId: location['locationID'],
-    public device: T9Thermostat,
+    public device: Thermostat,
     public sensorAccessory: sensorAccessory,
     public readonly group: T9groups,
   ) {
@@ -81,11 +79,11 @@ export class RoomSensorThermostat {
     this.accessory
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
-      .setCharacteristic(this.platform.Characteristic.Model, this.sensorAccessory.accessoryAttribute.model)
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID)
+      .setCharacteristic(this.platform.Characteristic.Model, sensorAccessory.accessoryAttribute.model)
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, sensorAccessory.deviceID)
       .setCharacteristic(
         this.platform.Characteristic.FirmwareRevision,
-        this.sensorAccessory.accessoryAttribute.softwareRevision,
+        sensorAccessory.accessoryAttribute.softwareRevision || accessory.context.firmwareRevision,
       );
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
@@ -93,7 +91,7 @@ export class RoomSensorThermostat {
     (this.service =
       this.accessory.getService(this.platform.Service.Thermostat) ||
       this.accessory.addService(this.platform.Service.Thermostat)),
-    `${this.sensorAccessory.accessoryAttribute.name} ${this.sensorAccessory.accessoryAttribute.type} Thermostat`;
+    `${sensorAccessory.accessoryAttribute.name} ${sensorAccessory.accessoryAttribute.type} Thermostat`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -103,7 +101,7 @@ export class RoomSensorThermostat {
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
     this.service.setCharacteristic(
       this.platform.Characteristic.Name,
-      `${this.sensorAccessory.accessoryAttribute.name} ${this.sensorAccessory.accessoryAttribute.type} Thermostat`,
+      `${sensorAccessory.accessoryAttribute.name} ${sensorAccessory.accessoryAttribute.type} Thermostat`,
     );
 
     // each service must implement at-minimum the "required characteristics" for the given service type
@@ -113,7 +111,7 @@ export class RoomSensorThermostat {
     this.parseStatus();
 
     // Set Min and Max
-    if (this.device.changeableValues.heatCoolMode === 'Heat') {
+    if (device.changeableValues.heatCoolMode === 'Heat') {
       this.platform.log.debug('RST %s - ', this.accessory.displayName, 'Device is in "Heat" mode');
       this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature).setProps({
         minValue: this.toCelsius(device.minHeatSetpoint),
@@ -180,7 +178,7 @@ export class RoomSensorThermostat {
           tap(() => {
             this.roomUpdateInProgress = true;
           }),
-          debounceTime(100),
+          debounceTime(this.platform.config.options!.pushRate! * 500),
         )
         .subscribe(async () => {
           try {
@@ -199,7 +197,7 @@ export class RoomSensorThermostat {
         tap(() => {
           this.thermostatUpdateInProgress = true;
         }),
-        debounceTime(100),
+        debounceTime(this.platform.config.options!.pushRate! * 1000),
       )
       .subscribe(async () => {
         try {
@@ -323,7 +321,7 @@ export class RoomSensorThermostat {
                 const roomsensors = await this.platform.getCurrentSensorData(this.device, group, this.locationId);
                 if (roomsensors.rooms) {
                   const rooms = roomsensors.rooms;
-                  this.platform.log.warn('RST %s - ', this.accessory.displayName, JSON.stringify(roomsensors));
+                  this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(roomsensors));
                   for (const accessories of rooms) {
                     if (accessories) {
                       this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(accessories));
@@ -390,7 +388,8 @@ export class RoomSensorThermostat {
    * Pushes the requested changes for Room Priority to the Honeywell API
    */
   async pushRoomChanges() {
-    this.platform.log.debug('RST Room Priority %s Current Room: %s, Changing Room: %s',
+    this.platform.log.debug(
+      'RST Room Priority %s Current Room: %s, Changing Room: %s',
       this.accessory.displayName,
       JSON.stringify(this.roompriority.currentPriority.selectedRooms),
       `[${this.sensorAccessory.accessoryId}]`,
@@ -407,11 +406,11 @@ export class RoomSensorThermostat {
       }
 
       /**
-     * For "LCC-" devices only.
-     * "NoHold" will return to schedule.
-     * "TemporaryHold" will hold the set temperature until "nextPeriodTime".
-     * "PermanentHold" will hold the setpoint until user requests another change.
-     */
+       * For "LCC-" devices only.
+       * "NoHold" will return to schedule.
+       * "TemporaryHold" will hold the set temperature until "nextPeriodTime".
+       * "PermanentHold" will hold the setpoint until user requests another change.
+       */
       if (this.platform.config.options?.roompriority?.thermostat) {
         if (this.platform.config.options.roompriority.priorityType === 'FollowMe') {
           this.platform.log.info(
@@ -450,62 +449,49 @@ export class RoomSensorThermostat {
    * Pushes the requested changes to the Honeywell API
    */
   async pushChanges() {
-    this.platform.log.debug('T9 %s Current Mode: %s, Changing Mode: %s, Current Heat: %s, Changing Heat: %s, Current Cool: %s, Changing Cool: %s',
-      this.accessory.displayName,
-      this.modes[this.device.changeableValues.mode],
-      this.TargetHeatingCoolingState,
-      this.toCelsius(this.device.changeableValues.heatSetpoint),
-      this.HeatingThresholdTemperature,
-      this.toCelsius(this.device.changeableValues.coolSetpoint),
-      this.CoolingThresholdTemperature,
-    );
-    if (this.toCelsius(this.device.changeableValues.heatSetpoint) !== this.HeatingThresholdTemperature
-      || this.toCelsius(this.device.changeableValues.coolSetpoint) !== this.CoolingThresholdTemperature
-      || this.modes[this.device.changeableValues.mode] !== this.TargetHeatingCoolingState) {
-      const payload = {
-        mode: this.honeywellMode[this.TargetHeatingCoolingState],
-        thermostatSetpointStatus: this.platform.config.options?.thermostat?.thermostatSetpointStatus,
-        autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
-      } as any;
+    const payload = {
+      mode: this.honeywellMode[this.TargetHeatingCoolingState],
+      thermostatSetpointStatus: this.platform.config.options?.thermostat?.thermostatSetpointStatus,
+      autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
+    } as any;
 
-      // Set the heat and cool set point value based on the selected mode
-      if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
-        payload.heatSetpoint = this.toFahrenheit(this.TargetTemperature);
-        payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
-      } else if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.COOL) {
-        payload.coolSetpoint = this.toFahrenheit(this.TargetTemperature);
-        payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
-      } else if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.AUTO) {
-        payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
-        payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
-      } else {
-        payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
-        payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
-      }
-
-      this.platform.log.info(
-        'Sending request for',
-        this.accessory.displayName,
-        'to Honeywell API. mode:',
-        payload.mode,
-        'coolSetpoint:',
-        payload.coolSetpoint,
-        'heatSetpoint:',
-        payload.heatSetpoint,
-        'thermostatSetpointStatus:',
-        this.platform.config.options?.thermostat?.thermostatSetpointStatus,
-      );
-      this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(payload));
-
-      // Make the API request
-      await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
-        params: {
-          locationId: this.locationId,
-        },
-      });
-      // Refresh the status from the API
-      await this.refreshStatus();
+    // Set the heat and cool set point value based on the selected mode
+    if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
+      payload.heatSetpoint = this.toFahrenheit(this.TargetTemperature);
+      payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
+    } else if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.COOL) {
+      payload.coolSetpoint = this.toFahrenheit(this.TargetTemperature);
+      payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
+    } else if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.AUTO) {
+      payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
+      payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
+    } else {
+      payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
+      payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
     }
+
+    this.platform.log.info(
+      'Sending request for',
+      this.accessory.displayName,
+      'to Honeywell API. mode:',
+      payload.mode,
+      'coolSetpoint:',
+      payload.coolSetpoint,
+      'heatSetpoint:',
+      payload.heatSetpoint,
+      'thermostatSetpointStatus:',
+      this.platform.config.options?.thermostat?.thermostatSetpointStatus,
+    );
+    this.platform.log.debug('RST %s - ', this.accessory.displayName, JSON.stringify(payload));
+
+    // Make the API request
+    await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
+      params: {
+        locationId: this.locationId,
+      },
+    });
+    // Refresh the status from the API
+    await this.refreshStatus();
   }
 
   /**
@@ -551,7 +537,7 @@ export class RoomSensorThermostat {
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, e);
   }
 
-  setTargetHeatingCoolingState(value: any, callback: CharacteristicSetCallback) {
+  async setTargetHeatingCoolingState(value: any, callback: CharacteristicSetCallback) {
     this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set TargetHeatingCoolingState: ${value}`);
 
     this.TargetHeatingCoolingState = value;
@@ -563,7 +549,7 @@ export class RoomSensorThermostat {
       this.TargetTemperature = this.toCelsius(this.device.changeableValues.coolSetpoint);
     }
     this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
-    this.doRoomUpdate.next();
+    await this.doRoomUpdate.next();
     this.doThermostatUpdate.next();
     callback(null);
   }

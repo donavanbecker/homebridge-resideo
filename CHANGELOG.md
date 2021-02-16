@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [9.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.4.0...v9.0.0) (2021-02-16)
+
+### Changes
+
+- Combined all Thermostat Models into 1 Thermostat file, making for easier updating of features and configurations.
+- Created DeviceIDs for Roomsensors and Roomsensor Thermostats so that they can be removed.
+- Added `PushRate`, which allows you to control how long the plugins waits before pushing an update to the Honeywell API.
+  - this can lower the nubmer of pushes being sent.
+
 ## [Version 8.4.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.3.2...v8.4.0) (2021-02-08)
 
 ### Changes

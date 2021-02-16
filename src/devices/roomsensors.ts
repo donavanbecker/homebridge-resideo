@@ -1,8 +1,8 @@
 import { Service, PlatformAccessory } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
-import { debounceTime, skipWhile, tap } from 'rxjs/operators';
-import { location, sensorAccessory, T9Thermostat, T9groups } from '../configTypes';
+import { skipWhile } from 'rxjs/operators';
+import { location, sensorAccessory, Thermostat, T9groups } from '../settings';
 
 /**
  * Platform Accessory
@@ -11,9 +11,9 @@ import { location, sensorAccessory, T9Thermostat, T9groups } from '../configType
  */
 export class RoomSensors {
   private service: Service;
-  temperatureService?: any;
-  occupancyService?: any;
-  humidityService?: any;
+  temperatureService?: Service;
+  occupancyService?: Service;
+  humidityService?: Service;
 
   CurrentTemperature!: number;
   StatusLowBattery!: number;
@@ -31,7 +31,7 @@ export class RoomSensors {
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
     public readonly locationId: location['locationID'],
-    public device: T9Thermostat,
+    public device: Thermostat,
     public sensorAccessory: sensorAccessory,
     public readonly group: T9groups,
   ) {
@@ -40,8 +40,8 @@ export class RoomSensors {
     this.StatusLowBattery;
     this.OccupancyDetected;
     this.CurrentRelativeHumidity;
-    this.accessoryId = this.sensorAccessory.accessoryId;
-    this.roomId = this.sensorAccessory.roomId;
+    this.accessoryId = sensorAccessory.accessoryId;
+    this.roomId = sensorAccessory.roomId;
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doSensorUpdate = new Subject();
@@ -51,11 +51,11 @@ export class RoomSensors {
     this.accessory
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
-      .setCharacteristic(this.platform.Characteristic.Model, this.device.deviceModel)
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, this.device.deviceID)
+      .setCharacteristic(this.platform.Characteristic.Model, sensorAccessory.accessoryAttribute.model)
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, sensorAccessory.deviceID)
       .setCharacteristic(
         this.platform.Characteristic.FirmwareRevision,
-        this.sensorAccessory.accessoryAttribute.softwareRevision,
+        sensorAccessory.accessoryAttribute.softwareRevision || accessory.context.firmwareRevision,
       );
 
     // get the BatteryService service if it exists, otherwise create a new Battery service
@@ -63,7 +63,7 @@ export class RoomSensors {
     (this.service =
       this.accessory.getService(this.platform.Service.BatteryService) ||
       this.accessory.addService(this.platform.Service.BatteryService)),
-    `${this.sensorAccessory.accessoryAttribute.name} Room Sensor`;
+    `${sensorAccessory.accessoryAttribute.name} Room Sensor`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -73,7 +73,7 @@ export class RoomSensors {
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
     this.service.setCharacteristic(
       this.platform.Characteristic.Name,
-      `${this.sensorAccessory.accessoryAttribute.name} Room Sensor`,
+      `${sensorAccessory.accessoryAttribute.name} Room Sensor`,
     );
 
     // each service must implement at-minimum the "required characteristics" for the given service type
@@ -89,7 +89,7 @@ export class RoomSensors {
     if (!this.temperatureService && !this.platform.config.options?.roomsensor?.hide_temperature) {
       this.temperatureService = accessory.addService(
         this.platform.Service.TemperatureSensor,
-        `${this.sensorAccessory.accessoryAttribute.name} Temperature Sensor`,
+        `${sensorAccessory.accessoryAttribute.name} Temperature Sensor`,
       );
     } else if (this.temperatureService && this.platform.config.options?.roomsensor?.hide_temperature) {
       accessory.removeService(this.temperatureService);
@@ -100,7 +100,7 @@ export class RoomSensors {
     if (!this.occupancyService && !this.platform.config.options?.roomsensor?.hide_occupancy) {
       this.occupancyService = accessory.addService(
         this.platform.Service.OccupancySensor,
-        `${this.sensorAccessory.accessoryAttribute.name} Occupancy Sensor`,
+        `${sensorAccessory.accessoryAttribute.name} Occupancy Sensor`,
       );
     } else if (this.occupancyService && this.platform.config.options?.roomsensor?.hide_occupancy) {
       accessory.removeService(this.occupancyService);
@@ -111,7 +111,7 @@ export class RoomSensors {
     if (!this.humidityService && !this.platform.config.options?.roomsensor?.hide_humidity) {
       this.humidityService = accessory.addService(
         this.platform.Service.HumiditySensor,
-        `${this.sensorAccessory.accessoryAttribute.name} Humidity Sensor`,
+        `${sensorAccessory.accessoryAttribute.name} Humidity Sensor`,
       );
     } else if (this.humidityService && this.platform.config.options?.roomsensor?.hide_humidity) {
       accessory.removeService(this.humidityService);
@@ -125,19 +125,6 @@ export class RoomSensors {
       .pipe(skipWhile(() => this.SensorUpdateInProgress))
       .subscribe(() => {
         this.refreshStatus();
-      });
-
-    // Watch for roomsensor change events
-    // We put in a debounce of 100ms so we don't make duplicate calls
-    this.doSensorUpdate
-      .pipe(
-        tap(() => {
-          this.SensorUpdateInProgress = true;
-        }),
-        debounceTime(100),
-      )
-      .subscribe(async () => {
-        this.SensorUpdateInProgress = false;
       });
   }
 
@@ -235,13 +222,13 @@ export class RoomSensors {
     this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, e);
     this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, e);
     if (!this.platform.config.options?.roomsensor?.hide_temperature) {
-      this.temperatureService.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
+      this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
     }
     if (!this.platform.config.options?.roomsensor?.hide_occupancy) {
-      this.occupancyService.updateCharacteristic(this.platform.Characteristic.OccupancyDetected, e);
+      this.occupancyService?.updateCharacteristic(this.platform.Characteristic.OccupancyDetected, e);
     }
     if (!this.platform.config.options?.roomsensor?.hide_humidity) {
-      this.humidityService.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
+      this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
     }
   }
 
