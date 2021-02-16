@@ -333,7 +333,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     return this.sensorData[device.deviceID].data;
   }
 
-  private normalizeSensorDate(sensorRoomData) {
+  private normalizeSensorDate(sensorRoomData: { rooms: any; }) {
     const normalized = [] as any;
     for (const room of sensorRoomData.rooms) {
       normalized[room.id] = [] as any;
@@ -400,32 +400,38 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         this.locationinfo(location);
         for (const device of location.devices) {
           this.deviceinfo(device);
-          if (device.isAlive && device.deviceClass === 'LeakDetector') {
-            if (this.config.devicediscovery) {
-              this.log.info('Discovered %s - %s', device.deviceType, location.name, device.userDefinedDeviceName);
-            }
-            this.Leak(device, locationId);
-          } else if (device.isAlive && device.deviceClass === 'Thermostat') {
-            if (this.config.devicediscovery) {
-              this.log.info(
-                'Discovered %s %s - %s',
-                device.deviceType,
-                device.deviceModel,
-                location.name,
-                device.userDefinedDeviceName,
-              );
-            }
-            await this.createThermostat(location, device, locationId);
-            if (device.deviceModel.startsWith('T9')) {
-              try {
-                await this.discoverRoomSensors(location.locationID, device);
-              } catch (e) {
-                this.log.error('Failed to Find Room Sensor(s).', JSON.stringify(e.message));
-                this.log.debug(JSON.stringify(e));
+          switch (device.deviceClass) {
+            case 'LeakDetector':
+              if (this.config.devicediscovery) {
+                this.log.info('Discovered %s - %s', device.deviceType, location.name, device.userDefinedDeviceName);
               }
-            }
-          } else {
-            this.log.info('Unsupported Device found, Please open Feature Request Here: https://git.io/JURLY');
+              this.Leak(device, locationId);
+              break;
+            case 'Thermostat':
+              if (this.config.devicediscovery) {
+                this.log.info(
+                  'Discovered %s %s - %s',
+                  device.deviceType,
+                  device.deviceModel,
+                  location.name,
+                  device.userDefinedDeviceName,
+                );
+              }
+              await this.createThermostat(location, device, locationId);
+              if (device.deviceModel.startsWith('T9')) {
+                try {
+                  await this.discoverRoomSensors(location.locationID, device);
+                } catch (e) {
+                  this.log.error('Failed to Find Room Sensor(s).', JSON.stringify(e.message));
+                  this.log.debug(JSON.stringify(e));
+                }
+              }
+              break;
+            default:
+              this.log.info(
+                'Unsupported Device found, enable `"devicediscovery": true`',
+                'Please open Feature Request Here: https://git.io/JURLY',
+              );
           }
         }
       }
@@ -469,7 +475,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     }
   }
 
-  private roomsensordisplaymethod(device) {
+  private roomsensordisplaymethod(device: Thermostat) {
     if (this.config.options?.roompriority) {
       /**
        * Room Priority
@@ -484,7 +490,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     }
   }
 
-  private async createThermostat(location, device: Thermostat, locationId: location['locationID']) {
+  private async createThermostat(location: location, device: Thermostat, locationId: location['locationID']) {
     const uuid = this.api.hap.uuid.generate(`${device.name}-${device.deviceID}-${device.deviceModel}`);
 
     // see if an accessory with the same uuid has already been registered and restored from
@@ -511,7 +517,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
-    } else if (!this.config.options?.hide_device.includes(device.deviceID)) {
+    } else if (!this.config.options?.hide_device.includes(device.deviceID) && device.isAlive) {
       // the accessory does not yet exist, so we need to create it
       this.log.info(
         'Adding new accessory:',
@@ -583,7 +589,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
-    } else if (!this.config.options?.hide_device.includes(device.deviceID)) {
+    } else if (!this.config.options?.hide_device.includes(device.deviceID) && device.isAlive) {
       // the accessory does not yet exist, so we need to create it
       this.log.info(
         'Adding new accessory:',
@@ -792,7 +798,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     }
   }
 
-  private async thermostatFirmwareNewAccessory(device: Thermostat, accessory: PlatformAccessory, location: any) {
+  public async thermostatFirmwareNewAccessory(device: Thermostat, accessory: PlatformAccessory, location: any) {
     if (device.deviceModel.startsWith('T9')) {
       try {
         accessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
@@ -800,14 +806,18 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         this.log.error('Failed to Get T9 Firmware Version.', JSON.stringify(e.message));
         this.log.debug(JSON.stringify(e));
       }
-    } else if (device.deviceModel.startsWith('Round') || device.deviceModel.startsWith('Unknown')) {
+    } else if (
+      device.deviceModel.startsWith('Round') ||
+      device.deviceModel.startsWith('Unknown') ||
+      device.deviceModel.startsWith('D6')
+    ) {
       accessory.context.firmwareRevision = device.thermostatVersion;
     } else {
       accessory.context.firmwareRevision = '9.0.0';
     }
   }
 
-  private async thermostatFirmwareExistingwAccessory(
+  public async thermostatFirmwareExistingwAccessory(
     device: Thermostat,
     existingAccessory: PlatformAccessory,
     location: any,
@@ -819,7 +829,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         this.log.error('Failed to Get T9 Firmware Version.', JSON.stringify(e.message));
         this.log.debug(JSON.stringify(e));
       }
-    } else if (device.deviceModel.startsWith('Round') || device.deviceModel.startsWith('Unknown')) {
+    } else if (
+      device.deviceModel.startsWith('Round') ||
+      device.deviceModel.startsWith('Unknown') ||
+      device.deviceModel.startsWith('D6')
+    ) {
       existingAccessory.context.firmwareRevision = device.thermostatVersion;
     } else {
       existingAccessory.context.firmwareRevision = '9.0.0';

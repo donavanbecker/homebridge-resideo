@@ -33,6 +33,7 @@ export class Thermostats {
   //Fan Characteristics
   Active!: number;
   TargetFanState!: number;
+  RotationSpeed!: number;
   //Modes
   honeywellMode!: Array<string>;
   fanMode!: FanChangeableValues;
@@ -98,7 +99,6 @@ export class Thermostats {
 
     //Service Name
     this.service.setCharacteristic(this.platform.Characteristic.Name, `${device.name} ${device.deviceClass}`);
-
     //Required Characteristics" see https://developers.homebridge.io/#/service/Thermostat
 
     //Initial Device Parse
@@ -523,10 +523,10 @@ export class Thermostats {
       this.TemperatureDisplayUnits,
     );
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
-    if (this.device.indoorHumidity && this.CurrentRelativeHumidity) {
+    if (this.device.indoorHumidity) {
       this.service.updateCharacteristic(
         this.platform.Characteristic.CurrentRelativeHumidity,
-        this.CurrentRelativeHumidity,
+        this.CurrentRelativeHumidity!,
       );
     }
     this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);

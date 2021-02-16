@@ -81,7 +81,7 @@ export type roompriority = {
 export type location = {
     locationID: number;
     name: string;
-    devices: Thermostat;
+    devices: Thermostat | LeakDevice;
   };
   
 export type Thermostat = {
@@ -97,7 +97,7 @@ export type Thermostat = {
     priorityType?: string;
     units: string;
     indoorTemperature: number;
-    allowedModes: string;
+    allowedModes: string[];
     minHeatSetpoint: number;
     maxHeatSetpoint: number;
     minCoolSetpoint: number;
@@ -120,6 +120,15 @@ export type Thermostat = {
     parentDeviceId?: number;
     service?: Service;
     deviceSettings?: Record<string, unknown>;
+    firmwareVersion?: string;
+    vacationHold?: VacationHold;
+    currentSchedulePeriod?: CurrentSchedulePeriod;
+    scheduleCapabilities?: ScheduleCapabilities;
+    scheduleType?: ScheduleType;
+    changeSource?: ChangeSource;
+    partnerInfo?: PartnerInfo;
+    deviceRegistrationDate?: Date;
+    indoorHumidityStatus?: string;
   };
   
 export type T9groups = {
@@ -138,6 +147,8 @@ export type Settings = {
     fan: Fan;
     temperatureMode?: TemperatureMode;
     specialMode?: SpecialMode;
+    hardwareSettings?: HardwareSettings;
+    devicePairingEnabled?: boolean;
   };
   
 export type ChangeableValues = {
@@ -179,24 +190,71 @@ export type HomeSetPoints = {
   };
   
 export type TemperatureMode = {
-    feelsLike: boolean;
+    feelsLike?: boolean;
     air: boolean;
   };
   
 export type SpecialMode = {
     autoChangeoverActive: boolean;
-    emergencyHeatActive: boolean;
+    emergencyHeatActive?: boolean;
   };
   
 export type Fan = {
-    allowedModes: string;
+    allowedModes: string[];
     changeableValues: FanChangeableValues;
     fanRunning: boolean;
+    allowedSpeeds?: AllowedSpeed[];
   };
   
 export type FanChangeableValues = {
     mode: string;
   };
+
+export type AllowedSpeed = {
+    item: string;
+    value: Value;
+}
+
+export type Value = {
+  speed?: number;
+  mode: string;
+}
+
+export type VacationHold = {
+    enabled: boolean;
+}
+
+export type CurrentSchedulePeriod = {
+  day: string;
+  period: string;
+}
+
+export type ScheduleCapabilities = {
+  availableScheduleTypes: string[];
+  schedulableFan: boolean;
+}
+
+export type ScheduleType = {
+  scheduleType: string;
+  scheduleSubType: string;
+}
+
+export type ChangeSource = {
+  by: string;
+  name: string;
+}
+
+export type HardwareSettings = {
+  brightness: number;
+  maxBrightness: number;
+}
+
+export type PartnerInfo = {
+  singleOrMultiODUConfiguration: number;
+  parentDeviceModelId: number;
+  parentDeviceBrandId: number;
+  oduName: string;
+}
   
 // Leak Sensor
 export type LeakDevice = {
