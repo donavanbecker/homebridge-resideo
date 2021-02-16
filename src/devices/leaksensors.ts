@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory } from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicGetCallback, CharacteristicEventTypes } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { skipWhile } from 'rxjs/operators';
@@ -97,6 +97,13 @@ export class LeakSensor {
         this.platform.Service.TemperatureSensor,
         `${device.userDefinedDeviceName} Temperature Sensor`,
       );
+      this.service.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+        .setProps({
+          minValue: -50,
+          maxValue: 212,
+          minStep: 0.1,
+        })
+        .on(CharacteristicEventTypes.GET, this.handleCurrentTemperatureGet.bind(this));
     } else if (this.temperatureService && this.platform.config.options?.leaksensor?.hide_temperature) {
       accessory.removeService(this.temperatureService);
     }
@@ -108,6 +115,11 @@ export class LeakSensor {
         this.platform.Service.HumiditySensor,
         `${device.userDefinedDeviceName} Humidity Sensor`,
       );
+
+      this.service.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
+        .setProps({
+          minStep: 0.1,
+        });
     } else if (this.humidityService && this.platform.config.options?.leaksensor?.hide_humidity) {
       accessory.removeService(this.humidityService);
     }
@@ -223,6 +235,20 @@ export class LeakSensor {
     }
     if (!this.platform.config.options?.leaksensor?.hide_humidity) {
       this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
+    }
+  }
+
+  /**
+   * Handle requests to get the current value of the "Current Temperature" characteristic
+   */
+  handleCurrentTemperatureGet(callback: CharacteristicGetCallback) {
+    if (!this.platform.config.options?.leaksensor?.hide_temperature) {
+      this.platform.log.debug('LS %s - Get CurrentTemperature', this.accessory.displayName);
+
+      const currentValue = this.CurrentTemperature;
+
+      callback(null, currentValue);
+      this.platform.log.info('LS %s - CurrentTemperature: %s', this.accessory.displayName, currentValue);
     }
   }
 }

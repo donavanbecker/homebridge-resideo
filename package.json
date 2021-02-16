@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge Honeywell Home",
   "name": "homebridge-honeywell-home",
-  "version": "9.0.0",
+  "version": "9.1.0",
   "description": "The [Homebridge](https://homebridge.io) Honeywell Home plugin allows you to access your [Honeywell Home](https://honeywellhome.com) thermostat from HomeKit.",
   "author": "donavanbecker",
   "license": "Apache-2.0",
@@ -18,8 +18,7 @@
   },
   "main": "dist/index.js",
   "scripts": {
-    "audit": "npm audit fix",
-    "update": "npm update",
+    "audit": "npm update && npm audit fix",
     "lint": "eslint src/**.ts",
     "watch": "npm run build && npm link && nodemon",
     "build": "rimraf ./dist && tsc",

@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 9.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.0.0...v9.1.0) (2021-02-16)
+
+### Changes
+
+- Moved Humidity Sensor to is own Service so that it displays as it on devices.
+  - Added option to config to disable humidity sensor.
+- Fixed Leaksensor Display issue with rouding tempature and humidity.
+
 ## [Version 9.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.4.0...v9.0.0) (2021-02-16)
 
 ### Changes

@@ -56,6 +56,7 @@ export type options = {
   
 export type thermostat = {
     hide_fan?: boolean;
+    hide_humidity?: boolean;
     thermostatSetpointStatus?: string;
   };
   
