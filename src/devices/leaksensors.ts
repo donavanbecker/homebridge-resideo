@@ -101,7 +101,7 @@ export class LeakSensor {
         .setProps({
           minValue: -50,
           maxValue: 212,
-          minStep: 0.5,
+          minStep: 0.1,
         })
         .on(CharacteristicEventTypes.GET, this.handleCurrentTemperatureGet.bind(this));
     } else if (this.temperatureService && this.platform.config.options?.leaksensor?.hide_temperature) {
@@ -118,7 +118,7 @@ export class LeakSensor {
 
       this.service.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
         .setProps({
-          minStep: 0.5,
+          minStep: 0.1,
         });
     } else if (this.humidityService && this.platform.config.options?.leaksensor?.hide_humidity) {
       accessory.removeService(this.humidityService);

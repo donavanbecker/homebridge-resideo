@@ -95,7 +95,7 @@ export class RoomSensors {
         .setProps({
           minValue: -50,
           maxValue: 212,
-          minStep: 0.5,
+          minStep: 0.1,
         })
         .on(CharacteristicEventTypes.GET, this.handleCurrentTemperatureGet.bind(this));
     } else if (this.temperatureService && this.platform.config.options?.roomsensor?.hide_temperature) {

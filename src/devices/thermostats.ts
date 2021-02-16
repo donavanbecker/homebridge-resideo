@@ -111,14 +111,14 @@ export class Thermostats {
       this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature).setProps({
         minValue: this.toCelsius(device.minHeatSetpoint),
         maxValue: this.toCelsius(device.maxHeatSetpoint),
-        minStep: 0.5,
+        minStep: 0.1,
       });
     } else {
       this.platform.log.debug('Thermostat %s -', this.accessory.displayName, 'Device is in "Cool" mode');
       this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature).setProps({
         minValue: this.toCelsius(device.minCoolSetpoint),
         maxValue: this.toCelsius(device.maxCoolSetpoint),
-        minStep: 0.5,
+        minStep: 0.1,
       });
     }
 
