@@ -180,15 +180,16 @@ export class Thermostats {
 
     // Humidity Sensor Service
     this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
-    if (device.indoorHumidity && !this.platform.config.options?.thermostat?.hide_humidity) {
+    if (device.indoorHumidity && !this.humidityService && !this.platform.config.options?.thermostat?.hide_humidity) {
       this.humidityService =
         accessory.getService(this.platform.Service.HumiditySensor) ||
-        accessory.addService(this.platform.Service.HumiditySensor, `${device.name} ${device.deviceClass} Humidity Sensor`);
-      this.humidityService
-        .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
-        .setProps({
-          minStep: 0.1,
-        });
+        accessory.addService(
+          this.platform.Service.HumiditySensor,
+          `${device.name} ${device.deviceClass} Humidity Sensor`,
+        );
+      this.humidityService.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity).setProps({
+        minStep: 0.1,
+      });
     } else if (this.humidityService && this.platform.config.options?.thermostat?.hide_humidity) {
       accessory.removeService(this.humidityService);
     }
@@ -538,7 +539,7 @@ export class Thermostats {
     );
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
     if (this.device.indoorHumidity && !this.platform.config.options?.thermostat?.hide_humidity) {
-      this.humidityService?.updateCharacteristic(
+      this.humidityService!.updateCharacteristic(
         this.platform.Characteristic.CurrentRelativeHumidity,
         this.CurrentRelativeHumidity!,
       );
