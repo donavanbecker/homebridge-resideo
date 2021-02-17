@@ -29,7 +29,7 @@ export class Thermostats {
   TargetHeatingCoolingState!: number;
   CoolingThresholdTemperature!: number;
   HeatingThresholdTemperature!: number;
-  CurrentRelativeHumidity!: number;
+  CurrentRelativeHumidity?: number;
   TemperatureDisplayUnits!: number;
   //Fan Characteristics
   Active!: number;
@@ -180,11 +180,15 @@ export class Thermostats {
 
     // Humidity Sensor Service
     this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
-    if (!this.humidityService && !this.platform.config.options?.thermostat?.hide_humidity) {
-      this.humidityService = accessory.addService(
-        this.platform.Service.HumiditySensor,
-        `${device.name} ${device.deviceClass} Humidity Sensor`,
-      );
+    if (device.indoorHumidity && !this.platform.config.options?.thermostat?.hide_humidity) {
+      this.humidityService =
+        accessory.getService(this.platform.Service.HumiditySensor) ||
+        accessory.addService(this.platform.Service.HumiditySensor, `${device.name} ${device.deviceClass} Humidity Sensor`);
+      this.humidityService
+        .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
+        .setProps({
+          minStep: 0.1,
+        });
     } else if (this.humidityService && this.platform.config.options?.thermostat?.hide_humidity) {
       accessory.removeService(this.humidityService);
     }
@@ -566,7 +570,7 @@ export class Thermostats {
     this.service.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, e);
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
     if (this.device.indoorHumidity && !this.platform.config.options?.thermostat?.hide_humidity) {
-      this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
+      this.humidityService!.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
     }
     this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, e);
     this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, e);
