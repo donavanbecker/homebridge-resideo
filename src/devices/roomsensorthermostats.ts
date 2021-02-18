@@ -79,11 +79,11 @@ export class RoomSensorThermostat {
     this.accessory
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
-      .setCharacteristic(this.platform.Characteristic.Model, sensorAccessory.accessoryAttribute.model)
+      .setCharacteristic(this.platform.Characteristic.Model, sensorAccessory.accessoryAttribute.model || '1100')
       .setCharacteristic(this.platform.Characteristic.SerialNumber, sensorAccessory.deviceID)
       .setCharacteristic(
         this.platform.Characteristic.FirmwareRevision,
-        sensorAccessory.accessoryAttribute.softwareRevision || accessory.context.firmwareRevision,
+        sensorAccessory.accessoryAttribute.softwareRevision || accessory.context.firmwareRevision || '1.0.3.0',
       );
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
