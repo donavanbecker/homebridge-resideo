@@ -462,7 +462,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                         sensorAccessory.accessoryAttribute.name,
                       );
                     }
-                    if (sensorAccessory.accessoryAttribute.model === 0){
+                    if (sensorAccessory.accessoryAttribute.model === '0'){
                       sensorAccessory.accessoryAttribute.model = '1100';
                     }
                     sensorAccessory.deviceID = `${sensorAccessory.accessoryId}${sensorAccessory.roomId}${sensorAccessory.accessoryAttribute.model}`;
