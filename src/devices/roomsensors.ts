@@ -91,7 +91,7 @@ export class RoomSensors {
         this.platform.Service.TemperatureSensor,
         `${sensorAccessory.accessoryAttribute.name} Temperature Sensor`,
       );
-      this.service.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+      this.temperatureService.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
         .setProps({
           minValue: -50,
           maxValue: 212,
@@ -262,7 +262,7 @@ export class RoomSensors {
       const currentValue = this.CurrentTemperature;
 
       callback(null, currentValue);
-      this.platform.log.info('RS %s - CurrentTemperature: %s', this.accessory.displayName, currentValue);
+      this.platform.log.debug('RS %s - CurrentTemperature: %s', this.accessory.displayName, currentValue);
     }
   }
 }

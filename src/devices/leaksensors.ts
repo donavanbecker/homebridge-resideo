@@ -97,7 +97,7 @@ export class LeakSensor {
         this.platform.Service.TemperatureSensor,
         `${device.userDefinedDeviceName} Temperature Sensor`,
       );
-      this.service.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+      this.temperatureService.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
         .setProps({
           minValue: -50,
           maxValue: 212,
@@ -115,7 +115,7 @@ export class LeakSensor {
         this.platform.Service.HumiditySensor,
         `${device.userDefinedDeviceName} Humidity Sensor`,
       );
-      this.service.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
+      this.humidityService.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
         .setProps({
           minStep: 0.1,
         });
@@ -247,7 +247,7 @@ export class LeakSensor {
       const currentValue = this.CurrentTemperature;
 
       callback(null, currentValue);
-      this.platform.log.info('LS %s - CurrentTemperature: %s', this.accessory.displayName, currentValue);
+      this.platform.log.debug('LS %s - CurrentTemperature: %s', this.accessory.displayName, currentValue);
     }
   }
 }
