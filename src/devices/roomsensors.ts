@@ -91,7 +91,8 @@ export class RoomSensors {
         this.platform.Service.TemperatureSensor,
         `${sensorAccessory.accessoryAttribute.name} Temperature Sensor`,
       );
-      this.temperatureService.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+      this.temperatureService
+        .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
         .setProps({
           minValue: -50,
           maxValue: 212,
@@ -203,21 +204,25 @@ export class RoomSensors {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-    this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
-    this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
-    if (!this.platform.config.options?.roomsensor?.hide_temperature) {
+    if (this.StatusLowBattery !== undefined) {
+      this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
+    }
+    if (this.BatteryLevel !== undefined) {
+      this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
+    }
+    if (!this.platform.config.options?.roomsensor?.hide_temperature && this.CurrentTemperature !== undefined && !isNaN(this.CurrentTemperature)) {
       this.temperatureService?.updateCharacteristic(
         this.platform.Characteristic.CurrentTemperature,
         this.CurrentTemperature,
       );
     }
-    if (!this.platform.config.options?.roomsensor?.hide_occupancy) {
+    if (!this.platform.config.options?.roomsensor?.hide_occupancy && this.OccupancyDetected !== undefined) {
       this.occupancyService?.updateCharacteristic(
         this.platform.Characteristic.OccupancyDetected,
         this.OccupancyDetected,
       );
     }
-    if (!this.platform.config.options?.roomsensor?.hide_humidity) {
+    if (!this.platform.config.options?.roomsensor?.hide_humidity && this.CurrentRelativeHumidity !== undefined) {
       this.humidityService?.updateCharacteristic(
         this.platform.Characteristic.CurrentRelativeHumidity,
         this.CurrentRelativeHumidity,
@@ -250,7 +255,6 @@ export class RoomSensors {
     // celsius should be to the nearest 0.5 degree
     return Math.round((5 / 9) * (value - 32) * 2) / 2;
   }
-
 
   /**
    * Handle requests to get the current value of the "Current Temperature" characteristic
