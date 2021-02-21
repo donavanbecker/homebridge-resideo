@@ -540,37 +540,55 @@ export class Thermostats {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.TemperatureDisplayUnits,
-      this.TemperatureDisplayUnits,
-    );
-    this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
-    if (this.device.indoorHumidity && !this.platform.config.options?.thermostat?.hide_humidity) {
+    if (this.TemperatureDisplayUnits !== undefined) {
+      this.service.updateCharacteristic(
+        this.platform.Characteristic.TemperatureDisplayUnits,
+        this.TemperatureDisplayUnits,
+      );
+    }
+    if (this.CurrentTemperature !== undefined) {
+      this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
+    }
+    if (this.device.indoorHumidity && !this.platform.config.options?.thermostat?.hide_humidity && this.CurrentRelativeHumidity !== undefined) {
       this.humidityService!.updateCharacteristic(
         this.platform.Characteristic.CurrentRelativeHumidity,
         this.CurrentRelativeHumidity!,
       );
     }
-    this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.HeatingThresholdTemperature,
-      this.HeatingThresholdTemperature,
-    );
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.CoolingThresholdTemperature,
-      this.CoolingThresholdTemperature,
-    );
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.TargetHeatingCoolingState,
-      this.TargetHeatingCoolingState,
-    );
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.CurrentHeatingCoolingState,
-      this.CurrentHeatingCoolingState,
-    );
+    if (this.TargetTemperature !== undefined) {
+      this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
+    }
+    if (this.HeatingThresholdTemperature !== undefined) {
+      this.service.updateCharacteristic(
+        this.platform.Characteristic.HeatingThresholdTemperature,
+        this.HeatingThresholdTemperature,
+      );
+    }
+    if (this.CoolingThresholdTemperature !== undefined) {
+      this.service.updateCharacteristic(
+        this.platform.Characteristic.CoolingThresholdTemperature,
+        this.CoolingThresholdTemperature,
+      );
+    }
+    if (this.TargetHeatingCoolingState !== undefined) {
+      this.service.updateCharacteristic(
+        this.platform.Characteristic.TargetHeatingCoolingState,
+        this.TargetHeatingCoolingState,
+      );
+    }
+    if (this.CurrentHeatingCoolingState !== undefined) {
+      this.service.updateCharacteristic(
+        this.platform.Characteristic.CurrentHeatingCoolingState,
+        this.CurrentHeatingCoolingState,
+      );
+    }
     if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
-      this.fanService?.updateCharacteristic(this.platform.Characteristic.TargetFanState, this.TargetFanState);
-      this.fanService?.updateCharacteristic(this.platform.Characteristic.Active, this.Active);
+      if (this.TargetFanState !== undefined){
+        this.fanService?.updateCharacteristic(this.platform.Characteristic.TargetFanState, this.TargetFanState);
+      }
+      if (this.Active !== undefined){
+        this.fanService?.updateCharacteristic(this.platform.Characteristic.Active, this.Active);
+      }
     }
   }
 

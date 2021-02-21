@@ -204,19 +204,27 @@ export class LeakSensor {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-    this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
-    this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
-    if (!this.platform.config.options?.leaksensor?.hide_leak) {
-      this.leakService?.updateCharacteristic(this.platform.Characteristic.LeakDetected, this.LeakDetected);
-      this.leakService?.updateCharacteristic(this.platform.Characteristic.StatusActive, this.StatusActive);
+    if (this.BatteryLevel !== undefined) {
+      this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
     }
-    if (!this.platform.config.options?.leaksensor?.hide_temperature) {
+    if (this.StatusLowBattery !== undefined) {
+      this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
+    }
+    if (!this.platform.config.options?.leaksensor?.hide_leak) {
+      if (this.LeakDetected !== undefined) {
+        this.leakService?.updateCharacteristic(this.platform.Characteristic.LeakDetected, this.LeakDetected);
+      }
+      if (this.StatusActive !== undefined) {
+        this.leakService?.updateCharacteristic(this.platform.Characteristic.StatusActive, this.StatusActive);
+      }
+    }
+    if (!this.platform.config.options?.leaksensor?.hide_temperature && this.CurrentTemperature !== undefined) {
       this.temperatureService?.updateCharacteristic(
         this.platform.Characteristic.CurrentTemperature,
         this.CurrentTemperature,
       );
     }
-    if (!this.platform.config.options?.leaksensor?.hide_humidity) {
+    if (!this.platform.config.options?.leaksensor?.hide_humidity && this.CurrentRelativeHumidity !== undefined) {
       this.humidityService?.updateCharacteristic(
         this.platform.Characteristic.CurrentRelativeHumidity,
         this.CurrentRelativeHumidity,

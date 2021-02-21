@@ -502,32 +502,48 @@ export class RoomSensorThermostat {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.TemperatureDisplayUnits,
-      this.TemperatureDisplayUnits,
-    );
-    this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.CurrentRelativeHumidity,
-      this.CurrentRelativeHumidity,
-    );
-    this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.HeatingThresholdTemperature,
-      this.HeatingThresholdTemperature,
-    );
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.CoolingThresholdTemperature,
-      this.CoolingThresholdTemperature,
-    );
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.TargetHeatingCoolingState,
-      this.TargetHeatingCoolingState,
-    );
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.CurrentHeatingCoolingState,
-      this.CurrentHeatingCoolingState,
-    );
+    if (this.TemperatureDisplayUnits !== undefined) {
+      this.service.updateCharacteristic(
+        this.platform.Characteristic.TemperatureDisplayUnits,
+        this.TemperatureDisplayUnits,
+      );
+    }
+    if (this.CurrentTemperature !== undefined) {
+      this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
+    }
+    if (this.CurrentRelativeHumidity !== undefined) {
+      this.service.updateCharacteristic(
+        this.platform.Characteristic.CurrentRelativeHumidity,
+        this.CurrentRelativeHumidity,
+      );
+    }
+    if (this.TargetTemperature !== undefined) {
+      this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
+    }
+    if (this.HeatingThresholdTemperature !== undefined) {
+      this.service.updateCharacteristic(
+        this.platform.Characteristic.HeatingThresholdTemperature,
+        this.HeatingThresholdTemperature,
+      );
+    }
+    if (this.CoolingThresholdTemperature !== undefined) {
+      this.service.updateCharacteristic(
+        this.platform.Characteristic.CoolingThresholdTemperature,
+        this.CoolingThresholdTemperature,
+      );
+    }
+    if (this.TargetHeatingCoolingState !== undefined) {
+      this.service.updateCharacteristic(
+        this.platform.Characteristic.TargetHeatingCoolingState,
+        this.TargetHeatingCoolingState,
+      );
+    }
+    if (this.CurrentHeatingCoolingState !== undefined) {
+      this.service.updateCharacteristic(
+        this.platform.Characteristic.CurrentHeatingCoolingState,
+        this.CurrentHeatingCoolingState,
+      );
+    }
   }
 
   public apiError(e: any) {
