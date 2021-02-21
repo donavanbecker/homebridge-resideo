@@ -2,11 +2,12 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
-## [Beta Version 9.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.1.0...v9.1.1) (2021-02-XX)
+## [Beta Version 9.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.1.0...v9.2.0) (2021-02-XX)
 
 ### Changes
 
-- Add Support and Set Requirement for Homebridge v1.3.0.
+- Add support and set new requirement for Homebridge v1.3.0.
+- Characteristics are now only updated if defined with a valid `CharacteristicValue`.
 
 ## [Version 9.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.0.0...v9.1.0) (2021-02-16)
 

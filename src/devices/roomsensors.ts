@@ -123,6 +123,14 @@ export class RoomSensors {
         this.platform.Service.HumiditySensor,
         `${sensorAccessory.accessoryAttribute.name} Humidity Sensor`,
       );
+      this.humidityService
+        .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
+        .setProps({
+          minStep: 0.1,
+        })
+        .onGet(async () => {
+          return this.CurrentRelativeHumidity;
+        });
     } else if (this.humidityService && this.platform.config.options?.roomsensor?.hide_humidity) {
       accessory.removeService(this.humidityService);
     }

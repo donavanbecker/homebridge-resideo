@@ -107,18 +107,28 @@ export class RoomSensorThermostat {
     // Set Min and Max
     if (device.changeableValues.heatCoolMode === 'Heat') {
       this.platform.log.debug('RST %s - ', this.accessory.displayName, 'Device is in "Heat" mode');
-      this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature).setProps({
-        minValue: this.toCelsius(device.minHeatSetpoint),
-        maxValue: this.toCelsius(device.maxHeatSetpoint),
-        minStep: 0.5,
-      });
+      this.service
+        .getCharacteristic(this.platform.Characteristic.TargetTemperature)
+        .setProps({
+          minValue: this.toCelsius(device.minHeatSetpoint),
+          maxValue: this.toCelsius(device.maxHeatSetpoint),
+          minStep: 0.5,
+        })
+        .onGet(async () => {
+          return this.TargetTemperature;
+        });
     } else {
       this.platform.log.debug('RST %s - ', this.accessory.displayName, 'Device is in "Cool" mode');
-      this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature).setProps({
-        minValue: this.toCelsius(device.minCoolSetpoint),
-        maxValue: this.toCelsius(device.maxCoolSetpoint),
-        minStep: 0.5,
-      });
+      this.service
+        .getCharacteristic(this.platform.Characteristic.TargetTemperature)
+        .setProps({
+          minValue: this.toCelsius(device.minCoolSetpoint),
+          maxValue: this.toCelsius(device.maxCoolSetpoint),
+          minStep: 0.5,
+        })
+        .onGet(async () => {
+          return this.TargetTemperature;
+        });
     }
 
     // The value property of TargetHeaterCoolerState must be one of the following:

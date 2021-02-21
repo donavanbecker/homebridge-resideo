@@ -118,9 +118,14 @@ export class LeakSensor {
         this.platform.Service.HumiditySensor,
         `${device.userDefinedDeviceName} Humidity Sensor`,
       );
-      this.humidityService.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity).setProps({
-        minStep: 0.1,
-      });
+      this.humidityService
+        .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
+        .setProps({
+          minStep: 0.1,
+        })
+        .onGet(async () => {
+          return this.CurrentRelativeHumidity;
+        });
     } else if (this.humidityService && this.platform.config.options?.leaksensor?.hide_humidity) {
       accessory.removeService(this.humidityService);
     }
