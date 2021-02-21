@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory, CharacteristicEventTypes, CharacteristicGetCallback } from 'homebridge';
+import { Service, PlatformAccessory } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { skipWhile } from 'rxjs/operators';
@@ -98,7 +98,9 @@ export class RoomSensors {
           maxValue: 212,
           minStep: 0.1,
         })
-        .on(CharacteristicEventTypes.GET, this.handleCurrentTemperatureGet.bind(this));
+        .onGet(async () => {
+          return this.CurrentTemperature;
+        });
     } else if (this.temperatureService && this.platform.config.options?.roomsensor?.hide_temperature) {
       accessory.removeService(this.temperatureService);
     }
@@ -210,7 +212,11 @@ export class RoomSensors {
     if (this.BatteryLevel !== undefined) {
       this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
     }
-    if (!this.platform.config.options?.roomsensor?.hide_temperature && this.CurrentTemperature !== undefined && !isNaN(this.CurrentTemperature)) {
+    if (
+      !this.platform.config.options?.roomsensor?.hide_temperature &&
+      this.CurrentTemperature !== undefined &&
+      !isNaN(this.CurrentTemperature)
+    ) {
       this.temperatureService?.updateCharacteristic(
         this.platform.Characteristic.CurrentTemperature,
         this.CurrentTemperature,
@@ -254,19 +260,5 @@ export class RoomSensors {
 
     // celsius should be to the nearest 0.5 degree
     return Math.round((5 / 9) * (value - 32) * 2) / 2;
-  }
-
-  /**
-   * Handle requests to get the current value of the "Current Temperature" characteristic
-   */
-  handleCurrentTemperatureGet(callback: CharacteristicGetCallback) {
-    if (!this.platform.config.options?.roomsensor?.hide_temperature) {
-      this.platform.log.debug('RS %s - Get CurrentTemperature', this.accessory.displayName);
-
-      const currentValue = this.CurrentTemperature;
-
-      callback(null, currentValue);
-      this.platform.log.debug('RS %s - CurrentTemperature: %s', this.accessory.displayName, currentValue);
-    }
   }
 }
