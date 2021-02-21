@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory, CharacteristicValue, CharacteristicSetCallback } from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
@@ -130,8 +130,8 @@ export class RoomSensorThermostat {
       .setProps({
         validValues: TargetState,
       })
-      .onSet(async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-        this.setTargetHeatingCoolingState(value, callback);
+      .onSet(async (value: CharacteristicValue) => {
+        this.setTargetHeatingCoolingState(value);
       });
 
     this.service.setCharacteristic(
@@ -141,26 +141,26 @@ export class RoomSensorThermostat {
 
     this.service
       .getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature)
-      .onSet(async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-        this.setHeatingThresholdTemperature(value, callback);
+      .onSet(async (value: CharacteristicValue) => {
+        this.setHeatingThresholdTemperature(value);
       });
 
     this.service
       .getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
-      .onSet(async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-        this.setCoolingThresholdTemperature(value, callback);
+      .onSet(async (value: CharacteristicValue) => {
+        this.setCoolingThresholdTemperature(value);
       });
 
     this.service
       .getCharacteristic(this.platform.Characteristic.TargetTemperature)
-      .onSet(async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-        this.setTargetTemperature(value, callback);
+      .onSet(async (value: CharacteristicValue) => {
+        this.setTargetTemperature(value);
       });
 
     this.service
       .getCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits)
-      .onSet(async (value: CharacteristicValue, callback: CharacteristicSetCallback) => {
-        this.setTemperatureDisplayUnits(value, callback);
+      .onSet(async (value: CharacteristicValue) => {
+        this.setTemperatureDisplayUnits(value);
       });
 
     // Retrieve initial values and updateHomekit
@@ -541,7 +541,7 @@ export class RoomSensorThermostat {
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, e);
   }
 
-  private setTargetHeatingCoolingState(value: CharacteristicValue, callback: CharacteristicSetCallback) {
+  private setTargetHeatingCoolingState(value: CharacteristicValue) {
     this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set TargetHeatingCoolingState: ${value}`);
 
     this.TargetHeatingCoolingState = value;
@@ -555,31 +555,27 @@ export class RoomSensorThermostat {
     this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
     this.doRoomUpdate.next();
     this.doThermostatUpdate.next();
-    callback(null);
   }
 
-  private setHeatingThresholdTemperature(value: any, callback: CharacteristicSetCallback) {
+  private setHeatingThresholdTemperature(value: CharacteristicValue) {
     this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set HeatingThresholdTemperature: ${value}`);
     this.HeatingThresholdTemperature = value;
     this.doThermostatUpdate.next();
-    callback(null);
   }
 
-  private setCoolingThresholdTemperature(value: any, callback: CharacteristicSetCallback) {
+  private setCoolingThresholdTemperature(value: CharacteristicValue) {
     this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set CoolingThresholdTemperature: ${value}`);
     this.CoolingThresholdTemperature = value;
     this.doThermostatUpdate.next();
-    callback(null);
   }
 
-  private setTargetTemperature(value: any, callback: CharacteristicSetCallback) {
+  private setTargetTemperature(value: CharacteristicValue) {
     this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set TargetTemperature:': ${value}`);
     this.TargetTemperature = value;
     this.doThermostatUpdate.next();
-    callback(null);
   }
 
-  private setTemperatureDisplayUnits(value: CharacteristicValue, callback: CharacteristicSetCallback) {
+  private setTemperatureDisplayUnits(value: CharacteristicValue) {
     this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set TemperatureDisplayUnits: ${value}`);
     this.platform.log.warn('Changing the Hardware Display Units from HomeKit is not supported.');
 
@@ -590,8 +586,6 @@ export class RoomSensorThermostat {
         this.TemperatureDisplayUnits,
       );
     }, 100);
-
-    callback(null);
   }
 
   /**
