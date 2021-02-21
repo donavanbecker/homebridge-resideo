@@ -1,9 +1,4 @@
-import {
-  Service,
-  PlatformAccessory,
-  CharacteristicValue,
-  CharacteristicSetCallback,
-} from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicValue, CharacteristicSetCallback } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
@@ -560,28 +555,28 @@ export class RoomSensorThermostat {
     this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
     this.doRoomUpdate.next();
     this.doThermostatUpdate.next();
-    callback();
+    callback(null);
   }
 
   private setHeatingThresholdTemperature(value: any, callback: CharacteristicSetCallback) {
     this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set HeatingThresholdTemperature: ${value}`);
     this.HeatingThresholdTemperature = value;
     this.doThermostatUpdate.next();
-    callback();
+    callback(null);
   }
 
   private setCoolingThresholdTemperature(value: any, callback: CharacteristicSetCallback) {
     this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set CoolingThresholdTemperature: ${value}`);
     this.CoolingThresholdTemperature = value;
     this.doThermostatUpdate.next();
-    callback();
+    callback(null);
   }
 
   private setTargetTemperature(value: any, callback: CharacteristicSetCallback) {
     this.platform.log.debug('RST %s - ', this.accessory.displayName, `Set TargetTemperature:': ${value}`);
     this.TargetTemperature = value;
     this.doThermostatUpdate.next();
-    callback();
+    callback(null);
   }
 
   private setTemperatureDisplayUnits(value: CharacteristicValue, callback: CharacteristicSetCallback) {
@@ -596,7 +591,7 @@ export class RoomSensorThermostat {
       );
     }, 100);
 
-    callback();
+    callback(null);
   }
 
   /**
