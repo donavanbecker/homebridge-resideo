@@ -462,6 +462,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                         sensorAccessory.accessoryAttribute.name,
                       );
                     }
+                    if (sensorAccessory.accessoryAttribute.model === '0'){
+                      sensorAccessory.accessoryAttribute.model = '4352';
+                    }
                     sensorAccessory.deviceID = `${sensorAccessory.accessoryId}${sensorAccessory.roomId}${sensorAccessory.accessoryAttribute.model}`;
                     this.createRoomSensors(device, locationId, sensorAccessory, group);
                     this.createRoomSensorThermostat(device, locationId, sensorAccessory, group);

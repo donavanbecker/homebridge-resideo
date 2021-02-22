@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory, CharacteristicGetCallback, CharacteristicEventTypes } from 'homebridge';
+import { Service, PlatformAccessory } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { skipWhile } from 'rxjs/operators';
@@ -97,13 +97,16 @@ export class LeakSensor {
         this.platform.Service.TemperatureSensor,
         `${device.userDefinedDeviceName} Temperature Sensor`,
       );
-      this.service.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+      this.temperatureService
+        .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
         .setProps({
           minValue: -50,
           maxValue: 212,
           minStep: 0.1,
         })
-        .on(CharacteristicEventTypes.GET, this.handleCurrentTemperatureGet.bind(this));
+        .onGet(async () => {
+          return this.CurrentTemperature;
+        });
     } else if (this.temperatureService && this.platform.config.options?.leaksensor?.hide_temperature) {
       accessory.removeService(this.temperatureService);
     }
@@ -115,10 +118,13 @@ export class LeakSensor {
         this.platform.Service.HumiditySensor,
         `${device.userDefinedDeviceName} Humidity Sensor`,
       );
-
-      this.service.getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
+      this.humidityService
+        .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
         .setProps({
           minStep: 0.1,
+        })
+        .onGet(async () => {
+          return this.CurrentRelativeHumidity;
         });
     } else if (this.humidityService && this.platform.config.options?.leaksensor?.hide_humidity) {
       accessory.removeService(this.humidityService);
@@ -203,19 +209,27 @@ export class LeakSensor {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-    this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
-    this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
-    if (!this.platform.config.options?.leaksensor?.hide_leak) {
-      this.leakService?.updateCharacteristic(this.platform.Characteristic.LeakDetected, this.LeakDetected);
-      this.leakService?.updateCharacteristic(this.platform.Characteristic.StatusActive, this.StatusActive);
+    if (this.BatteryLevel !== undefined) {
+      this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
     }
-    if (!this.platform.config.options?.leaksensor?.hide_temperature) {
+    if (this.StatusLowBattery !== undefined) {
+      this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
+    }
+    if (!this.platform.config.options?.leaksensor?.hide_leak) {
+      if (this.LeakDetected !== undefined) {
+        this.leakService?.updateCharacteristic(this.platform.Characteristic.LeakDetected, this.LeakDetected);
+      }
+      if (this.StatusActive !== undefined) {
+        this.leakService?.updateCharacteristic(this.platform.Characteristic.StatusActive, this.StatusActive);
+      }
+    }
+    if (!this.platform.config.options?.leaksensor?.hide_temperature && this.CurrentTemperature !== undefined) {
       this.temperatureService?.updateCharacteristic(
         this.platform.Characteristic.CurrentTemperature,
         this.CurrentTemperature,
       );
     }
-    if (!this.platform.config.options?.leaksensor?.hide_humidity) {
+    if (!this.platform.config.options?.leaksensor?.hide_humidity && this.CurrentRelativeHumidity !== undefined) {
       this.humidityService?.updateCharacteristic(
         this.platform.Characteristic.CurrentRelativeHumidity,
         this.CurrentRelativeHumidity,
@@ -235,20 +249,6 @@ export class LeakSensor {
     }
     if (!this.platform.config.options?.leaksensor?.hide_humidity) {
       this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
-    }
-  }
-
-  /**
-   * Handle requests to get the current value of the "Current Temperature" characteristic
-   */
-  handleCurrentTemperatureGet(callback: CharacteristicGetCallback) {
-    if (!this.platform.config.options?.leaksensor?.hide_temperature) {
-      this.platform.log.debug('LS %s - Get CurrentTemperature', this.accessory.displayName);
-
-      const currentValue = this.CurrentTemperature;
-
-      callback(null, currentValue);
-      this.platform.log.info('LS %s - CurrentTemperature: %s', this.accessory.displayName, currentValue);
     }
   }
 }

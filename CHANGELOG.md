@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 9.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.1.0...v9.2.0) (2021-02-22)
+
+### Changes
+
+- Add support and set new requirement for Homebridge v1.3.0.
+- Fixed Issue where thermostat was sending update when just clicking into Thermostat, plugin now waits for changes.
+- Characteristics are now only updated if defined with a valid `CharacteristicValue`.
+
 ## [Version 9.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.0.0...v9.1.0) (2021-02-16)
 
 ### Changes

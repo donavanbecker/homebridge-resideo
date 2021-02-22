@@ -4,11 +4,13 @@
 
 # Homebridge Honeywell Home
 
-<a href="https://www.npmjs.com/package/homebridge-honeywell-home"><img title="npm version" src="https://badgen.net/npm/v/homebridge-honeywell-home" ></a>
-<a href="https://www.npmjs.com/package/homebridge-honeywell-home"><img title="npm downloads" src="https://badgen.net/npm/dt/homebridge-honeywell-home" ></a>
+<a href="https://www.npmjs.com/package/homebridge-honeywell-home"><img title="npm version" src="https://badgen.net/npm/v/homebridge-honeywell-home?icon=npm&label" ></a>
+<a href="https://www.npmjs.com/package/homebridge-honeywell-home"><img title="npm downloads" src="https://badgen.net/npm/dt/homebridge-honeywell-home?label=downloads" ></a>
+<a href="https://discord.gg/8fpZA4S"><img title="discord-honeywell-home" src="https://badgen.net/discord/online-members/8fpZA4S?icon=discord&label=discord" ></a>
+<a href="https://paypal.me/donavanbecker"><img title="donate" src="https://badgen.net/badge/donate/paypal/yellow" ></a>
 
 <p>The Homebridge <a href="https://honeywellhome.com">Honeywell Home</a> 
-plugin allows you to access your Honeywell Home Thermostat(s) from HomeKit.
+plugin allows you to access your Honeywell Home Device(s) from HomeKit with
   <a href="https://homebridge.io">Homebridge</a>. 
 </p>
 
@@ -42,3 +44,9 @@ plugin allows you to access your Honeywell Home Thermostat(s) from HomeKit.
 10. Click Confirm
 11. Click Save
 12. Restart Homebridge
+
+## Supported Honeywell Devices
+
+- [T9 Thermostat](https://www.resideo.com/us/en/products/air/thermostats/wifi-thermostats/t9-smart-thermostat-with-sensor-rcht9610wfsw2003-u/)
+  - [T9 Smart Roomsensors](https://www.honeywellhome.com/us/en/products/air/thermostat-accessories/t9-smart-sensor-rchtsensor-1pk-u/)
+- [T5 Thermostat](https://www.resideo.com/us/en/products/air/thermostats/wifi-thermostats/t5-smart-thermostat-with-c-wire-adapter-rcht8612wf2005-u/)

@@ -1,10 +1,4 @@
-import {
-  Service,
-  PlatformAccessory,
-  CharacteristicValue,
-  CharacteristicSetCallback,
-  CharacteristicEventTypes,
-} from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
@@ -23,18 +17,17 @@ export class Thermostats {
   private modes: { Off: number; Heat: number; Cool: number; Auto: number };
 
   //Thermostat Characteristics
-  CurrentTemperature!: number;
-  TargetTemperature!: number;
-  CurrentHeatingCoolingState!: number;
-  TargetHeatingCoolingState!: number;
-  CoolingThresholdTemperature!: number;
-  HeatingThresholdTemperature!: number;
-  CurrentRelativeHumidity!: number;
-  TemperatureDisplayUnits!: number;
+  CurrentTemperature!: CharacteristicValue;
+  TargetTemperature!: CharacteristicValue;
+  CurrentHeatingCoolingState!: CharacteristicValue;
+  TargetHeatingCoolingState!: CharacteristicValue;
+  CoolingThresholdTemperature!: CharacteristicValue;
+  HeatingThresholdTemperature!: CharacteristicValue;
+  CurrentRelativeHumidity?: CharacteristicValue;
+  TemperatureDisplayUnits!: CharacteristicValue;
   //Fan Characteristics
-  Active!: number;
-  TargetFanState!: number;
-  RotationSpeed!: number;
+  Active!: CharacteristicValue;
+  TargetFanState!: CharacteristicValue;
   //Modes
   honeywellMode!: Array<string>;
   fanMode!: FanChangeableValues;
@@ -45,13 +38,13 @@ export class Thermostats {
   roompriority!: any;
   //Thermostat Updates
   thermostatUpdateInProgress!: boolean;
-  doThermostatUpdate!: any;
+  doThermostatUpdate!: Subject<unknown>;
   //Fan Updates
   fanUpdateInProgress!: boolean;
-  doFanUpdate!: any;
+  doFanUpdate!: Subject<unknown>;
   //Room updates - T9 Only
   roomUpdateInProgress!: boolean;
-  doRoomUpdate!: any;
+  doRoomUpdate!: Subject<unknown>;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
@@ -108,18 +101,28 @@ export class Thermostats {
     // Set Min and Max
     if (device.changeableValues.heatCoolMode === 'Heat') {
       this.platform.log.debug('Thermostat %s -', this.accessory.displayName, 'Device is in "Heat" mode');
-      this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature).setProps({
-        minValue: this.toCelsius(device.minHeatSetpoint),
-        maxValue: this.toCelsius(device.maxHeatSetpoint),
-        minStep: 0.1,
-      });
+      this.service
+        .getCharacteristic(this.platform.Characteristic.TargetTemperature)
+        .setProps({
+          minValue: this.toCelsius(device.minHeatSetpoint),
+          maxValue: this.toCelsius(device.maxHeatSetpoint),
+          minStep: 0.1,
+        })
+        .onGet(async () => {
+          return this.TargetTemperature!;
+        });
     } else {
       this.platform.log.debug('Thermostat %s -', this.accessory.displayName, 'Device is in "Cool" mode');
-      this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature).setProps({
-        minValue: this.toCelsius(device.minCoolSetpoint),
-        maxValue: this.toCelsius(device.maxCoolSetpoint),
-        minStep: 0.1,
-      });
+      this.service
+        .getCharacteristic(this.platform.Characteristic.TargetTemperature)
+        .setProps({
+          minValue: this.toCelsius(device.minCoolSetpoint),
+          maxValue: this.toCelsius(device.maxCoolSetpoint),
+          minStep: 0.1,
+        })
+        .onGet(async () => {
+          return this.TargetTemperature!;
+        });
     }
 
     // The value property of TargetHeaterCoolerState must be one of the following:
@@ -131,7 +134,9 @@ export class Thermostats {
       .setProps({
         validValues: TargetState,
       })
-      .on(CharacteristicEventTypes.SET, this.setTargetHeatingCoolingState.bind(this));
+      .onSet(async (value: CharacteristicValue) => {
+        this.setTargetHeatingCoolingState(value);
+      });
 
     this.service.setCharacteristic(
       this.platform.Characteristic.CurrentHeatingCoolingState,
@@ -140,19 +145,27 @@ export class Thermostats {
 
     this.service
       .getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature)
-      .on(CharacteristicEventTypes.SET, this.setHeatingThresholdTemperature.bind(this));
+      .onSet(async (value: CharacteristicValue) => {
+        this.setHeatingThresholdTemperature(value);
+      });
 
     this.service
       .getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
-      .on(CharacteristicEventTypes.SET, this.setCoolingThresholdTemperature.bind(this));
+      .onSet(async (value: CharacteristicValue) => {
+        this.setCoolingThresholdTemperature(value);
+      });
 
     this.service
       .getCharacteristic(this.platform.Characteristic.TargetTemperature)
-      .on(CharacteristicEventTypes.SET, this.setTargetTemperature.bind(this));
+      .onSet(async (value: CharacteristicValue) => {
+        this.setTargetTemperature(value);
+      });
 
     this.service
       .getCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits)
-      .on(CharacteristicEventTypes.SET, this.setTemperatureDisplayUnits.bind(this));
+      .onSet(async (value: CharacteristicValue) => {
+        this.setTemperatureDisplayUnits(value);
+      });
 
     // Fan Controls
     this.fanService = accessory.getService(this.platform.Service.Fanv2);
@@ -169,22 +182,36 @@ export class Thermostats {
 
       this.fanService
         .getCharacteristic(this.platform.Characteristic.Active)
-        .on(CharacteristicEventTypes.SET, this.setActive.bind(this));
+        .onSet(async (value: CharacteristicValue) => {
+          this.setActive(value);
+        });
 
       this.fanService
         .getCharacteristic(this.platform.Characteristic.TargetFanState)
-        .on(CharacteristicEventTypes.SET, this.setTargetFanState.bind(this));
+        .onSet(async (value: CharacteristicValue) => {
+          this.setTargetFanState(value);
+        });
     } else if (this.fanService && this.platform.config.options?.thermostat?.hide_fan) {
       accessory.removeService(this.fanService);
     }
 
     // Humidity Sensor Service
     this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
-    if (!this.humidityService && !this.platform.config.options?.thermostat?.hide_humidity) {
-      this.humidityService = accessory.addService(
-        this.platform.Service.HumiditySensor,
-        `${device.name} ${device.deviceClass} Humidity Sensor`,
-      );
+    if (device.indoorHumidity && !this.humidityService && !this.platform.config.options?.thermostat?.hide_humidity) {
+      this.humidityService =
+        accessory.getService(this.platform.Service.HumiditySensor) ||
+        accessory.addService(
+          this.platform.Service.HumiditySensor,
+          `${device.name} ${device.deviceClass} Humidity Sensor`,
+        );
+      this.humidityService
+        .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
+        .setProps({
+          minStep: 0.1,
+        })
+        .onGet(async () => {
+          return this.CurrentRelativeHumidity!;
+        });
     } else if (this.humidityService && this.platform.config.options?.thermostat?.hide_humidity) {
       accessory.removeService(this.humidityService);
     }
@@ -413,24 +440,24 @@ export class Thermostats {
    */
   async pushChanges() {
     const payload = {
-      mode: this.honeywellMode[this.TargetHeatingCoolingState],
+      mode: this.honeywellMode[Number(this.TargetHeatingCoolingState)],
       thermostatSetpointStatus: this.platform.config.options?.thermostat?.thermostatSetpointStatus,
       autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
     } as any;
 
     // Set the heat and cool set point value based on the selected mode
     if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
-      payload.heatSetpoint = this.toFahrenheit(this.TargetTemperature);
-      payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
+      payload.heatSetpoint = this.toFahrenheit(Number(this.TargetTemperature));
+      payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
     } else if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.COOL) {
-      payload.coolSetpoint = this.toFahrenheit(this.TargetTemperature);
-      payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
+      payload.coolSetpoint = this.toFahrenheit(Number(this.TargetTemperature));
+      payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
     } else if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.AUTO) {
-      payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
-      payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
+      payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
+      payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
     } else {
-      payload.coolSetpoint = this.toFahrenheit(this.CoolingThresholdTemperature);
-      payload.heatSetpoint = this.toFahrenheit(this.HeatingThresholdTemperature);
+      payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
+      payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
     }
 
     this.platform.log.info(
@@ -528,37 +555,59 @@ export class Thermostats {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.TemperatureDisplayUnits,
-      this.TemperatureDisplayUnits,
-    );
-    this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
-    if (this.device.indoorHumidity && !this.platform.config.options?.thermostat?.hide_humidity) {
-      this.humidityService?.updateCharacteristic(
+    if (this.TemperatureDisplayUnits !== undefined) {
+      this.service.updateCharacteristic(
+        this.platform.Characteristic.TemperatureDisplayUnits,
+        this.TemperatureDisplayUnits,
+      );
+    }
+    if (this.CurrentTemperature !== undefined) {
+      this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
+    }
+    if (
+      this.device.indoorHumidity &&
+      !this.platform.config.options?.thermostat?.hide_humidity &&
+      this.CurrentRelativeHumidity !== undefined
+    ) {
+      this.humidityService!.updateCharacteristic(
         this.platform.Characteristic.CurrentRelativeHumidity,
         this.CurrentRelativeHumidity!,
       );
     }
-    this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.HeatingThresholdTemperature,
-      this.HeatingThresholdTemperature,
-    );
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.CoolingThresholdTemperature,
-      this.CoolingThresholdTemperature,
-    );
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.TargetHeatingCoolingState,
-      this.TargetHeatingCoolingState,
-    );
-    this.service.updateCharacteristic(
-      this.platform.Characteristic.CurrentHeatingCoolingState,
-      this.CurrentHeatingCoolingState,
-    );
+    if (this.TargetTemperature !== undefined) {
+      this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
+    }
+    if (this.HeatingThresholdTemperature !== undefined) {
+      this.service.updateCharacteristic(
+        this.platform.Characteristic.HeatingThresholdTemperature,
+        this.HeatingThresholdTemperature,
+      );
+    }
+    if (this.CoolingThresholdTemperature !== undefined) {
+      this.service.updateCharacteristic(
+        this.platform.Characteristic.CoolingThresholdTemperature,
+        this.CoolingThresholdTemperature,
+      );
+    }
+    if (this.TargetHeatingCoolingState !== undefined) {
+      this.service.updateCharacteristic(
+        this.platform.Characteristic.TargetHeatingCoolingState,
+        this.TargetHeatingCoolingState,
+      );
+    }
+    if (this.CurrentHeatingCoolingState !== undefined) {
+      this.service.updateCharacteristic(
+        this.platform.Characteristic.CurrentHeatingCoolingState,
+        this.CurrentHeatingCoolingState,
+      );
+    }
     if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
-      this.fanService?.updateCharacteristic(this.platform.Characteristic.TargetFanState, this.TargetFanState);
-      this.fanService?.updateCharacteristic(this.platform.Characteristic.Active, this.Active);
+      if (this.TargetFanState !== undefined) {
+        this.fanService?.updateCharacteristic(this.platform.Characteristic.TargetFanState, this.TargetFanState);
+      }
+      if (this.Active !== undefined) {
+        this.fanService?.updateCharacteristic(this.platform.Characteristic.Active, this.Active);
+      }
     }
   }
 
@@ -566,7 +615,7 @@ export class Thermostats {
     this.service.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, e);
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
     if (this.device.indoorHumidity && !this.platform.config.options?.thermostat?.hide_humidity) {
-      this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
+      this.humidityService!.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
     }
     this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, e);
     this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, e);
@@ -579,7 +628,7 @@ export class Thermostats {
     }
   }
 
-  async setTargetHeatingCoolingState(value: any, callback: CharacteristicSetCallback) {
+  private setTargetHeatingCoolingState(value: CharacteristicValue) {
     this.platform.log.debug('Thermostat %s -', this.accessory.displayName, 'Set TargetHeatingCoolingState:', value);
 
     this.TargetHeatingCoolingState = value;
@@ -592,34 +641,32 @@ export class Thermostats {
     }
     this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
     if (this.platform.config.options?.roompriority?.thermostat && this.device.deviceModel === 'T9-T10') {
-      await this.doRoomUpdate.next();
+      this.doRoomUpdate.next();
     }
-    this.doThermostatUpdate.next();
-    callback(null);
+    if (this.TargetHeatingCoolingState !== this.modes[this.device.changeableValues.mode]) {
+      this.doThermostatUpdate.next();
+    }
   }
 
-  setHeatingThresholdTemperature(value: any, callback: CharacteristicSetCallback) {
+  private setHeatingThresholdTemperature(value: CharacteristicValue) {
     this.platform.log.debug('Thermostat %s -', this.accessory.displayName, 'Set HeatingThresholdTemperature:', value);
     this.HeatingThresholdTemperature = value;
     this.doThermostatUpdate.next();
-    callback(null);
   }
 
-  setCoolingThresholdTemperature(value: any, callback: CharacteristicSetCallback) {
+  private setCoolingThresholdTemperature(value: CharacteristicValue) {
     this.platform.log.debug('Thermostat %s -', this.accessory.displayName, 'Set CoolingThresholdTemperature:', value);
     this.CoolingThresholdTemperature = value;
     this.doThermostatUpdate.next();
-    callback(null);
   }
 
-  setTargetTemperature(value: any, callback: CharacteristicSetCallback) {
+  private setTargetTemperature(value: CharacteristicValue) {
     this.platform.log.debug('Thermostat %s -', this.accessory.displayName, 'Set TargetTemperature:', value);
     this.TargetTemperature = value;
     this.doThermostatUpdate.next();
-    callback(null);
   }
 
-  setTemperatureDisplayUnits(value: CharacteristicValue, callback: CharacteristicSetCallback) {
+  private setTemperatureDisplayUnits(value: CharacteristicValue) {
     this.platform.log.debug('Thermostat %s -', this.accessory.displayName, 'Set TemperatureDisplayUnits:', value);
     this.platform.log.warn('Changing the Hardware Display Units from HomeKit is not supported.');
 
@@ -630,8 +677,6 @@ export class Thermostats {
         this.TemperatureDisplayUnits,
       );
     }, 100);
-
-    callback(null);
   }
 
   /**
@@ -716,18 +761,16 @@ export class Thermostats {
   /**
    * Updates the status for each of the HomeKit Characteristics
    */
-  setActive(value: any, callback: CharacteristicSetCallback) {
+  private setActive(value: CharacteristicValue) {
     this.platform.log.debug('Thermostat %s -', this.accessory.displayName, 'Set Active State:', value);
     this.Active = value;
     this.doFanUpdate.next();
-    callback(null);
   }
 
-  setTargetFanState(value: any, callback: CharacteristicSetCallback) {
+  private setTargetFanState(value: CharacteristicValue) {
     this.platform.log.debug('Thermostat %s -', this.accessory.displayName, 'Set Target Fan State:', value);
     this.TargetFanState = value;
     this.doFanUpdate.next();
-    callback(null);
   }
 
   private TargetState() {

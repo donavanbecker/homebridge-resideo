@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory, CharacteristicEventTypes, CharacteristicGetCallback } from 'homebridge';
+import { Service, PlatformAccessory } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { skipWhile } from 'rxjs/operators';
@@ -91,13 +91,16 @@ export class RoomSensors {
         this.platform.Service.TemperatureSensor,
         `${sensorAccessory.accessoryAttribute.name} Temperature Sensor`,
       );
-      this.service.getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+      this.temperatureService
+        .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
         .setProps({
           minValue: -50,
           maxValue: 212,
           minStep: 0.1,
         })
-        .on(CharacteristicEventTypes.GET, this.handleCurrentTemperatureGet.bind(this));
+        .onGet(async () => {
+          return this.CurrentTemperature;
+        });
     } else if (this.temperatureService && this.platform.config.options?.roomsensor?.hide_temperature) {
       accessory.removeService(this.temperatureService);
     }
@@ -120,6 +123,14 @@ export class RoomSensors {
         this.platform.Service.HumiditySensor,
         `${sensorAccessory.accessoryAttribute.name} Humidity Sensor`,
       );
+      this.humidityService
+        .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
+        .setProps({
+          minStep: 0.1,
+        })
+        .onGet(async () => {
+          return this.CurrentRelativeHumidity;
+        });
     } else if (this.humidityService && this.platform.config.options?.roomsensor?.hide_humidity) {
       accessory.removeService(this.humidityService);
     }
@@ -203,21 +214,29 @@ export class RoomSensors {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-    this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
-    this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
-    if (!this.platform.config.options?.roomsensor?.hide_temperature) {
+    if (this.StatusLowBattery !== undefined) {
+      this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
+    }
+    if (this.BatteryLevel !== undefined) {
+      this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
+    }
+    if (
+      !this.platform.config.options?.roomsensor?.hide_temperature &&
+      this.CurrentTemperature !== undefined &&
+      !isNaN(this.CurrentTemperature)
+    ) {
       this.temperatureService?.updateCharacteristic(
         this.platform.Characteristic.CurrentTemperature,
         this.CurrentTemperature,
       );
     }
-    if (!this.platform.config.options?.roomsensor?.hide_occupancy) {
+    if (!this.platform.config.options?.roomsensor?.hide_occupancy && this.OccupancyDetected !== undefined) {
       this.occupancyService?.updateCharacteristic(
         this.platform.Characteristic.OccupancyDetected,
         this.OccupancyDetected,
       );
     }
-    if (!this.platform.config.options?.roomsensor?.hide_humidity) {
+    if (!this.platform.config.options?.roomsensor?.hide_humidity && this.CurrentRelativeHumidity !== undefined) {
       this.humidityService?.updateCharacteristic(
         this.platform.Characteristic.CurrentRelativeHumidity,
         this.CurrentRelativeHumidity,
@@ -249,20 +268,5 @@ export class RoomSensors {
 
     // celsius should be to the nearest 0.5 degree
     return Math.round((5 / 9) * (value - 32) * 2) / 2;
-  }
-
-
-  /**
-   * Handle requests to get the current value of the "Current Temperature" characteristic
-   */
-  handleCurrentTemperatureGet(callback: CharacteristicGetCallback) {
-    if (!this.platform.config.options?.roomsensor?.hide_temperature) {
-      this.platform.log.debug('RS %s - Get CurrentTemperature', this.accessory.displayName);
-
-      const currentValue = this.CurrentTemperature;
-
-      callback(null, currentValue);
-      this.platform.log.info('RS %s - CurrentTemperature: %s', this.accessory.displayName, currentValue);
-    }
   }
 }
