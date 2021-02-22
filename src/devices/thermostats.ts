@@ -643,24 +643,28 @@ export class Thermostats {
     if (this.platform.config.options?.roompriority?.thermostat && this.device.deviceModel === 'T9-T10') {
       this.doRoomUpdate.next();
     }
+    this.platform.log.warn('1');
     this.doThermostatUpdate.next();
   }
 
   private setHeatingThresholdTemperature(value: CharacteristicValue) {
     this.platform.log.debug('Thermostat %s -', this.accessory.displayName, 'Set HeatingThresholdTemperature:', value);
     this.HeatingThresholdTemperature = value;
+    this.platform.log.warn('2');
     this.doThermostatUpdate.next();
   }
 
   private setCoolingThresholdTemperature(value: CharacteristicValue) {
     this.platform.log.debug('Thermostat %s -', this.accessory.displayName, 'Set CoolingThresholdTemperature:', value);
     this.CoolingThresholdTemperature = value;
+    this.platform.log.warn('3');
     this.doThermostatUpdate.next();
   }
 
   private setTargetTemperature(value: CharacteristicValue) {
     this.platform.log.debug('Thermostat %s -', this.accessory.displayName, 'Set TargetTemperature:', value);
     this.TargetTemperature = value;
+    this.platform.log.warn('4');
     this.doThermostatUpdate.next();
   }
 
