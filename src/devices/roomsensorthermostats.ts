@@ -579,8 +579,10 @@ export class RoomSensorThermostat {
       this.TargetTemperature = this.toCelsius(this.device.changeableValues.coolSetpoint);
     }
     this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
-    this.doRoomUpdate.next();
-    this.doThermostatUpdate.next();
+    if (this.TargetHeatingCoolingState !== this.modes[this.device.changeableValues.mode]) {
+      this.doRoomUpdate.next();
+      this.doThermostatUpdate.next();
+    }
   }
 
   private setHeatingThresholdTemperature(value: CharacteristicValue) {
