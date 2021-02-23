@@ -48,21 +48,23 @@ export class RoomSensors {
     this.SensorUpdateInProgress = false;
 
     // set accessory information
-    this.accessory
+    accessory
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(this.platform.Characteristic.Model, sensorAccessory.accessoryAttribute.model)
       .setCharacteristic(this.platform.Characteristic.SerialNumber, sensorAccessory.deviceID)
       .setCharacteristic(
         this.platform.Characteristic.FirmwareRevision,
-        sensorAccessory.accessoryAttribute.softwareRevision || accessory.context.firmwareRevision,
-      );
+        sensorAccessory.accessoryAttribute.softwareRevision || accessory.context.firmwareRevision || '1.0.3.0',
+      )
+      .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(sensorAccessory.accessoryAttribute.softwareRevision ||
+        accessory.context.firmwareRevision || '1.0.3.0');
 
     // get the BatteryService service if it exists, otherwise create a new Battery service
     // you can create multiple services for each accessory
     (this.service =
-      this.accessory.getService(this.platform.Service.BatteryService) ||
-      this.accessory.addService(this.platform.Service.BatteryService)),
+      this.accessory.getService(this.platform.Service.Battery) ||
+      this.accessory.addService(this.platform.Service.Battery)),
     `${sensorAccessory.accessoryAttribute.name} Room Sensor`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
