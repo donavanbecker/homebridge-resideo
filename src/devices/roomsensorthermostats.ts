@@ -70,7 +70,7 @@ export class RoomSensorThermostat {
     this.thermostatUpdateInProgress = false;
 
     // set accessory information
-    this.accessory
+    accessory
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(this.platform.Characteristic.Model, sensorAccessory.accessoryAttribute.model || '1100')

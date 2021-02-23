@@ -10,7 +10,7 @@ import { DeviceURL, location, Thermostat, FanChangeableValues } from '../setting
  * Each accessory may expose multiple services of different service types.
  */
 export class Thermostats {
-  private service: Service;
+  private service!: Service;
   fanService?: Service;
   humidityService?: Service;
 
@@ -78,12 +78,11 @@ export class Thermostats {
     this.fanUpdateInProgress = false;
 
     // set accessory information
-    this.accessory
+    accessory
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(this.platform.Characteristic.Model, device.deviceModel)
       .setCharacteristic(this.platform.Characteristic.SerialNumber, device.deviceID)
-      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision)
       .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(accessory.context.firmwareRevision);
 
     //Thermostat Service
