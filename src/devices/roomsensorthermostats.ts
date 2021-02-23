@@ -78,7 +78,9 @@ export class RoomSensorThermostat {
       .setCharacteristic(
         this.platform.Characteristic.FirmwareRevision,
         sensorAccessory.accessoryAttribute.softwareRevision || accessory.context.firmwareRevision || '1.0.3.0',
-      );
+      )
+      .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(sensorAccessory.accessoryAttribute.softwareRevision ||
+        accessory.context.firmwareRevision || '1.0.3.0');
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory

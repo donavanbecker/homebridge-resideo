@@ -83,7 +83,8 @@ export class Thermostats {
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(this.platform.Characteristic.Model, device.deviceModel)
       .setCharacteristic(this.platform.Characteristic.SerialNumber, device.deviceID)
-      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
+      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision)
+      .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(accessory.context.firmwareRevision);
 
     //Thermostat Service
     (this.service =
