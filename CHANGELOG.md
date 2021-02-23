@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 9.3.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.2.0...v9.3.0) (2021-02-23)
+
+### Changes
+
+- Added Characteristic updating to FirmwareRevision.
+- Updated BatteryService Characteristic to Battery to meeting Homebridge 1.3.0 Standards.
+- Housekeeping and updated dependencies.
+
 ## [Version 9.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.1.0...v9.2.0) (2021-02-22)
 
 ### Changes
