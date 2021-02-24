@@ -66,12 +66,12 @@
             "type": "object",
             "properties": {
               "hide_fan": {
-                "title": "Hide Thermostat(s) Fan",
+                "title": "Hide Thermostat Fan",
                 "type": "boolean",
                 "requried": false
               },
-              "hide_temperature": {
-                "title": "Hide Temperature Service",
+              "hide_humidity": {
+                "title": "Hide Humidity Service",
                 "type": "boolean",
                 "required": false
               },
@@ -293,12 +293,12 @@
                   "expandable": true,
                   "expanded": false,
                   "items": [
-                    "options.roompriority.priorityType",
                     {
                       "type": "help",
                       "helpvalue": "<em class='primary-text'>Allows you to set your Priority to your Room Sensor(s).</em>"
                     },
-                    "options.roompriority.thermostat"
+                    "options.roompriority.thermostat",
+                    "options.roompriority.priorityType"
                   ]
                 }
               ]
