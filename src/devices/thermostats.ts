@@ -192,7 +192,7 @@ export class Thermostats {
         .onSet(async (value: CharacteristicValue) => {
           this.setTargetFanState(value);
         });
-    } else if (this.fanService || this.platform.config.options?.thermostat?.hide_fan) {
+    } else {
       accessory.removeService(this.fanService!);
     }
 
@@ -213,7 +213,7 @@ export class Thermostats {
         .onGet(async () => {
           return this.CurrentRelativeHumidity!;
         });
-    } else if (!device.indoorHumidity || this.humidityService || this.platform.config.options?.thermostat?.hide_humidity) {
+    } else {
       accessory.removeService(this.humidityService!);
     }
 

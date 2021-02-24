@@ -103,7 +103,7 @@ export class RoomSensors {
         .onGet(async () => {
           return this.CurrentTemperature;
         });
-    } else if (this.temperatureService || this.platform.config.options?.roomsensor?.hide_temperature) {
+    } else {
       accessory.removeService(this.temperatureService!);
     }
 
@@ -114,7 +114,7 @@ export class RoomSensors {
         this.platform.Service.OccupancySensor,
         `${sensorAccessory.accessoryAttribute.name} Occupancy Sensor`,
       );
-    } else if (this.occupancyService || this.platform.config.options?.roomsensor?.hide_occupancy) {
+    } else {
       accessory.removeService(this.occupancyService!);
     }
 

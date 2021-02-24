@@ -86,7 +86,7 @@ export class LeakSensor {
         this.platform.Service.LeakSensor,
         `${device.userDefinedDeviceName} Leak Sensor`,
       );
-    } else if (this.leakService || this.platform.config.options?.leaksensor?.hide_leak) {
+    } else {
       accessory.removeService(this.leakService!);
     }
 
@@ -107,7 +107,7 @@ export class LeakSensor {
         .onGet(async () => {
           return this.CurrentTemperature;
         });
-    } else if (this.temperatureService || this.platform.config.options?.leaksensor?.hide_temperature) {
+    } else {
       accessory.removeService(this.temperatureService!);
     }
 
@@ -126,7 +126,7 @@ export class LeakSensor {
         .onGet(async () => {
           return this.CurrentRelativeHumidity;
         });
-    } else if (this.humidityService || this.platform.config.options?.leaksensor?.hide_humidity) {
+    } else {
       accessory.removeService(this.humidityService!);
     }
 
