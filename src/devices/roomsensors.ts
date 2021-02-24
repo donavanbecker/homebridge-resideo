@@ -103,8 +103,8 @@ export class RoomSensors {
         .onGet(async () => {
           return this.CurrentTemperature;
         });
-    } else if (this.temperatureService && this.platform.config.options?.roomsensor?.hide_temperature) {
-      accessory.removeService(this.temperatureService);
+    } else if (this.temperatureService || this.platform.config.options?.roomsensor?.hide_temperature) {
+      accessory.removeService(this.temperatureService!);
     }
 
     // Occupancy Sensor Service
@@ -114,8 +114,8 @@ export class RoomSensors {
         this.platform.Service.OccupancySensor,
         `${sensorAccessory.accessoryAttribute.name} Occupancy Sensor`,
       );
-    } else if (this.occupancyService && this.platform.config.options?.roomsensor?.hide_occupancy) {
-      accessory.removeService(this.occupancyService);
+    } else if (this.occupancyService || this.platform.config.options?.roomsensor?.hide_occupancy) {
+      accessory.removeService(this.occupancyService!);
     }
 
     // Humidity Sensor Service
@@ -133,8 +133,8 @@ export class RoomSensors {
         .onGet(async () => {
           return this.CurrentRelativeHumidity;
         });
-    } else if (this.humidityService && this.platform.config.options?.roomsensor?.hide_humidity) {
-      accessory.removeService(this.humidityService);
+    } else if (this.humidityService || this.platform.config.options?.roomsensor?.hide_humidity) {
+      accessory.removeService(this.humidityService!);
     }
 
     // Retrieve initial values and updateHomekit

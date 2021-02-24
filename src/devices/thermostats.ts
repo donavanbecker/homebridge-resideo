@@ -192,8 +192,8 @@ export class Thermostats {
         .onSet(async (value: CharacteristicValue) => {
           this.setTargetFanState(value);
         });
-    } else if (this.fanService && this.platform.config.options?.thermostat?.hide_fan) {
-      accessory.removeService(this.fanService);
+    } else if (this.fanService || this.platform.config.options?.thermostat?.hide_fan) {
+      accessory.removeService(this.fanService!);
     }
 
     // Humidity Sensor Service
@@ -213,8 +213,8 @@ export class Thermostats {
         .onGet(async () => {
           return this.CurrentRelativeHumidity!;
         });
-    } else if (this.humidityService && this.platform.config.options?.thermostat?.hide_humidity) {
-      accessory.removeService(this.humidityService);
+    } else if (!device.indoorHumidity || this.humidityService || this.platform.config.options?.thermostat?.hide_humidity) {
+      accessory.removeService(this.humidityService!);
     }
 
     // Retrieve initial values and updateHomekit
