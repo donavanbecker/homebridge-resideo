@@ -86,45 +86,76 @@ export class RoomSensors {
 
     // Set Charging State
     this.service.setCharacteristic(this.platform.Characteristic.ChargingState, 2);
+
     // Temperature Sensor Service
-    this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor);
-    if (!this.temperatureService && !this.platform.config.options?.roomsensor?.hide_temperature) {
-      this.temperatureService = accessory.addService(
-        this.platform.Service.TemperatureSensor,
-        `${sensorAccessory.accessoryAttribute.name} Temperature Sensor`,
-      );
+    if (this.platform.config.options?.roomsensor?.hide_temperature) {
+      if (this.platform.debugMode) {
+        this.platform.log.error('Removing service');
+      }
+      this.temperatureService = this.accessory.getService(this.platform.Service.TemperatureSensor);
+      accessory.removeService(this.temperatureService!);
+    } else if (!this.temperatureService) {
+      if (this.platform.debugMode) {
+        this.platform.log.warn('Adding service');
+      }
+      (this.temperatureService =
+        this.accessory.getService(this.platform.Service.TemperatureSensor) ||
+        this.accessory.addService(this.platform.Service.TemperatureSensor)),
+      `${sensorAccessory.accessoryAttribute.name} TemperatureSensor`;
+
       this.temperatureService
         .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
         .setProps({
-          minValue: -50,
-          maxValue: 212,
+          minValue: -273.15,
+          maxValue: 100,
           minStep: 0.1,
         })
         .onGet(async () => {
           return this.CurrentTemperature;
         });
-    } else if (this.temperatureService && this.platform.config.options?.roomsensor?.hide_temperature) {
-      accessory.removeService(this.temperatureService);
+    } else {
+      if (this.platform.debugMode){
+        this.platform.log.warn('TemperatureSensor not added.');
+      }
     }
 
     // Occupancy Sensor Service
-    this.occupancyService = accessory.getService(this.platform.Service.OccupancySensor);
-    if (!this.occupancyService && !this.platform.config.options?.roomsensor?.hide_occupancy) {
-      this.occupancyService = accessory.addService(
-        this.platform.Service.OccupancySensor,
-        `${sensorAccessory.accessoryAttribute.name} Occupancy Sensor`,
-      );
-    } else if (this.occupancyService && this.platform.config.options?.roomsensor?.hide_occupancy) {
-      accessory.removeService(this.occupancyService);
+    if (this.platform.config.options?.roomsensor?.hide_occupancy) {
+      if (this.platform.debugMode) {
+        this.platform.log.error('Removing service');
+      }
+      this.occupancyService = this.accessory.getService(this.platform.Service.OccupancySensor);
+      accessory.removeService(this.occupancyService!);
+    } else if (!this.occupancyService) {
+      if (this.platform.debugMode) {
+        this.platform.log.warn('Adding service');
+      }
+      (this.occupancyService =
+        this.accessory.getService(this.platform.Service.OccupancySensor) ||
+        this.accessory.addService(this.platform.Service.OccupancySensor)),
+      `${sensorAccessory.accessoryAttribute.name} OccupancySensor`;
+    } else {
+      if (this.platform.debugMode){
+        this.platform.log.warn('OccupancySensor not added.');
+      }
     }
 
     // Humidity Sensor Service
-    this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
-    if (!this.humidityService && !this.platform.config.options?.roomsensor?.hide_humidity) {
-      this.humidityService = accessory.addService(
-        this.platform.Service.HumiditySensor,
-        `${sensorAccessory.accessoryAttribute.name} Humidity Sensor`,
-      );
+    if (this.platform.config.options?.roomsensor?.hide_humidity) {
+      if (this.platform.debugMode) {
+        this.platform.log.error('Removing service');
+      }
+      this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor);
+      accessory.removeService(this.humidityService!);
+    } else if (!this.humidityService) {
+      if (this.platform.debugMode) {
+        this.platform.log.warn('Adding service');
+      }
+      (this.humidityService =
+        this.accessory.getService(this.platform.Service.HumiditySensor) ||
+        this.accessory.addService(this.platform.Service.HumiditySensor)),
+      `${sensorAccessory.accessoryAttribute.name} HumiditySensor`;
+
       this.humidityService
         .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
         .setProps({
@@ -133,8 +164,10 @@ export class RoomSensors {
         .onGet(async () => {
           return this.CurrentRelativeHumidity;
         });
-    } else if (this.humidityService && this.platform.config.options?.roomsensor?.hide_humidity) {
-      accessory.removeService(this.humidityService);
+    } else {
+      if (this.platform.debugMode){
+        this.platform.log.warn('HumiditySensor not added.');
+      }
     }
 
     // Retrieve initial values and updateHomekit

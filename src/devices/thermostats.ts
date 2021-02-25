@@ -169,17 +169,26 @@ export class Thermostats {
       });
 
     // Fan Controls
-    this.fanService = accessory.getService(this.platform.Service.Fanv2);
-    if (device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
+    if (this.platform.config.options?.thermostat?.hide_fan) {
+      if (this.platform.debugMode) {
+        this.platform.log.error('Removing service');
+      }
+      this.fanService = this.accessory.getService(this.platform.Service.Fanv2);
+      accessory.removeService(this.fanService!);
+    } else if (!this.fanService && device.settings?.fan) {
+      if (this.platform.debugMode) {
+        this.platform.log.warn('Adding service');
+      }
       this.platform.log.debug(
         'Thermostat %s -',
         this.accessory.displayName,
         'Available FAN settings',
         JSON.stringify(device.settings.fan),
       );
-      this.fanService =
-        accessory.getService(this.platform.Service.Fanv2) ||
-        accessory.addService(this.platform.Service.Fanv2, `${device.name} ${device.deviceClass} Fan`);
+      (this.fanService =
+        this.accessory.getService(this.platform.Service.Fanv2) ||
+        this.accessory.addService(this.platform.Service.Fanv2)),
+      `${device.name} ${device.deviceClass} Fan`;
 
       this.fanService
         .getCharacteristic(this.platform.Characteristic.Active)
@@ -192,19 +201,28 @@ export class Thermostats {
         .onSet(async (value: CharacteristicValue) => {
           this.setTargetFanState(value);
         });
-    } else if (this.fanService && this.platform.config.options?.thermostat?.hide_fan) {
-      accessory.removeService(this.fanService);
+    } else {
+      if (this.platform.debugMode) {
+        this.platform.log.warn('Fanv2 not added.');
+      }
     }
 
     // Humidity Sensor Service
-    this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
-    if (device.indoorHumidity && !this.humidityService && !this.platform.config.options?.thermostat?.hide_humidity) {
-      this.humidityService =
-        accessory.getService(this.platform.Service.HumiditySensor) ||
-        accessory.addService(
-          this.platform.Service.HumiditySensor,
-          `${device.name} ${device.deviceClass} Humidity Sensor`,
-        );
+    if (this.platform.config.options?.thermostat?.hide_humidity) {
+      if (this.platform.debugMode) {
+        this.platform.log.error('Removing service');
+      }
+      this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor);
+      accessory.removeService(this.humidityService!);
+    } else if (!this.humidityService && device.indoorHumidity) {
+      if (this.platform.debugMode) {
+        this.platform.log.warn('Adding service');
+      }
+      (this.humidityService =
+        this.accessory.getService(this.platform.Service.HumiditySensor) ||
+        this.accessory.addService(this.platform.Service.HumiditySensor)),
+      `${device.name} ${device.deviceClass} HumiditySensor`;
+
       this.humidityService
         .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
         .setProps({
@@ -213,8 +231,10 @@ export class Thermostats {
         .onGet(async () => {
           return this.CurrentRelativeHumidity!;
         });
-    } else if (this.humidityService && this.platform.config.options?.thermostat?.hide_humidity) {
-      accessory.removeService(this.humidityService);
+    } else {
+      if (this.platform.debugMode) {
+        this.platform.log.warn('HumiditySensor not added.');
+      }
     }
 
     // Retrieve initial values and updateHomekit

@@ -80,44 +80,71 @@ export class LeakSensor {
     this.service.setCharacteristic(this.platform.Characteristic.ChargingState, 2);
 
     // Leak Sensor Service
-    this.leakService = accessory.getService(this.platform.Service.LeakSensor);
-    if (!this.leakService && !this.platform.config.options?.leaksensor?.hide_leak) {
-      this.leakService = accessory.addService(
-        this.platform.Service.LeakSensor,
-        `${device.userDefinedDeviceName} Leak Sensor`,
-      );
-    } else if (this.leakService && this.platform.config.options?.leaksensor?.hide_leak) {
-      accessory.removeService(this.leakService);
+    if (this.platform.config.options?.leaksensor?.hide_leak) {
+      if (this.platform.debugMode) {
+        this.platform.log.error('Removing service');
+      }
+      this.leakService = this.accessory.getService(this.platform.Service.LeakSensor);
+      accessory.removeService(this.leakService!);
+    } else if (!this.leakService) {
+      if (this.platform.debugMode) {
+        this.platform.log.warn('Adding service');
+      }
+      (this.service =
+        this.accessory.getService(this.platform.Service.LeakSensor) ||
+        this.accessory.addService(this.platform.Service.LeakSensor)),
+      `${device.userDefinedDeviceName} LeakSensor`;
+    } else {
+      if (this.platform.debugMode){
+        this.platform.log.warn('LeakSensor not added.');
+      }
     }
 
     // Temperature Sensor Service
-    this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor);
-    if (!this.temperatureService && !this.platform.config.options?.leaksensor?.hide_temperature) {
-      this.temperatureService = accessory.addService(
-        this.platform.Service.TemperatureSensor,
-        `${device.userDefinedDeviceName} Temperature Sensor`,
-      );
+    if (this.platform.config.options?.leaksensor?.hide_temperature) {
+      if (this.platform.debugMode) {
+        this.platform.log.error('Removing service');
+      }
+      this.temperatureService = this.accessory.getService(this.platform.Service.TemperatureSensor);
+      accessory.removeService(this.temperatureService!);
+    } else if (!this.temperatureService) {
+      if (this.platform.debugMode) {
+        this.platform.log.warn('Adding service');
+      }
+      (this.temperatureService =
+        this.accessory.getService(this.platform.Service.TemperatureSensor) ||
+        this.accessory.addService(this.platform.Service.TemperatureSensor)),
+      `${device.userDefinedDeviceName} TemperatureSensor`;
+
       this.temperatureService
         .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
         .setProps({
-          minValue: -50,
-          maxValue: 212,
+          minValue: -273.15,
+          maxValue: 100,
           minStep: 0.1,
         })
         .onGet(async () => {
           return this.CurrentTemperature;
         });
-    } else if (this.temperatureService && this.platform.config.options?.leaksensor?.hide_temperature) {
-      accessory.removeService(this.temperatureService);
+    } else {
+      if (this.platform.debugMode){
+        this.platform.log.warn('TemperatureSensor not added.');
+      }
     }
 
     // Humidity Sensor Service
-    this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
-    if (!this.humidityService && !this.platform.config.options?.leaksensor?.hide_humidity) {
-      this.humidityService = accessory.addService(
-        this.platform.Service.HumiditySensor,
-        `${device.userDefinedDeviceName} Humidity Sensor`,
-      );
+    if (this.platform.config.options?.leaksensor?.hide_humidity) {
+      if (this.platform.debugMode) {
+        this.platform.log.error('Removing service');
+      }
+      this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor); 
+      accessory.removeService(this.humidityService!);
+    } else if (!this.humidityService) {
+      (this.humidityService =
+        this.accessory.getService(this.platform.Service.HumiditySensor) ||
+        this.accessory.addService(this.platform.Service.HumiditySensor)),
+      `${device.userDefinedDeviceName} HumiditySensor`;
+
       this.humidityService
         .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
         .setProps({
@@ -126,8 +153,10 @@ export class LeakSensor {
         .onGet(async () => {
           return this.CurrentRelativeHumidity;
         });
-    } else if (this.humidityService && this.platform.config.options?.leaksensor?.hide_humidity) {
-      accessory.removeService(this.humidityService);
+    } else {
+      if (this.platform.debugMode){
+        this.platform.log.warn('HumiditySensor not added.');
+      }
     }
 
     // Retrieve initial values and updateHomekit
