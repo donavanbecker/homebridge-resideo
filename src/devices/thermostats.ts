@@ -207,8 +207,6 @@ export class Thermostats {
     }
 
     // Humidity Sensor Service
-    this.platform.log.warn(JSON.stringify(this.platform.config.options?.thermostat?.hide_humidity));
-    this.platform.log.warn(JSON.stringify(this.humidityService));
     if ((!this.humidityService || this.humidityService) && this.platform.config.options?.thermostat?.hide_humidity) {
       if (this.platform.debugMode) {
         this.platform.log.error('Removing service');
