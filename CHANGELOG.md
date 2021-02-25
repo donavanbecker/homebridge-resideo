@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file. This projec
 ### Changes
 
 - Correct issue with `config.schema.json`.
+- Fix issue with not hiding sensors when not compatible with device or hidden with config.
 
 ## [Version 9.3.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.2.0...v9.3.0) (2021-02-23)
 
