@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 9.3.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.3.0...v9.3.2) (2021-02-25)
+
+### Changes
+
+- Fix issue with not config potentially not working in some cases.
+
 ## [Version 9.3.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.3.0...v9.3.1) (2021-02-25)
 
 ### Changes

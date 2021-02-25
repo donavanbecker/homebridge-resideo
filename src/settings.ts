@@ -67,10 +67,10 @@ export type leaksensor = {
   };
   
 export type roomsensor = {
-    hide_temperature: boolean;
-    hide_occupancy: boolean;
-    hide_motion: boolean;
-    hide_humidity: boolean;
+    hide_temperature?: boolean;
+    hide_occupancy?: boolean;
+    hide_motion?: boolean;
+    hide_humidity?: boolean;
   };
   
 export type roompriority = {
