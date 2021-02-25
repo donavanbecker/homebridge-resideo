@@ -84,6 +84,7 @@ export class LeakSensor {
       if (this.platform.debugMode) {
         this.platform.log.error('Removing service');
       }
+      this.leakService = this.accessory.getService(this.platform.Service.LeakSensor);
       accessory.removeService(this.leakService!);
     } else if (!this.leakService) {
       if (this.platform.debugMode) {
@@ -104,6 +105,7 @@ export class LeakSensor {
       if (this.platform.debugMode) {
         this.platform.log.error('Removing service');
       }
+      this.temperatureService = this.accessory.getService(this.platform.Service.TemperatureSensor);
       accessory.removeService(this.temperatureService!);
     } else if (!this.temperatureService) {
       if (this.platform.debugMode) {
@@ -135,6 +137,7 @@ export class LeakSensor {
       if (this.platform.debugMode) {
         this.platform.log.error('Removing service');
       }
+      this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor); 
       accessory.removeService(this.humidityService!);
     } else if (!this.humidityService) {
       (this.humidityService =

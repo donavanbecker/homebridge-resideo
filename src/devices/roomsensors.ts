@@ -92,6 +92,7 @@ export class RoomSensors {
       if (this.platform.debugMode) {
         this.platform.log.error('Removing service');
       }
+      this.temperatureService = this.accessory.getService(this.platform.Service.TemperatureSensor);
       accessory.removeService(this.temperatureService!);
     } else if (!this.temperatureService) {
       if (this.platform.debugMode) {
@@ -123,6 +124,7 @@ export class RoomSensors {
       if (this.platform.debugMode) {
         this.platform.log.error('Removing service');
       }
+      this.occupancyService = this.accessory.getService(this.platform.Service.OccupancySensor);
       accessory.removeService(this.occupancyService!);
     } else if (!this.occupancyService) {
       if (this.platform.debugMode) {
@@ -143,6 +145,7 @@ export class RoomSensors {
       if (this.platform.debugMode) {
         this.platform.log.error('Removing service');
       }
+      this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor);
       accessory.removeService(this.humidityService!);
     } else if (!this.humidityService) {
       if (this.platform.debugMode) {

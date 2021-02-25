@@ -173,6 +173,7 @@ export class Thermostats {
       if (this.platform.debugMode) {
         this.platform.log.error('Removing service');
       }
+      this.fanService = this.accessory.getService(this.platform.Service.Fanv2);
       accessory.removeService(this.fanService!);
     } else if (!this.fanService && device.settings?.fan) {
       if (this.platform.debugMode) {
@@ -211,6 +212,7 @@ export class Thermostats {
       if (this.platform.debugMode) {
         this.platform.log.error('Removing service');
       }
+      this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor);
       accessory.removeService(this.humidityService!);
     } else if (!this.humidityService && device.indoorHumidity) {
       if (this.platform.debugMode) {
