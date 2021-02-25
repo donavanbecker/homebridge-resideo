@@ -169,7 +169,7 @@ export class Thermostats {
       });
 
     // Fan Controls
-    if (this.platform.config.options?.thermostat?.hide_humidity) {
+    if (this.platform.config.options?.thermostat?.hide_fan) {
       if (this.platform.debugMode) {
         this.platform.log.error('Removing service');
       }
@@ -207,7 +207,7 @@ export class Thermostats {
     }
 
     // Humidity Sensor Service
-    if ((!this.humidityService || this.humidityService) && this.platform.config.options?.thermostat?.hide_humidity) {
+    if (this.platform.config.options?.thermostat?.hide_humidity) {
       if (this.platform.debugMode) {
         this.platform.log.error('Removing service');
       }
