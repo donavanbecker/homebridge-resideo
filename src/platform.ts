@@ -122,52 +122,48 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
     this.config.options = this.config.options || {};
 
-    if (this.config.options) {
-      // Hide Devices by DeviceID
-      this.config.options.hide_device = this.config.options.hide_device || [];
+    // Hide Devices by DeviceID
+    this.config.options.hide_device = this.config.options.hide_device || [];
 
-      if (this.config.options?.thermostat) {
-        // Thermostat Config Options
-        this.config.options.thermostat.hide_fan;
-        this.config.options.thermostat.thermostatSetpointStatus =
-          this.config.options.thermostat.thermostatSetpointStatus || 'PermanentHold';
-      }
+    // Thermostat Config Options
+    this.config.options.thermostat = this.config.options.thermostat || {};
+    this.config.options.thermostat.hide_fan;
+    this.config.options.thermostat.thermostatSetpointStatus = this.config.options.thermostat.thermostatSetpointStatus || 'PermanentHold';
 
-      if (this.config.options?.leaksensor) {
-        // Leak Sensor Config Options
-        this.config.options.leaksensor.hide_humidity;
-        this.config.options.leaksensor.hide_temperature;
-        this.config.options.leaksensor.hide_leak;
-      }
+    // Leak Sensor Config Options
+    this.config.options.leaksensor = this.config.options.leaksensor || {};
+    this.config.options.leaksensor.hide_humidity;
+    this.config.options.leaksensor.hide_temperature;
+    this.config.options.leaksensor.hide_leak;
 
-      if (this.config.options?.roomsensor) {
-        // Room Sensor Config Options
-        this.config.options.roomsensor.hide_temperature;
-        this.config.options.roomsensor.hide_occupancy;
-        this.config.options.roomsensor.hide_humidity;
-      }
+    // Room Sensor Config Options
+    this.config.options.roomsensor = this.config.options.roomsensor || {};
+    this.config.options.roomsensor.hide_temperature;
+    this.config.options.roomsensor.hide_occupancy;
+    this.config.options.roomsensor.hide_humidity;
 
-      if (this.config.options?.roompriority) {
-        // Room Priority Config Options
-        this.config.options.roompriority.thermostat;
-        this.config.options.roompriority.priorityType = this.config.options.roompriority.priorityType || 'PickARoom';
-      }
 
-      if (this.config.options!.refreshRate! < 120) {
-        throw new Error('Refresh Rate must be above 120 (2 minutes).');
-      }
+    // Room Priority Config Options
+    this.config.options.roompriority = this.config.options.roompriority || {};
+    this.config.options.roompriority.thermostat;
+    this.config.options.roompriority.priorityType = this.config.options.roompriority.priorityType || 'PickARoom';
 
-      if (!this.config.options.refreshRate) {
-        // default 300 seconds
-        this.config.options!.refreshRate! = 300;
-        this.log.warn('Using Default Refresh Rate.');
-      }
 
-      if (!this.config.options.pushRate) {
-        // default 100 milliseconds
-        this.config.options!.pushRate! = 0.1;
-        this.log.warn('Using Default Push Rate.');
-      }
+    if (this.config.options!.refreshRate! < 120) {
+      throw new Error('Refresh Rate must be above 120 (2 minutes).');
+    }
+
+    if (!this.config.options.refreshRate) {
+      // default 300 seconds
+      this.config.options!.refreshRate! = 300;
+      this.log.warn('Using Default Refresh Rate.');
+    }
+
+    if (!this.config.options.pushRate) {
+      // default 100 milliseconds
+      this.config.options!.pushRate! = 0.1;
+      this.log.warn('Using Default Push Rate.');
+
     }
 
     if (!this.config.credentials) {
@@ -194,7 +190,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    */
   async getAccessToken() {
     try {
-      let result;
+      let result: { access_token: string; refresh_token: string; };
 
       if (this.config.credentials!.consumerSecret) {
         result = (
@@ -462,7 +458,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                         sensorAccessory.accessoryAttribute.name,
                       );
                     }
-                    if (sensorAccessory.accessoryAttribute.model === '0'){
+                    if (sensorAccessory.accessoryAttribute.model === '0') {
                       sensorAccessory.accessoryAttribute.model = '4352';
                     }
                     sensorAccessory.deviceID = `${sensorAccessory.accessoryId}${sensorAccessory.roomId}${sensorAccessory.accessoryAttribute.model}`;
