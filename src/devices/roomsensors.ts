@@ -88,7 +88,7 @@ export class RoomSensors {
     this.service.setCharacteristic(this.platform.Characteristic.ChargingState, 2);
     // Temperature Sensor Service
     this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor);
-    if (!this.temperatureService && !this.platform.config.options?.roomsensor?.hide_temperature) {
+    if (!this.platform.config.options?.roomsensor?.hide_temperature) {
       this.temperatureService = accessory.addService(
         this.platform.Service.TemperatureSensor,
         `${sensorAccessory.accessoryAttribute.name} Temperature Sensor`,
@@ -120,7 +120,7 @@ export class RoomSensors {
 
     // Humidity Sensor Service
     this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
-    if (!this.humidityService && !this.platform.config.options?.roomsensor?.hide_humidity) {
+    if (!this.platform.config.options?.roomsensor?.hide_humidity) {
       this.humidityService = accessory.addService(
         this.platform.Service.HumiditySensor,
         `${sensorAccessory.accessoryAttribute.name} Humidity Sensor`,

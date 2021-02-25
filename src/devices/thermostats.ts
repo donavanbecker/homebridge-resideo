@@ -198,7 +198,7 @@ export class Thermostats {
 
     // Humidity Sensor Service
     this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
-    if (device.indoorHumidity && !this.humidityService && !this.platform.config.options?.thermostat?.hide_humidity) {
+    if (device.indoorHumidity && !this.platform.config.options?.thermostat?.hide_humidity) {
       this.humidityService =
         accessory.getService(this.platform.Service.HumiditySensor) ||
         accessory.addService(
@@ -214,8 +214,9 @@ export class Thermostats {
           return this.CurrentRelativeHumidity!;
         });
     } else if (this.humidityService && this.platform.config.options?.thermostat?.hide_humidity) {
+      this.platform.log.error('removing service');
       accessory.removeService(this.humidityService);
-    }
+    } 
 
     // Retrieve initial values and updateHomekit
     this.updateHomeKitCharacteristics();

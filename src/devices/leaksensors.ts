@@ -81,7 +81,7 @@ export class LeakSensor {
 
     // Leak Sensor Service
     this.leakService = accessory.getService(this.platform.Service.LeakSensor);
-    if (!this.leakService && !this.platform.config.options?.leaksensor?.hide_leak) {
+    if (!this.platform.config.options?.leaksensor?.hide_leak) {
       this.leakService = accessory.addService(
         this.platform.Service.LeakSensor,
         `${device.userDefinedDeviceName} Leak Sensor`,
@@ -92,7 +92,7 @@ export class LeakSensor {
 
     // Temperature Sensor Service
     this.temperatureService = accessory.getService(this.platform.Service.TemperatureSensor);
-    if (!this.temperatureService && !this.platform.config.options?.leaksensor?.hide_temperature) {
+    if (!this.platform.config.options?.leaksensor?.hide_temperature) {
       this.temperatureService = accessory.addService(
         this.platform.Service.TemperatureSensor,
         `${device.userDefinedDeviceName} Temperature Sensor`,
@@ -113,7 +113,7 @@ export class LeakSensor {
 
     // Humidity Sensor Service
     this.humidityService = accessory.getService(this.platform.Service.HumiditySensor);
-    if (!this.humidityService && !this.platform.config.options?.leaksensor?.hide_humidity) {
+    if (!this.platform.config.options?.leaksensor?.hide_humidity) {
       this.humidityService = accessory.addService(
         this.platform.Service.HumiditySensor,
         `${device.userDefinedDeviceName} Humidity Sensor`,
