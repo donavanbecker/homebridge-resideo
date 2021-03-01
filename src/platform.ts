@@ -55,6 +55,12 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       return;
     }
 
+    // HOOBS notice
+    if (__dirname.includes('hoobs')) {
+      this.log.warn('This plugin has not been tested under HOOBS, it is highly recommended that ' +
+            'you switch to Homebridge: https://git.io/Jtxb0');
+    }
+        
     // verify the config
     try {
       this.verifyConfig();
