@@ -86,8 +86,7 @@ export class RoomSensorThermostat {
     // you can create multiple services for each accessory
     (this.service =
       this.accessory.getService(this.platform.Service.Thermostat) ||
-      this.accessory.addService(this.platform.Service.Thermostat)),
-    `${sensorAccessory.accessoryAttribute.name} ${sensorAccessory.accessoryAttribute.type} Thermostat`;
+      this.accessory.addService(this.platform.Service.Thermostat)), accessory.displayName;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -116,7 +115,7 @@ export class RoomSensorThermostat {
           maxValue: this.toCelsius(device.maxHeatSetpoint),
           minStep: 0.5,
         })
-        .onGet(async () => {
+        .onGet(() => {
           return this.TargetTemperature;
         });
     } else {
@@ -128,7 +127,7 @@ export class RoomSensorThermostat {
           maxValue: this.toCelsius(device.maxCoolSetpoint),
           minStep: 0.5,
         })
-        .onGet(async () => {
+        .onGet(() => {
           return this.TargetTemperature;
         });
     }
@@ -142,9 +141,7 @@ export class RoomSensorThermostat {
       .setProps({
         validValues: TargetState,
       })
-      .onSet(async (value: CharacteristicValue) => {
-        this.setTargetHeatingCoolingState(value);
-      });
+      .onSet(this.setTargetHeatingCoolingState.bind(this));
 
     this.service.setCharacteristic(
       this.platform.Characteristic.CurrentHeatingCoolingState,
@@ -153,27 +150,19 @@ export class RoomSensorThermostat {
 
     this.service
       .getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature)
-      .onSet(async (value: CharacteristicValue) => {
-        this.setHeatingThresholdTemperature(value);
-      });
+      .onSet(this.setHeatingThresholdTemperature.bind(this));
 
     this.service
       .getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
-      .onSet(async (value: CharacteristicValue) => {
-        this.setCoolingThresholdTemperature(value);
-      });
+      .onSet(this.setCoolingThresholdTemperature.bind(this));
 
     this.service
       .getCharacteristic(this.platform.Characteristic.TargetTemperature)
-      .onSet(async (value: CharacteristicValue) => {
-        this.setTargetTemperature(value);
-      });
+      .onSet(this.setTargetTemperature.bind(this));
 
     this.service
       .getCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits)
-      .onSet(async (value: CharacteristicValue) => {
-        this.setTemperatureDisplayUnits(value);
-      });
+      .onSet(this.setTemperatureDisplayUnits.bind(this));
 
     // Retrieve initial values and updateHomekit
     this.updateHomeKitCharacteristics();

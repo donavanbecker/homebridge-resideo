@@ -89,11 +89,10 @@ export class Thermostats {
     //Thermostat Service
     (this.service =
       this.accessory.getService(this.platform.Service.Thermostat) ||
-      this.accessory.addService(this.platform.Service.Thermostat)),
-    `${device.name} ${device.deviceClass}`;
+      this.accessory.addService(this.platform.Service.Thermostat)), accessory.displayName;
 
     //Service Name
-    this.service.setCharacteristic(this.platform.Characteristic.Name, `${device.name} ${device.deviceClass}`);
+    this.service.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
     //Required Characteristics" see https://developers.homebridge.io/#/service/Thermostat
 
     //Initial Device Parse
@@ -109,7 +108,7 @@ export class Thermostats {
           maxValue: this.toCelsius(device.maxHeatSetpoint),
           minStep: 0.1,
         })
-        .onGet(async () => {
+        .onGet(() => {
           return this.TargetTemperature!;
         });
     } else {
@@ -121,7 +120,7 @@ export class Thermostats {
           maxValue: this.toCelsius(device.maxCoolSetpoint),
           minStep: 0.1,
         })
-        .onGet(async () => {
+        .onGet(() => {
           return this.TargetTemperature!;
         });
     }
@@ -135,38 +134,19 @@ export class Thermostats {
       .setProps({
         validValues: TargetState,
       })
-      .onSet(async (value: CharacteristicValue) => {
-        this.setTargetHeatingCoolingState(value);
-      });
+      .onSet(this.setTargetHeatingCoolingState.bind(this));
 
-    this.service.setCharacteristic(
-      this.platform.Characteristic.CurrentHeatingCoolingState,
-      this.CurrentHeatingCoolingState,
-    );
+    this.service.setCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, this.CurrentHeatingCoolingState);
 
-    this.service
-      .getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature)
-      .onSet(async (value: CharacteristicValue) => {
-        this.setHeatingThresholdTemperature(value);
-      });
+    this.service.getCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature).onSet(this.setHeatingThresholdTemperature.bind(this));
 
-    this.service
-      .getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature)
-      .onSet(async (value: CharacteristicValue) => {
-        this.setCoolingThresholdTemperature(value);
-      });
+    this.service.getCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature).onSet(this.setCoolingThresholdTemperature.bind(this));
 
-    this.service
-      .getCharacteristic(this.platform.Characteristic.TargetTemperature)
-      .onSet(async (value: CharacteristicValue) => {
-        this.setTargetTemperature(value);
-      });
+    this.service.getCharacteristic(this.platform.Characteristic.TargetTemperature).onSet(this.setTargetTemperature.bind(this));
 
     this.service
       .getCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits)
-      .onSet(async (value: CharacteristicValue) => {
-        this.setTemperatureDisplayUnits(value);
-      });
+      .onSet(this.setTemperatureDisplayUnits.bind(this));
 
     // Fan Controls
     if (this.platform.config.options?.thermostat?.hide_fan) {
@@ -187,20 +167,15 @@ export class Thermostats {
       );
       (this.fanService =
         this.accessory.getService(this.platform.Service.Fanv2) ||
-        this.accessory.addService(this.platform.Service.Fanv2)),
-      `${device.name} ${device.deviceClass} Fan`;
+        this.accessory.addService(this.platform.Service.Fanv2)), '%s %s Fan', device.name, device.deviceClass;
 
       this.fanService
         .getCharacteristic(this.platform.Characteristic.Active)
-        .onSet(async (value: CharacteristicValue) => {
-          this.setActive(value);
-        });
+        .onSet(this.setActive.bind(this));
 
       this.fanService
         .getCharacteristic(this.platform.Characteristic.TargetFanState)
-        .onSet(async (value: CharacteristicValue) => {
-          this.setTargetFanState(value);
-        });
+        .onSet(this.setTargetFanState.bind(this));
     } else {
       if (this.platform.debugMode) {
         this.platform.log.warn('Fanv2 not added.');
@@ -220,15 +195,14 @@ export class Thermostats {
       }
       (this.humidityService =
         this.accessory.getService(this.platform.Service.HumiditySensor) ||
-        this.accessory.addService(this.platform.Service.HumiditySensor)),
-      `${device.name} ${device.deviceClass} HumiditySensor`;
+        this.accessory.addService(this.platform.Service.HumiditySensor)), '%s %s HumiditySensor', device.name, device.deviceClass;
 
       this.humidityService
         .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
         .setProps({
           minStep: 0.1,
         })
-        .onGet(async () => {
+        .onGet(() => {
           return this.CurrentRelativeHumidity!;
         });
     } else {
@@ -372,7 +346,7 @@ export class Thermostats {
     // Set the Target Fan State
     if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
       if (this.fanMode) {
-        this.platform.log.debug('Thermostat %s Fan -', this.accessory.displayName, `${JSON.stringify(this.fanMode)}`);
+        this.platform.log.debug('Thermostat %s Fan -', this.accessory.displayName, JSON.stringify(this.fanMode));
         if (this.fanMode.mode === 'Auto') {
           this.TargetFanState = this.platform.Characteristic.TargetFanState.AUTO;
           this.Active = this.platform.Characteristic.Active.INACTIVE;
