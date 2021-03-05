@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory } from 'homebridge';
+import { Service, PlatformAccessory, HAPStatus } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { skipWhile } from 'rxjs/operators';
@@ -285,6 +285,7 @@ export class RoomSensors {
     if (!this.platform.config.options?.roomsensor?.hide_humidity) {
       this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
     }
+    throw new this.platform.api.hap.HapStatusError(HAPStatus.OPERATION_TIMED_OUT);
   }
 
   /**

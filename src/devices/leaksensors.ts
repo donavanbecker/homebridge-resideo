@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory } from 'homebridge';
+import { Service, PlatformAccessory, HAPStatus } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { skipWhile } from 'rxjs/operators';
@@ -137,7 +137,7 @@ export class LeakSensor {
       if (this.platform.debugMode) {
         this.platform.log.error('Removing service');
       }
-      this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor); 
+      this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor);
       accessory.removeService(this.humidityService!);
     } else if (!this.humidityService) {
       (this.humidityService =
@@ -279,5 +279,6 @@ export class LeakSensor {
     if (!this.platform.config.options?.leaksensor?.hide_humidity) {
       this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
     }
+    throw new this.platform.api.hap.HapStatusError(HAPStatus.OPERATION_TIMED_OUT);
   }
 }

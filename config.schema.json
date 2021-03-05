@@ -52,7 +52,7 @@
             "title": "Push Rate",
             "type": "number",
             "placeholder": 1,
-            "description": "Indicates the number of seconds between pushes to SwitchBot API."
+            "description": "Indicates the number of seconds between pushes to Honewell Home API."
           },
           "hide_device": {
             "title": "Hide Device",
