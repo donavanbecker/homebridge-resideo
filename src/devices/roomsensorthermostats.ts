@@ -282,7 +282,7 @@ export class RoomSensorThermostat {
    */
   async refreshStatus() {
     try {
-      this.device = await this.platform.refreshStatus(this.device);
+      this.device = await this.platform.refreshStatus();
       this.platform.log.debug(
         'RST %s - ',
         this.accessory.displayName,

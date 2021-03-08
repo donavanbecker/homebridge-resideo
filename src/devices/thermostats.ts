@@ -366,7 +366,7 @@ export class Thermostats {
    */
   async refreshStatus() {
     try {
-      this.device = await this.platform.refreshStatus(this.device);
+      this.device = await this.platform.refreshStatus();
       this.platform.log.debug(
         'Thermostat %s -',
         this.accessory.displayName,

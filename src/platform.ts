@@ -500,8 +500,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   /**
    * Asks the Honeywell Home API for the latest device information
    */
-  public async refreshStatus(device) {
-    this.device = (
+  public async refreshStatus() {
+    const device = (
       await this.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
         params: {
           locationId: this.locationId,
