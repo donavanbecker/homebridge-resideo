@@ -2,7 +2,7 @@ import { Service, PlatformAccessory, HAPStatus } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { skipWhile } from 'rxjs/operators';
-import { DeviceURL, location, LeakDevice } from '../settings';
+import { location, LeakDevice } from '../settings';
 
 /**
  * Platform Accessory
@@ -207,13 +207,7 @@ export class LeakSensor {
    */
   async refreshStatus() {
     try {
-      this.device = (
-        await this.platform.axios.get(`${DeviceURL}/waterLeakDetectors/${this.device.deviceID}`, {
-          params: {
-            locationId: this.locationId,
-          },
-        })
-      ).data;
+      this.device = await this.platform.refreshStatus();
       this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(this.device));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
