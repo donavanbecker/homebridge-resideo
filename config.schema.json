@@ -44,15 +44,15 @@
           "refreshRate": {
             "title": "Refresh Rate",
             "type": "number",
-            "minimum": 300,
-            "placeholder": 300,
+            "minimum": 120,
+            "placeholder": 900,
             "description": "Indicates the number of seconds between polls of the Honeywell Home service."
           },
           "pushRate": {
             "title": "Push Rate",
             "type": "number",
             "placeholder": 1,
-            "description": "Indicates the number of seconds between pushes to SwitchBot API."
+            "description": "Indicates the number of seconds between pushes to Honewell Home API."
           },
           "hide_device": {
             "title": "Hide Device",
