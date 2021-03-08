@@ -282,7 +282,13 @@ export class RoomSensorThermostat {
    */
   async refreshStatus() {
     try {
-      this.device = await this.platform.refreshStatus();
+      this.device = (
+        await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
+          params: {
+            locationId: this.locationId,
+          },
+        })
+      ).data;
       this.platform.log.debug(
         'RST %s - ',
         this.accessory.displayName,

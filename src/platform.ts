@@ -47,8 +47,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   public sensorData = [];
   private refreshInterval;
   debugMode!: boolean;
-  device: any;
-  locationId: any;
 
   constructor(public readonly log: Logger, public readonly config: HoneywellPlatformConfig, public readonly api: API) {
     this.log.debug('Finished initializing platform:', this.config.name);
@@ -495,20 +493,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         this.log.warn('Only Displaying Room Sensor(s).');
       }
     }
-  }
-
-  /**
-   * Asks the Honeywell Home API for the latest device information
-   */
-  public async refreshStatus() {
-    const device = (
-      await this.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
-        params: {
-          locationId: this.locationId,
-        },
-      })
-    ).data;
-    return device;
   }
 
   private async createThermostat(location: location, device: Thermostat, locationId: location['locationID']) {
