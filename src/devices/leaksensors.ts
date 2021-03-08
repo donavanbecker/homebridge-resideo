@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory, HAPStatus } from 'homebridge';
+import { Service, PlatformAccessory, HAPStatus, CharacteristicValue } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { skipWhile } from 'rxjs/operators';
@@ -15,16 +15,16 @@ export class LeakSensor {
   humidityService?: Service;
   leakService?: Service;
 
-  StatusActive!: boolean;
-  LeakDetected!: number;
-  CurrentTemperature!: number;
-  CurrentRelativeHumidity!: number;
-  BatteryLevel!: number;
-  ChargingState!: number;
-  StatusLowBattery!: number;
+  StatusActive!: CharacteristicValue;
+  LeakDetected!: CharacteristicValue;
+  CurrentTemperature!: CharacteristicValue;
+  CurrentRelativeHumidity!: CharacteristicValue;
+  BatteryLevel!: CharacteristicValue;
+  ChargingState!: CharacteristicValue;
+  StatusLowBattery!: CharacteristicValue;
 
   SensorUpdateInProgress!: boolean;
-  doSensorUpdate!: any;
+  doSensorUpdate!: Subject<unknown>;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,

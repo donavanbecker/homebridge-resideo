@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory, HAPStatus } from 'homebridge';
+import { Service, PlatformAccessory, HAPStatus, CharacteristicValue } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { skipWhile } from 'rxjs/operators';
@@ -15,17 +15,17 @@ export class RoomSensors {
   occupancyService?: Service;
   humidityService?: Service;
 
-  CurrentTemperature!: number;
-  StatusLowBattery!: number;
-  OccupancyDetected!: number;
-  CurrentRelativeHumidity!: number;
-  TemperatureDisplayUnits!: number;
-  BatteryLevel!: number;
+  CurrentTemperature!: CharacteristicValue;
+  StatusLowBattery!: CharacteristicValue;
+  OccupancyDetected!: CharacteristicValue;
+  CurrentRelativeHumidity!: CharacteristicValue;
+  TemperatureDisplayUnits!: CharacteristicValue;
+  BatteryLevel!: CharacteristicValue;
   accessoryId!: number;
   roomId!: number;
 
   SensorUpdateInProgress!: boolean;
-  doSensorUpdate!: any;
+  doSensorUpdate!: Subject<unknown>;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
@@ -252,7 +252,7 @@ export class RoomSensors {
     if (
       !this.platform.config.options?.roomsensor?.hide_temperature &&
       this.CurrentTemperature !== undefined &&
-      !isNaN(this.CurrentTemperature)
+      !isNaN(Number(this.CurrentTemperature))
     ) {
       this.temperatureService?.updateCharacteristic(
         this.platform.Characteristic.CurrentTemperature,
