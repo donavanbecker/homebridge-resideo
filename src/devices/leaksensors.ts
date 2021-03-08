@@ -207,7 +207,7 @@ export class LeakSensor {
    */
   async refreshStatus() {
     try {
-      this.device = await this.platform.refreshStatus();
+      this.device = await this.platform.refreshStatus(this.device);
       this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(this.device));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
