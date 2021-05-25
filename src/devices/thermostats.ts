@@ -38,13 +38,13 @@ export class Thermostats {
   roompriority!: any;
   //Thermostat Updates
   thermostatUpdateInProgress!: boolean;
-  doThermostatUpdate!: Subject<unknown>;
+  doThermostatUpdate;
   //Fan Updates
   fanUpdateInProgress!: boolean;
-  doFanUpdate!: Subject<unknown>;
+  doFanUpdate;
   //Room updates - T9 Only
   roomUpdateInProgress!: boolean;
-  doRoomUpdate!: Subject<unknown>;
+  doRoomUpdate;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
@@ -436,9 +436,19 @@ export class Thermostats {
   async pushChanges() {
     const payload = {
       mode: this.honeywellMode[Number(this.TargetHeatingCoolingState)],
-      thermostatSetpointStatus: this.platform.config.options?.thermostat?.thermostatSetpointStatus,
-      autoChangeoverActive: this.device.changeableValues.autoChangeoverActive,
     } as any;
+
+    // Only include thermostatSetpointStatus on certain models
+    if (this.device.deviceModel !== 'Round') {
+      payload.thermostatSetpointStatus = this.platform.config.options?.thermostat?.thermostatSetpointStatus;
+    }
+
+    // Always set autoChangeoverActive to 'true' for Round Thermostats
+    if (this.device.deviceModel === 'Round') {
+      payload.autoChangeoverActive = true;
+    } else {
+      payload.autoChangeoverActive = this.device.changeableValues.autoChangeoverActive;
+    }
 
     // Set the heat and cool set point value based on the selected mode
     if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {

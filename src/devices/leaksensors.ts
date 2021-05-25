@@ -24,7 +24,7 @@ export class LeakSensor {
   StatusLowBattery!: CharacteristicValue;
 
   SensorUpdateInProgress!: boolean;
-  doSensorUpdate!: Subject<unknown>;
+  doSensorUpdate;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,

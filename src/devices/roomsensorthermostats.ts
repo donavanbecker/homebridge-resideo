@@ -27,11 +27,11 @@ export class RoomSensorThermostat {
   deviceFan!: FanChangeableValues;
 
   roomUpdateInProgress!: boolean;
-  doRoomUpdate!: Subject<unknown>;
+  doRoomUpdate;
   thermostatUpdateInProgress!: boolean;
-  doThermostatUpdate!: Subject<unknown>;
+  doThermostatUpdate;
   fanUpdateInProgress!: boolean;
-  doFanUpdate!: Subject<unknown>;
+  doFanUpdate;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,

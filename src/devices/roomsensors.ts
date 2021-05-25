@@ -25,7 +25,7 @@ export class RoomSensors {
   roomId!: number;
 
   SensorUpdateInProgress!: boolean;
-  doSensorUpdate!: Subject<unknown>;
+  doSensorUpdate;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
