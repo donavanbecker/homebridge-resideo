@@ -38,13 +38,13 @@ export class Thermostats {
   roompriority!: any;
   //Thermostat Updates
   thermostatUpdateInProgress!: boolean;
-  doThermostatUpdate!: Subject<unknown>;
+  doThermostatUpdate;
   //Fan Updates
   fanUpdateInProgress!: boolean;
-  doFanUpdate!: Subject<unknown>;
+  doFanUpdate;
   //Room updates - T9 Only
   roomUpdateInProgress!: boolean;
-  doRoomUpdate!: Subject<unknown>;
+  doRoomUpdate;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
