@@ -50,7 +50,8 @@
   ],
   "dependencies": {
     "axios": "^0.21.1",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "@homebridge/plugin-ui-utils": "0.0.18"
   },
   "devDependencies": {
     "@types/node": "^16.4.1",
