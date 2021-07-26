@@ -10,8 +10,42 @@
     <p>
       Input your HoneywellHome Developer Account CustomerKey and CustomerSecret on the next page
     </p>
-    <button type="button" class="btn btn-primary" id="introContinue">
-      Continue &rarr;
+    <div *ngIf="!honeywellConfig?.credentials?.refreshToken">
+  
+      <ol>
+        <li>Login / create an account at <a href="https://developer.honeywellhome.com/user" target="_blank"
+            rel="noreferrer noopener">https://developer.honeywellhome.com/user</a>.</li>
+        <li>Click <strong>Create New App</strong>.</li>
+        <li>Give your application a name, and enter the Callback URL exactly as it is displayed below.</li>
+        <li>Enter the generated consumer key and secret below.</li>
+        <li>Click <strong>{{ 'plugins.settings.custom.homebridge-gsh.label_link_account' | translate }}</strong>.</li>
+      </ol>
+
+      <div class="form-group">
+        <label for="inputAppName">App Name</label>
+        <input type="text" class="form-control" readonly [value]="'Homebridge'" id="inputAppName">
+      </div>
+      <div class="form-group">
+        <label for="inputCallbackUrl">Callback URL</label>
+        <input type="text" class="form-control" readonly [value]="linkUrl" id="inputCallbackUrl">
+      </div>
+      <div class="form-group">
+        <label for="inputConsumerKey">Consumer Key <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="inputConsumerKey" [(ngModel)]="honeywellConfig.consumerKey">
+      </div>
+      <div class="form-group">
+        <label for="inputConsumerSecret">Consumer Secret <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="inputConsumerSecret" [(ngModel)]="honeywellConfig.consumerSecret">
+      </div>
+
+      <div class="text-center">
+        <button class="btn btn-primary btn-lg" (click)="linkAccount()"
+          [disabled]="!honeywellConfig.consumerSecret || !honeywellConfig.consumerKey"
+          translate="plugins.settings.custom.homebridge-gsh.label_link_account"></button>
+      </div>
+    </div>
+    <button type="button" class="btn btn-primary" id="introLink">
+      Link Account &rarr;
     </button>
   </div>
   <div
@@ -24,7 +58,7 @@
   <button type="button" class="btn btn-primary ml-0" id="menuAccount">
     Account
   </button>
-  <button type="button" class="btn btn-primary ml-0" id="menuSettings">
+    <button type="button" class="btn btn-primary" id="menuSettings">
       Settings
     </button>
     <button type="button" class="btn btn-primary" id="menuDevices">
@@ -159,8 +193,8 @@
       try {
         const currentConfig = await homebridge.getPluginConfig()
         showIntro = () => {
-          const introContinue = document.getElementById('introContinue')
-          introContinue.addEventListener('click', () => {
+          const introLink = document.getElementById('introLink')
+          introLink.addEventListener('click', () => {
             homebridge.showSpinner()
             document.getElementById('pageIntro').style.display = 'none'
             document.getElementById('menuWrapper').style.display = 'inline-flex'
@@ -233,10 +267,10 @@
           document.getElementById('menuHome').classList.remove('btn-primary')
           document.getElementById('menuDevices').classList.remove('btn-elegant')
           document.getElementById('menuDevices').classList.add('btn-primary')
-          document.getElementById('menuAccount').classList.remove('btn-elegant')
-          document.getElementById('menuAccount').classList.add('btn-primary')
           document.getElementById('menuSettings').classList.remove('btn-elegant')
           document.getElementById('menuSettings').classList.add('btn-primary')
+          document.getElementById('menuAccount').classList.remove('btn-elegant')
+          document.getElementById('menuAccount').classList.add('btn-primary')
           document.getElementById('pageSupport').style.display = 'block'
           document.getElementById('pageDevices').style.display = 'none'
           homebridge.hideSpinner()
@@ -247,10 +281,10 @@
           document.getElementById('menuHome').classList.add('btn-primary')
           document.getElementById('menuDevices').classList.remove('btn-elegant')
           document.getElementById('menuDevices').classList.add('btn-primary')
-          document.getElementById('menuAccount').classList.add('btn-elegant')
-          document.getElementById('menuAccount').classList.remove('btn-primary')
           document.getElementById('menuSettings').classList.add('btn-elegant')
           document.getElementById('menuSettings').classList.remove('btn-primary')
+          document.getElementById('menuAccount').classList.remove('btn-elegant')
+          document.getElementById('menuAccount').classList.add('btn-primary')
           document.getElementById('pageSupport').style.display = 'none'
           document.getElementById('pageDevices').style.display = 'none'
           homebridge.showSchemaForm()
@@ -264,11 +298,11 @@
           document.getElementById('menuDevices').classList.add('btn-primary')
           document.getElementById('menuAccount').classList.add('btn-elegant')
           document.getElementById('menuAccount').classList.remove('btn-primary')
-          document.getElementById('menuSettings').classList.add('btn-elegant')
-          document.getElementById('menuSettings').classList.remove('btn-primary')
+          document.getElementById('menuSettings').classList.remove('btn-elegant')
+          document.getElementById('menuSettings').classList.add('btn-primary')
           document.getElementById('pageSupport').style.display = 'none'
           document.getElementById('pageDevices').style.display = 'none'
-          homebridge.showSchemaForm()
+          homebridge.linkAccount()
           homebridge.hideSpinner()
         }
         showDisabledBanner = () => {
