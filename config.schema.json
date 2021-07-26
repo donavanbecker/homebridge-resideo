@@ -189,6 +189,10 @@
       "devicediscovery": {
         "name": "Device Discovery",
         "type": "boolean"
+      },
+      "disablePlugin": {
+        "title": "Disable Plugin",
+        "type": "boolean"
       }
     }
   },
@@ -322,12 +326,14 @@
           ]
         },
         {
-          "type": "help",
-          "helpvalue": "<h5>Device Discovery</h5><em class='primary-text'>Enables Device Info Logging.</em>"
+          "key": "devicediscovery",
+          "title": "Device Discovery",
+          "description": "Enables Device Info Logging."
         },
         {
-          "key": "devicediscovery",
-          "title": "Device Discovery"
+          "key": "disablePlugin",
+          "title": "Disable Plugin",
+          "description": "If true, the plugin will remove all accessories and not load the plugin on restart."
         }
       ]
     }

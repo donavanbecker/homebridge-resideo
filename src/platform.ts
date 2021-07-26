@@ -125,6 +125,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
      * This will disable adding any device and will just output info.
      */
     this.config.devicediscovery;
+    this.config.disablePlugin;
 
     this.config.options = this.config.options || {};
 
@@ -303,9 +304,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    * this method discovers the Locations
    */
   async discoverlocations() {
-    const locations = (await this.axios.get(LocationURL)).data;
-    this.log.info('Total Locations Found:', locations.length);
-    return locations;
+    if (!this.config.disablePlugin) {
+      const locations = (await this.axios.get(LocationURL)).data;
+      this.log.info('Total Locations Found:', locations.length);
+      return locations;
+    }
   }
 
   /**

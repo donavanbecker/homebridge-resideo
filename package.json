@@ -51,10 +51,10 @@
   "dependencies": {
     "axios": "^0.21.1",
     "rxjs": "^7.2.0",
-    "@homebridge/plugin-ui-utils": "0.0.18"
+    "@homebridge/plugin-ui-utils": "0.0.19"
   },
   "devDependencies": {
-    "@types/node": "^16.4.1",
+    "@types/node": "^16.4.3",
     "@typescript-eslint/eslint-plugin": "^4.28.4",
     "@typescript-eslint/parser": "^4.28.4",
     "eslint": "^7.31.0",
