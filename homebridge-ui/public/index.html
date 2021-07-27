@@ -56,7 +56,7 @@
    </div>
    <div class="form-group text-center">
       <button type="button" class="btn btn-primary" id="linkButton">Continue &rarr;</button>
-      <button type="button" class="btn btn-primary" id="unLinkButton">Unlink Account &rarr;</button>
+      <button type="button" class="btn btn-danger" id="unLinkButton">Unlink Account &rarr;</button>
    </div>
 </div>
 <div id="pageDevices" class="mt-4" style="display: none;">
@@ -170,6 +170,7 @@
                await homebridge.updatePluginConfig(currentConfig)
                await homebridge.savePluginConfig()
                document.getElementById('linkButton').style.display = 'none'
+                document.getElementById('unLinkButton').style.display = 'none'
             } catch (err) {
                console.error(err)
                homebridge.toast.error('Try again, or see the console message for info.', 'Error')
@@ -204,15 +205,26 @@
                popup.postMessage('origin-check', 'https://homebridge-honeywell.iot.oz.nu/link-account');
             }, 2000);
          }
-         unLinkAccount = () => {
-            document.getElementById('validateForm').style.display = 'none'
-            if (
-               !document.getElementById('inputConsumerKey').value ||
-               !document.getElementById('inputConsumerSecret').value
-            ) {
-               document.getElementById('validateForm').style.display = 'block'
-               return
-            }
+         unLinkAccount = async () => {
+           try {
+              document.getElementById('validateForm').style.display = 'none'
+              if (
+                 !document.getElementById('inputConsumerKey').value ||
+                 !document.getElementById('inputConsumerSecret').value
+              ) {
+                 document.getElementById('validateForm').style.display = 'block'
+                 return
+              }
+              delete currentConfig[0].credentials
+               await homebridge.updatePluginConfig(currentConfig)
+               await homebridge.savePluginConfig()
+               document.getElementById('inputConsumerKey').value = ''
+               document.getElementById('inputConsumerSecret').value = ''
+               document.getElementById('unLinkButton').style.display = 'none'
+             } catch (err) {
+               console.error(err)
+                homebridge.toast.error('Try again, or see the console message for info.', 'Error')
+             }
          }
          showIntro = () => {
             const introLink = document.getElementById('introLink')
@@ -321,6 +333,7 @@
                linkAccount()
             })
             const unLinkButton = document.getElementById('unLinkButton')
+            unLinkButton.style.display = 'none'
             unLinkButton.addEventListener('click', () => {
                unLinkAccount()
             })
@@ -345,6 +358,9 @@
                document.getElementById('inputConsumerSecret').value = secret
                if (key && secret) {
                   isRelink = true
+                  document.getElementById('unLinkButton').style.display = 'inline-block'
+               } else {
+                 document.getElementById('unLinkButton').style.display = 'none'
                }
             }
             document.getElementById('linkButton').innerHTML = isRelink
