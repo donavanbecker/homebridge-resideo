@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 9.5.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.5.0...v9.5.1) (2021-07-27)
+
+### Changes
+
+- Fix Custom UI not loading.
+
 ## [Version 9.5.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.4.4...v9.5.0) (2021-07-27)
 
 ### Changes
