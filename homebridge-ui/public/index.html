@@ -36,7 +36,16 @@
       Support
    </button>
 </div>
+<div id="disabledBanner" class="alert alert-secondary mb-0 mt-3" role="alert" style="display: none;">
+   Plugin is currently disabled
+   <button id="disabledEnable" type="button" class="btn btn-link p-0 m-0 float-right">
+      Enable
+   </button>
+</div>
 <div id="pageAccount" class="mt-4" style="display: none;">
+   <div class="alert alert-warning" style="display: none;" id="validateForm">
+      Please enter both values
+   </div>
    <div class="form-group">
       <label for="inputConsumerKey">Consumer Key <span class="text-danger">*</span></label>
       <input type="text" class="form-control" id="inputConsumerKey">
@@ -46,7 +55,8 @@
       <input type="text" class="form-control" id="inputConsumerSecret">
    </div>
    <div class="form-group text-center">
-      <button type="button" class="btn btn-primary" id="linkButton">Link Account &rarr;</button>
+      <button type="button" class="btn btn-primary" id="linkButton">Continue &rarr;</button>
+      <button type="button" class="btn btn-primary" id="unLinkButton">Unlink Account &rarr;</button>
    </div>
 </div>
 <div id="pageDevices" class="mt-4" style="display: none;">
@@ -65,20 +75,16 @@
          </thead>
          <tbody>
             <tr>
-               <th scope="row">Connection Type</th>
-               <td id="connection_type"></td>
-            </tr>
-            <tr>
-               <th scope="row">Serial Number</th>
-               <td id="serial_number"></td>
+               <th scope="row">Device ID</th>
+               <td id="deviceID"></td>
             </tr>
             <tr>
                <th scope="row">Model</th>
                <td id="model"></td>
             </tr>
             <tr>
-               <th scope="row">Firmware</th>
-               <td id="firmware"></td>
+               <th scope="row">Firmware Version</th>
+               <td id="firmwareRevision"></td>
             </tr>
          </tbody>
       </table>
@@ -87,17 +93,18 @@
 <div id="pageSupport" class="mt-4" style="display: none;">
    <p class="text-center lead">Thank you for using <strong>homebridge-honeywell-home</strong></p>
    <p class="text-center">The links below will take you to our GitHub wiki</p>
-   <h4>Setup</h4>
+   <h5>Setup</h5>
    <ul>
       <li>
          <a href="https://github.com/donavanbecker/homebridge-honeywell-home/wiki" target="_blank">Wiki Home</a>
       </li>
       <li>
-         <a href="https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Manual-Setup"
+         <a href="https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Configuration"
             target="_blank">Configuration</a>
       </li>
       <li>
-         <a href="https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Beta" target="_blank">Beta Version</a>
+         <a href="https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Beta-Version" target="_blank">Beta
+            Version</a>
       </li>
       <li>
          <a href="https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Node-Version" target="_blank">Node
@@ -108,7 +115,7 @@
             target="_blank">Uninstallation</a>
       </li>
    </ul>
-   <h4>Features</h4>
+   <h5>Features</h5>
    <ul>
       <li>
          <a href="https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Supported-Devices"
@@ -119,7 +126,7 @@
             Modes</a>
       </li>
    </ul>
-   <h4>Help/About</h4>
+   <h5>Help/About</h5>
    <ul>
       <li>
          <a href="https://github.com/donavanbecker/homebridge-honeywell-home/issues/new/choose" target="_blank">Support
@@ -133,7 +140,7 @@
          <a href="https://github.com/sponsors/donavanbecker" target="_blank">About Me</a>
       </li>
    </ul>
-   <h4>Disclaimer</h4>
+   <h5>Disclaimer</h5>
    <ul>
       <li>
          I am in no way affiliated with Honeywell and this plugin is a personal project that I maintain in
@@ -148,7 +155,35 @@
    ; (async () => {
       try {
          const currentConfig = await homebridge.getPluginConfig()
+         window.addEventListener('message', async e => {
+            try {
+               if (e.origin !== 'https://homebridge-honeywell.iot.oz.nu') {
+                  // throw new Error('Refusing to process message from ' + e.origin)
+                  return
+               }
+               clearInterval(this.originCheckInterval)
+               if (this.popup) {
+                  this.popup.close()
+               }
+               const data = JSON.parse(e.data)
+               currentConfig[0].credentials = data
+               await homebridge.updatePluginConfig(currentConfig)
+               await homebridge.savePluginConfig()
+               document.getElementById('linkButton').style.display = 'none'
+            } catch (err) {
+               console.error(err)
+               homebridge.toast.error('Try again, or see the console message for info.', 'Error')
+            }
+         }, false)
          linkAccount = () => {
+            document.getElementById('validateForm').style.display = 'none'
+            if (
+               !document.getElementById('inputConsumerKey').value ||
+               !document.getElementById('inputConsumerSecret').value
+            ) {
+               document.getElementById('validateForm').style.display = 'block'
+               return
+            }
             const w = 450;
             const h = 700;
             const y = window.top.outerHeight / 2 + window.top.screenY - (h / 2);
@@ -158,16 +193,26 @@
                `?consumerKey=${encodeURIComponent(document.getElementById('inputConsumerKey').value)}` +
                `&consumerSecret=${encodeURIComponent(document.getElementById('inputConsumerSecret').value)}`;
 
-            const popup = window.open(
+            this.popup = window.open(
                urlToOpen, 'oznu-google-smart-home-auth',
                'toolbar=no, location=no, directories=no, status=no, menubar=no scrollbars=no, resizable=no, copyhistory=no, ' +
                'width=' + w + ', height=' + h + ', top=' + y + ', left=' + x,
             );
 
             // simple message to popup to provide the current hostname
-            const originCheckInterval = setInterval(() => {
+            this.originCheckInterval = setInterval(() => {
                popup.postMessage('origin-check', 'https://homebridge-honeywell.iot.oz.nu/link-account');
             }, 2000);
+         }
+         unLinkAccount = () => {
+            document.getElementById('validateForm').style.display = 'none'
+            if (
+               !document.getElementById('inputConsumerKey').value ||
+               !document.getElementById('inputConsumerSecret').value
+            ) {
+               document.getElementById('validateForm').style.display = 'block'
+               return
+            }
          }
          showIntro = () => {
             const introLink = document.getElementById('introLink')
@@ -178,8 +223,6 @@
                showAccount()
                homebridge.hideSpinner()
             })
-            document.getElementById('inputConsumerKey').value = currentConfig.consumerKey || ''
-            document.getElementById('inputConsumerSecret').value = currentConfig.consumerSecret || ''
             document.getElementById('pageIntro').style.display = 'block'
          }
          showDevices = async () => {
@@ -222,10 +265,9 @@
                const thisAcc = cachedAccessories.find(x => x.UUID === UUID)
                const context = thisAcc.context
                document.getElementById('displayName').innerHTML = thisAcc.displayName
-               document.getElementById('serial_number').innerHTML = context.serialNumber
-               document.getElementById('connection_type').innerHTML = context.connection
+               document.getElementById('deviceID').innerHTML = context.deviceID
                document.getElementById('model').innerHTML = context.model
-               document.getElementById('firmware').innerHTML = context.firmware || 'N/A'
+               document.getElementById('firmwareRevision').innerHTML = context.firmwareRevision || 'N/A'
                document.getElementById('deviceTable').style.display = 'inline-table'
                homebridge.hideSpinner()
             }
@@ -278,6 +320,10 @@
             linkButton.addEventListener('click', () => {
                linkAccount()
             })
+            const unLinkButton = document.getElementById('unLinkButton')
+            unLinkButton.addEventListener('click', () => {
+               unLinkAccount()
+            })
             homebridge.hideSchemaForm()
             document.getElementById('menuHome').classList.remove('btn-elegant')
             document.getElementById('menuHome').classList.add('btn-primary')
@@ -290,13 +336,38 @@
             document.getElementById('pageSupport').style.display = 'none'
             document.getElementById('pageDevices').style.display = 'none'
             document.getElementById('pageAccount').style.display = 'block'
-            // homebridge.linkAccount()
+            document.getElementById('linkButton').style.display = 'inline-block'
+            let isRelink = false
+            if (currentConfig[0] && currentConfig[0].credentials) {
+               const key = currentConfig[0].credentials.consumerKey || ''
+               const secret = currentConfig[0].credentials.consumerSecret || ''
+               document.getElementById('inputConsumerKey').value = key
+               document.getElementById('inputConsumerSecret').value = secret
+               if (key && secret) {
+                  isRelink = true
+               }
+            }
+            document.getElementById('linkButton').innerHTML = isRelink
+               ? 'Relink Account &rarr;'
+               : 'Link Account &rarr;'
+            homebridge.hideSpinner()
+         }
+         showDisabledBanner = () => {
+            document.getElementById('disabledBanner').style.display = 'block'
+         }
+         enablePlugin = async () => {
+            homebridge.showSpinner()
+            document.getElementById('disabledBanner').style.display = 'none'
+            currentConfig[0].disablePlugin = false
+            await homebridge.updatePluginConfig(currentConfig)
+            await homebridge.savePluginConfig()
             homebridge.hideSpinner()
          }
          menuHome.addEventListener('click', () => showSupport())
          menuAccount.addEventListener('click', () => showAccount())
          menuDevices.addEventListener('click', () => showDevices())
          menuSettings.addEventListener('click', () => showSettings())
+         disabledEnable.addEventListener('click', () => enablePlugin())
          if (currentConfig.length) {
             document.getElementById('menuWrapper').style.display = 'inline-flex'
             showAccount()
