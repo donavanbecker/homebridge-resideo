@@ -50,7 +50,9 @@ export class LeakSensor {
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(this.platform.Characteristic.Model, device.deviceType)
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, device.deviceID);
+      .setCharacteristic(this.platform.Characteristic.SerialNumber, device.deviceID)
+      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision)
+      .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(accessory.context.firmwareRevision);
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory

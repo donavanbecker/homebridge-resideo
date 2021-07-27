@@ -54,11 +54,8 @@ export class RoomSensors {
       .setCharacteristic(this.platform.Characteristic.Model, sensorAccessory.accessoryAttribute.model)
       .setCharacteristic(this.platform.Characteristic.SerialNumber, sensorAccessory.deviceID)
       .setCharacteristic(
-        this.platform.Characteristic.FirmwareRevision,
-        sensorAccessory.accessoryAttribute.softwareRevision || accessory.context.firmwareRevision || '1.0.3.0',
-      )
-      .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(sensorAccessory.accessoryAttribute.softwareRevision ||
-        accessory.context.firmwareRevision || '1.0.3.0');
+        this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision)
+      .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(accessory.context.firmwareRevision);
 
     // get the BatteryService service if it exists, otherwise create a new Battery service
     // you can create multiple services for each accessory

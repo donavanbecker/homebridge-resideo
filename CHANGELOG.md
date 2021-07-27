@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 9.5.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.4.4...v9.5.0) (2021-07-27)
+
+### Changes
+
+- Implement Custom UI for Linking, Re-Linking, and Un-Linking.
+- Added Option to Disable Plugin in the Config.
+
 ## [Version 9.4.4](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.4.3...v9.4.4) (2021-07-22)
 
 ### Changes

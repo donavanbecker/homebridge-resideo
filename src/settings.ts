@@ -34,6 +34,7 @@ export const UIurl = 'https://homebridge-honeywell.iot.oz.nu/user/refresh';
 export interface HoneywellPlatformConfig extends PlatformConfig {
   credentials?: credentials;
   devicediscovery?: boolean;
+  disablePlugin?: boolean;
   options?: options | Record<string, never>;
 }
 

@@ -43,6 +43,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   locations?: any;
   firmware!: accessoryAttribute['softwareRevision'];
   sensorAccessory!: sensorAccessory;
+  version = require('../package.json').version // eslint-disable-line @typescript-eslint/no-var-requires
 
   public sensorData = [];
   private refreshInterval;
@@ -93,13 +94,13 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       try {
         this.locations = await this.discoverlocations();
       } catch (e) {
-        this.log.error('Failed to Discover Locations.', JSON.stringify(e.message));
+        this.log.error('Failed to Discover Locations,', JSON.stringify(e.message));
         this.log.debug(JSON.stringify(e));
       }
       try {
         this.discoverDevices();
       } catch (e) {
-        this.log.error('Failed to Discover Devices.', JSON.stringify(e.message));
+        this.log.error('Failed to Discover Devices,', JSON.stringify(e.message));
         this.log.debug(JSON.stringify(e));
       }
     });
@@ -125,6 +126,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
      * This will disable adding any device and will just output info.
      */
     this.config.devicediscovery;
+    this.config.disablePlugin;
 
     this.config.options = this.config.options || {};
 
@@ -159,13 +161,17 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       throw new Error('Refresh Rate must be above 120 (2 minutes).');
     }
 
-    if (!this.config.options.refreshRate) {
+    if (this.config.disablePlugin) {
+      this.log.error('Plugin is disabled.');
+    }
+
+    if (!this.config.options.refreshRate && !this.config.disablePlugin) {
       // default 900 seconds (15 minutes)
       this.config.options!.refreshRate! = 900;
       this.log.warn('Using Default Refresh Rate.');
     }
 
-    if (!this.config.options.pushRate) {
+    if (!this.config.options.pushRate && !this.config.disablePlugin) {
       // default 100 milliseconds
       this.config.options!.pushRate! = 0.1;
       this.log.warn('Using Default Push Rate.');
@@ -397,7 +403,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     if (this.locations) {
       // get the devices at each location
       for (const location of this.locations) {
-        this.log.info('Total Devices Found at ', location.name, ':', location.devices.length);
+        this.log.info('Total Devices Found at', location.name, ':', location.devices.length);
         const locationId = location.locationID;
         this.locationinfo(location);
         for (const device of location.devices) {
@@ -486,10 +492,18 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
        * Room Priority
        * This will display what room priority option that has been selected.
        */
-      if (this.config.options.roompriority.thermostat && !this.config.options?.hide_device.includes(device.deviceID)) {
+      if (
+        this.config.options.roompriority.thermostat &&
+        !this.config.options?.hide_device.includes(device.deviceID) &&
+        !this.config.disablePlugin
+      ) {
         this.log.warn('Displaying Thermostat(s) for Each Room Sensor(s).');
       }
-      if (!this.config.options.roompriority.thermostat && !this.config.options?.hide_device.includes(device.deviceID)) {
+      if (
+        !this.config.options.roompriority.thermostat &&
+        !this.config.options?.hide_device.includes(device.deviceID) &&
+        !this.config.disablePlugin
+      ) {
         this.log.warn('Only Displaying Room Sensor(s).');
       }
     }
@@ -504,7 +518,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
     if (existingAccessory) {
       // the accessory already exists
-      if (!this.config.options?.hide_device.includes(device.deviceID) && device.isAlive) {
+      if (
+        !this.config.options?.hide_device.includes(device.deviceID) &&
+        device.isAlive &&
+        !this.config.disablePlugin
+      ) {
         this.log.info(
           'Restoring existing accessory from cache:',
           existingAccessory.displayName,
@@ -514,6 +532,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
         await this.thermostatFirmwareExistingwAccessory(device, existingAccessory, location);
+        existingAccessory.context.device = device;
+        existingAccessory.context.deviceID = device.deviceID;
+        existingAccessory.context.model = device.deviceModel;
         this.api.updatePlatformAccessories([existingAccessory]);
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
@@ -522,7 +543,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
-    } else if (!this.config.options?.hide_device.includes(device.deviceID) && device.isAlive) {
+    } else if (
+      !this.config.options?.hide_device.includes(device.deviceID) &&
+      device.isAlive &&
+      !this.config.disablePlugin
+    ) {
       // the accessory does not yet exist, so we need to create it
       this.log.info(
         'Adding new accessory:',
@@ -540,8 +565,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
       await this.thermostatFirmwareNewAccessory(device, accessory, location);
-      accessory.context.deviceID = device.deviceID;
       accessory.context.device = device;
+      accessory.context.deviceID = device.deviceID;
+      accessory.context.model = device.deviceModel;
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
       new Thermostats(this, accessory, locationId, device);
@@ -575,7 +601,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
     if (existingAccessory) {
       // the accessory already exists
-      if (!this.config.options?.hide_device.includes(device.deviceID) && device.isAlive) {
+      if (!this.config.options?.hide_device.includes(device.deviceID) && device.isAlive && !this.config.disablePlugin) {
         this.log.info(
           'Restoring existing accessory from cache:',
           existingAccessory.displayName,
@@ -584,8 +610,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         );
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-        //existingAccessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
-        //this.api.updatePlatformAccessories([existingAccessory]);
+        existingAccessory.context.displayName = device.userDefinedDeviceName;
+        existingAccessory.context.deviceID = device.deviceID;
+        existingAccessory.context.model = device.deviceClass;
+        existingAccessory.context.firmwareRevision = this.version;
+        this.api.updatePlatformAccessories([existingAccessory]);
 
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
@@ -594,7 +623,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
-    } else if (!this.config.options?.hide_device.includes(device.deviceID) && device.isAlive) {
+    } else if (
+      !this.config.options?.hide_device.includes(device.deviceID) &&
+      device.isAlive &&
+      !this.config.disablePlugin
+    ) {
       // the accessory does not yet exist, so we need to create it
       this.log.info(
         'Adding new accessory:',
@@ -609,8 +642,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
-      accessory.context.deviceID = device.deviceID;
       accessory.context.device = device;
+      accessory.context.deviceID = device.deviceID;
+      accessory.context.model = device.deviceClass;
+      accessory.context.firmwareRevision = this.version;
+
       // accessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
       // create the accessory handler for the newly create accessory
       // this is imported from `/Sensors/leakSensors.ts`
@@ -649,7 +685,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
     if (existingAccessory) {
       // the accessory already exists
-      if (!this.config.options?.hide_device.includes(sensorAccessory.deviceID) && device.isAlive) {
+      if (
+        !this.config.options?.hide_device.includes(sensorAccessory.deviceID) &&
+        device.isAlive &&
+        !this.config.disablePlugin
+      ) {
         this.log.info(
           'Restoring existing accessory from cache:',
           existingAccessory.displayName,
@@ -658,7 +698,10 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         );
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-        //this.api.updatePlatformAccessories([existingAccessory]);
+        existingAccessory.context.deviceID = sensorAccessory.deviceID;
+        existingAccessory.context.model = sensorAccessory.accessoryAttribute.model;
+        existingAccessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision || this.version;
+        this.api.updatePlatformAccessories([existingAccessory]);
 
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
@@ -666,7 +709,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
-    } else if (!this.config.options?.hide_device.includes(sensorAccessory.deviceID) && device.isAlive) {
+    } else if (
+      !this.config.options?.hide_device.includes(sensorAccessory.deviceID) &&
+      device.isAlive &&
+      !this.config.disablePlugin
+    ) {
       // the accessory does not yet exist, so we need to create it
       this.log.info(
         'Adding new accessory:',
@@ -684,7 +731,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
-      accessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision;
+      accessory.context.deviceID = sensorAccessory.deviceID;
+      accessory.context.model = sensorAccessory.accessoryAttribute.model;
+      accessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision || this.version;
 
       // create the accessory handler for the newly create accessory
       // this is imported from `roomSensor.ts`
@@ -727,7 +776,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       if (
         device.isAlive &&
         this.config.options?.roompriority?.thermostat &&
-        !this.config.options?.hide_device.includes(sensorAccessory.deviceID)
+        !this.config.options?.hide_device.includes(sensorAccessory.deviceID) &&
+        !this.config.disablePlugin
       ) {
         this.log.info(
           'Restoring existing accessory from cache:',
@@ -738,10 +788,10 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         );
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-        // existingAccessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision;
-        // existingAccessory.context.name = sensorAccessory.accessoryAttribute.name;
-        // existingAccessory.context.type = sensorAccessory.accessoryAttribute.type;
-        // this.api.updatePlatformAccessories([existingAccessory]);
+        existingAccessory.context.deviceID = sensorAccessory.deviceID;
+        existingAccessory.context.model = sensorAccessory.accessoryAttribute.model;
+        existingAccessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision || this.version;
+        this.api.updatePlatformAccessories([existingAccessory]);
 
         // create the accessory handler for the restored accessory
         // this is imported from `platformAccessory.ts`
@@ -756,7 +806,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     } else if (
       device.isAlive &&
       this.config.options?.roompriority?.thermostat &&
-      !this.config.options?.hide_device.includes(sensorAccessory.deviceID)
+      !this.config.options?.hide_device.includes(sensorAccessory.deviceID) &&
+      !this.config.disablePlugin
     ) {
       // the accessory does not yet exist, so we need to create it
       this.log.info(
@@ -776,7 +827,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
       // store a copy of the device object in the `accessory.context`
       // the `context` property can be used to store any data about the accessory you may need
-      accessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision;
+      accessory.context.deviceID = sensorAccessory.deviceID;
+      accessory.context.model = sensorAccessory.accessoryAttribute.model;
+      accessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision || this.version;
 
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
@@ -841,7 +894,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     ) {
       existingAccessory.context.firmwareRevision = device.thermostatVersion;
     } else {
-      existingAccessory.context.firmwareRevision = '9.0.0';
+      existingAccessory.context.firmwareRevision = this.version;
     }
   }
 
