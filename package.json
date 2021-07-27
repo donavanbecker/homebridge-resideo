@@ -18,7 +18,7 @@
   },
   "main": "dist/index.js",
   "scripts": {
-    "update": "npm update",
+    "update": "npm install && npm update",
     "lint": "eslint src/**.ts",
     "watch": "npm run build && npm link && nodemon",
     "build": "rimraf ./dist && tsc",
