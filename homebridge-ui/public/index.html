@@ -68,6 +68,7 @@
       <input type="text" class="form-control" id="inputConsumerSecret">
    </div>
    <div class="form-group text-center">
+      <button type="button" class="btn btn-primary" id="backToIntro">&larr;</button>
       <button type="button" class="btn btn-primary" id="linkButton">Continue &rarr;</button>
       <button type="button" class="btn btn-danger" id="unLinkButton">Unlink Account &rarr;</button>
    </div>
@@ -182,6 +183,7 @@
                currentConfig[0].credentials = data
                await homebridge.updatePluginConfig(currentConfig)
                await homebridge.savePluginConfig()
+               document.getElementById('backToIntro').style.display = 'none'
                document.getElementById('linkButton').style.display = 'none'
                document.getElementById('unLinkButton').style.display = 'none'
             } catch (err) {
@@ -253,6 +255,8 @@
                showAccount()
                homebridge.hideSpinner()
             })
+            document.getElementById('pageAccount').style.display = 'none'
+            document.getElementById('menuWrapper').style.display = 'none'
             document.getElementById('pageIntro').style.display = 'block'
          }
          showDevices = async () => {
@@ -346,6 +350,11 @@
          }
          showAccount = () => {
             homebridge.showSpinner()
+            const backToIntro = document.getElementById('backToIntro')
+            backToIntro.addEventListener('click', () => {
+               showIntro()
+            })
+            backToIntro.style.display = 'none'
             const linkButton = document.getElementById('linkButton')
             linkButton.addEventListener('click', () => {
                linkAccount()
@@ -384,6 +393,9 @@
             document.getElementById('linkButton').innerHTML = isRelink
                ? 'Relink Account &rarr;'
                : 'Link Account &rarr;'
+            if (!isRelink) {
+               document.getElementById('backToIntro').style.display = 'inline-block'
+            }
             homebridge.hideSpinner()
          }
          showDisabledBanner = () => {
