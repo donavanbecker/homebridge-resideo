@@ -183,6 +183,7 @@
                currentConfig[0].credentials = data
                await homebridge.updatePluginConfig(currentConfig)
                await homebridge.savePluginConfig()
+               homebridge.toast.success("Successfully Linked Honeywell Home Account", "homebridge-honeywell-home")
                document.getElementById('backToIntro').style.display = 'none'
                document.getElementById('linkButton').style.display = 'none'
                document.getElementById('unLinkButton').style.display = 'none'
@@ -238,6 +239,7 @@
                delete currentConfig[0].credentials
                await homebridge.updatePluginConfig(currentConfig)
                await homebridge.savePluginConfig()
+               homebridge.toast.warning("Successfully Unlinked Honeywell Home Account", "homebridge-honeywell-home")
                document.getElementById('inputConsumerKey').value = ''
                document.getElementById('inputConsumerSecret').value = ''
                document.getElementById('unLinkButton').style.display = 'none'
