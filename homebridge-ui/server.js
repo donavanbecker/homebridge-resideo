@@ -8,7 +8,7 @@ const { HomebridgePluginUiServer } = require('@homebridge/plugin-ui-utils');
 const fs = require('fs');
 
 class PluginUiServer extends HomebridgePluginUiServer {
-  constructor () {
+  constructor() {
     super();
 
     /*

@@ -13,8 +13,21 @@
       <li class="mb-3">
          Give your application a name, and enter the 'Callback URL' exactly as it is displayed below.
          <br>
-         <input class="form-control mt-3" id="disabledInput" type="text"
-            placeholder="https://homebridge-honeywell.iot.oz.nu/link-account" disabled>
+         <div class="input-group mt-3">
+            <input type="text" class="form-control" value="https://homebridge-honeywell.iot.oz.nu/link-account" disabled
+               id="copyMe">
+            <div class="input-group-append">
+               <button class="btn btn-primary m-0 py-0 px-3" onclick="copyMyText()" type="button">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
+                     class="mb-1 bi bi-clipboard" viewBox="0 0 16 16">
+                     <path
+                        d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z" />
+                     <path
+                        d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z" />
+                  </svg>
+               </button>
+            </div>
+         </div>
       </li>
       <li>Enter the generated 'Consumer Key' and 'Consumer Secret' on the next page.</li>
    </ol>
@@ -55,6 +68,7 @@
       <input type="text" class="form-control" id="inputConsumerSecret">
    </div>
    <div class="form-group text-center">
+      <button type="button" class="btn btn-primary" id="backToIntro">&larr;</button>
       <button type="button" class="btn btn-primary" id="linkButton">Continue &rarr;</button>
       <button type="button" class="btn btn-danger" id="unLinkButton">Unlink Account &rarr;</button>
    </div>
@@ -169,13 +183,20 @@
                currentConfig[0].credentials = data
                await homebridge.updatePluginConfig(currentConfig)
                await homebridge.savePluginConfig()
+               homebridge.toast.success("Successfully Linked Honeywell Home Account", "homebridge-honeywell-home")
+               document.getElementById('backToIntro').style.display = 'none'
                document.getElementById('linkButton').style.display = 'none'
-                document.getElementById('unLinkButton').style.display = 'none'
+               document.getElementById('unLinkButton').style.display = 'none'
             } catch (err) {
                console.error(err)
                homebridge.toast.error('Try again, or see the console message for info.', 'Error')
             }
          }, false)
+         copyMyText = () => {
+            var textToCopy = document.getElementById("copyMe");
+            textToCopy.select();
+            document.execCommand("copy");
+         }
          linkAccount = () => {
             document.getElementById('validateForm').style.display = 'none'
             if (
@@ -206,25 +227,26 @@
             }, 2000);
          }
          unLinkAccount = async () => {
-           try {
-              document.getElementById('validateForm').style.display = 'none'
-              if (
-                 !document.getElementById('inputConsumerKey').value ||
-                 !document.getElementById('inputConsumerSecret').value
-              ) {
-                 document.getElementById('validateForm').style.display = 'block'
-                 return
-              }
-              delete currentConfig[0].credentials
+            try {
+               document.getElementById('validateForm').style.display = 'none'
+               if (
+                  !document.getElementById('inputConsumerKey').value ||
+                  !document.getElementById('inputConsumerSecret').value
+               ) {
+                  document.getElementById('validateForm').style.display = 'block'
+                  return
+               }
+               delete currentConfig[0].credentials
                await homebridge.updatePluginConfig(currentConfig)
                await homebridge.savePluginConfig()
+               homebridge.toast.warning("Successfully Unlinked Honeywell Home Account", "homebridge-honeywell-home")
                document.getElementById('inputConsumerKey').value = ''
                document.getElementById('inputConsumerSecret').value = ''
                document.getElementById('unLinkButton').style.display = 'none'
-             } catch (err) {
+            } catch (err) {
                console.error(err)
-                homebridge.toast.error('Try again, or see the console message for info.', 'Error')
-             }
+               homebridge.toast.error('Try again, or see the console message for info.', 'Error')
+            }
          }
          showIntro = () => {
             const introLink = document.getElementById('introLink')
@@ -235,6 +257,8 @@
                showAccount()
                homebridge.hideSpinner()
             })
+            document.getElementById('pageAccount').style.display = 'none'
+            document.getElementById('menuWrapper').style.display = 'none'
             document.getElementById('pageIntro').style.display = 'block'
          }
          showDevices = async () => {
@@ -328,6 +352,11 @@
          }
          showAccount = () => {
             homebridge.showSpinner()
+            const backToIntro = document.getElementById('backToIntro')
+            backToIntro.addEventListener('click', () => {
+               showIntro()
+            })
+            backToIntro.style.display = 'none'
             const linkButton = document.getElementById('linkButton')
             linkButton.addEventListener('click', () => {
                linkAccount()
@@ -360,12 +389,15 @@
                   isRelink = true
                   document.getElementById('unLinkButton').style.display = 'inline-block'
                } else {
-                 document.getElementById('unLinkButton').style.display = 'none'
+                  document.getElementById('unLinkButton').style.display = 'none'
                }
             }
             document.getElementById('linkButton').innerHTML = isRelink
                ? 'Relink Account &rarr;'
                : 'Link Account &rarr;'
+            if (!isRelink) {
+               document.getElementById('backToIntro').style.display = 'inline-block'
+            }
             homebridge.hideSpinner()
          }
          showDisabledBanner = () => {

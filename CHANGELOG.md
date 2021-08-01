@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 9.6.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.5.2...v9.6.0) (2021-07-31)
+
+### Changes
+
+- Add a Copy to Clipboard Button, for Honeywell Linking URL.
+- Add a Back To Intro Arrow, To get back to intro if no config has been saved.
+- Add a link and unlink notification.
+
 ## [Version 9.5.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.5.1...v9.5.2) (2021-07-28)
 
 ### Changes
