@@ -6,7 +6,8 @@
 'use strict';
 
 const { HomebridgePluginUiServer } = require('@homebridge/plugin-ui-utils');
-const exec = require('child_process').exec;
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
 const fs = require('fs');
 const http = require('http');
 const url = require('url');
@@ -21,7 +22,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
     */
 
     this.onRequest('/startServer', () => {
-      const runningServer = http.createServer(function (req, res) {
+      const runningServer = http.createServer(async (req, res) => {
         res.writeHead(200, { 'Content-Type': 'text/html' });
         const urlParts = url.parse(req.url, true);
         const pathArr = urlParts.pathname.split('?');
@@ -29,8 +30,8 @@ class PluginUiServer extends HomebridgePluginUiServer {
         const query = urlParts.query;
         switch (action) {
           case 'start': {
-            this.key = urlParts[2];
-            this.secret = urlParts[3];
+            this.key = query.key;
+            this.secret = query.secret;
             const url = 'https://api.honeywell.com/oauth2/authorize?' +
               'response_type=code&redirect_uri=' + encodeURI('http://127.0.0.1:64911/auth') + '&' +
               'client_id=' + query.key;
@@ -52,41 +53,23 @@ class PluginUiServer extends HomebridgePluginUiServer {
               curlString += 'redirect_uri=' + encodeURI('http://127.0.0.1:64911/auth');
               curlString += '" ';
               curlString += '"https://api.honeywell.com/oauth2/token"';
-
-              console.log(curlString);
-              console.log(query);
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              exec(curlString, (error, stdout, stderr) => {
+              try {
+                const { stdout } = await exec(curlString);
                 const response = JSON.parse(stdout);
-                console.log(JSON.stringify(response));
                 if (response.access_token) {
                   this.pushEvent('creds-received', {
+                    key: this.key,
+                    secret: this.secret,
                     access: response.access_token,
                     refresh: response.refresh_token,
                   });
-                } else {
-                  this.pushEvent('creds-received', {
-                    error: JSON.stringify(response),
-                  });
                 }
-
-                if (error !== null) {
-                  console.log('exec error: ' + JSON.stringify(error));
-                }
-                if (stderr !== null) {
-                  console.log('exec stderr: ' + JSON.stringify(stderr));
-                }
-
-                res.end(JSON.stringify(response));
-                if (error) {
-                  res.end('error - ' + JSON.stringify(error));
-                }
-                console.log(JSON.stringify(res));
-                console.log(JSON.stringify(response));
-              });
-              res.end('not sure how we get here');
+                res.end('Success. You can close this window now.');
+              } catch (err) {
+                res.end('<strong>An error occurred:</strong><br>' + JSON.stringify(err) + '<br><br>Close this window and start again');
+              }
             } else {
-              res.end('an error occurred. close this window and try again.');
+              res.end('<strong>An error occurred:</strong><br>no code received<br><br>Close this window and start again');
             }
             break;
           }
@@ -99,7 +82,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       });
       runningServer.listen(64911, err => {
         if (err) {
-          Console.log(err);
+          console.log(err);
         }
       });
 
@@ -107,11 +90,6 @@ class PluginUiServer extends HomebridgePluginUiServer {
         runningServer.close();
       }, 300000);
     });
-
-    /*
-      A native method getCachedAccessories() was introduced in config-ui-x v4.37.0
-      The following is for users who have a lower version of config-ui-x
-    */
 
     this.onRequest('/getCachedAccessories', async () => {
       try {
