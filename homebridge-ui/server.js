@@ -15,69 +15,72 @@ const url = require('url');
 class PluginUiServer extends HomebridgePluginUiServer {
   constructor() {
     super();
-
-    /*
-      A native method getCachedAccessories() was introduced in config-ui-x v4.37.0
-      The following is for users who have a lower version of config-ui-x
-    */
-
     this.onRequest('/startServer', () => {
       const runningServer = http.createServer(async (req, res) => {
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-        const urlParts = url.parse(req.url, true);
-        const pathArr = urlParts.pathname.split('?');
-        const action = pathArr[0].replace('/', '');
-        const query = urlParts.query;
-        switch (action) {
-          case 'start': {
-            this.key = query.key;
-            this.secret = query.secret;
-            const url = 'https://api.honeywell.com/oauth2/authorize?' +
-              'response_type=code&redirect_uri=' + encodeURI('http://127.0.0.1:8585/auth') + '&' +
-              'client_id=' + query.key;
-            res.end('<script>window.location.replace(\'' + url + '\');</script>');
-            break;
-          }
-          case 'auth': {
-            if (query.code) {
-              const code = query.code;
-              const auth = Buffer.from(this.key + ':' + this.secret).toString('base64');
-              let curlString = '';
-              curlString += 'curl -X POST ';
-              curlString += '--header "Authorization: Basic ' + auth + '" ';
-              curlString += '--header "Accept: application/json" ';
-              curlString += '--header "Content-Type: application/x-www-form-urlencoded" ';
-              curlString += '-d "';
-              curlString += 'grant_type=authorization_code&';
-              curlString += 'code=' + code + '&';
-              curlString += 'redirect_uri=' + encodeURI('http://127.0.0.1:8585/auth');
-              curlString += '" ';
-              curlString += '"https://api.honeywell.com/oauth2/token"';
-              try {
-                const { stdout } = await exec(curlString);
-                const response = JSON.parse(stdout);
-                if (response.access_token) {
-                  this.pushEvent('creds-received', {
-                    key: this.key,
-                    secret: this.secret,
-                    access: response.access_token,
-                    refresh: response.refresh_token,
-                  });
-                }
-                res.end('Success. You can close this window now.');
-              } catch (err) {
-                res.end('<strong>An error occurred:</strong><br>' + JSON.stringify(err) + '<br><br>Close this window and start again');
-              }
-            } else {
-              res.end('<strong>An error occurred:</strong><br>no code received<br><br>Close this window and start again');
+        try {
+          res.writeHead(200, { 'Content-Type': 'text/html' });
+          const urlParts = url.parse(req.url, true);
+          const pathArr = urlParts.pathname.split('?');
+          const action = pathArr[0].replace('/', '');
+          const query = urlParts.query;
+          switch (action) {
+            case 'start': {
+              this.key = query.key;
+              this.secret = query.secret;
+              this.hostname = query.host;
+              const url = 'https://api.honeywell.com/oauth2/authorize?' +
+                'response_type=code&redirect_uri=' + encodeURI('http://' + this.hostname + ':8585/auth') + '&' +
+                'client_id=' + query.key;
+              res.end('<script>window.location.replace(\'' + url + '\');</script>');
+              break;
             }
-            break;
+            case 'auth': {
+              if (query.code) {
+                const code = query.code;
+                const auth = Buffer.from(this.key + ':' + this.secret).toString('base64');
+                let curlString = '';
+                curlString += 'curl -X POST ';
+                curlString += '--header "Authorization: Basic ' + auth + '" ';
+                curlString += '--header "Accept: application/json" ';
+                curlString += '--header "Content-Type: application/x-www-form-urlencoded" ';
+                curlString += '-d "';
+                curlString += 'grant_type=authorization_code&';
+                curlString += 'code=' + code + '&';
+                curlString += 'redirect_uri=' + encodeURI('http://' + this.hostname + ':8585/auth');
+                curlString += '" ';
+                curlString += '"https://api.honeywell.com/oauth2/token"';
+                console.log(curlString);
+                try {
+                  const { stdout } = await exec(curlString);
+                  const response = JSON.parse(stdout);
+                  console.log(response);
+                  if (response.access_token) {
+                    this.pushEvent('creds-received', {
+                      key: this.key,
+                      secret: this.secret,
+                      access: response.access_token,
+                      refresh: response.refresh_token,
+                    });
+                    res.end('Success. You can close this window now.');
+                  } else {
+                    res.end('oops.');
+                  }
+                } catch (err) {
+                  res.end('<strong>An error occurred:</strong><br>' + JSON.stringify(err) + '<br><br>Close this window and start again');
+                }
+              } else {
+                res.end('<strong>An error occurred:</strong><br>no code received<br><br>Close this window and start again');
+              }
+              break;
+            }
+            default: {
+              // should never happen
+              res.end('welcome to the server');
+              break;
+            }
           }
-          default: {
-            // should never happen
-            res.end('welcome to the server');
-            break;
-          }
+        } catch (err) {
+          console.log(err);
         }
       });
       runningServer.listen(8585, err => {
@@ -90,6 +93,13 @@ class PluginUiServer extends HomebridgePluginUiServer {
         runningServer.close();
       }, 300000);
     });
+
+
+    /*
+      A native method getCachedAccessories() was introduced in config-ui-x v4.37.0
+      The following is for users who have a lower version of config-ui-x
+    */
+
 
     this.onRequest('/getCachedAccessories', async () => {
       try {
