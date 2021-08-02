@@ -49,7 +49,6 @@ class PluginUiServer extends HomebridgePluginUiServer {
                 curlString += 'redirect_uri=' + encodeURI('http://' + this.hostname + ':8585/auth');
                 curlString += '" ';
                 curlString += '"https://api.honeywell.com/oauth2/token"';
-                console.log(curlString);
                 try {
                   const { stdout } = await exec(curlString);
                   const response = JSON.parse(stdout);
