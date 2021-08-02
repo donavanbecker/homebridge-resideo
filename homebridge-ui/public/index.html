@@ -173,7 +173,7 @@
          const currentConfig = await homebridge.getPluginConfig()
          const hostname = window.location.hostname
          try {
-            await homebridge.request('/startServer')
+            await homebridge.request('Start Honeywell Login Server')
          } catch (err) {
             const msg = err.message
             homebridge.toast.error(msg, 'HTTP Server Not Started')

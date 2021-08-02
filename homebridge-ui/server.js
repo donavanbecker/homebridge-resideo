@@ -15,7 +15,7 @@ const url = require('url');
 class PluginUiServer extends HomebridgePluginUiServer {
   constructor() {
     super();
-    this.onRequest('/startServer', () => {
+    this.onRequest('Start Honeywell Login Server', () => {
       const runningServer = http.createServer(async (req, res) => {
         try {
           res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -52,7 +52,6 @@ class PluginUiServer extends HomebridgePluginUiServer {
                 try {
                   const { stdout } = await exec(curlString);
                   const response = JSON.parse(stdout);
-                  console.log(response);
                   if (response.access_token) {
                     this.pushEvent('creds-received', {
                       key: this.key,
