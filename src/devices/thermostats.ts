@@ -439,15 +439,26 @@ export class Thermostats {
     } as any;
 
     // Only include thermostatSetpointStatus on certain models
-    if (this.device.deviceModel !== 'Round') {
-      payload.thermostatSetpointStatus = this.platform.config.options?.thermostat?.thermostatSetpointStatus;
+    switch (this.device.deviceModel) {
+      case 'Round':
+      case 'Unknown':
+      case 'D6':
+        break;
+      default:
+        payload.thermostatSetpointStatus = this.platform.config.options?.thermostat?.thermostatSetpointStatus;
     }
 
     // Always set autoChangeoverActive to 'true' for Round Thermostats
-    if (this.device.deviceModel === 'Round') {
-      payload.autoChangeoverActive = true;
-    } else {
-      payload.autoChangeoverActive = this.device.changeableValues.autoChangeoverActive;
+    switch (this.device.deviceModel) {
+      case 'Round':
+      case 'Unknown':
+      case 'D6':
+        payload.autoChangeoverActive = true;
+        break;
+      case 'Test':
+        break;
+      default:
+        payload.autoChangeoverActive = this.device.changeableValues.autoChangeoverActive;
     }
 
     // Set the heat and cool set point value based on the selected mode
