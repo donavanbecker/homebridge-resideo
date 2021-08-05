@@ -443,9 +443,13 @@ export class Thermostats {
       case 'Round':
       case 'Unknown':
       case 'D6':
+        this.platform.log.warn('Round, Unknown, or D6 thermostatSetpointStatus');
+        this.platform.log.warn(this.device.deviceClass, this.device.deviceModel);
         break;
       default:
         payload.thermostatSetpointStatus = this.platform.config.options?.thermostat?.thermostatSetpointStatus;
+        this.platform.log.warn('Default thermostatSetpointStatus');
+        this.platform.log.warn(this.device.deviceClass, this.device.deviceModel);
     }
 
     // Always set autoChangeoverActive to 'true' for Round Thermostats
@@ -453,11 +457,16 @@ export class Thermostats {
       case 'Round':
       case 'Unknown':
       case 'D6':
+        this.platform.log.warn('Round, Unknown, or D6 autoChangeoverActive');
+        this.platform.log.warn(this.device.deviceClass, this.device.deviceModel);
         payload.autoChangeoverActive = true;
         break;
       case 'Test':
+        this.platform.log.warn('Test autoChangeoverActive');
         break;
       default:
+        this.platform.log.warn('Default autoChangeoverActive');
+        this.platform.log.warn(this.device.deviceClass, this.device.deviceModel);
         payload.autoChangeoverActive = this.device.changeableValues.autoChangeoverActive;
     }
 
