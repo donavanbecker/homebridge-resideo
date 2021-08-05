@@ -462,18 +462,22 @@ export class Thermostats {
     }
 
     // Set the heat and cool set point value based on the selected mode
-    if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
-      payload.heatSetpoint = this.toFahrenheit(Number(this.TargetTemperature));
-      payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
-    } else if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.COOL) {
-      payload.coolSetpoint = this.toFahrenheit(Number(this.TargetTemperature));
-      payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
-    } else if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.AUTO) {
-      payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
-      payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
-    } else {
-      payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
-      payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
+    switch (this.TargetHeatingCoolingState) {
+      case this.platform.Characteristic.TargetHeatingCoolingState.HEAT:
+        payload.heatSetpoint = this.toFahrenheit(Number(this.TargetTemperature));
+        payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
+        break;
+      case this.platform.Characteristic.TargetHeatingCoolingState.COOL:
+        payload.coolSetpoint = this.toFahrenheit(Number(this.TargetTemperature));
+        payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
+        break;
+      case this.platform.Characteristic.TargetHeatingCoolingState.AUTO:
+        payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
+        payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
+        break;
+      default:
+        payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
+        payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
     }
 
     this.platform.log.info(
