@@ -8,7 +8,6 @@ All notable changes to this project will be documented in this file. This projec
 
 - Implimented A Local Authentication HTTP Server that runs when opening Plugin Settings.
   - URL(Callback URL *) that will be used to Link or Relink your Honeywell Account, will now be your local IP.
-- Potential Fix for `Unknown` Model of Thermostats, specificly RTH9580 not being able to push updates to Thermostat.
 - Housekeeping and updated dependencies.
 
 ## [Version 9.6.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.5.2...v9.6.0) (2021-07-31)
