@@ -688,7 +688,7 @@ export class Thermostats {
       this.fanService?.updateCharacteristic(this.platform.Characteristic.TargetFanState, e);
       this.fanService?.updateCharacteristic(this.platform.Characteristic.Active, e);
     }
-    throw new this.platform.api.hap.HapStatusError(HAPStatus.OPERATION_TIMED_OUT);
+    //throw new this.platform.api.hap.HapStatusError(HAPStatus.OPERATION_TIMED_OUT);
   }
 
   private setTargetHeatingCoolingState(value: CharacteristicValue) {
