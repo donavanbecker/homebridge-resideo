@@ -531,7 +531,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         );
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-        await this.thermostatFirmwareExistingwAccessory(device, existingAccessory, location);
+        await this.thermostatFirmwareExistingAccessory(device, existingAccessory, location);
         existingAccessory.context.device = device;
         existingAccessory.context.deviceID = device.deviceID;
         existingAccessory.context.model = device.deviceModel;
@@ -875,7 +875,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     }
   }
 
-  public async thermostatFirmwareExistingwAccessory(
+  public async thermostatFirmwareExistingAccessory(
     device: Thermostat,
     existingAccessory: PlatformAccessory,
     location: any,
