@@ -35,9 +35,9 @@ body:
       validations:
         required: true
   - type: textarea
-    id: Config:
+    id: Config
     attributes:
-      label: Config
+      label: Config for homebridge-honeywell-home
       description: Paste your homebridge config.json here. Remove any sensitive information, such as your homebridge-honeywell-home consumerKey/ consumerSecret / refreshToken.
       render: shell
       validations:
