@@ -42,10 +42,13 @@ body:
       render: shell
     validations:
       required: true
-  - type: input
+  - type: textarea
     attributes:
       label: Screenshots
-      placeholder: If applicable, add screenshots to help explain your problem.
+      description: |
+      If applicable, add screenshots to help explain your problem.
+
+      Tip: You can attach images by clicking this area to highlight it and then dragging files in.
     validations:
       required: false
   - type: input
