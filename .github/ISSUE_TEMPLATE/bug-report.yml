@@ -16,13 +16,13 @@ body:
       required: true
   - type: input
     attributes:
-      label: To Reproduce:
+      label: To Reproduce
       placeholder: Steps to reproduce the behavior.
     validations:
       required: true
   - type: input
     attributes:
-      label: Expected behavior:
+      label: Expected behavior
       placeholder: A clear and concise description of what you expected to happen.
     validations:
       required: true
@@ -44,53 +44,53 @@ body:
         required: true
   - type: input
     attributes:
-      label: Screenshots:
+      label: Screenshots
       placeholder: If applicable, add screenshots to help explain your problem.
     validations:
       required: false
   - type: input
     attributes:
-      label: Device & Model:
+      label: Device & Model
       placeholder: If applicable, add screenshots to help explain your problem.
     validations:
       required: true
  - type: markdown
     attributes:
       value: |
-        Environment:     
+        Environment   
   - type: input
     attributes:
-      label: Node.js Version:
+      label: Node.js Version
       placeholder: v14.17.5
     validations:
       required: true  
   - type: input
     attributes:
-      label: NPM Version:
+      label: NPM Version
       placeholder: v7.20.5
     validations:
       required: true
   - type: input
     attributes:
-      label: Homebridge Version:
+      label: Homebridge Version
       placeholder: If applicable, add screenshots to help explain your problem.
     validations:
       required: true
     - type: input
     attributes:
-      label: Homebridge Honeywell Home Plugin Version:
+      label: Homebridge Honeywell Home Plugin Version
       placeholder: v9.6.0
     validations:
       required: true
         - type: input
     attributes:
-      label: Homebridge Config UI X Plugin Version:
+      label: Homebridge Config UI X Plugin Version
       placeholder: v4.41.2
     validations:
       required: false  
       - type: input
     attributes:
-      label: Operating System:
+      label: Operating System
       placeholder: Raspbian / Ubuntu / Debian / Windows / macOS / Docker
     validations:
       required: true
