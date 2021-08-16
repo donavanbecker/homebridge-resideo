@@ -48,6 +48,6 @@ body:
   - type: input
     attributes:
       label: Additional context
-      placeholder: Add any other context or screenshots about the feature request here. Post devicediscovery: true logs here.
+      placeholder: Add any other context or screenshots about the feature request here. Post devicediscovery logs here.
     validations:
       required: false
