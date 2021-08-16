@@ -1,5 +1,5 @@
 name: Bug-Report
-description: Request your plugin be reviewed for verification
+description: Report a Bug to help us improve
 title: "Bug:"
 labels: [bug]
 assignees: 'donavanbecker'
