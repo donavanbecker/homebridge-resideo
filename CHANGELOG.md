@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 10.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.6.0...v10.0.0) (2021-08-21)
+
+### Changes
+
+- Implimented A Local Authentication HTTP Server that runs when opening Plugin Settings.
+  - URL(Callback URL *) that will be used to Link or Relink your Honeywell Account, will now be your local IP.
+- Housekeeping and updated dependencies.
+
 ## [Version 9.6.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.5.2...v9.6.0) (2021-07-31)
 
 ### Changes
