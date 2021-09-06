@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory, HAPStatus, CharacteristicValue } from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { skipWhile } from 'rxjs/operators';
@@ -79,13 +79,13 @@ export class LeakSensor {
 
     // Leak Sensor Service
     if (this.platform.config.options?.leaksensor?.hide_leak) {
-      if (this.platform.debugMode) {
+      if (this.platform.config.options.debug) {
         this.platform.log.error('Removing service');
       }
       this.leakService = this.accessory.getService(this.platform.Service.LeakSensor);
       accessory.removeService(this.leakService!);
     } else if (!this.leakService) {
-      if (this.platform.debugMode) {
+      if (this.platform.config.option?.debug) {
         this.platform.log.warn('Adding service');
       }
       (this.service =
@@ -93,20 +93,20 @@ export class LeakSensor {
         this.accessory.addService(this.platform.Service.LeakSensor)), '%s LeakSensor', accessory.displayName;
 
     } else {
-      if (this.platform.debugMode) {
+      if (this.platform.config.options?.debug) {
         this.platform.log.warn('LeakSensor not added.');
       }
     }
 
     // Temperature Sensor Service
     if (this.platform.config.options?.leaksensor?.hide_temperature) {
-      if (this.platform.debugMode) {
+      if (this.platform.config.options.debug) {
         this.platform.log.error('Removing service');
       }
       this.temperatureService = this.accessory.getService(this.platform.Service.TemperatureSensor);
       accessory.removeService(this.temperatureService!);
     } else if (!this.temperatureService) {
-      if (this.platform.debugMode) {
+      if (this.platform.config.options?.debug) {
         this.platform.log.warn('Adding service');
       }
       (this.temperatureService =
@@ -124,14 +124,14 @@ export class LeakSensor {
           return this.CurrentTemperature;
         });
     } else {
-      if (this.platform.debugMode) {
+      if (this.platform.config.options?.debug) {
         this.platform.log.warn('TemperatureSensor not added.');
       }
     }
 
     // Humidity Sensor Service
     if (this.platform.config.options?.leaksensor?.hide_humidity) {
-      if (this.platform.debugMode) {
+      if (this.platform.config.options.debug) {
         this.platform.log.error('Removing service');
       }
       this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor);
@@ -150,7 +150,7 @@ export class LeakSensor {
           return this.CurrentRelativeHumidity;
         });
     } else {
-      if (this.platform.debugMode) {
+      if (this.platform.config.options?.debug) {
         this.platform.log.warn('HumiditySensor not added.');
       }
     }
@@ -196,7 +196,7 @@ export class LeakSensor {
     } else {
       this.StatusLowBattery = 0;
     }
-    this.platform.log.debug(
+    this.platform.debug(
       'LS %s - %s°, %s%',
       this.accessory.displayName,
       this.CurrentTemperature,
@@ -216,7 +216,7 @@ export class LeakSensor {
           },
         })
       ).data;
-      this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(this.device));
+      this.platform.debug('LS %s - ', this.accessory.displayName, JSON.stringify(this.device));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e: any) {
@@ -224,8 +224,8 @@ export class LeakSensor {
         'LS - Failed to update status of',
         this.device.userDefinedDeviceName,
         JSON.stringify(e.message),
-        this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(e)),
       );
+      this.platform.debug('LS %s - ', this.accessory.displayName, JSON.stringify(e));
       this.apiError(e);
     }
   }

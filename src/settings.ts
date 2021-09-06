@@ -49,6 +49,7 @@ export type options = {
   refreshRate?: number;
   pushRate?: number;
   hide_device: string[];
+  debug?: boolean;
   thermostat?: thermostat;
   leaksensor?: leaksensor;
   roomsensor?: roomsensor;
