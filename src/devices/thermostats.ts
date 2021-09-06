@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory, CharacteristicValue, HAPStatus } from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
@@ -235,7 +235,7 @@ export class Thermostats {
           try {
             await this.refreshRoomPriority();
             await this.pushRoomChanges();
-          } catch (e) {
+          } catch (e: any) {
             this.platform.log.error(JSON.stringify(e.message));
             this.platform.log.debug('Thermostat %s -', this.accessory.displayName, JSON.stringify(e));
             this.platform.refreshAccessToken();
@@ -254,7 +254,7 @@ export class Thermostats {
       .subscribe(async () => {
         try {
           await this.pushChanges();
-        } catch (e) {
+        } catch (e: any) {
           this.platform.log.error(JSON.stringify(e.message));
           this.platform.log.debug('Thermostat %s -', this.accessory.displayName, JSON.stringify(e));
           this.platform.refreshAccessToken();
@@ -273,7 +273,7 @@ export class Thermostats {
         .subscribe(async () => {
           try {
             await this.pushFanChanges();
-          } catch (e) {
+          } catch (e: any) {
             this.platform.log.error(JSON.stringify(e.message));
             this.platform.log.debug('Thermostat %s -', this.accessory.displayName, JSON.stringify(e));
             this.platform.refreshAccessToken();
@@ -401,7 +401,7 @@ export class Thermostats {
       }
       this.parseStatus();
       this.updateHomeKitCharacteristics();
-    } catch (e) {
+    } catch (e: any) {
       this.platform.log.error(
         'Thermostat - Failed to update status of',
         this.device.name,
@@ -688,7 +688,6 @@ export class Thermostats {
       this.fanService?.updateCharacteristic(this.platform.Characteristic.TargetFanState, e);
       this.fanService?.updateCharacteristic(this.platform.Characteristic.Active, e);
     }
-    //throw new this.platform.api.hap.HapStatusError(HAPStatus.OPERATION_TIMED_OUT);
   }
 
   private setTargetHeatingCoolingState(value: CharacteristicValue) {

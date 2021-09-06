@@ -219,7 +219,7 @@ export class LeakSensor {
       this.platform.log.debug('LS %s - ', this.accessory.displayName, JSON.stringify(this.device));
       this.parseStatus();
       this.updateHomeKitCharacteristics();
-    } catch (e) {
+    } catch (e: any) {
       this.platform.log.error(
         'LS - Failed to update status of',
         this.device.userDefinedDeviceName,
@@ -275,6 +275,5 @@ export class LeakSensor {
     if (!this.platform.config.options?.leaksensor?.hide_humidity) {
       this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
     }
-    //throw new this.platform.api.hap.HapStatusError(HAPStatus.OPERATION_TIMED_OUT);
   }
 }

@@ -66,7 +66,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     try {
       this.verifyConfig();
       this.log.debug('Config OK');
-    } catch (e) {
+    } catch (e: any) {
       this.log.error(JSON.stringify(e.message));
       this.log.debug(JSON.stringify(e));
       return;
@@ -93,13 +93,13 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       await this.refreshAccessToken();
       try {
         this.locations = await this.discoverlocations();
-      } catch (e) {
+      } catch (e: any) {
         this.log.error('Failed to Discover Locations,', JSON.stringify(e.message));
         this.log.debug(JSON.stringify(e));
       }
       try {
         this.discoverDevices();
-      } catch (e) {
+      } catch (e: any) {
         this.log.error('Failed to Discover Devices,', JSON.stringify(e.message));
         this.log.debug(JSON.stringify(e));
       }
@@ -233,7 +233,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               refresh_token: this.config.credentials!.refreshToken,
             })
           ).data;
-        } catch (e) {
+        } catch (e: any) {
           this.log.error('Failed to exchange refresh token for an access token.', JSON.stringify(e.message));
           this.log.debug(JSON.stringify(e));
           throw e;
@@ -253,7 +253,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       }
 
       this.config.credentials!.refreshToken = result.refresh_token;
-    } catch (e) {
+    } catch (e: any) {
       this.log.error('Failed to refresh access token.', JSON.stringify(e.message));
       this.log.debug(JSON.stringify(e));
     }
@@ -299,7 +299,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       if (this.debugMode) {
         this.log.warn('Homebridge config.json has been updated with new refresh token.');
       }
-    } catch (e) {
+    } catch (e: any) {
       this.log.error('Failed to update refresh token in config:', JSON.stringify(e.message));
       this.log.debug(JSON.stringify(e));
     }
@@ -429,7 +429,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
               if (device.deviceModel.startsWith('T9')) {
                 try {
                   await this.discoverRoomSensors(location.locationID, device);
-                } catch (e) {
+                } catch (e: any) {
                   this.log.error('Failed to Find Room Sensor(s).', JSON.stringify(e.message));
                   this.log.debug(JSON.stringify(e));
                 }
@@ -860,7 +860,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     if (device.deviceModel.startsWith('T9')) {
       try {
         accessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
-      } catch (e) {
+      } catch (e: any) {
         this.log.error('Failed to Get T9 Firmware Version.', JSON.stringify(e.message));
         this.log.debug(JSON.stringify(e));
       }
@@ -871,7 +871,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     ) {
       accessory.context.firmwareRevision = device.thermostatVersion;
     } else {
-      accessory.context.firmwareRevision = '9.0.0';
+      accessory.context.firmwareRevision = this.version;
     }
   }
 
@@ -883,7 +883,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     if (device.deviceModel.startsWith('T9')) {
       try {
         existingAccessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
-      } catch (e) {
+      } catch (e: any) {
         this.log.error('Failed to Get T9 Firmware Version.', JSON.stringify(e.message));
         this.log.debug(JSON.stringify(e));
       }

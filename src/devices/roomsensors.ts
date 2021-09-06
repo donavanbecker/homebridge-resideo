@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory, HAPStatus, CharacteristicValue } from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { skipWhile } from 'rxjs/operators';
@@ -224,7 +224,7 @@ export class RoomSensors {
 
       this.parseStatus();
       this.updateHomeKitCharacteristics();
-    } catch (e) {
+    } catch (e: any) {
       this.platform.log.error(
         'RS - Failed to update status of',
         this.sensorAccessory.accessoryAttribute.name,
@@ -282,7 +282,6 @@ export class RoomSensors {
     if (!this.platform.config.options?.roomsensor?.hide_humidity) {
       this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
     }
-    //throw new this.platform.api.hap.HapStatusError(HAPStatus.OPERATION_TIMED_OUT);
   }
 
   /**

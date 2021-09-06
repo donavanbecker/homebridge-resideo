@@ -3,10 +3,10 @@
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended" // uses the recommended rules from the @typescript-eslint/eslint-plugin
+    "plugin:@typescript-eslint/recommended"
   ],
   "parserOptions": {
-    "ecmaVersion": 2020,
+    "ecmaVersion": 2021,
     "sourceType": "module"
   },
   "ignorePatterns": [
@@ -55,7 +55,7 @@
     ],
     "no-console": [
       "warn"
-    ], // use the provided Homebridge log method instead
+    ],
     "no-non-null-assertion": [
       "off"
     ],
