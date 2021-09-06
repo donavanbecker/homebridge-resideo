@@ -240,7 +240,7 @@
           "key": "options.pushRate",
           "notitle": true
         },
-        "options.deubg",
+        "options.debug",
         {
           "type": "fieldset",
           "title": "Hidden Devices",
