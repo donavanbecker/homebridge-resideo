@@ -77,6 +77,12 @@ export class LeakSensor {
     // Set Charging State
     this.service.setCharacteristic(this.platform.Characteristic.ChargingState, 2);
 
+    // create handlers for required characteristics
+    this.service.getCharacteristic(this.platform.Characteristic.BatteryLevel)
+      .onGet(async () => {
+        return this.BatteryLevel;
+      });
+
     // Leak Sensor Service
     if (this.platform.config.options?.leaksensor?.hide_leak) {
       if (this.platform.config.options.debug) {
@@ -192,9 +198,9 @@ export class LeakSensor {
     // Battery Service
     this.BatteryLevel = this.device.batteryRemaining;
     if (this.device.batteryRemaining < 15) {
-      this.StatusLowBattery = 1;
+      this.StatusLowBattery = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW;
     } else {
-      this.StatusLowBattery = 0;
+      this.StatusLowBattery = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL;
     }
     this.platform.debug(
       'LS %s - %s°, %s%',
