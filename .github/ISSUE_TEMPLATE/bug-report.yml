@@ -80,7 +80,7 @@ body:
   - type: input
     attributes:
       label: Homebridge Honeywell Home Plugin Version
-      placeholder: v9.6.0
+      placeholder: v10.0.1
     validations:
       required: true
   - type: input

@@ -206,12 +206,7 @@ export class RoomSensors {
     if (!this.platform.config.options?.roomsensor?.hide_humidity) {
       this.CurrentRelativeHumidity = this.sensorAccessory.accessoryValue.indoorHumidity;
     }
-    this.platform.debug(
-      'Room Sensor %s - %s°c, %s%',
-      this.accessory.displayName,
-      this.CurrentTemperature,
-      this.CurrentRelativeHumidity,
-    );
+    this.platform.debug(`Room Sensor ${this.accessory.displayName} - ${this.CurrentTemperature}°c, ${this.CurrentRelativeHumidity}%`);
   }
 
   /**
@@ -231,7 +226,7 @@ export class RoomSensors {
         this.sensorAccessory.accessoryAttribute.type,
         JSON.stringify(e.message),
       );
-      this.platform.debug('RS %s - ', this.accessory.displayName, JSON.stringify(e));
+      this.platform.debug(`RS ${this.accessory.displayName} - ${JSON.stringify(e)}`);
       this.apiError(e);
     }
   }

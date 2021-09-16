@@ -49,7 +49,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   private refreshInterval!: NodeJS.Timeout;
 
   constructor(public readonly log: Logger, public readonly config: HoneywellPlatformConfig, public readonly api: API) {
-    this.debug('Finished initializing platform:', this.config.name);
+    this.debug(`Finished initializing platform: ${this.config.name}`);
     // only load if configured
     if (!this.config) {
       return;
@@ -376,14 +376,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
                 sensorAccessory.accessoryAttribute.type &&
                 sensorAccessory.accessoryAttribute.type.startsWith('Thermostat')
               ) {
-                this.debug(
-                  'Software Revision',
-                  group.id,
-                  sensorAccessory.roomId,
-                  sensorAccessory.accessoryId,
-                  sensorAccessory.accessoryAttribute.name,
-                  JSON.stringify(sensorAccessory.accessoryAttribute.softwareRevision),
-                );
+                this.debug(`Software Revision ${group.id} ${sensorAccessory.roomId} ${sensorAccessory.accessoryId} 
+                ${sensorAccessory.accessoryAttribute.name} ${JSON.stringify(sensorAccessory.accessoryAttribute.softwareRevision)}`);
                 return sensorAccessory.accessoryAttribute.softwareRevision;
               } else {
                 this.log.info('No Thermostat', device, group, locationId);
@@ -990,7 +984,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   debug(...log: any[]) {
     if (this.config.options?.debug) {
       this.log.info('[DEBUG]', String(...log));
-    } else{
+    } else {
       this.log.debug(String(...log));
     }
   }

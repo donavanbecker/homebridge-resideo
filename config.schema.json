@@ -58,7 +58,7 @@
           "debug": {
             "title": "Debug",
             "type": "boolean",
-            "description": "Indicates weather plugin debug mdoe is on."
+            "description": "Turn plugin's debug mode on."
           },
           "hide_device": {
             "title": "Hide Device",

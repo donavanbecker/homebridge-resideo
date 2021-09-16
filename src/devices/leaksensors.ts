@@ -197,12 +197,7 @@ export class LeakSensor {
     } else {
       this.StatusLowBattery = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL;
     }
-    this.platform.debug(
-      'LS %s - %s°, %s%',
-      this.accessory.displayName,
-      this.CurrentTemperature,
-      this.CurrentRelativeHumidity,
-    );
+    this.platform.debug(`LS ${this.accessory.displayName} - ${this.CurrentTemperature}°, ${this.CurrentRelativeHumidity}%`);
   }
 
   /**
@@ -217,7 +212,7 @@ export class LeakSensor {
           },
         })
       ).data;
-      this.platform.debug('LS %s - ', this.accessory.displayName, JSON.stringify(this.device));
+      this.platform.debug(`LS ${this.accessory.displayName} - ${JSON.stringify(this.device)}`);
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e: any) {
@@ -226,7 +221,7 @@ export class LeakSensor {
         this.device.userDefinedDeviceName,
         JSON.stringify(e.message),
       );
-      this.platform.debug('LS %s - ', this.accessory.displayName, JSON.stringify(e));
+      this.platform.debug(`LS ${this.accessory.displayName} - ${JSON.stringify(e)}`);
       this.apiError(e);
     }
   }
