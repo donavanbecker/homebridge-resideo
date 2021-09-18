@@ -456,7 +456,6 @@ export class Thermostats {
         this.platform.log.debug(this.device.deviceModel);
     }
 
-    // Always set autoChangeoverActive to 'true' for Round Thermostats
     switch (this.device.deviceModel) {
       case 'Round':
       case 'D6':
@@ -464,7 +463,16 @@ export class Thermostats {
           this.platform.log.warn('Round/D6 set autoChangeoverActive');
           this.platform.log.warn(this.device.deviceModel);
         }
-        payload.autoChangeoverActive = true;
+
+        // for Round  the 'Auto' feature is enabled via the special mode so only flip this bit when
+        // the heating/cooling state is set to  `Auto
+        if (this.TargetHeatingCoolingState == this.platform.Characteristic.TargetHeatingCoolingState.AUTO) {
+          this.platform.log.debug('Round/D6 heating/cooling state set to auto, force autoChangeoverActive');
+          payload.autoChangeoverActive = true;
+        } else {
+          this.platform.log.debug('Round/D6 heating/cooling state not set to auto, use device setting', this.device.changeableValues.autoChangeoverActive);
+          payload.autoChangeoverActive = this.device.changeableValues.autoChangeoverActive;
+        }
         break;
       case 'Unknown':
         if (this.platform.debugMode) {
@@ -536,13 +544,19 @@ export class Thermostats {
     }
 
     this.platform.log.debug('Thermostat %s pushChanges -', this.accessory.displayName, JSON.stringify(payload));
-    // Make the API request
-    await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
-      params: {
-        locationId: this.locationId,
-      },
-    });
-    // Refresh the status from the API
+    
+    // Attempt to make the API request
+    try {
+      await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
+        params: {
+          locationId: this.locationId,
+        },
+      });
+    } catch (e) {
+      // logged within post call above
+    }
+
+    // Always refresh the status from the API such that failed API requests will still reflect the correct state in HomeKit
     await this.refreshStatus();
   }
 
