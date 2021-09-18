@@ -191,7 +191,8 @@ export class LeakSensor {
 
     // Battery Service
     this.BatteryLevel = Number(this.device.batteryRemaining);
-    this.platform.log.warn(JSON.stringify(this.device.batteryRemaining));
+    this.service.getCharacteristic(this.platform.Characteristic.BatteryLevel).updateValue(this.BatteryLevel);
+    this.platform.debug(JSON.stringify(this.device.batteryRemaining));
     if (this.device.batteryRemaining < 15) {
       this.StatusLowBattery = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW;
     } else {
