@@ -62,13 +62,13 @@ body:
   - type: input
     attributes:
       label: Node.js Version
-      placeholder: v14.17.5
+      placeholder: v14.17.6
     validations:
       required: true  
   - type: input
     attributes:
       label: NPM Version
-      placeholder: v7.20.5
+      placeholder: v7.22.0
     validations:
       required: true
   - type: input
@@ -80,7 +80,7 @@ body:
   - type: input
     attributes:
       label: Homebridge Honeywell Home Plugin Version
-      placeholder: v9.6.0
+      placeholder: v10.0.1
     validations:
       required: true
   - type: input
