@@ -26,24 +26,34 @@ plugin allows you to access your Honeywell Home Device(s) from HomeKit with
 1. Login / create an account at https://developer.honeywellhome.com/user
     - Your Honeywell Home Developer Account, this account is different then your Honeywell Home Account that you log into the Honeywell Home App with
 2. Click **Create New App**
-3. Give your application a name, and enter the Callback URL as `https://homebridge-honeywell.iot.oz.nu/link-account`
-4. Enter the generated consumer key and secret into the plugin settings screen of [Homebridge Config UI X](https://github.com/oznu/homebridge-config-ui-x)
-5. Click **Link Account**
+3. Give your application a name
+4. Copy the hostname found on #3 of the Intro Page into the Callback URL field
 
 <p align="center">
 
-<img src="https://user-images.githubusercontent.com/9875439/133935243-1a0db200-e47a-46d4-9060-114e2704876f.png" width="600px">
+<img src="https://user-images.githubusercontent.com/9875439/133935459-091af658-b51c-4d69-987c-028b67b45e84.png" width="400px">
 
 </p>
 
-6. Login to your [https://www.honeywellhome.com](https://account.honeywellhome.com).
-7. Click Allow
-8. Select Devices
+5. Enter the generated consumer key and secret into the plugin settings screen of [Homebridge Config UI X](https://github.com/oznu/homebridge-config-ui-x)
+6. Click **Link Account**
+
+<p align="center">
+
+<img src="https://user-images.githubusercontent.com/9875439/133935243-1a0db200-e47a-46d4-9060-114e2704876f.png" width="400px">
+
+</p>
+
+7. Login to your [https://www.honeywellhome.com](https://account.honeywellhome.com).
+8. Click Allow
+9. Select Devices
     - I would recommend selecting all devices since you can restrict the devices you don't want in the Home app later, by DeviceID.
-9. Click Connect
-10. Click Confirm
+10. Click Connect
 11. Click Save
+    - If you plan on adding this plugin into a child bridge, I would configure that at this time before restarting Homebridge.
+       - Reminder that you will have to add this child bridge into the home app to get honeywell accessories to show up.
 12. Restart Homebridge
+
 
 ## Supported Honeywell Devices
 
