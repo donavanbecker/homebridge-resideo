@@ -32,7 +32,7 @@ plugin allows you to access your Honeywell Home Device(s) from HomeKit with
 
 <p align="center">
 
-<img src="https://user-images.githubusercontent.com/3979615/88920827-d5b97680-d2b0-11ea-9002-15209eebd995.png" width="600px">
+<img src="https://user-images.githubusercontent.com/9875439/133935243-1a0db200-e47a-46d4-9060-114e2704876f.png" width="600px">
 
 </p>
 
