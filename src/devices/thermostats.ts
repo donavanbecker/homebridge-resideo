@@ -162,7 +162,7 @@ export class Thermostats {
       this.platform.debug(`Thermostat ${this.accessory.displayName}, Available Fan Settings ${JSON.stringify(device.settings.fan)}`);
       (this.fanService =
         this.accessory.getService(this.platform.Service.Fanv2) ||
-        this.accessory.addService(this.platform.Service.Fanv2)), '%s %s Fan', device.name, device.deviceClass;
+        this.accessory.addService(this.platform.Service.Fanv2)), `${device.name} ${device.deviceClass} Fan`;
 
       this.fanService
         .getCharacteristic(this.platform.Characteristic.Active)
@@ -190,7 +190,7 @@ export class Thermostats {
       }
       (this.humidityService =
         this.accessory.getService(this.platform.Service.HumiditySensor) ||
-        this.accessory.addService(this.platform.Service.HumiditySensor)), '%s %s HumiditySensor', device.name, device.deviceClass;
+        this.accessory.addService(this.platform.Service.HumiditySensor)), `${device.name} ${device.deviceClass} HumiditySensor`;
 
       this.humidityService
         .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
@@ -432,18 +432,18 @@ export class Thermostats {
     switch (this.device.deviceModel) {
       case 'Round':
       case 'D6':
-        if (this.platform.debugMode) {
+        if (this.platform.config.options?.debug) {
           this.platform.log.warn('Round/D6 set autoChangeoverActive');
           this.platform.log.warn(this.device.deviceModel);
         }
-
         // for Round  the 'Auto' feature is enabled via the special mode so only flip this bit when
         // the heating/cooling state is set to  `Auto
-        if (this.TargetHeatingCoolingState == this.platform.Characteristic.TargetHeatingCoolingState.AUTO) {
+        if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.AUTO) {
           this.platform.log.debug(`Heating/Cooling state set to Auto for ${this.device.deviceModel}, Force autoChangeoverActive`);
           payload.autoChangeoverActive = true;
         } else {
-          this.platform.log.debug(`Heating/cooling state not set to Auto for ${this.device.deviceModel}, Using device setting ${this.device.changeableValues.autoChangeoverActive}`);
+          this.platform.log.debug(`Heating/cooling state not set to Auto for ${this.device.deviceModel}
+          , Using device setting ${this.device.changeableValues.autoChangeoverActive}`);
           payload.autoChangeoverActive = this.device.changeableValues.autoChangeoverActive;
         }
         break;
