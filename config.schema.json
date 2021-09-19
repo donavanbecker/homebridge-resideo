@@ -55,6 +55,11 @@
             "placeholder": 1,
             "description": "Indicates the number of seconds between pushes to Honewell Home API."
           },
+          "debug": {
+            "title": "Debug",
+            "type": "boolean",
+            "description": "Turn plugin's debug mode on."
+          },
           "hide_device": {
             "title": "Hide Device",
             "type": "array",
@@ -235,6 +240,7 @@
           "key": "options.pushRate",
           "notitle": true
         },
+        "options.debug",
         {
           "type": "fieldset",
           "title": "Hidden Devices",

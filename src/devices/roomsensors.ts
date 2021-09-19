@@ -82,13 +82,13 @@ export class RoomSensors {
 
     // Temperature Sensor Service
     if (this.platform.config.options?.roomsensor?.hide_temperature) {
-      if (this.platform.debugMode) {
+      if (this.platform.config.options.debug) {
         this.platform.log.error('Removing service');
       }
       this.temperatureService = this.accessory.getService(this.platform.Service.TemperatureSensor);
       accessory.removeService(this.temperatureService!);
     } else if (!this.temperatureService) {
-      if (this.platform.debugMode) {
+      if (this.platform.config.options?.debug) {
         this.platform.log.warn('Adding service');
       }
       (this.temperatureService =
@@ -107,40 +107,40 @@ export class RoomSensors {
           return this.CurrentTemperature;
         });
     } else {
-      if (this.platform.debugMode) {
+      if (this.platform.config.options?.debug) {
         this.platform.log.warn('TemperatureSensor not added.');
       }
     }
 
     // Occupancy Sensor Service
     if (this.platform.config.options?.roomsensor?.hide_occupancy) {
-      if (this.platform.debugMode) {
+      if (this.platform.config.options.debug) {
         this.platform.log.error('Removing service');
       }
       this.occupancyService = this.accessory.getService(this.platform.Service.OccupancySensor);
       accessory.removeService(this.occupancyService!);
     } else if (!this.occupancyService) {
-      if (this.platform.debugMode) {
+      if (this.platform.config.options?.debug) {
         this.platform.log.warn('Adding service');
       }
       (this.occupancyService =
         this.accessory.getService(this.platform.Service.OccupancySensor) ||
         this.accessory.addService(this.platform.Service.OccupancySensor)), '%s OccupancySensor', accessory.displayName;
     } else {
-      if (this.platform.debugMode) {
+      if (this.platform.config.options?.debug) {
         this.platform.log.warn('OccupancySensor not added.');
       }
     }
 
     // Humidity Sensor Service
     if (this.platform.config.options?.roomsensor?.hide_humidity) {
-      if (this.platform.debugMode) {
+      if (this.platform.config.options.debug) {
         this.platform.log.error('Removing service');
       }
       this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor);
       accessory.removeService(this.humidityService!);
     } else if (!this.humidityService) {
-      if (this.platform.debugMode) {
+      if (this.platform.config.options?.debug) {
         this.platform.log.warn('Adding service');
       }
       (this.humidityService =
@@ -156,7 +156,7 @@ export class RoomSensors {
           return this.CurrentRelativeHumidity;
         });
     } else {
-      if (this.platform.debugMode) {
+      if (this.platform.config.options?.debug) {
         this.platform.log.warn('HumiditySensor not added.');
       }
     }
@@ -206,12 +206,7 @@ export class RoomSensors {
     if (!this.platform.config.options?.roomsensor?.hide_humidity) {
       this.CurrentRelativeHumidity = this.sensorAccessory.accessoryValue.indoorHumidity;
     }
-    this.platform.log.debug(
-      'Room Sensor %s - %s°c, %s%',
-      this.accessory.displayName,
-      this.CurrentTemperature,
-      this.CurrentRelativeHumidity,
-    );
+    this.platform.debug(`Room Sensor ${this.accessory.displayName} - ${this.CurrentTemperature}°c, ${this.CurrentRelativeHumidity}%`);
   }
 
   /**
@@ -230,8 +225,8 @@ export class RoomSensors {
         this.sensorAccessory.accessoryAttribute.name,
         this.sensorAccessory.accessoryAttribute.type,
         JSON.stringify(e.message),
-        this.platform.log.debug('RS %s - ', this.accessory.displayName, JSON.stringify(e)),
       );
+      this.platform.debug(`RS ${this.accessory.displayName} - ${JSON.stringify(e)}`);
       this.apiError(e);
     }
   }
