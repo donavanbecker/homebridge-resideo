@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file. This projec
 ### Changes
 
 - Implment Plugin Debug Logging.
-- Fix for Round Thermostats Auto mode, thanks to @mowens for PR [#558](https://github.com/donavanbecker/homebridge-honeywell-home/pull/558)
+- Fix for Round Thermostats Auto mode, thanks to [@mowens](https://github.com/mowens) for PR [#558](https://github.com/donavanbecker/homebridge-honeywell-home/pull/558)
 
 ## [Version 10.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v10.0.0...v10.0.1) (2021-09-05)
 
