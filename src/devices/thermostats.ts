@@ -429,12 +429,23 @@ export class Thermostats {
         this.platform.debug(`Send thermostatSetpointStatus Model: ${this.device.deviceModel}`);
     }
 
-    // Always set autoChangeoverActive to 'true' for Round Thermostats
     switch (this.device.deviceModel) {
       case 'Round':
       case 'D6':
-        this.platform.debug(`Set autoChangeoverActive to true, for ${this.device.deviceModel} Thermostats`);
-        payload.autoChangeoverActive = true;
+        if (this.platform.debugMode) {
+          this.platform.log.warn('Round/D6 set autoChangeoverActive');
+          this.platform.log.warn(this.device.deviceModel);
+        }
+
+        // for Round  the 'Auto' feature is enabled via the special mode so only flip this bit when
+        // the heating/cooling state is set to  `Auto
+        if (this.TargetHeatingCoolingState == this.platform.Characteristic.TargetHeatingCoolingState.AUTO) {
+          this.platform.log.debug(`Heating/Cooling state set to Auto for ${this.device.deviceModel}, Force autoChangeoverActive`);
+          payload.autoChangeoverActive = true;
+        } else {
+          this.platform.log.debug(`Heating/cooling state not set to Auto for ${this.device.deviceModel}, Using device setting ${this.device.changeableValues.autoChangeoverActive}`);
+          payload.autoChangeoverActive = this.device.changeableValues.autoChangeoverActive;
+        }
         break;
       case 'Unknown':
         this.platform.debug(`${this.device.deviceModel} Thermostats do not send autoChangeoverActive`);
@@ -500,14 +511,19 @@ export class Thermostats {
           this.platform.config.options?.thermostat?.thermostatSetpointStatus,
         );
     }
-    this.platform.debug(`Thermostat ${this.accessory.displayName} pushChanges - ${JSON.stringify(payload)}`);
-    // Make the API request
-    await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
-      params: {
-        locationId: this.locationId,
-      },
-    });
-    // Refresh the status from the API
+
+    this.platform.log.debug(`Thermostat ${this.accessory.displayName} pushChanges - ${JSON.stringify(payload)}`);
+    // Attempt to make the API request
+    try {
+      await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
+        params: {
+          locationId: this.locationId,
+        },
+      });
+    } catch (e) {
+      // logged within post call above
+      this.apiError(e);
+    }
     await this.refreshStatus();
   }
 
