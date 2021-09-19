@@ -51,3 +51,4 @@ plugin allows you to access your Honeywell Home Device(s) from HomeKit with
   - [T9 Smart Roomsensors](https://www.honeywellhome.com/us/en/products/air/thermostat-accessories/t9-smart-sensor-rchtsensor-1pk-u/)
 - [T6 Thermostat](https://getconnected.honeywellhome.com/en/t6)
 - [T5 Thermostat](https://www.resideo.com/us/en/products/air/thermostats/wifi-thermostats/t5-smart-thermostat-with-c-wire-adapter-rcht8612wf2005-u/)
+- [Round Thermostat](https://www.honeywellhome.com/us/en/products/air/thermostats/wifi-thermostats/the-round-smart-thermostat-rch9310wf5003-u/)
