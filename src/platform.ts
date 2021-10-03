@@ -75,10 +75,10 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
     // setup axios interceptor to add headers / api key to each request
     this.axios.interceptors.request.use((request: AxiosRequestConfig) => {
-      request.headers.Authorization = `Bearer ${this.config.credentials?.accessToken}`;
+      request.headers!.Authorization = `Bearer ${this.config.credentials?.accessToken}`;
       request.params = request.params || {};
       request.params.apikey = this.config.credentials?.consumerKey;
-      request.headers['Content-Type'] = 'application/json';
+      request.headers!['Content-Type'] = 'application/json';
       return request;
     });
 
@@ -206,7 +206,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    */
   async getAccessToken() {
     try {
-      let result: { access_token: string; refresh_token: string; };
+      let result: { access_token?: string; refresh_token: string; consumerKey?: string;};
 
       if (this.config.credentials!.consumerSecret) {
         result = (
@@ -230,6 +230,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       } else {
         this.log.warn('Please re-link your account in the Homebridge UI.');
         // if no consumerSecret is defined, attempt to use the shared consumerSecret
+
         try {
           result = (
             await axios.post(UIurl, {
@@ -314,7 +315,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    */
   async discoverlocations() {
     const locations = (await this.axios.get(LocationURL)).data;
-    this.log.info('Total Locations Found:', locations.length);
     return locations;
   }
 
@@ -399,6 +399,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    */
   private async discoverDevices() {
     if (this.locations) {
+      this.log.info('Total Locations Found:', this.locations.length);
       // get the devices at each location
       for (const location of this.locations) {
         this.log.info('Total Devices Found at', location.name, ':', location.devices.length);

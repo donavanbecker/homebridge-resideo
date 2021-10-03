@@ -1,8 +1,8 @@
-name: NodeJS
+name: Latest
 
 on:
   push:
-    branches: master
+    branches: latest
   pull_request:
   release: # Run when release is created
     types: [created]
