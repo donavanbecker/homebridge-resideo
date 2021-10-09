@@ -88,7 +88,7 @@ export class LeakSensor {
       if (this.platform.config.option?.debug) {
         this.platform.log.warn('Adding service');
       }
-      (this.service =
+      (this.leakService =
         this.accessory.getService(this.platform.Service.LeakSensor) ||
         this.accessory.addService(this.platform.Service.LeakSensor)), '%s LeakSensor', accessory.displayName;
 
