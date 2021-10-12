@@ -207,7 +207,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    */
   async getAccessToken() {
     try {
-      let result: { access_token?: string; refresh_token: string; consumerKey?: string; };
+      let result: any;//{ access_token?: string; refresh_token: string; consumerKey?: string; };
 
       if (this.config.credentials!.consumerSecret) {
         result = (
@@ -324,7 +324,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    */
   public async getCurrentSensorData(device: Thermostat, group: T9groups, locationId: location['locationID']) {
     if (!this.sensorData[device.deviceID] || this.sensorData[device.deviceID].timestamp < Date.now()) {
-      const response = await this.axios.get(`${DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
+      const response: any = await this.axios.get(`${DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
         params: {
           locationId: locationId,
         },

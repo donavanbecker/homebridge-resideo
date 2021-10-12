@@ -357,24 +357,20 @@ export class Thermostats {
    */
   async refreshStatus() {
     try {
-      this.device = (
-        await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
-          params: {
-            locationId: this.locationId,
-          },
-        })
-      ).data;
+      this.device = await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
+        params: {
+          locationId: this.locationId,
+        },
+      });
       this.platform.debug(`Thermostat ${this.accessory.displayName}, Fetched update for ${this.device.name}
        from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`);
       await this.refreshRoomPriority();
       if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
-        this.fanMode = (
-          await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
-            params: {
-              locationId: this.locationId,
-            },
-          })
-        ).data;
+        this.fanMode = await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
+          params: {
+            locationId: this.locationId,
+          },
+        });
         this.platform.debug(`Thermostat ${this.accessory.displayName}, Fan Fetched update for ${this.device.name}
         from Honeywell Fan API: ${JSON.stringify(this.fanMode)}`);
       }
