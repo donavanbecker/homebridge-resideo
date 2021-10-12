@@ -44,7 +44,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   locations?: any;
   firmware!: accessoryAttribute['softwareRevision'];
   sensorAccessory!: sensorAccessory;
-  version = require('../package.json').version // eslint-disable-line @typescript-eslint/no-var-requires
+  version = require('../package.json').version; // eslint-disable-line @typescript-eslint/no-var-requires
 
   public sensorData = [];
   private refreshInterval!: NodeJS.Timeout;
