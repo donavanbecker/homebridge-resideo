@@ -207,7 +207,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    */
   async getAccessToken() {
     try {
-      let result: any;//{ access_token?: string; refresh_token: string; consumerKey?: string; };
+      let result: any;
 
       if (this.config.credentials!.consumerSecret) {
         result = (
