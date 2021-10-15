@@ -216,7 +216,6 @@ export class RoomSensors {
     try {
       const roomsensors = await this.platform.getCurrentSensorData(this.device, this.group, this.locationId);
       this.sensorAccessory = roomsensors[this.roomId][this.accessoryId];
-
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e: any) {
