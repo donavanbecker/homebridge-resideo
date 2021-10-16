@@ -167,7 +167,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       // default 900 seconds (15 minutes)
       this.config.options!.refreshRate! = 900;
       if (this.config.options.debug) {
-        this.log.warn('Using Default Refresh Rate.');
+        this.log.warn('Using Default Refresh Rate (15 minutes).');
       }
     }
 
