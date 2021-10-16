@@ -244,14 +244,10 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       }
 
       this.config.credentials!.accessToken = result.access_token;
-      if (this.config.options?.debug) {
-        this.log.warn('Got access token:', this.config.credentials!.accessToken);
-      }
+      this.device('Got access token:', this.config.credentials!.accessToken);
       // check if the refresh token has changed
       if (result.refresh_token !== this.config.credentials!.refreshToken) {
-        if (this.config.options?.debug) {
-          this.log.warn('New refresh token:', result.refresh_token);
-        }
+        this.device('New refresh token:', result.refresh_token);
         await this.updateRefreshToken(result.refresh_token);
       }
 
@@ -299,9 +295,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
       // save the config, ensuring we maintain pretty json
       writeFileSync(this.api.user.configPath(), JSON.stringify(currentConfig, null, 4));
-      if (this.config.options?.debug) {
-        this.log.warn('Homebridge config.json has been updated with new refresh token.');
-      }
+      this.debug('Homebridge config.json has been updated with new refresh token.');
     } catch (e: any) {
       this.log.error('Failed to update refresh token in config:', JSON.stringify(e.message));
       this.debug(JSON.stringify(e));
@@ -331,9 +325,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         data: this.normalizeSensorDate(response.data),
       };
     } else {
-      if (this.config.options?.debug) {
-        this.log.warn(`getCurrentSensorData Cache ${device.deviceType} ${device.deviceModel} - ${device.userDefinedDeviceName}`);
-      }
+      this.device(`getCurrentSensorData Cache ${device.deviceType} ${device.deviceModel} - ${device.userDefinedDeviceName}`);
     }
     return this.sensorData[device.deviceID].data;
   }
