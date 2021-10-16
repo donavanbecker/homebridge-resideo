@@ -58,7 +58,7 @@ export class LeakSensor {
     // you can create multiple services for each accessory
     (this.service =
       this.accessory.getService(this.platform.Service.Battery) ||
-      this.accessory.addService(this.platform.Service.Battery)), accessory.displayName;
+      this.accessory.addService(this.platform.Service.Battery)), `${accessory.displayName} Battery`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -79,39 +79,33 @@ export class LeakSensor {
 
     // Leak Sensor Service
     if (this.platform.config.options?.leaksensor?.hide_leak) {
-      if (this.platform.config.options.debug) {
-        this.platform.log.error('Removing service');
-      }
+      this.platform.device('Removing Leak Sensor Service');
       this.leakService = this.accessory.getService(this.platform.Service.LeakSensor);
       accessory.removeService(this.leakService!);
     } else if (!this.leakService) {
-      if (this.platform.config.option?.debug) {
-        this.platform.log.warn('Adding service');
-      }
+      this.platform.device('Adding Leak Sensor Service');
       (this.leakService =
         this.accessory.getService(this.platform.Service.LeakSensor) ||
-        this.accessory.addService(this.platform.Service.LeakSensor)), '%s LeakSensor', accessory.displayName;
+        this.accessory.addService(this.platform.Service.LeakSensor)), `${accessory.displayName} Leak Sensor`;
+
+      this.leakService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Leak Sensor`);
 
     } else {
-      if (this.platform.config.options?.debug) {
-        this.platform.log.warn('LeakSensor not added.');
-      }
+      this.platform.device('Leak Sensor Not Added');
     }
 
     // Temperature Sensor Service
     if (this.platform.config.options?.leaksensor?.hide_temperature) {
-      if (this.platform.config.options.debug) {
-        this.platform.log.error('Removing service');
-      }
+      this.platform.device('Removing Temperature Sensor Service');
       this.temperatureService = this.accessory.getService(this.platform.Service.TemperatureSensor);
       accessory.removeService(this.temperatureService!);
     } else if (!this.temperatureService) {
-      if (this.platform.config.options?.debug) {
-        this.platform.log.warn('Adding service');
-      }
+      this.platform.device('Adding Temperature Sensor Service');
       (this.temperatureService =
         this.accessory.getService(this.platform.Service.TemperatureSensor) ||
-        this.accessory.addService(this.platform.Service.TemperatureSensor)), '%s TemperatureSensor', accessory.displayName;
+        this.accessory.addService(this.platform.Service.TemperatureSensor)), `${accessory.displayName} Temperature Sensor`;
+
+      this.temperatureService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Temperature Sensor`);
 
       this.temperatureService
         .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
@@ -124,22 +118,21 @@ export class LeakSensor {
           return this.CurrentTemperature;
         });
     } else {
-      if (this.platform.config.options?.debug) {
-        this.platform.log.warn('TemperatureSensor not added.');
-      }
+      this.platform.device('Temperature Sensor Not Added');
     }
 
     // Humidity Sensor Service
     if (this.platform.config.options?.leaksensor?.hide_humidity) {
-      if (this.platform.config.options.debug) {
-        this.platform.log.error('Removing service');
-      }
+      this.platform.device('Removing Humidity Sensor Service');
       this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor);
       accessory.removeService(this.humidityService!);
     } else if (!this.humidityService) {
+      this.platform.device('Adding Humidity Sensor Service');
       (this.humidityService =
         this.accessory.getService(this.platform.Service.HumiditySensor) ||
-        this.accessory.addService(this.platform.Service.HumiditySensor)), '%s HumiditySensor', accessory.displayName;
+        this.accessory.addService(this.platform.Service.HumiditySensor)), `${accessory.displayName} Humidity Sensor`;
+
+      this.humidityService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Humidity Sensor`);
 
       this.humidityService
         .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
@@ -150,9 +143,7 @@ export class LeakSensor {
           return this.CurrentRelativeHumidity;
         });
     } else {
-      if (this.platform.config.options?.debug) {
-        this.platform.log.warn('HumiditySensor not added.');
-      }
+      this.platform.device('Humidity Sensor Not Added');
     }
 
     // Retrieve initial values and updateHomekit
@@ -178,27 +169,31 @@ export class LeakSensor {
     } else {
       this.LeakDetected = 0;
     }
+    this.platform.debug(`Leak Sensor ${this.accessory.displayName}, LeakDetected: ${this.LeakDetected}`);
 
     // Temperature Sensor
     if (!this.platform.config.options?.leaksensor?.hide_temperature) {
       this.CurrentTemperature = this.device.currentSensorReadings.temperature;
+      this.platform.debug(`Leak Sensor ${this.accessory.displayName},  CurrentTemperature: ${this.CurrentTemperature}°`);
     }
 
     // HumiditySensor
     if (!this.platform.config.options?.leaksensor?.hide_humidity) {
       this.CurrentRelativeHumidity = this.device.currentSensorReadings.humidity;
+      this.platform.debug(`Leak Sensor ${this.accessory.displayName}, CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}%`);
     }
 
     // Battery Service
     this.BatteryLevel = Number(this.device.batteryRemaining);
     this.service.getCharacteristic(this.platform.Characteristic.BatteryLevel).updateValue(this.BatteryLevel);
+    this.platform.debug(`Leak Sensor ${this.accessory.displayName}, BatteryLevel: ${this.BatteryLevel}`);
     this.platform.debug(JSON.stringify(this.device.batteryRemaining));
     if (this.device.batteryRemaining < 15) {
       this.StatusLowBattery = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW;
     } else {
       this.StatusLowBattery = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL;
     }
-    this.platform.debug(`LS ${this.accessory.displayName} - ${this.CurrentTemperature}°, ${this.CurrentRelativeHumidity}%`);
+    this.platform.debug(`Leak Sensor ${this.accessory.displayName}, StatusLowBattery: ${this.StatusLowBattery}`);
   }
 
   /**
@@ -206,22 +201,20 @@ export class LeakSensor {
    */
   async refreshStatus() {
     try {
+      this.platform.device(`Leak Sensor Reading: ${DeviceURL}/waterLeakDetectors/${this.device.deviceID}`);
       const device: any = (await this.platform.axios.get(`${DeviceURL}/waterLeakDetectors/${this.device.deviceID}`, {
         params: {
           locationId: this.locationId,
         },
       })).data;
       this.device = device;
-      this.platform.debug(`LS ${this.accessory.displayName} - ${JSON.stringify(this.device)}`);
+      this.platform.device(`Leak Sensor ${this.accessory.displayName} refreshStatus: ${JSON.stringify(this.device)}`);
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e: any) {
-      this.platform.log.error(
-        'LS - Failed to update status of',
-        this.device.userDefinedDeviceName,
-        JSON.stringify(e.message),
-      );
-      this.platform.debug(`LS ${this.accessory.displayName} - ${JSON.stringify(e)}`);
+      this.platform.log.error(`Leak Sensor ${this.accessory.displayName}: failed to update status.`
+        + ` Error Message: ${JSON.stringify(e.message)}`);
+      this.platform.debug(`Leak Sensor ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
       this.apiError(e);
     }
   }
@@ -230,31 +223,43 @@ export class LeakSensor {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-    if (this.BatteryLevel !== undefined) {
+    if (this.BatteryLevel === undefined) {
+      this.platform.debug(`Leak Sensor ${this.accessory.displayName} BatteryLevel: ${this.BatteryLevel}`);
+    } else {
       this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
+      this.platform.device(`Leak Sensor ${this.accessory.displayName} updateCharacteristic BatteryLevel: ${this.BatteryLevel}`);
     }
-    if (this.StatusLowBattery !== undefined) {
+    if (this.StatusLowBattery === undefined) {
+      this.platform.debug(`Leak Sensor ${this.accessory.displayName} StatusLowBattery: ${this.StatusLowBattery}`);
+    } else {
       this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
+      this.platform.device(`Leak Sensor ${this.accessory.displayName} updateCharacteristic StatusLowBattery: ${this.StatusLowBattery}`);
     }
     if (!this.platform.config.options?.leaksensor?.hide_leak) {
-      if (this.LeakDetected !== undefined) {
+      if (this.LeakDetected === undefined) {
+        this.platform.debug(`Leak Sensor ${this.accessory.displayName} LeakDetected: ${this.LeakDetected}`);
+      } else {
         this.leakService?.updateCharacteristic(this.platform.Characteristic.LeakDetected, this.LeakDetected);
+        this.platform.device(`Leak Sensor ${this.accessory.displayName} updateCharacteristic LeakDetected: ${this.LeakDetected}`);
       }
-      if (this.StatusActive !== undefined) {
+      if (this.StatusActive === undefined) {
+        this.platform.debug(`Leak Sensor ${this.accessory.displayName} StatusActive: ${this.StatusActive}`);
+      } else {
         this.leakService?.updateCharacteristic(this.platform.Characteristic.StatusActive, this.StatusActive);
+        this.platform.device(`Leak Sensor ${this.accessory.displayName} updateCharacteristic StatusActive: ${this.StatusActive}`);
       }
     }
-    if (!this.platform.config.options?.leaksensor?.hide_temperature && this.CurrentTemperature !== undefined) {
-      this.temperatureService?.updateCharacteristic(
-        this.platform.Characteristic.CurrentTemperature,
-        this.CurrentTemperature,
-      );
+    if (this.platform.config.options?.leaksensor?.hide_temperature && this.CurrentTemperature === undefined) {
+      this.platform.debug(`Leak Sensor ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}`);
+    } else {
+      this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
+      this.platform.device(`Leak Sensor ${this.accessory.displayName} updateCharacteristic CurrentTemperature: ${this.CurrentTemperature}`);
     }
-    if (!this.platform.config.options?.leaksensor?.hide_humidity && this.CurrentRelativeHumidity !== undefined) {
-      this.humidityService?.updateCharacteristic(
-        this.platform.Characteristic.CurrentRelativeHumidity,
-        this.CurrentRelativeHumidity,
-      );
+    if (this.platform.config.options?.leaksensor?.hide_humidity && this.CurrentRelativeHumidity === undefined) {
+      this.platform.debug(`Leak Sensor ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
+    } else {
+      this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
+      this.platform.device(`Leak Sensor ${this.accessory.displayName} updateCharacteristic CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
     }
   }
 

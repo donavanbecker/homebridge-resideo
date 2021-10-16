@@ -7,10 +7,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        IF THIS HAS ANYTHING TO DO WITH ADDING SUPPORT FOR A DEVICE, FOLLOW THESE INSTRUCTIONS
-            Enable "devicediscovery": true, this can be found under Advance Settings of the Plugin Settings using Homebridge UI.
-            Restart Homebridge, you will see yellows displayed. -->
-            Please copy all of these logs and paste them into this Feature Request Template, in the Additonal conext section.
+        You must use the issue template below when submitting a feature request.
   - type: markdown
     attributes:
       value: |
@@ -36,6 +33,6 @@ body:
   - type: input
     attributes:
       label: Additional context
-      placeholder: Add any other context or screenshots about the feature request here. Post devicediscovery logs here.
+      placeholder: Add any other context or screenshots about the feature request here. Post device logs here.
     validations:
       required: false
