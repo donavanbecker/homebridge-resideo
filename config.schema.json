@@ -56,7 +56,7 @@
             "description": "Indicates the number of seconds between pushes to Honewell Home API."
           },
           "debug": {
-            "title": "Logging Setting",
+            "title": "Logging Settings",
             "type": "string",
             "description": "Enble 'Device' or 'Debug' logging.",
             "oneOf": [
@@ -208,7 +208,8 @@
       },
       "disablePlugin": {
         "title": "Disable Plugin",
-        "type": "boolean"
+        "type": "boolean",
+        "description": "DO NOT USE, UNLESS YOU WANT TO REMOVE ACCESSORIES FROM CACHE."
       }
     }
   },
@@ -251,6 +252,7 @@
           "notitle": true
         },
         "options.debug",
+        "disablePlugin",
         {
           "type": "fieldset",
           "title": "Hidden Devices",
@@ -340,11 +342,6 @@
             "options.leaksensor.hide_leak",
             "options.leaksensor.hide_humidity"
           ]
-        },
-        {
-          "key": "disablePlugin",
-          "title": "Disable Plugin",
-          "description": "If true, the plugin will remove all accessories and not load the plugin on restart."
         }
       ]
     }

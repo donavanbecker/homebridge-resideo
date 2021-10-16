@@ -855,5 +855,4 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       this.log.debug(String(...log));
     }
   }
-
 }
