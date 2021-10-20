@@ -56,9 +56,24 @@
             "description": "Indicates the number of seconds between pushes to Honewell Home API."
           },
           "debug": {
-            "title": "Debug",
-            "type": "boolean",
-            "description": "Turn plugin's debug mode on."
+            "title": "Logging Settings",
+            "type": "string",
+            "description": "Enble 'Device' or 'Debug' logging.",
+            "oneOf": [
+              {
+                "title": "Enable Debug Logging",
+                "enum": [
+                  "debug"
+                ]
+              },
+              {
+                "title": "Enable Device Logging",
+                "enum": [
+                  "device"
+                ]
+              }
+            ],
+            "required": false
           },
           "hide_device": {
             "title": "Hide Device",
@@ -191,13 +206,10 @@
           }
         }
       },
-      "devicediscovery": {
-        "name": "Device Discovery",
-        "type": "boolean"
-      },
       "disablePlugin": {
         "title": "Disable Plugin",
-        "type": "boolean"
+        "type": "boolean",
+        "description": "DO NOT USE, UNLESS YOU WANT TO REMOVE ACCESSORIES FROM CACHE."
       }
     }
   },
@@ -212,7 +224,6 @@
           "type": "help",
           "helpvalue": "<h5></h5><em class='primary-text'>This is for Manual Setup Only.</em>"
         },
-        "name",
         "credentials.consumerKey",
         "credentials.consumerSecret",
         "credentials.refreshToken"
@@ -241,6 +252,7 @@
           "notitle": true
         },
         "options.debug",
+        "disablePlugin",
         {
           "type": "fieldset",
           "title": "Hidden Devices",
@@ -330,16 +342,6 @@
             "options.leaksensor.hide_leak",
             "options.leaksensor.hide_humidity"
           ]
-        },
-        {
-          "key": "devicediscovery",
-          "title": "Device Discovery",
-          "description": "Enables Device Info Logging."
-        },
-        {
-          "key": "disablePlugin",
-          "title": "Disable Plugin",
-          "description": "If true, the plugin will remove all accessories and not load the plugin on restart."
         }
       ]
     }

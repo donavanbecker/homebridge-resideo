@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 11.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v10.1.1...v11.0.0) (2021-10-20)
+
+### Changes
+
+- Changed the way that devices are named and stored in cache
+  - *You will have to Clear Cache on your devices and re-add them because of this.*
+- Replace Device Discovery with Plugin Device Logging Config Setting to show more logs.
+- Housekeeping and updated dependencies.
+
 ## [Version 10.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v10.1.0...v10.1.1) (2021-10-02)
 
 ### Changes

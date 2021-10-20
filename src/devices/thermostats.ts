@@ -150,19 +150,17 @@ export class Thermostats {
 
     // Fan Controls
     if (this.platform.config.options?.thermostat?.hide_fan) {
-      if (this.platform.config.options.debug) {
-        this.platform.log.error('Removing service');
-      }
+      this.platform.device('Removing Fanv2 Service');
       this.fanService = this.accessory.getService(this.platform.Service.Fanv2);
       accessory.removeService(this.fanService!);
     } else if (!this.fanService && device.settings?.fan) {
-      if (this.platform.config.options?.debug) {
-        this.platform.log.warn('Adding service');
-      }
+      this.platform.device('Add Fanv2 Service');
       this.platform.debug(`Thermostat ${this.accessory.displayName}, Available Fan Settings ${JSON.stringify(device.settings.fan)}`);
       (this.fanService =
         this.accessory.getService(this.platform.Service.Fanv2) ||
-        this.accessory.addService(this.platform.Service.Fanv2)), `${device.name} ${device.deviceClass} Fan`;
+        this.accessory.addService(this.platform.Service.Fanv2)), `${accessory.displayName} Fan`;
+
+      this.fanService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Fan`);
 
       this.fanService
         .getCharacteristic(this.platform.Characteristic.Active)
@@ -172,25 +170,21 @@ export class Thermostats {
         .getCharacteristic(this.platform.Characteristic.TargetFanState)
         .onSet(this.setTargetFanState.bind(this));
     } else {
-      if (this.platform.config.options?.debug) {
-        this.platform.log.warn('Fanv2 not added.');
-      }
+      this.platform.device('Fanv2 Service Not Added');
     }
 
     // Humidity Sensor Service
     if (this.platform.config.options?.thermostat?.hide_humidity) {
-      if (this.platform.config.options.debug) {
-        this.platform.log.error('Removing service');
-      }
+      this.platform.device('Removing Humidity Sensor Service');
       this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor);
       accessory.removeService(this.humidityService!);
     } else if (!this.humidityService && device.indoorHumidity) {
-      if (this.platform.config.options?.debug) {
-        this.platform.log.warn('Adding service');
-      }
+      this.platform.device('Adding Humidity Sensor Service');
       (this.humidityService =
         this.accessory.getService(this.platform.Service.HumiditySensor) ||
-        this.accessory.addService(this.platform.Service.HumiditySensor)), `${device.name} ${device.deviceClass} HumiditySensor`;
+        this.accessory.addService(this.platform.Service.HumiditySensor)), `${device.name} Humidity Sensor`;
+
+      this.humidityService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Humidity Sensor`);
 
       this.humidityService
         .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
@@ -201,9 +195,7 @@ export class Thermostats {
           return this.CurrentRelativeHumidity!;
         });
     } else {
-      if (this.platform.config.options?.debug) {
-        this.platform.log.warn('HumiditySensor not added.');
-      }
+      this.platform.device('Humidity Sensor Not Added');
     }
 
     // Retrieve initial values and updateHomekit
@@ -357,37 +349,30 @@ export class Thermostats {
    */
   async refreshStatus() {
     try {
-      this.device = (
-        await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
-          params: {
-            locationId: this.locationId,
-          },
-        })
-      ).data;
+      const device: any = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
+        params: {
+          locationId: this.locationId,
+        },
+      })).data;
+      this.device = device;
       this.platform.debug(`Thermostat ${this.accessory.displayName}, Fetched update for ${this.device.name}
        from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`);
       await this.refreshRoomPriority();
       if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
-        this.fanMode = (
-          await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
-            params: {
-              locationId: this.locationId,
-            },
-          })
-        ).data;
+        this.fanMode = await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
+          params: {
+            locationId: this.locationId,
+          },
+        });
         this.platform.debug(`Thermostat ${this.accessory.displayName}, Fan Fetched update for ${this.device.name}
         from Honeywell Fan API: ${JSON.stringify(this.fanMode)}`);
       }
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e: any) {
-      this.platform.log.error(
-        'Thermostat - Failed to update status of',
-        this.device.name,
-        JSON.stringify(e.message),
-      );
-      this.platform.debug(`Thermostat ${this.accessory.displayName} - ${JSON.stringify(e)}`);
-      this.platform.refreshAccessToken();
+      this.platform.log.error(`Thermostat ${this.accessory.displayName}: failed to update status.`
+        + ` Error Message: ${JSON.stringify(e.message)}`);
+      this.platform.debug(`Thermostat ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
       this.apiError(e);
     }
   }
@@ -594,58 +579,71 @@ export class Thermostats {
    * Updates the status for each of the HomeKit Characteristics
    */
   updateHomeKitCharacteristics() {
-    if (this.TemperatureDisplayUnits !== undefined) {
-      this.service.updateCharacteristic(
-        this.platform.Characteristic.TemperatureDisplayUnits,
-        this.TemperatureDisplayUnits,
-      );
+    if (this.TemperatureDisplayUnits === undefined) {
+      this.platform.debug(`Thermostat ${this.accessory.displayName} TemperatureDisplayUnits: ${this.TemperatureDisplayUnits}`);
+    } else {
+      this.service.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, this.TemperatureDisplayUnits);
+      this.platform.device(`Thermostat ${this.accessory.displayName} updateCharacteristic TemperatureDisplayUnits: ${this.TemperatureDisplayUnits}`);
     }
-    if (this.CurrentTemperature !== undefined) {
+    if (this.CurrentTemperature === undefined) {
+      this.platform.debug(`Thermostat ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}`);
+    } else {
       this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
+      this.platform.device(`Thermostat ${this.accessory.displayName} updateCharacteristic CurrentTemperature: ${this.CurrentTemperature}`);
     }
-    if (
-      this.device.indoorHumidity &&
-      !this.platform.config.options?.thermostat?.hide_humidity &&
-      this.CurrentRelativeHumidity !== undefined
-    ) {
-      this.humidityService!.updateCharacteristic(
-        this.platform.Characteristic.CurrentRelativeHumidity,
-        this.CurrentRelativeHumidity!,
-      );
+    if (!this.device.indoorHumidity || this.platform.config.options?.thermostat?.hide_humidity ||
+      this.CurrentRelativeHumidity === undefined) {
+      this.platform.debug(`Thermostat ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
+    } else {
+      this.humidityService!.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
+      this.platform.device(`Thermostat ${this.accessory.displayName} updateCharacteristic CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
     }
-    if (this.TargetTemperature !== undefined) {
+    if (this.TargetTemperature === undefined) {
+      this.platform.debug(`Thermostat ${this.accessory.displayName} TargetTemperature: ${this.TargetTemperature}`);
+    } else {
       this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
+      this.platform.device(`Thermostat ${this.accessory.displayName} updateCharacteristic TargetTemperature: ${this.TargetTemperature}`);
     }
-    if (this.HeatingThresholdTemperature !== undefined) {
-      this.service.updateCharacteristic(
-        this.platform.Characteristic.HeatingThresholdTemperature,
-        this.HeatingThresholdTemperature,
-      );
+    if (this.HeatingThresholdTemperature === undefined) {
+      this.platform.debug(`Thermostat ${this.accessory.displayName} HeatingThresholdTemperature: ${this.HeatingThresholdTemperature}`);
+    } else {
+      this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, this.HeatingThresholdTemperature);
+      this.platform.device(`Thermostat ${this.accessory.displayName} updateCharacteristic`
+        + ` HeatingThresholdTemperature: ${this.HeatingThresholdTemperature}`);
     }
-    if (this.CoolingThresholdTemperature !== undefined) {
-      this.service.updateCharacteristic(
-        this.platform.Characteristic.CoolingThresholdTemperature,
-        this.CoolingThresholdTemperature,
-      );
+    if (this.CoolingThresholdTemperature === undefined) {
+      this.platform.debug(`Thermostat ${this.accessory.displayName} CoolingThresholdTemperature: ${this.CoolingThresholdTemperature}`);
+    } else {
+      this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
+      this.platform.device(`Thermostat ${this.accessory.displayName} updateCharacteristic`
+        + ` CoolingThresholdTemperature: ${this.CoolingThresholdTemperature}`);
     }
-    if (this.TargetHeatingCoolingState !== undefined) {
-      this.service.updateCharacteristic(
-        this.platform.Characteristic.TargetHeatingCoolingState,
-        this.TargetHeatingCoolingState,
-      );
+    if (this.TargetHeatingCoolingState === undefined) {
+      this.platform.debug(`Thermostat ${this.accessory.displayName} TargetHeatingCoolingState: ${this.TargetHeatingCoolingState}`);
+    } else {
+      this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, this.TargetHeatingCoolingState);
+      this.platform.device(`Thermostat ${this.accessory.displayName} updateCharacteristic`
+        + ` TargetHeatingCoolingState: ${this.TargetHeatingCoolingState}`);
     }
-    if (this.CurrentHeatingCoolingState !== undefined) {
-      this.service.updateCharacteristic(
-        this.platform.Characteristic.CurrentHeatingCoolingState,
-        this.CurrentHeatingCoolingState,
-      );
+    if (this.CurrentHeatingCoolingState === undefined) {
+      this.platform.debug(`Thermostat ${this.accessory.displayName} CurrentHeatingCoolingState: ${this.CurrentHeatingCoolingState}`);
+    } else {
+      this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, this.CurrentHeatingCoolingState);
+      this.platform.device(`Thermostat ${this.accessory.displayName} updateCharacteristic`
+        + ` CurrentHeatingCoolingState: ${this.TargetHeatingCoolingState}`);
     }
     if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
-      if (this.TargetFanState !== undefined) {
+      if (this.TargetFanState === undefined) {
+        this.platform.debug(`Thermostat Fan ${this.accessory.displayName} TargetFanState: ${this.TargetFanState}`);
+      } else {
         this.fanService?.updateCharacteristic(this.platform.Characteristic.TargetFanState, this.TargetFanState);
+        this.platform.device(`Thermostat Fan ${this.accessory.displayName} updateCharacteristic TargetFanState: ${this.TargetFanState}`);
       }
-      if (this.Active !== undefined) {
+      if (this.Active === undefined) {
+        this.platform.debug(`Thermostat Fan ${this.accessory.displayName} Active: ${this.Active}`);
+      } else {
         this.fanService?.updateCharacteristic(this.platform.Characteristic.Active, this.Active);
+        this.platform.device(`Thermostat Fan ${this.accessory.displayName} updateCharacteristic Active: ${this.Active}`);
       }
     }
   }
