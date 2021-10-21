@@ -359,11 +359,12 @@ export class Thermostats {
        from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`);
       await this.refreshRoomPriority();
       if (this.device.settings?.fan && !this.platform.config.options?.thermostat?.hide_fan) {
-        this.fanMode = await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
+        const fanMode: any = (await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
           params: {
             locationId: this.locationId,
           },
-        });
+        })).data;
+        this.fanMode = fanMode;
         this.platform.debug(`Thermostat ${this.accessory.displayName}, Fan Fetched update for ${this.device.name}
         from Honeywell Fan API: ${JSON.stringify(this.fanMode)}`);
       }
