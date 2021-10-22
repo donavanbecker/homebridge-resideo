@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 11.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.0...v11.0.1) (2021-10-21)
+
+### Changes
+
+- Fix for [#580](https://github.com/donavanbecker/homebridge-honeywell-home/issues/580)'s `failed to update status` error.
+- Housekeeping and updated dependencies.
+
 ## [Version 11.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v10.1.1...v11.0.0) (2021-10-20)
 
 ### Changes
