@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 11.0.4](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.3...v11.0.4) (2021-11-13)
+
+### Changes
+
+- Allow `refreshRate` to be set to 30 Seconds or Higher.
+
 ## [Version 11.0.3](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.2...v11.0.3) (2021-11-12)
 
 ### Changes

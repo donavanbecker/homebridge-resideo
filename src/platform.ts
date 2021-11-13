@@ -155,8 +155,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     this.config.options.roompriority.priorityType = this.config.options.roompriority.priorityType || 'PickARoom';
 
 
-    if (this.config.options!.refreshRate! < 120) {
-      throw new Error('Refresh Rate must be above 120 (2 minutes).');
+    if (this.config.options!.refreshRate! < 30) {
+      throw new Error('Refresh Rate must be above 30 seconds.');
     }
 
     if (this.config.disablePlugin) {
@@ -164,10 +164,10 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     }
 
     if (!this.config.options.refreshRate && !this.config.disablePlugin) {
-      // default 900 seconds (15 minutes)
-      this.config.options!.refreshRate! = 900;
+      // default 120 seconds (2 minutes)
+      this.config.options!.refreshRate! = 120;
       if (this.config.options.debug) {
-        this.log.warn('Using Default Refresh Rate (15 minutes).');
+        this.log.warn('Using Default Refresh Rate of 2 Minutes.');
       }
     }
 
