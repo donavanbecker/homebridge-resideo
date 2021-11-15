@@ -42,6 +42,224 @@
       "options": {
         "type": "object",
         "properties": {
+          "devices": {
+            "type": "array",
+            "items": {
+              "title": "Devices",
+              "type": "object",
+              "properties": {
+                "deviceID": {
+                  "title": "Device ID",
+                  "type": "string",
+                  "required": true,
+                  "placeholder": "81F3UT59513F"
+                },
+                "hide_device": {
+                  "title": "Hide Device",
+                  "type": "boolean",
+                  "condition": {
+                    "functionBody": "return (model.options && model.options.devices && model.options.devices[arrayIndices].deviceID);"
+                  }
+                },
+                "deviceClass": {
+                  "title": "Device Class",
+                  "type": "string",
+                  "required": true,
+                  "oneOf": [
+                    {
+                      "title": "Thermostat",
+                      "enum": [
+                        "Thermostat"
+                      ]
+                    },
+                    {
+                      "title": "Leak Sensor",
+                      "enum": [
+                        "LeakDetector"
+                      ]
+                    },
+                    {
+                      "title": "Room Sensor",
+                      "enum": [
+                        "Roomsensor"
+                      ]
+                    },
+                    {
+                      "title": "Room Priority",
+                      "enum": [
+                        "Roompriority"
+                      ]
+                    }
+                  ],
+                  "condition": {
+                    "functionBody": "return (model.options && model.options.devices && model.options.devices[arrayIndices].deviceID && !model.options.devices[arrayIndices].hide_device);"
+                  }
+                },
+                "thermostat": {
+                  "type": "object",
+                  "properties": {
+                    "hide_fan": {
+                      "title": "Hide Thermostat Fan",
+                      "type": "boolean",
+                      "requried": false,
+                      "condition": {
+                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID);"
+                      }
+                    },
+                    "hide_humidity": {
+                      "title": "Hide Humidity Service",
+                      "type": "boolean",
+                      "required": false,
+                      "condition": {
+                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID);"
+                      }
+                    },
+                    "thermostatSetpointStatus": {
+                      "title": "Thermostat Setpoint Status",
+                      "type": "string",
+                      "description": "For \"LCC-\" devices only. \"PermanentHold\" will hold the setpoint until user requests another change. \"NoHold\" will return to schedule. \"TemporaryHold\" will hold the set temperature until \"nextPeriodTime\".",
+                      "required": true,
+                      "default": "PermanentHold",
+                      "condition": {
+                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID);"
+                      },
+                      "oneOf": [
+                        {
+                          "title": "No Hold",
+                          "enum": [
+                            "NoHold"
+                          ]
+                        },
+                        {
+                          "title": "Permanent Hold",
+                          "enum": [
+                            "PermanentHold"
+                          ]
+                        },
+                        {
+                          "title": "Temporary Hold",
+                          "enum": [
+                            "TemporaryHold"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                },
+                "leaksensor": {
+                  "title": "Leak Sensor",
+                  "type": "object",
+                  "properties": {
+                    "hide_leak": {
+                      "title": "Hide Leak Service",
+                      "type": "boolean",
+                      "required": false,
+                      "condition": {
+                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Roomsensor' && model.options.devices[arrayIndices].deviceID);"
+                      }
+                    },
+                    "hide_temperature": {
+                      "title": "Hide Temperature Service",
+                      "type": "boolean",
+                      "required": false,
+                      "condition": {
+                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Roomsensor' && model.options.devices[arrayIndices].deviceID);"
+                      }
+                    },
+                    "hide_humidity": {
+                      "title": "Hide Humidity Service",
+                      "type": "boolean",
+                      "required": false,
+                      "condition": {
+                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Roomsensor' && model.options.devices[arrayIndices].deviceID);"
+                      }
+                    }
+                  }
+                },
+                "roomsensor": {
+                  "title": "Room Sensor",
+                  "type": "object",
+                  "properties": {
+                    "hide_temperature": {
+                      "title": "Hide Temperature Service",
+                      "type": "boolean",
+                      "requried": false,
+                      "condition": {
+                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'LeakDetector' && model.options.devices[arrayIndices].deviceID);"
+                      }
+                    },
+                    "hide_humidity": {
+                      "title": "Hide Humidity Service",
+                      "type": "boolean",
+                      "requried": false,
+                      "condition": {
+                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'LeakDetector' && model.options.devices[arrayIndices].deviceID);"
+                      }
+                    },
+                    "hide_occupancy": {
+                      "title": "Hide Occupancy Service",
+                      "type": "boolean",
+                      "requried": false,
+                      "condition": {
+                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'LeakDetector' && model.options.devices[arrayIndices].deviceID);"
+                      }
+                    }
+                  }
+                },
+                "roompriority": {
+                  "title": "Room Priority",
+                  "type": "object",
+                  "properties": {
+                    "deviceType": {
+                      "title": "Display As",
+                      "type": "boolean",
+                      "requried": true,
+                      "condition": {
+                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Roompriority' && model.options.devices[arrayIndices].deviceID);"
+                      },
+                      "oneOf": [
+                        {
+                          "title": "Thermostat",
+                          "enum": [
+                            "Thermostat"
+                          ]
+                        }
+                      ]
+                    },
+                    "priorityType": {
+                      "title": "Priority Type",
+                      "type": "string",
+                      "required": true,
+                      "condition": {
+                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Roompriority' && model.options.devices[arrayIndices].deviceID);"
+                      },
+                      "default": "PickARoom",
+                      "oneOf": [
+                        {
+                          "title": "Pick A Room",
+                          "enum": [
+                            "PickARoom"
+                          ]
+                        },
+                        {
+                          "title": "Whole House",
+                          "enum": [
+                            "WholeHouse"
+                          ]
+                        },
+                        {
+                          "title": "Follow Me",
+                          "enum": [
+                            "FollowMe"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
           "refreshRate": {
             "title": "Refresh Rate",
             "type": "number",
@@ -74,135 +292,6 @@
               }
             ],
             "required": false
-          },
-          "hide_device": {
-            "title": "Hide Device",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "thermostat": {
-            "title": "Thermostat",
-            "type": "object",
-            "properties": {
-              "hide_fan": {
-                "title": "Hide Thermostat Fan",
-                "type": "boolean",
-                "requried": false
-              },
-              "hide_humidity": {
-                "title": "Hide Humidity Service",
-                "type": "boolean",
-                "required": false
-              },
-              "thermostatSetpointStatus": {
-                "title": "Thermostat Setpoint Status",
-                "type": "string",
-                "description": "For \"LCC-\" devices only. \"PermanentHold\" will hold the setpoint until user requests another change. \"NoHold\" will return to schedule. \"TemporaryHold\" will hold the set temperature until \"nextPeriodTime\".",
-                "required": true,
-                "default": "PermanentHold",
-                "oneOf": [
-                  {
-                    "title": "No Hold",
-                    "enum": [
-                      "NoHold"
-                    ]
-                  },
-                  {
-                    "title": "Permanent Hold",
-                    "enum": [
-                      "PermanentHold"
-                    ]
-                  },
-                  {
-                    "title": "Temporary Hold",
-                    "enum": [
-                      "TemporaryHold"
-                    ]
-                  }
-                ]
-              }
-            }
-          },
-          "leaksensor": {
-            "title": "Leak Sensor",
-            "type": "object",
-            "properties": {
-              "hide_leak": {
-                "title": "Hide Leak Service",
-                "type": "boolean",
-                "required": false
-              },
-              "hide_temperature": {
-                "title": "Hide Temperature Service",
-                "type": "boolean",
-                "required": false
-              },
-              "hide_humidity": {
-                "title": "Hide Humidity Service",
-                "type": "boolean",
-                "required": false
-              }
-            }
-          },
-          "roomsensor": {
-            "title": "Room Sensor",
-            "type": "object",
-            "properties": {
-              "hide_temperature": {
-                "title": "Hide Temperature Service",
-                "type": "boolean",
-                "requried": false
-              },
-              "hide_humidity": {
-                "title": "Hide Humidity Service",
-                "type": "boolean",
-                "requried": false
-              },
-              "hide_occupancy": {
-                "title": "Hide Occupancy Service",
-                "type": "boolean",
-                "requried": false
-              }
-            }
-          },
-          "roompriority": {
-            "title": "Room Priority",
-            "type": "object",
-            "properties": {
-              "thermostat": {
-                "title": "Thermostat Room Priority",
-                "type": "boolean",
-                "requried": false
-              },
-              "priorityType": {
-                "title": "Priority Type",
-                "type": "string",
-                "required": true,
-                "default": "PickARoom",
-                "oneOf": [
-                  {
-                    "title": "Pick A Room",
-                    "enum": [
-                      "PickARoom"
-                    ]
-                  },
-                  {
-                    "title": "Whole House",
-                    "enum": [
-                      "WholeHouse"
-                    ]
-                  },
-                  {
-                    "title": "Follow Me",
-                    "enum": [
-                      "FollowMe"
-                    ]
-                  }
-                ]
-              }
-            }
           }
         }
       },
@@ -230,6 +319,40 @@
       ]
     },
     {
+      "key": "options.devices",
+      "notitle": false,
+      "add": "Add Another Device",
+      "type": "fieldset",
+      "title": "Honeywell Device Settings",
+      "expandable": true,
+      "expanded": false,
+      "orderable": false,
+      "buttonText": "Add Device",
+      "items": [
+        {
+          "type": "div",
+          "displayFlex": true,
+          "flex-direction": "column",
+          "items": [
+            "options.devices[].deviceID",
+            "options.devices[].hide_device",
+            "options.devices[].deviceClass",
+            "options.devices[].thermostat.hide_fan",
+            "options.devices[].thermostat.hide_humidity",
+            "options.devices[].thermostat.thermostatSetpointStatus",
+            "options.devices[].leaksensor.hide_leak",
+            "options.devices[].leaksensor.hide_temperature",
+            "options.devices[].leaksensor.hide_humidity",
+            "options.devices[].roomsensor.hide_temperature",
+            "options.devices[].roomsensor.hide_humidity",
+            "options.devices[].roomsensor.hide_occupancy",
+            "options.devices[].roompriority.deviceType",
+            "options.devices[].roompriority.priorityType"
+          ]
+        }
+      ]
+    },
+    {
       "type": "fieldset",
       "title": "Advanced Settings",
       "expandable": true,
@@ -252,97 +375,7 @@
           "notitle": true
         },
         "options.debug",
-        "disablePlugin",
-        {
-          "type": "fieldset",
-          "title": "Hidden Devices",
-          "expandable": true,
-          "expanded": false,
-          "items": [
-            {
-              "type": "help",
-              "helpvalue": "<h5>Hide Device</h5><em class='primary-text'>Hide Device allows you to hide a device using it's deviceID.</em>"
-            },
-            {
-              "key": "options.hide_device",
-              "notitle": true,
-              "add": "Add Another Device",
-              "type": "array",
-              "items": [
-                {
-                  "type": "div",
-                  "displayFlex": true,
-                  "flex-direction": "row",
-                  "items": [
-                    {
-                      "key": "options.hide_device[]",
-                      "placeholder": "LLC-81F3UT59513F"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "fieldset",
-          "title": "Thermostat Options",
-          "expandable": true,
-          "expanded": false,
-          "items": [
-            "options.thermostat.thermostatSetpointStatus",
-            {
-              "type": "help",
-              "helpvalue": "<h5>Hide Thermostat Fan Service</h5><em class='primary-text'>Allows you to hide your Thermostat's Fan.</em>"
-            },
-            "options.thermostat.hide_fan",
-            "options.thermostat.hide_humidity",
-            {
-              "type": "fieldset",
-              "title": "Room Sensor Options",
-              "expandable": true,
-              "expanded": false,
-              "items": [
-                {
-                  "type": "help",
-                  "helpvalue": "<h5>Hide Room Sensor Services</h5><em class='primary-text'>Allows you to hide your tempeture sensor, occupancy sensor, or humidity sensor of your Room Sensor(s).</em>"
-                },
-                "options.roomsensor.hide_temperature",
-                "options.roomsensor.hide_occupancy",
-                "options.roomsensor.hide_humidity",
-                {
-                  "type": "fieldset",
-                  "title": "Room Priority Options",
-                  "expandable": true,
-                  "expanded": false,
-                  "items": [
-                    {
-                      "type": "help",
-                      "helpvalue": "<em class='primary-text'>Allows you to set your Priority to your Room Sensor(s).</em>"
-                    },
-                    "options.roompriority.thermostat",
-                    "options.roompriority.priorityType"
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "fieldset",
-          "title": "Leak Sensor Options",
-          "expandable": true,
-          "expanded": false,
-          "items": [
-            {
-              "type": "help",
-              "helpvalue": "<h5>Hide Leak Sensor Services</h5><em class='primary-text'>Allows you to hide your Leak Sensor's tempeture sensor, leak sensor, or humidity sensor.</em>"
-            },
-            "options.leaksensor.hide_temperature",
-            "options.leaksensor.hide_leak",
-            "options.leaksensor.hide_humidity"
-          ]
-        }
+        "disablePlugin"
       ]
     }
   ]

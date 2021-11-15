@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Beta - Version 11.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.4...v11.1.0) (2021-11-xx)
+
+### Changes
+
+- Add Device Configs, So that each device can be customized for itself.
+
 ## [Version 11.0.4](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.3...v11.0.4) (2021-11-13)
 
 ### Changes

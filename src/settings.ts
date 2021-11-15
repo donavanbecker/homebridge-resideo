@@ -47,13 +47,19 @@ export type credentials = {
 export type options = {
   refreshRate?: number;
   pushRate?: number;
-  hide_device: string[];
+  devices?: Array<devicesConfig>;
   debug?: string;
+};
+
+export interface devicesConfig extends device {
+  deviceClass: string;
+  deviceID: string;
   thermostat?: thermostat;
   leaksensor?: leaksensor;
   roomsensor?: roomsensor;
   roompriority?: roompriority;
-};
+  hide_device?: boolean;
+}
 
 export type thermostat = {
   hide_fan?: boolean;
@@ -75,7 +81,7 @@ export type roomsensor = {
 };
 
 export type roompriority = {
-  thermostat?: boolean;
+  deviceType?: string;
   priorityType?: string;
 };
 
@@ -83,29 +89,29 @@ export type roompriority = {
 export type location = {
   locationID: number;
   name: string;
-  devices: Thermostat | LeakDevice;
+  devices: Array<device>;
 };
 
-export type Thermostat = {
+export type device = {
   groups?: Array<T9groups>;
   inBuiltSensorState?: inBuiltSensorState;
-  settings: Settings;
+  settings?: Settings;
   deviceClass: string;
   deviceType: string;
   deviceID: string;
   userDefinedDeviceName: string;
-  name: string;
+  name?: string;
   isAlive: boolean;
   priorityType?: string;
-  units: string;
-  indoorTemperature: number;
-  allowedModes: string[];
-  minHeatSetpoint: number;
-  maxHeatSetpoint: number;
-  minCoolSetpoint: number;
-  maxCoolSetpoint: number;
-  changeableValues: ChangeableValues;
-  operationStatus: OperationStatus;
+  units?: string;
+  indoorTemperature?: number;
+  allowedModes?: string[];
+  minHeatSetpoint?: number;
+  maxHeatSetpoint?: number;
+  minCoolSetpoint?: number;
+  maxCoolSetpoint?: number;
+  changeableValues?: ChangeableValues;
+  operationStatus?: OperationStatus;
   indoorHumidity?: number;
   deviceModel: string;
   displayedOutdoorHumidity?: number;
@@ -120,8 +126,8 @@ export type Thermostat = {
   hasDualSetpointStatus?: boolean;
   thermostatVersion?: string;
   parentDeviceId?: number;
-  service?: Service;
-  deviceSettings?: Record<string, unknown>;
+  service: Service;
+  deviceSettings: Record<string, unknown>; //DeviceSettings
   firmwareVersion?: string;
   vacationHold?: VacationHold;
   currentSchedulePeriod?: CurrentSchedulePeriod;
@@ -131,6 +137,12 @@ export type Thermostat = {
   partnerInfo?: PartnerInfo;
   deviceRegistrationDate?: Date;
   indoorHumidityStatus?: string;
+  waterPresent: boolean;
+  currentSensorReadings: CurrentSensorReadings;
+  batteryRemaining: number;
+  isRegistered: boolean;
+  hasDeviceCheckedIn: boolean;
+  isDeviceOffline: boolean;
 };
 
 export type T9groups = {
@@ -257,23 +269,6 @@ export type PartnerInfo = {
   parentDeviceBrandId: number;
   oduName: string;
 }
-
-// Leak Sensor
-export type LeakDevice = {
-  waterPresent: boolean;
-  currentSensorReadings: CurrentSensorReadings;
-  batteryRemaining: number;
-  isRegistered: boolean;
-  hasDeviceCheckedIn: boolean;
-  isDeviceOffline: boolean;
-  deviceClass: string;
-  deviceType: string;
-  deviceID: string;
-  userDefinedDeviceName: string;
-  isAlive: boolean;
-  deviceSettings: DeviceSettings;
-  service: Service;
-};
 
 export type DeviceSettings = {
   temp: Temp;
