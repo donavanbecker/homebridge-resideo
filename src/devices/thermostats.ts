@@ -2,7 +2,7 @@ import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, tap } from 'rxjs/operators';
-import { DeviceURL, location, device, FanChangeableValues, devicesConfig } from '../settings';
+import { DeviceURL, location, device, FanChangeableValues, devicesConfig, modes } from '../settings';
 
 /**
  * Platform Accessory
@@ -14,37 +14,41 @@ export class Thermostats {
   fanService?: Service;
   humidityService?: Service;
 
-  private modes: { Off: number; Heat: number; Cool: number; Auto: number };
-
-  //Thermostat Characteristics
-  CurrentTemperature!: CharacteristicValue;
+  // Thermostat Characteristics
   TargetTemperature!: CharacteristicValue;
-  CurrentHeatingCoolingState!: CharacteristicValue;
-  TargetHeatingCoolingState!: CharacteristicValue;
-  CoolingThresholdTemperature!: CharacteristicValue;
-  HeatingThresholdTemperature!: CharacteristicValue;
+  CurrentTemperature!: CharacteristicValue;
   CurrentRelativeHumidity?: CharacteristicValue;
   TemperatureDisplayUnits!: CharacteristicValue;
-  //Fan Characteristics
+  TargetHeatingCoolingState!: CharacteristicValue;
+  CurrentHeatingCoolingState!: CharacteristicValue;
+  CoolingThresholdTemperature!: CharacteristicValue;
+  HeatingThresholdTemperature!: CharacteristicValue;
+
+  // Fan Characteristics
   Active!: CharacteristicValue;
   TargetFanState!: CharacteristicValue;
-  //Modes
-  honeywellMode!: Array<string>;
-  fanMode!: FanChangeableValues;
-  //Setpoints
+
+  // Others
+  modes: modes;
   heatSetpoint!: number;
   coolSetpoint!: number;
-  //T9 Only
+  honeywellMode!: Array<string>;
+  fanMode!: FanChangeableValues;
+
+  // Others - T9 Only
   roompriority!: any;
-  //Thermostat Updates
+
+  // Thermostat Updates
   thermostatUpdateInProgress!: boolean;
-  doThermostatUpdate;
-  //Fan Updates
+  doThermostatUpdate!: Subject<void>;
+
+  // Fan Updates
   fanUpdateInProgress!: boolean;
-  doFanUpdate;
-  //Room updates - T9 Only
+  doFanUpdate!: Subject<void>;
+
+  // Room Updates - T9 Only
   roomUpdateInProgress!: boolean;
-  doRoomUpdate;
+  doRoomUpdate!: Subject<void>;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
@@ -355,6 +359,7 @@ export class Thermostats {
         },
       })).data;
       this.device = device;
+      this.platform.debug(`Thermostat: ${this.accessory.displayName} device: ${JSON.stringify(this.device)}`);
       this.platform.debug(`Thermostat: ${this.accessory.displayName} Fetched update for ${this.device.name}
        from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`);
       await this.refreshRoomPriority();
@@ -365,6 +370,7 @@ export class Thermostats {
           },
         })).data;
         this.fanMode = fanMode;
+        this.platform.debug(`Thermostat: ${this.accessory.displayName} fanMode: ${JSON.stringify(this.fanMode)}`);
         this.platform.debug(`Thermostat: ${this.accessory.displayName} Fan Fetched update for ${this.device.name}
         from Honeywell Fan API: ${JSON.stringify(this.fanMode)}`);
       }
@@ -387,7 +393,7 @@ export class Thermostats {
           },
         })
       ).data;
-      this.platform.debug(`Thermostat: ${this.accessory.displayName} Priority: ${JSON.stringify(this.roompriority)}`);
+      this.platform.debug(`Thermostat: ${this.accessory.displayName} Priority: ${JSON.stringify(this.roompriority.data)}`);
     }
   }
 
@@ -454,16 +460,9 @@ export class Thermostats {
             payload.unit = 'Celsius';
             break;
         }
-        this.platform.log.info(
-          'Sending request for',
-          this.accessory.displayName,
-          'to Honeywell API. thermostatSetpoint:',
-          payload.thermostatSetpoint,
-          'unit:',
-          payload.unit,
-          'thermostatSetpointStatus:',
-          this.device.thermostat?.thermostatSetpointStatus,
-        );
+        this.platform.log.info(`Sending request for ${this.accessory.displayName} to Honeywell API thermostatSetpoint:`
+          +` ${payload.thermostatSetpoint}, unit: ${payload.unit}, thermostatSetpointStatus: ${this.device.thermostat?.thermostatSetpointStatus}`);
+
         break;
       default:
         // Set the heat and cool set point value based on the selected mode
@@ -484,18 +483,9 @@ export class Thermostats {
             payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
             payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
         }
-        this.platform.log.info(
-          'Sending request for',
-          this.accessory.displayName,
-          'to Honeywell API. mode:',
-          payload.mode,
-          'coolSetpoint:',
-          payload.coolSetpoint,
-          'heatSetpoint:',
-          payload.heatSetpoint,
-          'thermostatSetpointStatus:',
-          this.device.thermostat?.thermostatSetpointStatus,
-        );
+        this.platform.log.info(`Sending request for ${this.accessory.displayName} to Honeywell API mode: ${payload.mode}, coolSetpoint: `
+          + `${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint},`
+          + ` thermostatSetpointStatus: ${this.device.thermostat?.thermostatSetpointStatus}`);
     }
 
     this.platform.log.debug(`Thermostat: ${this.accessory.displayName} pushChanges - ${JSON.stringify(payload)}`);
@@ -506,6 +496,7 @@ export class Thermostats {
           locationId: this.locationId,
         },
       });
+      this.platform.debug(`Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(this.device)}`);
     } catch (e) {
       // logged within post call above
       this.apiError(e);
@@ -539,37 +530,22 @@ export class Thermostats {
        */
       if (this.device.roompriority?.deviceType === 'Thermostat') {
         if (this.device.priorityType === 'FollowMe') {
-          this.platform.log.info(
-            'Sending request for',
-            this.accessory.displayName,
-            'to Honeywell API. Priority Type:',
-            this.device.priorityType,
-            ', Built-in Occupancy Sensor(s) Will be used to set Priority Automatically.',
-          );
+          this.platform.log.info(`Sending request for ${this.accessory.displayName} to Honeywell API Priority Type:`
+          +` ${this.device.priorityType}, Built-in Occupancy Sensor(s) Will be used to set Priority Automatically`);
         } else if (this.device.priorityType === 'WholeHouse') {
-          this.platform.log.info(
-            'Sending request for',
-            this.accessory.displayName,
-            'to Honeywell API. Priority Type:',
-            this.device.priorityType,
-          );
+          this.platform.log.info(`Sending request for ${this.accessory.displayName} to Honeywell API Priority Type:`
+          +` ${this.device.priorityType}`);
         } else if (this.device.priorityType === 'PickARoom') {
-          this.platform.log.info(
-            'Sending request for',
-            this.accessory.displayName,
-            'to Honeywell API. Room Priority:',
-            this.device.inBuiltSensorState!.roomName,
-            ', Priority Type:',
-            this.device.roompriority.priorityType,
-          );
+          this.platform.log.info(`Sending request for ${this.accessory.displayName} to Honeywell API Room Priority:`
+          +` ${this.device.inBuiltSensorState!.roomName}, Priority Type: ${this.device.roompriority.priorityType}`);
         }
-        this.platform.debug(`Thermostat: ${this.accessory.displayName} pushRoomChanges - ${JSON.stringify(payload)}`);
         // Make the API request
         await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
           params: {
             locationId: this.locationId,
           },
         });
+        this.platform.debug(`Thermostat: ${this.accessory.displayName} pushRoomChanges: ${JSON.stringify(payload)}`);
       }
       // Refresh the status from the API
       await this.refreshStatus();
@@ -770,20 +746,14 @@ export class Thermostats {
         };
       }
 
-      this.platform.log.info(
-        'Sending request for',
-        this.accessory.displayName,
-        'to Honeywell API. Fan Mode:',
-        payload.mode,
-      );
-      this.platform.debug(`Thermostat: ${this.accessory.displayName} Fan Mode: ${JSON.stringify(payload)}`);
-
+      this.platform.log.info(`Sending request for ${this.accessory.displayName} to Honeywell API Fan Mode: ${payload.mode}`);
       // Make the API request
       await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, payload, {
         params: {
           locationId: this.locationId,
         },
       });
+      this.platform.debug(`Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(payload)}`);
     }
     // Refresh the status from the API
     await this.refreshStatus();

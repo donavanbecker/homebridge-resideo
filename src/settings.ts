@@ -85,6 +85,13 @@ export type roompriority = {
   priorityType?: string;
 };
 
+export type modes = {
+  Off: number;
+  Heat: number;
+  Cool: number;
+  Auto: number;
+};
+
 // Location
 export type location = {
   locationID: number;

@@ -10,21 +10,24 @@ import { DeviceURL, location, device, devicesConfig } from '../settings';
  * Each accessory may expose multiple services of different service types.
  */
 export class LeakSensor {
+  // Services
   private service: Service;
   temperatureService?: Service;
   humidityService?: Service;
   leakService?: Service;
 
+  // CharacteristicValue
   StatusActive!: CharacteristicValue;
   LeakDetected!: CharacteristicValue;
-  CurrentTemperature!: CharacteristicValue;
-  CurrentRelativeHumidity!: CharacteristicValue;
   BatteryLevel!: CharacteristicValue;
   ChargingState!: CharacteristicValue;
   StatusLowBattery!: CharacteristicValue;
+  CurrentTemperature!: CharacteristicValue;
+  CurrentRelativeHumidity!: CharacteristicValue;
 
+  // Updates
   SensorUpdateInProgress!: boolean;
-  doSensorUpdate;
+  doSensorUpdate!: Subject<void>;
 
   constructor(
     private readonly platform: HoneywellHomePlatform,
@@ -147,7 +150,6 @@ export class LeakSensor {
     }
 
     // Retrieve initial values and updateHomekit
-    // this.refreshStatus();
     this.updateHomeKitCharacteristics();
 
     // Start an update interval
@@ -162,38 +164,37 @@ export class LeakSensor {
    * Parse the device status from the honeywell api
    */
   parseStatus() {
-    // Set Sensor State
+    // Leak Service
     this.StatusActive = this.device.hasDeviceCheckedIn;
     if (this.device.waterPresent === true) {
       this.LeakDetected = 1;
     } else {
       this.LeakDetected = 0;
     }
-    this.platform.debug(`Leak Sensor: ${this.accessory.displayName} LeakDetected: ${this.LeakDetected}`);
+    this.platform.device(`Leak Sensor: ${this.accessory.displayName} LeakDetected: ${this.LeakDetected}`);
 
-    // Temperature Sensor
+    // Temperature Service
     if (!this.device.leaksensor?.hide_temperature) {
       this.CurrentTemperature = this.device.currentSensorReadings.temperature;
-      this.platform.debug(`Leak Sensor: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}°`);
+      this.platform.device(`Leak Sensor: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}°`);
     }
 
-    // HumiditySensor
+    // Humidity Service
     if (!this.device.leaksensor?.hide_humidity) {
       this.CurrentRelativeHumidity = this.device.currentSensorReadings.humidity;
-      this.platform.debug(`Leak Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}%`);
+      this.platform.device(`Leak Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}%`);
     }
 
     // Battery Service
     this.BatteryLevel = Number(this.device.batteryRemaining);
     this.service.getCharacteristic(this.platform.Characteristic.BatteryLevel).updateValue(this.BatteryLevel);
-    this.platform.debug(`Leak Sensor: ${this.accessory.displayName} BatteryLevel: ${this.BatteryLevel}`);
-    this.platform.debug(JSON.stringify(this.device.batteryRemaining));
     if (this.device.batteryRemaining < 15) {
       this.StatusLowBattery = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW;
     } else {
       this.StatusLowBattery = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL;
     }
-    this.platform.debug(`Leak Sensor: ${this.accessory.displayName} StatusLowBattery: ${this.StatusLowBattery}`);
+    this.platform.device(`Leak Sensor: ${this.accessory.displayName} BatteryLevel: ${this.BatteryLevel},`
+      + ` StatusLowBattery: ${this.StatusLowBattery}`);
   }
 
   /**
@@ -201,18 +202,17 @@ export class LeakSensor {
    */
   async refreshStatus() {
     try {
-      this.platform.device(`Leak Sensor Reading: ${DeviceURL}/waterLeakDetectors/${this.device.deviceID}`);
       const device: any = (await this.platform.axios.get(`${DeviceURL}/waterLeakDetectors/${this.device.deviceID}`, {
         params: {
           locationId: this.locationId,
         },
       })).data;
       this.device = device;
-      this.platform.device(`Leak Sensor: ${this.accessory.displayName} refreshStatus: ${JSON.stringify(this.device)}`);
+      this.platform.device(`Leak Sensor: ${this.accessory.displayName} device: ${JSON.stringify(this.device)}`);
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e: any) {
-      this.platform.log.error(`Leak Sensor: ${this.accessory.displayName}: failed to update status.`
+      this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} failed to update status.`
         + ` Error Message: ${JSON.stringify(e.message)}`);
       this.platform.debug(`Leak Sensor: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
       this.apiError(e);
