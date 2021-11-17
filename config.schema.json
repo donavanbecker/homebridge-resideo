@@ -114,23 +114,24 @@
                       "title": "Thermostat Setpoint Status",
                       "type": "string",
                       "description": "For \"LCC-\" devices only. \"PermanentHold\" will hold the setpoint until user requests another change. \"NoHold\" will return to schedule. \"TemporaryHold\" will hold the set temperature until \"nextPeriodTime\".",
-                      "default": "PermanentHold",
+                      "placeholder": "PermanentHold",
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID);"
                       },
                       "oneOf": [
-                        {
-                          "title": "No Hold",
-                          "enum": [
-                            "NoHold"
-                          ]
-                        },
                         {
                           "title": "Permanent Hold",
                           "enum": [
                             "PermanentHold"
                           ]
                         },
+                        {
+                          "title": "No Hold",
+                          "enum": [
+                            "NoHold"
+                          ]
+                        },
+                        
                         {
                           "title": "Temporary Hold",
                           "enum": [
@@ -220,7 +221,7 @@
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Roompriority' && model.options.devices[arrayIndices].deviceID);"
                       },
-                      "default": "PickARoom",
+                      "placeholder": "PickARoom",
                       "oneOf": [
                         {
                           "title": "Pick A Room",
