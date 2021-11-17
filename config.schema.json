@@ -51,7 +51,6 @@
                 "deviceID": {
                   "title": "Device ID",
                   "type": "string",
-                  "required": true,
                   "placeholder": "81F3UT59513F"
                 },
                 "hide_device": {
@@ -64,7 +63,6 @@
                 "deviceClass": {
                   "title": "Device Class",
                   "type": "string",
-                  "required": true,
                   "oneOf": [
                     {
                       "title": "Thermostat",
@@ -101,7 +99,6 @@
                     "hide_fan": {
                       "title": "Hide Thermostat Fan",
                       "type": "boolean",
-                      "requried": false,
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID);"
                       }
@@ -109,7 +106,6 @@
                     "hide_humidity": {
                       "title": "Hide Humidity Service",
                       "type": "boolean",
-                      "required": false,
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID);"
                       }
@@ -118,7 +114,6 @@
                       "title": "Thermostat Setpoint Status",
                       "type": "string",
                       "description": "For \"LCC-\" devices only. \"PermanentHold\" will hold the setpoint until user requests another change. \"NoHold\" will return to schedule. \"TemporaryHold\" will hold the set temperature until \"nextPeriodTime\".",
-                      "required": true,
                       "default": "PermanentHold",
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID);"
@@ -153,7 +148,6 @@
                     "hide_leak": {
                       "title": "Hide Leak Service",
                       "type": "boolean",
-                      "required": false,
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Roomsensor' && model.options.devices[arrayIndices].deviceID);"
                       }
@@ -161,7 +155,6 @@
                     "hide_temperature": {
                       "title": "Hide Temperature Service",
                       "type": "boolean",
-                      "required": false,
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Roomsensor' && model.options.devices[arrayIndices].deviceID);"
                       }
@@ -169,7 +162,6 @@
                     "hide_humidity": {
                       "title": "Hide Humidity Service",
                       "type": "boolean",
-                      "required": false,
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Roomsensor' && model.options.devices[arrayIndices].deviceID);"
                       }
@@ -183,7 +175,6 @@
                     "hide_temperature": {
                       "title": "Hide Temperature Service",
                       "type": "boolean",
-                      "requried": false,
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'LeakDetector' && model.options.devices[arrayIndices].deviceID);"
                       }
@@ -191,7 +182,6 @@
                     "hide_humidity": {
                       "title": "Hide Humidity Service",
                       "type": "boolean",
-                      "requried": false,
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'LeakDetector' && model.options.devices[arrayIndices].deviceID);"
                       }
@@ -199,7 +189,6 @@
                     "hide_occupancy": {
                       "title": "Hide Occupancy Service",
                       "type": "boolean",
-                      "requried": false,
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'LeakDetector' && model.options.devices[arrayIndices].deviceID);"
                       }
@@ -213,7 +202,6 @@
                     "deviceType": {
                       "title": "Display As",
                       "type": "boolean",
-                      "requried": true,
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Roompriority' && model.options.devices[arrayIndices].deviceID);"
                       },
@@ -229,7 +217,6 @@
                     "priorityType": {
                       "title": "Priority Type",
                       "type": "string",
-                      "required": true,
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Roompriority' && model.options.devices[arrayIndices].deviceID);"
                       },
