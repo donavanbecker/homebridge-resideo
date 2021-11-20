@@ -2,17 +2,21 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
-## [Beta - Version 11.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.4...v11.1.0) (2021-11-xx)
+## [Version 11.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.1.0) (2021-11-19)
+
+### What's Changes
+* Add Device Configs, So that each device can be customized for itself.
+    * ANY CONFIGS SET MUST BE REMOVED AND REPLACED WITH THIS NEW DEVICE CONFIGS
+
+**Full Changelog**: https://github.com/OpenWonderLabs/homebridge-switchbot/compare/v11.0.4...v11.1.0
+
+## [Version 11.0.4](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.0.4) (2021-11-13)
 
 ### Changes
 
-- Add Device Configs, So that each device can be customized for itself.
+* Allow `refreshRate` to be set to 30 Seconds or Higher.
 
-## [Version 11.0.4](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.3...v11.0.4) (2021-11-13)
-
-### Changes
-
-- Allow `refreshRate` to be set to 30 Seconds or Higher.
+**Full Changelog**: https://github.com/OpenWonderLabs/homebridge-switchbot/compare/v11.0.3...v11.0.4
 
 ## [Version 11.0.3](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.2...v11.0.3) (2021-11-12)
 
