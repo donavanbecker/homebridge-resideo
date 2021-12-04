@@ -193,7 +193,7 @@ export class RoomSensorThermostat {
           } catch (e: any) {
             this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} roompriority,`
               + ` Error Message: ${JSON.stringify(e.message)}`);
-            this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
+            this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
             this.apiError(e);
           }
           this.roomUpdateInProgress = false;
@@ -212,7 +212,7 @@ export class RoomSensorThermostat {
         } catch (e: any) {
           this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} pushChanges,`
             + ` Error Message: ${JSON.stringify(e.message)}`);
-          this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
+          this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
           this.apiError(e);
         }
         this.thermostatUpdateInProgress = false;
@@ -286,7 +286,7 @@ export class RoomSensorThermostat {
         },
       })).data;
       this.device = device;
-      this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} device: ${JSON.stringify(device)}`);
+      this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} device: ${JSON.stringify(device)}`);
       this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName}`
         + ` Fetched update for: ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`);
 

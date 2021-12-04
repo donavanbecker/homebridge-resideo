@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Beta - Version 11.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.1.1) (2021-12-XX)
+
+### What's Changes
+* Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/OpenWonderLabs/homebridge-switchbot/compare/v11.1.0...v11.1.1
+
 ## [Version 11.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.1.0) (2021-11-19)
 
 ### What's Changes

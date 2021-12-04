@@ -414,11 +414,11 @@ export class Thermostats {
     // Only include thermostatSetpointStatus on certain models
     switch (this.device.deviceModel) {
       case 'Round':
-        this.platform.debug(`${this.device.deviceModel} Thermostats do not send thermostatSetpointStatus`);
+        this.platform.device(`${this.device.deviceModel} Thermostats do not send thermostatSetpointStatus`);
         break;
       default:
         payload.thermostatSetpointStatus = this.device.thermostat?.thermostatSetpointStatus;
-        this.platform.debug(`Send thermostatSetpointStatus Model: ${this.device.deviceModel}`);
+        this.platform.device(`Send thermostatSetpointStatus Model: ${this.device.deviceModel}`);
     }
 
     switch (this.device.deviceModel) {
@@ -431,19 +431,19 @@ export class Thermostats {
         // for Round  the 'Auto' feature is enabled via the special mode so only flip this bit when
         // the heating/cooling state is set to  `Auto
         if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.AUTO) {
-          this.platform.log.debug(`Heating/Cooling state set to Auto for ${this.device.deviceModel} Force autoChangeoverActive`);
+          this.platform.device(`Heating/Cooling state set to Auto for ${this.device.deviceModel} Force autoChangeoverActive`);
           payload.autoChangeoverActive = true;
         } else {
-          this.platform.log.debug(`Heating/cooling state not set to Auto for ${this.device.deviceModel}`
+          this.platform.device(`Heating/cooling state not set to Auto for ${this.device.deviceModel}`
             + ` Using device setting ${this.device.changeableValues!.autoChangeoverActive}`);
           payload.autoChangeoverActive = this.device.changeableValues!.autoChangeoverActive;
         }
         break;
       case 'Unknown':
-        this.platform.debug(`${this.device.deviceModel} Thermostats do not send autoChangeoverActive`);
+        this.platform.device(`${this.device.deviceModel} Thermostats do not send autoChangeoverActive`);
         break;
       default:
-        this.platform.debug(`Set autoChangeoverActive to ${this.device.changeableValues!.autoChangeoverActive}`
+        this.platform.device(`Set autoChangeoverActive to ${this.device.changeableValues!.autoChangeoverActive}`
           + ` for ${this.device.deviceModel} Thermostats`);
         payload.autoChangeoverActive = this.device.changeableValues!.autoChangeoverActive;
     }
@@ -488,7 +488,7 @@ export class Thermostats {
           + ` thermostatSetpointStatus: ${this.device.thermostat?.thermostatSetpointStatus}`);
     }
 
-    this.platform.log.debug(`Thermostat: ${this.accessory.displayName} pushChanges - ${JSON.stringify(payload)}`);
+    this.platform.device(`Thermostat: ${this.accessory.displayName} pushChanges - ${JSON.stringify(payload)}`);
     // Attempt to make the API request
     try {
       await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
@@ -496,7 +496,7 @@ export class Thermostats {
           locationId: this.locationId,
         },
       });
-      this.platform.debug(`Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(this.device)}`);
+      this.platform.device(`Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(this.device)}`);
     } catch (e) {
       // logged within post call above
       this.apiError(e);
@@ -545,7 +545,7 @@ export class Thermostats {
             locationId: this.locationId,
           },
         });
-        this.platform.debug(`Thermostat: ${this.accessory.displayName} pushRoomChanges: ${JSON.stringify(payload)}`);
+        this.platform.device(`Thermostat: ${this.accessory.displayName} pushRoomChanges: ${JSON.stringify(payload)}`);
       }
       // Refresh the status from the API
       await this.refreshStatus();
@@ -643,7 +643,7 @@ export class Thermostats {
   }
 
   private setTargetHeatingCoolingState(value: CharacteristicValue) {
-    this.platform.debug(`Thermostat: ${this.accessory.displayName} Set TargetHeatingCoolingState: ${value}`);
+    this.platform.device(`Thermostat: ${this.accessory.displayName} Set TargetHeatingCoolingState: ${value}`);
 
     this.TargetHeatingCoolingState = value;
 
@@ -663,25 +663,25 @@ export class Thermostats {
   }
 
   private setHeatingThresholdTemperature(value: CharacteristicValue) {
-    this.platform.debug(`Thermostat: ${this.accessory.displayName} Set HeatingThresholdTemperature: ${value}`);
+    this.platform.device(`Thermostat: ${this.accessory.displayName} Set HeatingThresholdTemperature: ${value}`);
     this.HeatingThresholdTemperature = value;
     this.doThermostatUpdate.next();
   }
 
   private setCoolingThresholdTemperature(value: CharacteristicValue) {
-    this.platform.debug(`Thermostat: ${this.accessory.displayName} Set CoolingThresholdTemperature: ${value}`);
+    this.platform.device(`Thermostat: ${this.accessory.displayName} Set CoolingThresholdTemperature: ${value}`);
     this.CoolingThresholdTemperature = value;
     this.doThermostatUpdate.next();
   }
 
   private setTargetTemperature(value: CharacteristicValue) {
-    this.platform.debug(`Thermostat: ${this.accessory.displayName} Set TargetTemperature: ${value}`);
+    this.platform.device(`Thermostat: ${this.accessory.displayName} Set TargetTemperature: ${value}`);
     this.TargetTemperature = value;
     this.doThermostatUpdate.next();
   }
 
   private setTemperatureDisplayUnits(value: CharacteristicValue) {
-    this.platform.debug(`Thermostat: ${this.accessory.displayName} Set TemperatureDisplayUnits: ${value}`);
+    this.platform.device(`Thermostat: ${this.accessory.displayName} Set TemperatureDisplayUnits: ${value}`);
     this.platform.log.warn('Changing the Hardware Display Units from HomeKit is not supported.');
 
     // change the temp units back to the one the Honeywell API said the thermostat was set to
@@ -724,7 +724,7 @@ export class Thermostats {
       mode: 'Auto', // default to Auto
     };
     if (this.device.settings?.fan && !this.device.thermostat?.hide_fan) {
-      this.platform.debug(`Thermostat: ${this.accessory.displayName} TargetFanState: ${this.TargetFanState}, Active: ${this.Active}`);
+      this.platform.device(`Thermostat: ${this.accessory.displayName} TargetFanState: ${this.TargetFanState}, Active: ${this.Active}`);
 
       if (this.TargetFanState === this.platform.Characteristic.TargetFanState.AUTO) {
         payload = {
@@ -753,7 +753,7 @@ export class Thermostats {
           locationId: this.locationId,
         },
       });
-      this.platform.debug(`Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(payload)}`);
+      this.platform.device(`Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(payload)}`);
     }
     // Refresh the status from the API
     await this.refreshStatus();
@@ -763,19 +763,19 @@ export class Thermostats {
    * Updates the status for each of the HomeKit Characteristics
    */
   private setActive(value: CharacteristicValue) {
-    this.platform.debug(`Thermostat: ${this.accessory.displayName} Set Active: ${value}`);
+    this.platform.device(`Thermostat: ${this.accessory.displayName} Set Active: ${value}`);
     this.Active = value;
     this.doFanUpdate.next();
   }
 
   private setTargetFanState(value: CharacteristicValue) {
-    this.platform.debug(`Thermostat: ${this.accessory.displayName} Set TargetFanState: ${value}`);
+    this.platform.device(`Thermostat: ${this.accessory.displayName} Set TargetFanState: ${value}`);
     this.TargetFanState = value;
     this.doFanUpdate.next();
   }
 
   private TargetState() {
-    this.platform.debug(`Thermostat: ${this.accessory.displayName} allowedModes: ${this.device.allowedModes}`);
+    this.platform.device(`Thermostat: ${this.accessory.displayName} allowedModes: ${this.device.allowedModes}`);
 
     const TargetState = [4];
     TargetState.pop();
@@ -791,7 +791,7 @@ export class Thermostats {
     if (this.device.allowedModes!.includes('Auto')) {
       TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.AUTO);
     }
-    this.platform.debug(`Thermostat: ${this.accessory.displayName} Only Show These Modes: ${JSON.stringify(TargetState)}`);
+    this.platform.device(`Thermostat: ${this.accessory.displayName} Only Show These Modes: ${JSON.stringify(TargetState)}`);
     return TargetState;
   }
 }
