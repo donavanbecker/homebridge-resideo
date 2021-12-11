@@ -5,9 +5,11 @@ All notable changes to this project will be documented in this file. This projec
 ## [Beta - Version 11.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.1.1) (2021-12-XX)
 
 ### What's Changes
+* Fixed Bug: Changing the temperature doesn't work. [#598](https://github.com/donavanbecker/homebridge-honeywell-home/issues/598)
+* Fixed Bug: Changelog has incorrect link for full changelog. [#605](https://github.com/donavanbecker/homebridge-honeywell-home/issues/605)
 * Housekeeping and updated dependencies.
 
-**Full Changelog**: https://github.com/OpenWonderLabs/homebridge-switchbot/compare/v11.1.0...v11.1.1
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.1.0...v11.1.1
 
 ## [Version 11.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.1.0) (2021-11-19)
 
@@ -15,7 +17,7 @@ All notable changes to this project will be documented in this file. This projec
 * Add Device Configs, So that each device can be customized for itself.
     * ANY CONFIGS SET MUST BE REMOVED AND REPLACED WITH THIS NEW DEVICE CONFIGS
 
-**Full Changelog**: https://github.com/OpenWonderLabs/homebridge-switchbot/compare/v11.0.4...v11.1.0
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.4...v11.1.0
 
 ## [Version 11.0.4](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.0.4) (2021-11-13)
 
@@ -23,7 +25,7 @@ All notable changes to this project will be documented in this file. This projec
 
 * Allow `refreshRate` to be set to 30 Seconds or Higher.
 
-**Full Changelog**: https://github.com/OpenWonderLabs/homebridge-switchbot/compare/v11.0.3...v11.0.4
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.3...v11.0.4
 
 ## [Version 11.0.3](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.2...v11.0.3) (2021-11-12)
 

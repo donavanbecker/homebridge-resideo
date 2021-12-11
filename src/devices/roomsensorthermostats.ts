@@ -197,6 +197,8 @@ export class RoomSensorThermostat {
             this.apiError(e);
           }
           this.roomUpdateInProgress = false;
+          // Refresh the status from the API
+          await this.refreshStatus();
         });
     }
     this.doThermostatUpdate
@@ -216,6 +218,8 @@ export class RoomSensorThermostat {
           this.apiError(e);
         }
         this.thermostatUpdateInProgress = false;
+        // Refresh the status from the API
+        await this.refreshStatus();
       });
   }
 
@@ -446,8 +450,6 @@ export class RoomSensorThermostat {
       },
     });
     this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(payload)}`);
-    // Refresh the status from the API
-    await this.refreshStatus();
   }
 
   /**

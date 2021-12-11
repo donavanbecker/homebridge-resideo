@@ -233,6 +233,8 @@ export class Thermostats {
             this.apiError(e);
           }
           this.roomUpdateInProgress = false;
+          // Refresh the status from the API
+          await this.refreshStatus();
         });
     }
     this.doThermostatUpdate
@@ -252,6 +254,8 @@ export class Thermostats {
           this.apiError(e);
         }
         this.thermostatUpdateInProgress = false;
+        // Refresh the status from the API
+        await this.refreshStatus();
       });
     if (device.settings?.fan && !device.thermostat?.hide_fan) {
       this.doFanUpdate
@@ -271,6 +275,8 @@ export class Thermostats {
             this.apiError(e);
           }
           this.fanUpdateInProgress = false;
+          // Refresh the status from the API
+          await this.refreshStatus();
         });
     }
   }
@@ -461,7 +467,7 @@ export class Thermostats {
             break;
         }
         this.platform.log.info(`Sending request for ${this.accessory.displayName} to Honeywell API thermostatSetpoint:`
-          +` ${payload.thermostatSetpoint}, unit: ${payload.unit}, thermostatSetpointStatus: ${this.device.thermostat?.thermostatSetpointStatus}`);
+          + ` ${payload.thermostatSetpoint}, unit: ${payload.unit}, thermostatSetpointStatus: ${this.device.thermostat?.thermostatSetpointStatus}`);
 
         break;
       default:
@@ -501,7 +507,6 @@ export class Thermostats {
       // logged within post call above
       this.apiError(e);
     }
-    await this.refreshStatus();
   }
 
   /**
@@ -531,13 +536,13 @@ export class Thermostats {
       if (this.device.roompriority?.deviceType === 'Thermostat') {
         if (this.device.priorityType === 'FollowMe') {
           this.platform.log.info(`Sending request for ${this.accessory.displayName} to Honeywell API Priority Type:`
-          +` ${this.device.priorityType}, Built-in Occupancy Sensor(s) Will be used to set Priority Automatically`);
+            + ` ${this.device.priorityType}, Built-in Occupancy Sensor(s) Will be used to set Priority Automatically`);
         } else if (this.device.priorityType === 'WholeHouse') {
           this.platform.log.info(`Sending request for ${this.accessory.displayName} to Honeywell API Priority Type:`
-          +` ${this.device.priorityType}`);
+            + ` ${this.device.priorityType}`);
         } else if (this.device.priorityType === 'PickARoom') {
           this.platform.log.info(`Sending request for ${this.accessory.displayName} to Honeywell API Room Priority:`
-          +` ${this.device.inBuiltSensorState!.roomName}, Priority Type: ${this.device.roompriority.priorityType}`);
+            + ` ${this.device.inBuiltSensorState!.roomName}, Priority Type: ${this.device.roompriority.priorityType}`);
         }
         // Make the API request
         await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
@@ -547,8 +552,6 @@ export class Thermostats {
         });
         this.platform.device(`Thermostat: ${this.accessory.displayName} pushRoomChanges: ${JSON.stringify(payload)}`);
       }
-      // Refresh the status from the API
-      await this.refreshStatus();
     }
   }
 
@@ -755,8 +758,6 @@ export class Thermostats {
       });
       this.platform.device(`Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(payload)}`);
     }
-    // Refresh the status from the API
-    await this.refreshStatus();
   }
 
   /**
