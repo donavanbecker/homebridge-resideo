@@ -234,7 +234,7 @@ export class Thermostats {
           }
           this.roomUpdateInProgress = false;
           // Refresh the status from the API
-          await this.refreshStatus();
+          setTimeout(this.refreshStatus, 5000);
         });
     }
     this.doThermostatUpdate
@@ -255,7 +255,7 @@ export class Thermostats {
         }
         this.thermostatUpdateInProgress = false;
         // Refresh the status from the API
-        await this.refreshStatus();
+        setTimeout(this.refreshStatus, 5000);
       });
     if (device.settings?.fan && !device.thermostat?.hide_fan) {
       this.doFanUpdate
@@ -276,7 +276,7 @@ export class Thermostats {
           }
           this.fanUpdateInProgress = false;
           // Refresh the status from the API
-          await this.refreshStatus();
+          setTimeout(this.refreshStatus, 5000);
         });
     }
   }
