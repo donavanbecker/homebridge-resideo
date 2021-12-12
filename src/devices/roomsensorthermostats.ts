@@ -198,7 +198,12 @@ export class RoomSensorThermostat {
           }
           this.roomUpdateInProgress = false;
           // Refresh the status from the API
-          setTimeout(this.refreshStatus, 5000);
+          interval(5000)
+            .pipe(skipWhile(() => this.thermostatUpdateInProgress))
+            .pipe(take(1))
+            .subscribe(() => {
+              this.refreshStatus();
+            });
         });
     }
     this.doThermostatUpdate

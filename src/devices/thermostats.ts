@@ -234,7 +234,12 @@ export class Thermostats {
           }
           this.roomUpdateInProgress = false;
           // Refresh the status from the API
-          setTimeout(this.refreshStatus, 5000);
+          interval(5000)
+            .pipe(skipWhile(() => this.thermostatUpdateInProgress))
+            .pipe(take(1))
+            .subscribe(() => {
+              this.refreshStatus();
+            });
         });
     }
     this.doThermostatUpdate
@@ -255,7 +260,12 @@ export class Thermostats {
         }
         this.thermostatUpdateInProgress = false;
         // Refresh the status from the API
-        setTimeout(this.refreshStatus, 5000);
+        interval(5000)
+          .pipe(skipWhile(() => this.thermostatUpdateInProgress))
+          .pipe(take(1))
+          .subscribe(() => {
+            this.refreshStatus();
+          });
       });
     if (device.settings?.fan && !device.thermostat?.hide_fan) {
       this.doFanUpdate
