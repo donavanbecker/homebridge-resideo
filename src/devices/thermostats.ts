@@ -427,9 +427,11 @@ export class Thermostats {
     // Only include mode on certain models
     switch (this.device.deviceModel) {
       case 'Unknown':
+        this.platform.device(`${this.device.deviceModel} Thermostats do not send TargetHeatingCoolingState`);
         break;
       default:
         payload.mode = this.honeywellMode[Number(this.TargetHeatingCoolingState)];
+        this.platform.device(`Send TargetHeatingCoolingState mode: ${this.honeywellMode[Number(this.TargetHeatingCoolingState)]}`);
     }
 
     // Only include thermostatSetpointStatus on certain models
@@ -491,18 +493,30 @@ export class Thermostats {
           case this.platform.Characteristic.TargetHeatingCoolingState.HEAT:
             payload.heatSetpoint = this.toFahrenheit(Number(this.TargetTemperature));
             payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
+            this.platform.device(`${this.device.deviceModel} Thermostat, TargetHeatingCoolingState (HEAT): ${this.TargetHeatingCoolingState},`
+              + ` TargetTemperature: ${this.toFahrenheit(Number(this.TargetTemperature))} heatSetpoint,`
+              + ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint`);
             break;
           case this.platform.Characteristic.TargetHeatingCoolingState.COOL:
             payload.coolSetpoint = this.toFahrenheit(Number(this.TargetTemperature));
             payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
+            this.platform.device(`${this.device.deviceModel} Thermostat, TargetHeatingCoolingState (COOL): ${this.TargetHeatingCoolingState},`
+            + ` TargetTemperature: ${this.toFahrenheit(Number(this.TargetTemperature))} coolSetpoint,`
+            + ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`);
             break;
           case this.platform.Characteristic.TargetHeatingCoolingState.AUTO:
             payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
             payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
+            this.platform.device(`${this.device.deviceModel} Thermostat, TargetHeatingCoolingState (AUTO): ${this.TargetHeatingCoolingState},`
+              + ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint,`
+              + ` HeatingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`);
             break;
           default:
             payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
             payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
+            this.platform.device(`${this.device.deviceModel} Thermostat, TargetHeatingCoolingState (OFF): ${this.TargetHeatingCoolingState},`
+              + ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint,`
+              + ` HeatingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`);
         }
         this.platform.log.info(`Sending request for ${this.accessory.displayName} to Honeywell API mode: ${payload.mode}, coolSetpoint: `
           + `${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint},`
@@ -795,16 +809,16 @@ export class Thermostats {
 
     const TargetState = [4];
     TargetState.pop();
-    if (this.device.allowedModes!.includes('Cool')) {
+    if (this.device.allowedModes?.includes('Cool')) {
       TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.COOL);
     }
-    if (this.device.allowedModes!.includes('Heat')) {
+    if (this.device.allowedModes?.includes('Heat')) {
       TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.HEAT);
     }
-    if (this.device.allowedModes!.includes('Off')) {
+    if (this.device.allowedModes?.includes('Off')) {
       TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.OFF);
     }
-    if (this.device.allowedModes!.includes('Auto')) {
+    if (this.device.allowedModes?.includes('Auto')) {
       TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.AUTO);
     }
     this.platform.device(`Thermostat: ${this.accessory.displayName} Only Show These Modes: ${JSON.stringify(TargetState)}`);
