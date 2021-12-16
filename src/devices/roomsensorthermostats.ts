@@ -2,7 +2,7 @@ import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, take, tap } from 'rxjs/operators';
-import { DeviceURL, location, sensorAccessory, T9groups, FanChangeableValues, device, devicesConfig, modes } from '../settings';
+import { DeviceURL, location, sensorAccessory, T9groups, FanChangeableValues, device, devicesConfig, modes, payload } from '../settings';
 
 /**
  * Platform Accessory
@@ -428,38 +428,58 @@ export class RoomSensorThermostat {
    * Pushes the requested changes to the Honeywell API
    */
   async pushChanges() {
-    const payload = {
-      mode: this.honeywellMode[Number(this.TargetHeatingCoolingState)],
-      thermostatSetpointStatus: this.device.thermostat?.thermostatSetpointStatus,
-      autoChangeoverActive: this.device.changeableValues!.autoChangeoverActive,
-    } as any;
+    try {
+      const payload = {
+        mode: this.honeywellMode[Number(this.TargetHeatingCoolingState)],
+        thermostatSetpointStatus: this.device.thermostat?.thermostatSetpointStatus,
+        autoChangeoverActive: this.device.changeableValues!.autoChangeoverActive,
+      } as payload;
 
-    // Set the heat and cool set point value based on the selected mode
-    if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
-      payload.heatSetpoint = this.toFahrenheit(Number(this.TargetTemperature));
-      payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
-    } else if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.COOL) {
-      payload.coolSetpoint = this.toFahrenheit(Number(this.TargetTemperature));
-      payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
-    } else if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.AUTO) {
-      payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
-      payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
-    } else {
-      payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
-      payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
+      // Set the heat and cool set point value based on the selected mode
+      if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
+        payload.heatSetpoint = this.toFahrenheit(Number(this.TargetTemperature));
+        payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
+        this.platform.device(`${this.device.deviceModel} Thermostat, TargetHeatingCoolingState (HEAT): ${this.TargetHeatingCoolingState},`
+          + ` TargetTemperature: ${this.toFahrenheit(Number(this.TargetTemperature))} heatSetpoint,`
+          + ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint`);
+      } else if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.COOL) {
+        payload.coolSetpoint = this.toFahrenheit(Number(this.TargetTemperature));
+        payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
+        this.platform.device(`${this.device.deviceModel} Thermostat, TargetHeatingCoolingState (COOL): ${this.TargetHeatingCoolingState},`
+          + ` TargetTemperature: ${this.toFahrenheit(Number(this.TargetTemperature))} coolSetpoint,`
+          + ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`);
+      } else if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.AUTO) {
+        payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
+        payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
+        this.platform.device(`${this.device.deviceModel} Thermostat, TargetHeatingCoolingState (AUTO): ${this.TargetHeatingCoolingState},`
+          + ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint,`
+          + ` HeatingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`);
+      } else {
+        payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
+        payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
+        this.platform.device(`${this.device.deviceModel} Thermostat, TargetHeatingCoolingState (OFF): ${this.TargetHeatingCoolingState},`
+          + ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint,`
+          + ` HeatingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`);
+      }
+
+      this.platform.log.info(`'Sending request for ${this.accessory.displayName} to Honeywell API. mode: ${payload.mode},`
+        + ` coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}, autoChangeoverActive: ${payload.autoChangeoverActive},`
+        + ` thermostatSetpointStatus: ${this.device.thermostat?.thermostatSetpointStatus},`);
+
+      // Make the API request
+      await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
+        params: {
+          locationId: this.locationId,
+        },
+      });
+      this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(payload)}`);
+    } catch (e: any) {
+      this.platform.log.error(`Thermostat: ${this.accessory.displayName}: failed to pushChanges.`
+        + ` Error Message: ${JSON.stringify(e.message)}`);
+      this.platform.device(`Thermostat: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
+      // logged within post call above
+      this.apiError(e);
     }
-
-    this.platform.log.info(`'Sending request for ${this.accessory.displayName} to Honeywell API. mode: ${payload.mode},`
-      + ` coolSetpoint: ${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint},`
-      + ` thermostatSetpointStatus: ${this.device.thermostat?.thermostatSetpointStatus},`);
-
-    // Make the API request
-    await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
-      params: {
-        locationId: this.locationId,
-      },
-    });
-    this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(payload)}`);
   }
 
   /**

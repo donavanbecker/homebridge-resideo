@@ -550,18 +550,17 @@ export class Thermostats {
                 + ` HeatingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`);
           }
           this.platform.log.info(`Sending request for ${this.accessory.displayName} to Honeywell API mode: ${payload.mode}, coolSetpoint: `
-            + `${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}, autoChangeoverActive: ${payload.autoChangeoverActive}, `
+            + `${payload.coolSetpoint}, heatSetpoint: ${payload.heatSetpoint}, autoChangeoverActive: ${payload.autoChangeoverActive},`
             + ` thermostatSetpointStatus: ${thermostatSetpointStatus}`);
       }
 
-      this.platform.device(`Thermostat: ${this.accessory.displayName} pushChanges - ${JSON.stringify(payload)}`);
       // Attempt to make the API request
       await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
         params: {
           locationId: this.locationId,
         },
       });
-      this.platform.device(`Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(this.device)}`);
+      this.platform.device(`Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(payload)}`);
     } catch (e: any) {
       this.platform.log.error(`Thermostat: ${this.accessory.displayName}: failed to pushChanges.`
         + ` Error Message: ${JSON.stringify(e.message)}`);
