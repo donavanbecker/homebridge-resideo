@@ -92,6 +92,16 @@ export type modes = {
   Auto: number;
 };
 
+export type payload = {
+  mode?: string;
+  heatSetpoint: number;
+  coolSetpoint: number;
+  thermostatSetpointStatus?: string;
+  autoChangeoverActive?: boolean;
+  thermostatSetpoint?: number;
+  unit?: string;
+};
+
 // Location
 export type location = {
   locationID: number;

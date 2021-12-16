@@ -229,10 +229,10 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       }
 
       this.config.credentials!.accessToken = result.access_token;
-      this.device('Got access token:', this.config.credentials!.accessToken);
+      this.device(`Got access token: ${this.config.credentials!.accessToken}`);
       // check if the refresh token has changed
       if (result.refresh_token !== this.config.credentials!.refreshToken) {
-        this.device('New refresh token:', result.refresh_token);
+        this.device(`New refresh token: ${result.refresh_token}`);
         await this.updateRefreshToken(result.refresh_token);
       }
 
@@ -862,6 +862,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   device(...log: any[]) {
     if (this.config.options?.debug === 'device') {
       this.log.warn('[DEVICE]', String(...log));
+    } else if (this.config.options?.debug === 'debug') {
+      this.log.info('[DEBUG]', String(...log));
     } else {
       this.log.debug(String(...log));
     }
