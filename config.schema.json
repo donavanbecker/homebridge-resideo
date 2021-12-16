@@ -202,7 +202,7 @@
                   "properties": {
                     "deviceType": {
                       "title": "Display As",
-                      "type": "boolean",
+                      "type": "string",
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Roompriority' && model.options.devices[arrayIndices].deviceID);"
                       },
