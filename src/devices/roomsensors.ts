@@ -26,6 +26,7 @@ export class RoomSensors {
   // Others
   accessoryId!: number;
   roomId!: number;
+  action!: string;
 
   // Updates
   SensorUpdateInProgress!: boolean;
@@ -208,9 +209,8 @@ export class RoomSensors {
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e: any) {
-      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to update status.`
-        + ` Error Message: ${JSON.stringify(e.message)}`);
-      this.platform.debug(`Room Sensor: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
+      this.action = 'refreshStatus';
+      this.honeywellAPIError(e);
       this.apiError();
     }
   }
@@ -251,6 +251,46 @@ export class RoomSensors {
 
   public apiError() {
     throw new this.platform.api.hap.HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+  }
+
+  public honeywellAPIError(e: any) {
+    if (e.message.includes('400')) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Bad Request`);
+      this.platform.debug('The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.');
+    } else if (e.message.includes('401')) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Unauthorized Request`);
+      this.platform.debug('Authorization for the API is required, but the request has not been authenticated.');
+    } else if (e.message.includes('403')) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Forbidden Request`);
+      this.platform.debug('The request has been authenticated but does not have appropriate permissions, or a requested resource is not found.');
+    } else if (e.message.includes('404')) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Requst Not Found`);
+      this.platform.debug('Specifies the requested path does not exist.');
+    } else if (e.message.includes('406')) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Request Not Acceptable`);
+      this.platform.debug('The client has requested a MIME type via the Accept header for a value not supported by the server.');
+    } else if (e.message.includes('415')) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Unsupported Requst Header`);
+      this.platform.debug('The client has defined a contentType header that is not supported by the server.');
+    } else if (e.message.includes('422')) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Unprocessable Entity`);
+      this.platform.debug('The client has made a valid request, but the server cannot process it.'
+        + ' This is often used for APIs for which certain limits have been exceeded.');
+    } else if (e.message.includes('429')) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Too Many Requests`);
+      this.platform.debug('The client has exceeded the number of requests allowed for a given time window.');
+    } else if (e.message.includes('500')) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Internal Server Error`);
+      this.platform.debug('An unexpected error on the SmartThings servers has occurred. These errors should be rare.');
+    } else {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action},`);
+    }
+    if (this.platform.config.options?.debug === 'device') {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to pushChanges, Error Message: ${JSON.stringify(e.message)}`);
+    }
+    if (this.platform.config.options?.debug === 'debug' || this.platform.debugMode) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
+    }
   }
 
   /**

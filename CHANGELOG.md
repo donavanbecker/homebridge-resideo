@@ -2,10 +2,18 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Beta - Version 11.1.3](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.1.3) (2021-12-XX)
+
+### What's Changes
+* Fixed Bug: Changing the temperature doesn't work. [#598](https://github.com/donavanbecker/homebridge-honeywell-home/issues/598)
+* Fixed: `config.schema.json` room priority parameter.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.1.2...v11.1.3
+
 ## [Version 11.1.2](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.1.2) (2021-12-15)
 
 ### What's Changes
-* Quick fix to `config.schema.json` for room priority parameter.
+* Fixed: `config.schema.json` room priority parameter.
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.1.1...v11.1.2
 

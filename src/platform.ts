@@ -48,6 +48,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
   public sensorData = [];
   private refreshInterval!: NodeJS.Timeout;
+  debugMode!: boolean;
+  errorLocationOrDevice!: string;
 
   constructor(public readonly log: Logger, public readonly config: HoneywellPlatformConfig, public readonly api: API) {
     this.debug(`Finished initializing platform: ${this.config.name}`);
@@ -55,6 +57,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     if (!this.config) {
       return;
     }
+
+    this.debugMode = process.argv.includes('-D') || process.argv.includes('--debug');
 
     // HOOBS notice
     if (__dirname.includes('hoobs')) {
@@ -92,14 +96,14 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       try {
         this.locations = await this.discoverlocations();
       } catch (e: any) {
-        this.log.error('Failed to Discover Locations,', JSON.stringify(e.message));
-        this.debug(JSON.stringify(e));
+        this.errorLocationOrDevice = 'Locations';
+        this.apiError(e);
       }
       try {
         this.discoverDevices();
       } catch (e: any) {
-        this.log.error('Failed to Discover Devices,', JSON.stringify(e.message));
-        this.debug(JSON.stringify(e));
+        this.errorLocationOrDevice = 'Device';
+        this.apiError(e);
       }
     });
   }
@@ -842,10 +846,49 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     }
   }
 
+  apiError(e: any) {
+    if (e.message.includes('400')) {
+      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}: Bad Request`);
+      this.debug('The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.');
+    } else if (e.message.includes('401')) {
+      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}: Unauthorized Request`);
+      this.debug('Authorization for the API is required, but the request has not been authenticated.');
+    } else if (e.message.includes('403')) {
+      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}: Forbidden Request`);
+      this.debug('The request has been authenticated but does not have appropriate permissions, or a requested resource is not found.');
+    } else if (e.message.includes('404')) {
+      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}: Requst Not Found`);
+      this.debug('Specifies the requested path does not exist.');
+    } else if (e.message.includes('406')) {
+      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}: Request Not Acceptable`);
+      this.debug('The client has requested a MIME type via the Accept header for a value not supported by the server.');
+    } else if (e.message.includes('415')) {
+      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}: Unsupported Requst Header`);
+      this.debug('The client has defined a contentType header that is not supported by the server.');
+    } else if (e.message.includes('422')) {
+      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}: Unprocessable Entity`);
+      this.debug('The client has made a valid request, but the server cannot process it.'
+        + ' This is often used for APIs for which certain limits have been exceeded.');
+    } else if (e.message.includes('429')) {
+      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}: Too Many Requests`);
+      this.debug('The client has exceeded the number of requests allowed for a given time window.');
+    } else if (e.message.includes('500')) {
+      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}: Internal Server Error`);
+      this.debug('An unexpected error on the SmartThings servers has occurred. These errors should be rare.');
+    } else {
+      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}`);
+    }
+    if (this.config.options?.debug === 'device') {
+      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}, Error Message: ${JSON.stringify(e.message)}`);
+    }
+    if (this.config.options?.debug === 'debug' || this.debugMode) {
+      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}, Error: ${JSON.stringify(e)}`);
+    }
+  }
+
   /**
    * If debug level logging is turned on, log to log.info
    * Otherwise send debug logs to log.debug
-   * this.debugMode = process.argv.includes('-D') || process.argv.includes('--debug');
    */
   debug(...log: any[]) {
     if (this.config.options?.debug === 'debug') {
