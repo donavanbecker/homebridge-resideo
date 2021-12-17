@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicValue, HAPStatus } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { skipWhile } from 'rxjs/operators';
@@ -211,7 +211,7 @@ export class RoomSensors {
       this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to update status.`
         + ` Error Message: ${JSON.stringify(e.message)}`);
       this.platform.debug(`Room Sensor: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
-      this.apiError(e);
+      this.apiError();
     }
   }
 
@@ -249,17 +249,8 @@ export class RoomSensors {
     }
   }
 
-  public apiError(e: any) {
-    this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, e);
-    if (!this.device.roomsensor?.hide_temperature) {
-      this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
-    }
-    if (!this.device.roomsensor?.hide_occupancy) {
-      this.occupancyService?.updateCharacteristic(this.platform.Characteristic.OccupancyDetected, e);
-    }
-    if (!this.device.roomsensor?.hide_humidity) {
-      this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
-    }
+  public apiError() {
+    throw new this.platform.api.hap.HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
   }
 
   /**

@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicValue, HAPStatus } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, take, tap } from 'rxjs/operators';
@@ -194,7 +194,7 @@ export class RoomSensorThermostat {
             this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} roompriority,`
               + ` Error Message: ${JSON.stringify(e.message)}`);
             this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
-            this.apiError(e);
+            this.apiError();
           }
           this.roomUpdateInProgress = false;
           // Refresh the status from the API
@@ -220,7 +220,7 @@ export class RoomSensorThermostat {
           this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} pushChanges,`
             + ` Error Message: ${JSON.stringify(e.message)}`);
           this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
-          this.apiError(e);
+          this.apiError();
         }
         this.thermostatUpdateInProgress = false;
         // Refresh the status from the API
@@ -310,7 +310,7 @@ export class RoomSensorThermostat {
       this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName}: failed to update status,`
         + ` Error Message: ${JSON.stringify(e.message)}`);
       this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
-      this.apiError(e);
+      this.apiError();
     }
   }
 
@@ -360,7 +360,7 @@ export class RoomSensorThermostat {
       this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to update status.`
         + ` Error Message: ${JSON.stringify(e.message)}`);
       this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
-      this.apiError(e);
+      this.apiError();
     }
   }
 
@@ -478,7 +478,7 @@ export class RoomSensorThermostat {
         + ` Error Message: ${JSON.stringify(e.message)}`);
       this.platform.device(`Thermostat: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
       // logged within post call above
-      this.apiError(e);
+      this.apiError();
     }
   }
 
@@ -543,15 +543,8 @@ export class RoomSensorThermostat {
     }
   }
 
-  public apiError(e: any) {
-    this.service.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, e);
-    this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
-    this.service.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
-    this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, e);
-    this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, e);
-    this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, e);
-    this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, e);
-    this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, e);
+  public apiError() {
+    throw new this.platform.api.hap.HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
   }
 
   private setTargetHeatingCoolingState(value: CharacteristicValue) {

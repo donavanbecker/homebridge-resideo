@@ -20,16 +20,26 @@
           "consumerKey": {
             "title": "Consumer Key",
             "type": "string",
-            "required": true
+            "required": true,
+            "x-schema-form": {
+              "type": "password"
+            }
           },
           "consumerSecret": {
             "title": "Consumer Secret",
-            "type": "string"
+            "type": "string",
+            "required": true,
+            "x-schema-form": {
+              "type": "password"
+            }
           },
           "refreshToken": {
             "title": "Refresh Token",
             "type": "string",
-            "required": true
+            "required": true,
+            "x-schema-form": {
+              "type": "password"
+            }
           },
           "notice": {
             "title": "Notice",

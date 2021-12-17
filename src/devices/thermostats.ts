@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicValue, HAPStatus } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, take, tap } from 'rxjs/operators';
@@ -236,7 +236,7 @@ export class Thermostats {
             this.platform.log.error(JSON.stringify(e.message));
             this.platform.device(`Thermostat: ${this.accessory.displayName} - ${JSON.stringify(e)}`);
             this.platform.refreshAccessToken();
-            this.apiError(e);
+            this.apiError();
           }
           this.roomUpdateInProgress = false;
           // Refresh the status from the API
@@ -262,7 +262,7 @@ export class Thermostats {
           this.platform.log.error(JSON.stringify(e.message));
           this.platform.device(`Thermostat: ${this.accessory.displayName} - ${JSON.stringify(e)}`);
           this.platform.refreshAccessToken();
-          this.apiError(e);
+          this.apiError();
         }
         this.thermostatUpdateInProgress = false;
         // Refresh the status from the API
@@ -288,7 +288,7 @@ export class Thermostats {
             this.platform.log.error(JSON.stringify(e.message));
             this.platform.device(`Thermostat: ${this.accessory.displayName} - ${JSON.stringify(e)}`);
             this.platform.refreshAccessToken();
-            this.apiError(e);
+            this.apiError();
           }
           this.fanUpdateInProgress = false;
           // Refresh the status from the API
@@ -430,7 +430,7 @@ export class Thermostats {
       this.platform.log.error(`Thermostat: ${this.accessory.displayName}: failed to update status.`
         + ` Error Message: ${JSON.stringify(e.message)}`);
       this.platform.device(`Thermostat: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
-      this.apiError(e);
+      this.apiError();
     }
   }
 
@@ -566,7 +566,7 @@ export class Thermostats {
         + ` Error Message: ${JSON.stringify(e.message)}`);
       this.platform.device(`Thermostat: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
       // logged within post call above
-      this.apiError(e);
+      this.apiError();
     }
   }
 
@@ -689,21 +689,8 @@ export class Thermostats {
     }
   }
 
-  public apiError(e: any) {
-    this.service.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, e);
-    this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
-    if (this.device.indoorHumidity && !this.device.thermostat?.hide_humidity) {
-      this.humidityService!.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
-    }
-    this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, e);
-    this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, e);
-    this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, e);
-    this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, e);
-    this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, e);
-    if (this.device.settings?.fan && !this.device.thermostat?.hide_fan) {
-      this.fanService?.updateCharacteristic(this.platform.Characteristic.TargetFanState, e);
-      this.fanService?.updateCharacteristic(this.platform.Characteristic.Active, e);
-    }
+  public apiError() {
+    throw new this.platform.api.hap.HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
   }
 
   private setTargetHeatingCoolingState(value: CharacteristicValue) {
