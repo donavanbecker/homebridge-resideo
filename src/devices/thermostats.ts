@@ -484,8 +484,14 @@ export class Thermostats {
           break;
         default:
           payload.thermostatSetpointStatus = this.thermostatSetpointStatus;
-          this.platform.device(`Thermostat: ${this.accessory.displayName} send thermostatSetpointStatus: `
-            + `${payload.thermostatSetpointStatus}, Model: ${this.device.deviceModel}`);
+          if (this.device.thermostat?.thermostatSetpointStatus === 'TemporaryHold' && this.device.thermostat?.nextPeriodTime) {
+            payload.nextPeriodTime = this.device.thermostat.nextPeriodTime;
+            this.platform.device(`Thermostat: ${this.accessory.displayName} send thermostatSetpointStatus: `
+              + `${payload.thermostatSetpointStatus}, nextPeriodTime: ${payload.nextPeriodTime}, Model: ${this.device.deviceModel}`);
+          } else {
+            this.platform.device(`Thermostat: ${this.accessory.displayName} send thermostatSetpointStatus: `
+              + `${payload.thermostatSetpointStatus}, Model: ${this.device.deviceModel}`);
+          }
       }
 
       switch (this.device.deviceModel) {
@@ -530,7 +536,7 @@ export class Thermostats {
               break;
           }
           this.platform.log.info(`Thermostat: ${this.accessory.displayName} sent request to Honeywell API thermostatSetpoint:`
-            + ` ${payload.thermostatSetpoint}, unit: ${payload.unit}, thermostatSetpointStatus: ${payload.thermostatSetpointStatus}`);
+            + ` ${payload.thermostatSetpoint}, unit: ${payload.unit}`);
 
           break;
         default:

@@ -63,6 +63,7 @@ export type thermostat = {
   hide_fan?: boolean;
   hide_humidity?: boolean;
   thermostatSetpointStatus?: string;
+  nextPeriodTime?: string;
   roomsensor?: roomsensor;
   roompriority?: roompriority;
 };
@@ -98,6 +99,7 @@ export type payload = {
   heatSetpoint: number;
   coolSetpoint: number;
   thermostatSetpointStatus?: string;
+  nextPeriodTime?: string;
   autoChangeoverActive?: boolean;
   thermostatSetpoint?: number;
   unit?: string;
