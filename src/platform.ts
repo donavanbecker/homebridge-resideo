@@ -49,7 +49,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   public sensorData = [];
   private refreshInterval!: NodeJS.Timeout;
   debugMode!: boolean;
-  errorLocationOrDevice!: string;
+  action!: string;
 
   constructor(public readonly log: Logger, public readonly config: HoneywellPlatformConfig, public readonly api: API) {
     this.debug(`Finished initializing platform: ${this.config.name}`);
@@ -71,8 +71,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       this.verifyConfig();
       this.debug('Config OK');
     } catch (e: any) {
-      this.log.error(JSON.stringify(e.message));
-      this.debug(JSON.stringify(e));
+      this.action = 'get Valid Config';
+      this.apiError(e);
       return;
     }
 
@@ -96,13 +96,13 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       try {
         this.locations = await this.discoverlocations();
       } catch (e: any) {
-        this.errorLocationOrDevice = 'Locations';
+        this.action = 'Discober Locations';
         this.apiError(e);
       }
       try {
         this.discoverDevices();
       } catch (e: any) {
-        this.errorLocationOrDevice = 'Device';
+        this.action = 'Discober Device';
         this.apiError(e);
       }
     });
@@ -226,8 +226,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
             })
           ).data;
         } catch (e: any) {
-          this.log.error('Failed to exchange refresh token for an access token.', JSON.stringify(e.message));
-          this.debug(JSON.stringify(e));
+          this.action = 'exchange refresh token for an access token.';
+          this.apiError(e);
           throw e;
         }
       }
@@ -242,8 +242,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
       this.config.credentials!.refreshToken = result.refresh_token;
     } catch (e: any) {
-      this.log.error('Failed to refresh access token.', JSON.stringify(e.message));
-      this.debug(JSON.stringify(e));
+      this.action = 'refresh access token';
+      this.apiError(e);
     }
   }
 
@@ -286,8 +286,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       writeFileSync(this.api.user.configPath(), JSON.stringify(currentConfig, null, 4));
       this.debug('Homebridge config.json has been updated with new refresh token.');
     } catch (e: any) {
-      this.log.error('Failed to update refresh token in config:', JSON.stringify(e.message));
-      this.debug(JSON.stringify(e));
+      this.action = 'refresh token in config';
+      this.apiError(e);
     }
   }
 
@@ -424,8 +424,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
           try {
             await this.discoverRoomSensors(location.locationID, device);
           } catch (e: any) {
-            this.log.error(`Failed to Find Room Sensor(s): ${JSON.stringify(e.message)}`);
-            this.debug(JSON.stringify(e));
+            this.action = 'Find Room Sensor(s)';
+            this.apiError(e);
           }
         }
         break;
@@ -737,8 +737,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       try {
         accessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
       } catch (e: any) {
-        this.log.error(`Failed to Get T9 Firmware Version: ${JSON.stringify(e.message)}`);
-        this.debug(JSON.stringify(e));
+        this.action = 'Get T9 Firmware Version';
+        this.apiError(e);
       }
     } else if (
       device.deviceModel.startsWith('Round') ||
@@ -756,8 +756,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       try {
         existingAccessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
       } catch (e: any) {
-        this.log.error('Failed to Get T9 Firmware Version.', JSON.stringify(e.message));
-        this.debug(JSON.stringify(e));
+        this.action = 'Get T9 Firmware Version';
+        this.apiError(e);
       }
     } else if (
       device.deviceModel.startsWith('Round') ||
@@ -848,41 +848,41 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
   apiError(e: any) {
     if (e.message.includes('400')) {
-      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}: Bad Request`);
+      this.log.error(`Failed to ${this.action}: Bad Request`);
       this.debug('The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.');
     } else if (e.message.includes('401')) {
-      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}: Unauthorized Request`);
+      this.log.error(`Failed to ${this.action}: Unauthorized Request`);
       this.debug('Authorization for the API is required, but the request has not been authenticated.');
     } else if (e.message.includes('403')) {
-      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}: Forbidden Request`);
+      this.log.error(`Failed to ${this.action}: Forbidden Request`);
       this.debug('The request has been authenticated but does not have appropriate permissions, or a requested resource is not found.');
     } else if (e.message.includes('404')) {
-      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}: Requst Not Found`);
+      this.log.error(`Failed to ${this.action}: Requst Not Found`);
       this.debug('Specifies the requested path does not exist.');
     } else if (e.message.includes('406')) {
-      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}: Request Not Acceptable`);
+      this.log.error(`Failed to ${this.action}: Request Not Acceptable`);
       this.debug('The client has requested a MIME type via the Accept header for a value not supported by the server.');
     } else if (e.message.includes('415')) {
-      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}: Unsupported Requst Header`);
+      this.log.error(`Failed to ${this.action}: Unsupported Requst Header`);
       this.debug('The client has defined a contentType header that is not supported by the server.');
     } else if (e.message.includes('422')) {
-      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}: Unprocessable Entity`);
+      this.log.error(`Failed to ${this.action}: Unprocessable Entity`);
       this.debug('The client has made a valid request, but the server cannot process it.'
         + ' This is often used for APIs for which certain limits have been exceeded.');
     } else if (e.message.includes('429')) {
-      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}: Too Many Requests`);
+      this.log.error(`Failed to ${this.action}: Too Many Requests`);
       this.debug('The client has exceeded the number of requests allowed for a given time window.');
     } else if (e.message.includes('500')) {
-      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}: Internal Server Error`);
+      this.log.error(`Failed to ${this.action}: Internal Server Error`);
       this.debug('An unexpected error on the SmartThings servers has occurred. These errors should be rare.');
     } else {
-      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}`);
+      this.log.error(`Failed to ${this.action}`);
     }
     if (this.config.options?.debug === 'device') {
-      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}, Error Message: ${JSON.stringify(e.message)}`);
+      this.log.error(`Failed to ${this.action}, Error Message: ${JSON.stringify(e.message)}`);
     }
     if (this.config.options?.debug === 'debug' || this.debugMode) {
-      this.log.error(`Failed to Discover ${this.errorLocationOrDevice}, Error: ${JSON.stringify(e)}`);
+      this.log.error(`Failed to ${this.action}, Error: ${JSON.stringify(e)}`);
     }
   }
 
