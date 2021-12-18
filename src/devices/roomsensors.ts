@@ -86,7 +86,7 @@ export class RoomSensors {
     this.service.setCharacteristic(this.platform.Characteristic.ChargingState, 2);
 
     // Temperature Sensor Service
-    if (this.device.roomsensor?.hide_temperature) {
+    if (device.thermostat?.roomsensor?.hide_temperature) {
       this.platform.device(`Room Sensor: ${accessory.displayName} Removing Temperature Sensor Service`);
       this.temperatureService = this.accessory.getService(this.platform.Service.TemperatureSensor);
       accessory.removeService(this.temperatureService!);
@@ -113,7 +113,7 @@ export class RoomSensors {
     }
 
     // Occupancy Sensor Service
-    if (this.device.roomsensor?.hide_occupancy) {
+    if (device.thermostat?.roomsensor?.hide_occupancy) {
       this.platform.device(`Room Sensor: ${accessory.displayName} Removing Occupancy Sensor Service`);
       this.occupancyService = this.accessory.getService(this.platform.Service.OccupancySensor);
       accessory.removeService(this.occupancyService!);
@@ -130,7 +130,7 @@ export class RoomSensors {
     }
 
     // Humidity Sensor Service
-    if (this.device.roomsensor?.hide_humidity) {
+    if (device.thermostat?.roomsensor?.hide_humidity) {
       this.platform.device(`Room Sensor: ${accessory.displayName} Removing Humidity Sensor Service`);
       this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor);
       accessory.removeService(this.humidityService!);
@@ -178,13 +178,13 @@ export class RoomSensors {
     this.platform.device(`Room Sensor: ${this.accessory.displayName} StatusLowBattery: ${this.StatusLowBattery}`);
 
     // Set Temperature Sensor State
-    if (!this.device.roomsensor?.hide_temperature) {
+    if (!this.device.thermostat?.roomsensor?.hide_temperature) {
       this.CurrentTemperature = this.toCelsius(this.sensorAccessory.accessoryValue.indoorTemperature);
     }
     this.platform.device(`Room Sensor: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}°c`);
 
     // Set Occupancy Sensor State
-    if (!this.device.roomsensor?.hide_occupancy) {
+    if (!this.device.thermostat?.roomsensor?.hide_occupancy) {
       if (this.sensorAccessory.accessoryValue.occupancyDet) {
         this.OccupancyDetected = 1;
       } else {
@@ -193,7 +193,7 @@ export class RoomSensors {
     }
 
     // Set Humidity Sensor State
-    if (!this.device.roomsensor?.hide_humidity) {
+    if (!this.device.thermostat?.roomsensor?.hide_humidity) {
       this.CurrentRelativeHumidity = this.sensorAccessory.accessoryValue.indoorHumidity;
     }
     this.platform.device(`Room Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}%`);
@@ -226,7 +226,7 @@ export class RoomSensors {
       this.platform.device(`Room Sensor: ${this.accessory.displayName} updateCharacteristic StatusLowBattery: ${this.StatusLowBattery}`);
     }
     if (
-      this.device.roomsensor?.hide_temperature || this.CurrentTemperature === undefined
+      this.device.thermostat?.roomsensor?.hide_temperature || this.CurrentTemperature === undefined
       && Number.isNaN(this.CurrentTemperature)
     ) {
       this.platform.debug(`Room Sensor: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}`);
@@ -234,13 +234,13 @@ export class RoomSensors {
       this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
       this.platform.device(`Room Sensor: ${this.accessory.displayName} updateCharacteristic CurrentTemperature: ${this.CurrentTemperature}`);
     }
-    if (this.device.roomsensor?.hide_occupancy || this.OccupancyDetected === undefined) {
+    if (this.device.thermostat?.roomsensor?.hide_occupancy || this.OccupancyDetected === undefined) {
       this.platform.debug(`Room Sensor: ${this.accessory.displayName} OccupancyDetected: ${this.OccupancyDetected}`);
     } else {
       this.occupancyService?.updateCharacteristic(this.platform.Characteristic.OccupancyDetected, this.OccupancyDetected);
       this.platform.device(`Room Sensor: ${this.accessory.displayName} updateCharacteristic OccupancyDetected: ${this.OccupancyDetected}`);
     }
-    if (this.device.roomsensor?.hide_humidity || this.CurrentRelativeHumidity === undefined) {
+    if (this.device.thermostat?.roomsensor?.hide_humidity || this.CurrentRelativeHumidity === undefined) {
       this.platform.debug(`Room Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
     } else {
       this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);

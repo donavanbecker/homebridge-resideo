@@ -179,7 +179,7 @@ export class RoomSensorThermostat {
 
     // Watch for thermostat change events
     // We put in a debounce of 100ms so we don't make duplicate calls
-    if (device.roompriority?.deviceType === 'Thermostat') {
+    if (device.thermostat?.roompriority?.deviceType === 'Thermostat') {
       this.doRoomUpdate
         .pipe(
           tap(() => {
@@ -323,7 +323,7 @@ export class RoomSensorThermostat {
    */
   async refreshSensorStatus() {
     try {
-      if (this.device.roompriority?.deviceType === 'Thermostat') {
+      if (this.device.thermostat?.roompriority?.deviceType === 'Thermostat') {
         if (this.device.deviceID.startsWith('LCC')) {
           if (this.device.deviceModel.startsWith('T9')) {
             if (this.device.groups) {
@@ -368,7 +368,7 @@ export class RoomSensorThermostat {
   }
 
   public async refreshRoomPriority() {
-    if (this.device.roompriority?.deviceType === 'Thermostat') {
+    if (this.device.thermostat?.roompriority?.deviceType === 'Thermostat') {
       this.roompriority = (
         await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
           params: {
@@ -389,11 +389,11 @@ export class RoomSensorThermostat {
     if (`[${this.sensorAccessory.accessoryId}]` !== `[${this.roompriority.currentPriority.selectedRooms}]`) {
       const payload = {
         currentPriority: {
-          priorityType: this.device.roompriority?.priorityType,
+          priorityType: this.device.thermostat?.roompriority?.priorityType,
         },
       } as any;
 
-      if (this.device.roompriority?.priorityType === 'PickARoom') {
+      if (this.device.thermostat?.roompriority?.priorityType === 'PickARoom') {
         payload.currentPriority.selectedRooms = [this.sensorAccessory.accessoryId];
       }
 
@@ -403,16 +403,16 @@ export class RoomSensorThermostat {
        * "TemporaryHold" will hold the set temperature until "nextPeriodTime".
        * "PermanentHold" will hold the setpoint until user requests another change.
        */
-      if (this.device.roompriority?.deviceType === 'Thermostat') {
-        if (this.device.roompriority.priorityType === 'FollowMe') {
+      if (this.device.thermostat?.roompriority?.deviceType === 'Thermostat') {
+        if (this.device.thermostat?.roompriority.priorityType === 'FollowMe') {
+          this.platform.log.info(`Room Sensor Thermostat: ${this.accessory.displayName} sent request to Honeywell API, Priority Type: `
+            + `${this.device.thermostat?.roompriority.priorityType} Built-in Occupancy Sensor(s) Will be used to set Priority Automatically.`);
+        } else if (this.device.thermostat?.roompriority.priorityType === 'WholeHouse') {
           this.platform.log.info(`Room Sensor Thermostat: ${this.accessory.displayName} sent request to Honeywell API,`
-            + ` Priority Type: ${this.device.roompriority.priorityType} Built-in Occupancy Sensor(s) Will be used to set Priority Automatically.`);
-        } else if (this.device.roompriority.priorityType === 'WholeHouse') {
+            + ` Priority Type: ${this.device.thermostat?.roompriority.priorityType}`);
+        } else if (this.device.thermostat?.roompriority.priorityType === 'PickARoom') {
           this.platform.log.info(`Room Sensor Thermostat: ${this.accessory.displayName} sent request to Honeywell API,`
-            + ` Priority Type: ${this.device.roompriority.priorityType}`);
-        } else if (this.device.roompriority.priorityType === 'PickARoom') {
-          this.platform.log.info(`Room Sensor Thermostat: ${this.accessory.displayName} sent request to Honeywell API,`
-            + ` Room Priority: ${this.sensorAccessory.accessoryAttribute.name}, Priority Type: ${this.device.roompriority.priorityType}`);
+            + ` Room Priority: ${this.sensorAccessory.accessoryAttribute.name}, Priority Type: ${this.device.thermostat?.roompriority.priorityType}`);
         }
 
         // Make the API request

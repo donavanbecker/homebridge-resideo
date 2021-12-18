@@ -73,6 +73,14 @@ export class Thermostats {
     // default placeholders
     this.Active = this.platform.Characteristic.Active.INACTIVE;
     this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
+    if (this.device.thermostat?.thermostatSetpointStatus) {
+      this.thermostatSetpointStatus = this.device.thermostat.thermostatSetpointStatus;
+      this.platform.device(`Thermostat: ${this.accessory.displayName} thermostatSetpointStatus config set to `
+        + `${this.thermostatSetpointStatus},`);
+    } else {
+      this.thermostatSetpointStatus = 'PermanentHold';
+      this.platform.device(`Thermostat: ${this.accessory.displayName} thermostatSetpointStatus config not set`);
+    }
 
     // this is subject we use to track when we need to POST changes to the Honeywell API for Room Changes - T9 Only
     this.doRoomUpdate = new Subject();
@@ -216,7 +224,7 @@ export class Thermostats {
 
     // Watch for thermostat change events
     // We put in a debounce of 100ms so we don't make duplicate calls
-    if (device.roompriority?.deviceType === 'Thermostat' && device.deviceModel === 'T9-T10') {
+    if (device.thermostat?.roompriority?.deviceType === 'Thermostat' && device.deviceModel === 'T9-T10') {
       this.doRoomUpdate
         .pipe(
           tap(() => {
@@ -437,7 +445,7 @@ export class Thermostats {
   }
 
   public async refreshRoomPriority() {
-    if (this.device.roompriority?.deviceType === 'Thermostat' && this.device.deviceModel === 'T9-T10') {
+    if (this.device.thermostat?.roompriority?.deviceType === 'Thermostat' && this.device.deviceModel === 'T9-T10') {
       this.roompriority = (
         await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
           params: {
@@ -468,7 +476,6 @@ export class Thermostats {
             + ` mode: ${this.honeywellMode[Number(this.TargetHeatingCoolingState)]}`);
       }
 
-      this.thermostatSetpointStatus = this.device.thermostat?.thermostatSetpointStatus || 'PermanentHold';
       // Only include thermostatSetpointStatus on certain models
       switch (this.device.deviceModel) {
         case 'Round':
@@ -502,12 +509,12 @@ export class Thermostats {
           break;
         case 'Unknown':
           this.platform.device(`Thermostat: ${this.accessory.displayName} do not send autoChangeoverActive,`
-            +` Model: ${this.device.deviceModel}`);
+            + ` Model: ${this.device.deviceModel}`);
           break;
         default:
           payload.autoChangeoverActive = this.device.changeableValues!.autoChangeoverActive;
           this.platform.device(`Thermostat: ${this.accessory.displayName} set autoChangeoverActive to `
-            +`${this.device.changeableValues!.autoChangeoverActive} for Model: ${this.device.deviceModel}`);
+            + `${this.device.changeableValues!.autoChangeoverActive} for Model: ${this.device.deviceModel}`);
       }
 
       switch (this.device.deviceModel) {
@@ -584,11 +591,11 @@ export class Thermostats {
     if (`[${this.device.inBuiltSensorState!.roomId}]` !== `[${this.roompriority.currentPriority.selectedRooms}]`) {
       const payload = {
         currentPriority: {
-          priorityType: this.device.roompriority?.priorityType,
+          priorityType: this.device.thermostat?.roompriority?.priorityType,
         },
       } as any;
 
-      if (this.device.roompriority?.priorityType === 'PickARoom') {
+      if (this.device.thermostat?.roompriority?.priorityType === 'PickARoom') {
         payload.currentPriority.selectedRooms = [this.device.inBuiltSensorState!.roomId];
       }
 
@@ -598,7 +605,7 @@ export class Thermostats {
        * "TemporaryHold" will hold the set temperature until "nextPeriodTime".
        * "PermanentHold" will hold the setpoint until user requests another change.
        */
-      if (this.device.roompriority?.deviceType === 'Thermostat') {
+      if (this.device.thermostat?.roompriority?.deviceType === 'Thermostat') {
         if (this.device.priorityType === 'FollowMe') {
           this.platform.log.info(`Sending request for ${this.accessory.displayName} to Honeywell API Priority Type:`
             + ` ${this.device.priorityType}, Built-in Occupancy Sensor(s) Will be used to set Priority Automatically`);
@@ -607,7 +614,7 @@ export class Thermostats {
             + ` ${this.device.priorityType}`);
         } else if (this.device.priorityType === 'PickARoom') {
           this.platform.log.info(`Sending request for ${this.accessory.displayName} to Honeywell API Room Priority:`
-            + ` ${this.device.inBuiltSensorState!.roomName}, Priority Type: ${this.device.roompriority.priorityType}`);
+            + ` ${this.device.inBuiltSensorState!.roomName}, Priority Type: ${this.device.thermostat?.roompriority.priorityType}`);
         }
         // Make the API request
         await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
@@ -749,7 +756,7 @@ export class Thermostats {
       this.TargetTemperature = this.toCelsius(this.device.changeableValues!.coolSetpoint);
     }
     this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
-    if (this.device.roompriority?.deviceType === 'Thermostat' && this.device.deviceModel === 'T9-T10') {
+    if (this.device.thermostat?.roompriority?.deviceType === 'Thermostat' && this.device.deviceModel === 'T9-T10') {
       this.doRoomUpdate.next();
     }
     if (this.TargetHeatingCoolingState !== this.modes[this.device.changeableValues!.mode]) {
