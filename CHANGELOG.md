@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file. This projec
 ## [Version 11.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.2.0) (2021-12-18)
 
 ### What's Changes
-* Fixed Bug: Changing the temperature doesn't work. [#598](https://github.com/donavanbecker/homebridge-honeywell-home/issues/598)
+* Fixed Bug: Changing the temperature doesn't work. [#613](https://github.com/donavanbecker/homebridge-honeywell-home/issues/613)
 * Moved the `Room Sensor` and `Room Priority` settings under `Thermostat` DeviceClass, since they are all tied to the Thermostat.
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.1.2...v11.2.0
