@@ -20,16 +20,26 @@
           "consumerKey": {
             "title": "Consumer Key",
             "type": "string",
-            "required": true
+            "required": true,
+            "x-schema-form": {
+              "type": "password"
+            }
           },
           "consumerSecret": {
             "title": "Consumer Secret",
-            "type": "string"
+            "type": "string",
+            "required": true,
+            "x-schema-form": {
+              "type": "password"
+            }
           },
           "refreshToken": {
             "title": "Refresh Token",
             "type": "string",
-            "required": true
+            "required": true,
+            "x-schema-form": {
+              "type": "password"
+            }
           },
           "notice": {
             "title": "Notice",
@@ -75,18 +85,6 @@
                       "enum": [
                         "LeakDetector"
                       ]
-                    },
-                    {
-                      "title": "Room Sensor",
-                      "enum": [
-                        "Roomsensor"
-                      ]
-                    },
-                    {
-                      "title": "Room Priority",
-                      "enum": [
-                        "Roompriority"
-                      ]
                     }
                   ],
                   "condition": {
@@ -104,16 +102,16 @@
                       }
                     },
                     "hide_humidity": {
-                      "title": "Hide Humidity Service",
+                      "title": "Hide Thermostat Humidity Service",
                       "type": "boolean",
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID);"
                       }
                     },
                     "thermostatSetpointStatus": {
-                      "title": "Thermostat Setpoint Status",
+                      "title": "Thermostat Setpoint Status (LCC Devices Only)",
                       "type": "string",
-                      "description": "For \"LCC-\" devices only. \"PermanentHold\" will hold the setpoint until user requests another change. \"NoHold\" will return to schedule. \"TemporaryHold\" will hold the set temperature until \"nextPeriodTime\".",
+                      "description": "\"PermanentHold\" will hold the setpoint until user requests another change. \"NoHold\" will return to schedule. \"TemporaryHold\" will hold the set temperature until \"nextPeriodTime\".",
                       "placeholder": "PermanentHold",
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID);"
@@ -139,6 +137,95 @@
                           ]
                         }
                       ]
+                    },
+                    "roompriority": {
+                      "title": "Room Priority Settings (T9/T10 Only)",
+                      "type": "object",
+                      "properties": {
+                        "deviceType": {
+                          "title": "Display As",
+                          "type": "string",
+                          "condition": {
+                            "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID);"
+                          },
+                          "oneOf": [
+                            {
+                              "title": "Thermostat",
+                              "enum": [
+                                "Thermostat"
+                              ]
+                            }
+                          ]
+                        },
+                        "priorityType": {
+                          "title": "Priority Type",
+                          "type": "string",
+                          "condition": {
+                            "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID);"
+                          },
+                          "placeholder": "PickARoom",
+                          "oneOf": [
+                            {
+                              "title": "Pick A Room",
+                              "enum": [
+                                "PickARoom"
+                              ]
+                            },
+                            {
+                              "title": "Whole House",
+                              "enum": [
+                                "WholeHouse"
+                              ]
+                            },
+                            {
+                              "title": "Follow Me",
+                              "enum": [
+                                "FollowMe"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      "condition": {
+                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID);"
+                      }
+                    },
+                    "roomsensor": {
+                      "title": "Room Sensor Settings (T9/T10 Only)",
+                      "type": "object",
+                      "properties": {
+                        "hide_roomsensor": {
+                          "title": "Hide Roomsensor(s)",
+                          "type": "boolean",
+                          "condition": {
+                            "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID);"
+                          }
+                        },
+                        "hide_temperature": {
+                          "title": "Hide Roomsensor Temperature Service",
+                          "type": "boolean",
+                          "condition": {
+                            "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID && !model.options.devices[arrayIndices].thermostat.roomsensor.hide_roomsensor);"
+                          }
+                        },
+                        "hide_humidity": {
+                          "title": "Hide Roomsensor Humidity Service",
+                          "type": "boolean",
+                          "condition": {
+                            "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID && !model.options.devices[arrayIndices].thermostat.roomsensor.hide_roomsensor);"
+                          }
+                        },
+                        "hide_occupancy": {
+                          "title": "Hide Roomsensor Occupancy Service",
+                          "type": "boolean",
+                          "condition": {
+                            "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID && !model.options.devices[arrayIndices].thermostat.roomsensor.hide_roomsensor);"
+                          }
+                        }
+                      },
+                      "condition": {
+                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID);"
+                      }
                     }
                   }
                 },
@@ -150,29 +237,9 @@
                       "title": "Hide Leak Service",
                       "type": "boolean",
                       "condition": {
-                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Roomsensor' && model.options.devices[arrayIndices].deviceID);"
+                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'LeakDetector' && model.options.devices[arrayIndices].deviceID);"
                       }
                     },
-                    "hide_temperature": {
-                      "title": "Hide Temperature Service",
-                      "type": "boolean",
-                      "condition": {
-                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Roomsensor' && model.options.devices[arrayIndices].deviceID);"
-                      }
-                    },
-                    "hide_humidity": {
-                      "title": "Hide Humidity Service",
-                      "type": "boolean",
-                      "condition": {
-                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Roomsensor' && model.options.devices[arrayIndices].deviceID);"
-                      }
-                    }
-                  }
-                },
-                "roomsensor": {
-                  "title": "Room Sensor",
-                  "type": "object",
-                  "properties": {
                     "hide_temperature": {
                       "title": "Hide Temperature Service",
                       "type": "boolean",
@@ -186,62 +253,6 @@
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'LeakDetector' && model.options.devices[arrayIndices].deviceID);"
                       }
-                    },
-                    "hide_occupancy": {
-                      "title": "Hide Occupancy Service",
-                      "type": "boolean",
-                      "condition": {
-                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'LeakDetector' && model.options.devices[arrayIndices].deviceID);"
-                      }
-                    }
-                  }
-                },
-                "roompriority": {
-                  "title": "Room Priority",
-                  "type": "object",
-                  "properties": {
-                    "deviceType": {
-                      "title": "Display As",
-                      "type": "string",
-                      "condition": {
-                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Roompriority' && model.options.devices[arrayIndices].deviceID);"
-                      },
-                      "oneOf": [
-                        {
-                          "title": "Thermostat",
-                          "enum": [
-                            "Thermostat"
-                          ]
-                        }
-                      ]
-                    },
-                    "priorityType": {
-                      "title": "Priority Type",
-                      "type": "string",
-                      "condition": {
-                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Roompriority' && model.options.devices[arrayIndices].deviceID);"
-                      },
-                      "placeholder": "PickARoom",
-                      "oneOf": [
-                        {
-                          "title": "Pick A Room",
-                          "enum": [
-                            "PickARoom"
-                          ]
-                        },
-                        {
-                          "title": "Whole House",
-                          "enum": [
-                            "WholeHouse"
-                          ]
-                        },
-                        {
-                          "title": "Follow Me",
-                          "enum": [
-                            "FollowMe"
-                          ]
-                        }
-                      ]
                     }
                   }
                 }
@@ -328,14 +339,17 @@
             "options.devices[].thermostat.hide_fan",
             "options.devices[].thermostat.hide_humidity",
             "options.devices[].thermostat.thermostatSetpointStatus",
+            "options.devices[].thermostat.roompriority",
+            "options.devices[].thermostat.roompriority.deviceType",
+            "options.devices[].thermostat.roompriority.priorityType",
+            "options.devices[].thermostat.roomsensor",
+            "options.devices[].thermostat.roomsensor.hide_roomsensor",
+            "options.devices[].thermostat.roomsensor.hide_temperature",
+            "options.devices[].thermostat.roomsensor.hide_humidity",
+            "options.devices[].thermostat.roomsensor.hide_occupancy",
             "options.devices[].leaksensor.hide_leak",
             "options.devices[].leaksensor.hide_temperature",
-            "options.devices[].leaksensor.hide_humidity",
-            "options.devices[].roomsensor.hide_temperature",
-            "options.devices[].roomsensor.hide_humidity",
-            "options.devices[].roomsensor.hide_occupancy",
-            "options.devices[].roompriority.deviceType",
-            "options.devices[].roompriority.priorityType"
+            "options.devices[].leaksensor.hide_humidity"
           ]
         }
       ]

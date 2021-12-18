@@ -48,6 +48,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
   public sensorData = [];
   private refreshInterval!: NodeJS.Timeout;
+  debugMode!: boolean;
+  action!: string;
 
   constructor(public readonly log: Logger, public readonly config: HoneywellPlatformConfig, public readonly api: API) {
     this.debug(`Finished initializing platform: ${this.config.name}`);
@@ -55,6 +57,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     if (!this.config) {
       return;
     }
+
+    this.debugMode = process.argv.includes('-D') || process.argv.includes('--debug');
 
     // HOOBS notice
     if (__dirname.includes('hoobs')) {
@@ -67,8 +71,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       this.verifyConfig();
       this.debug('Config OK');
     } catch (e: any) {
-      this.log.error(JSON.stringify(e.message));
-      this.debug(JSON.stringify(e));
+      this.action = 'get Valid Config';
+      this.apiError(e);
       return;
     }
 
@@ -92,14 +96,14 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       try {
         this.locations = await this.discoverlocations();
       } catch (e: any) {
-        this.log.error('Failed to Discover Locations,', JSON.stringify(e.message));
-        this.debug(JSON.stringify(e));
+        this.action = 'Discober Locations';
+        this.apiError(e);
       }
       try {
         this.discoverDevices();
       } catch (e: any) {
-        this.log.error('Failed to Discover Devices,', JSON.stringify(e.message));
-        this.debug(JSON.stringify(e));
+        this.action = 'Discober Device';
+        this.apiError(e);
       }
     });
   }
@@ -222,8 +226,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
             })
           ).data;
         } catch (e: any) {
-          this.log.error('Failed to exchange refresh token for an access token.', JSON.stringify(e.message));
-          this.debug(JSON.stringify(e));
+          this.action = 'exchange refresh token for an access token.';
+          this.apiError(e);
           throw e;
         }
       }
@@ -238,8 +242,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
       this.config.credentials!.refreshToken = result.refresh_token;
     } catch (e: any) {
-      this.log.error('Failed to refresh access token.', JSON.stringify(e.message));
-      this.debug(JSON.stringify(e));
+      this.action = 'refresh access token';
+      this.apiError(e);
     }
   }
 
@@ -282,8 +286,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       writeFileSync(this.api.user.configPath(), JSON.stringify(currentConfig, null, 4));
       this.debug('Homebridge config.json has been updated with new refresh token.');
     } catch (e: any) {
-      this.log.error('Failed to update refresh token in config:', JSON.stringify(e.message));
-      this.debug(JSON.stringify(e));
+      this.action = 'refresh token in config';
+      this.apiError(e);
     }
   }
 
@@ -334,7 +338,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     if (device.deviceModel.startsWith('T9') && device.groups) {
       for (const group of device.groups) {
         const roomsensors = await this.getCurrentSensorData(device, group, locationId);
-        if (device.roompriority?.deviceType) {
+        if (device.thermostat?.roompriority?.deviceType) {
           this.log.info('Total Rooms Found:', roomsensors.length);
         }
         for (const accessories of roomsensors) {
@@ -420,8 +424,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
           try {
             await this.discoverRoomSensors(location.locationID, device);
           } catch (e: any) {
-            this.log.error(`Failed to Find Room Sensor(s): ${JSON.stringify(e.message)}`);
-            this.debug(JSON.stringify(e));
+            this.action = 'Find Room Sensor(s)';
+            this.apiError(e);
           }
         }
         break;
@@ -463,20 +467,20 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   }
 
   private roomsensordisplaymethod(device: device & devicesConfig) {
-    if (device.roompriority) {
+    if (device.thermostat?.roompriority) {
       /**
        * Room Priority
        * This will display what room priority option that has been selected.
        */
       if (
-        device.roompriority.deviceType &&
+        device.thermostat?.roompriority.deviceType &&
         !device.hide_device &&
         !this.config.disablePlugin
       ) {
         this.log.warn('Displaying Thermostat(s) for Each Room Sensor(s).');
       }
       if (
-        !device.roompriority.deviceType &&
+        !device.thermostat?.roompriority.deviceType &&
         !device.hide_device &&
         !this.config.disablePlugin
       ) {
@@ -606,7 +610,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
     if (existingAccessory) {
       // the accessory already exists
-      if (!device.hide_device && device.isAlive && !this.config.disablePlugin) {
+      if (!device.hide_device && !device.thermostat?.roomsensor?.hide_roomsensor && device.isAlive && !this.config.disablePlugin) {
         this.log.info(`Restoring existing accessory from cache: ${existingAccessory.displayName} DeviceID: ${sensorAccessory.deviceID}`);
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
@@ -624,7 +628,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
-    } else if (!device.hide_device && device.isAlive && !this.config.disablePlugin) {
+    } else if (!device.hide_device && !device.thermostat?.roomsensor?.hide_roomsensor && device.isAlive && !this.config.disablePlugin) {
       // the accessory does not yet exist, so we need to create it
       this.log.info(`Adding new accessory: ${sensorAccessory.accessoryAttribute.name} ${sensorAccessory.accessoryAttribute.type} `
         + `Device ID: ${sensorAccessory.deviceID}`);
@@ -670,7 +674,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     if (existingAccessory) {
       // the accessory already exists
       if (
-        device.isAlive && device.roompriority?.deviceType &&
+        device.isAlive && device.thermostat?.roompriority?.deviceType &&
         !device.hide_device && !this.config.disablePlugin
       ) {
         this.log.info(`Restoring existing accessory from cache: ${existingAccessory.displayName} DeviceID: ${sensorAccessory.deviceID}`);
@@ -692,7 +696,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       }
     } else if (
       device.isAlive &&
-      device.roompriority?.deviceType &&
+      device.thermostat?.roompriority?.deviceType &&
       !device.hide_device &&
       !this.config.disablePlugin
     ) {
@@ -733,8 +737,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       try {
         accessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
       } catch (e: any) {
-        this.log.error(`Failed to Get T9 Firmware Version: ${JSON.stringify(e.message)}`);
-        this.debug(JSON.stringify(e));
+        this.action = 'Get T9 Firmware Version';
+        this.apiError(e);
       }
     } else if (
       device.deviceModel.startsWith('Round') ||
@@ -752,8 +756,8 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       try {
         existingAccessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
       } catch (e: any) {
-        this.log.error('Failed to Get T9 Firmware Version.', JSON.stringify(e.message));
-        this.debug(JSON.stringify(e));
+        this.action = 'Get T9 Firmware Version';
+        this.apiError(e);
       }
     } else if (
       device.deviceModel.startsWith('Round') ||
@@ -842,10 +846,49 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     }
   }
 
+  apiError(e: any) {
+    if (e.message.includes('400')) {
+      this.log.error(`Failed to ${this.action}: Bad Request`);
+      this.debug('The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.');
+    } else if (e.message.includes('401')) {
+      this.log.error(`Failed to ${this.action}: Unauthorized Request`);
+      this.debug('Authorization for the API is required, but the request has not been authenticated.');
+    } else if (e.message.includes('403')) {
+      this.log.error(`Failed to ${this.action}: Forbidden Request`);
+      this.debug('The request has been authenticated but does not have appropriate permissions, or a requested resource is not found.');
+    } else if (e.message.includes('404')) {
+      this.log.error(`Failed to ${this.action}: Requst Not Found`);
+      this.debug('Specifies the requested path does not exist.');
+    } else if (e.message.includes('406')) {
+      this.log.error(`Failed to ${this.action}: Request Not Acceptable`);
+      this.debug('The client has requested a MIME type via the Accept header for a value not supported by the server.');
+    } else if (e.message.includes('415')) {
+      this.log.error(`Failed to ${this.action}: Unsupported Requst Header`);
+      this.debug('The client has defined a contentType header that is not supported by the server.');
+    } else if (e.message.includes('422')) {
+      this.log.error(`Failed to ${this.action}: Unprocessable Entity`);
+      this.debug('The client has made a valid request, but the server cannot process it.'
+        + ' This is often used for APIs for which certain limits have been exceeded.');
+    } else if (e.message.includes('429')) {
+      this.log.error(`Failed to ${this.action}: Too Many Requests`);
+      this.debug('The client has exceeded the number of requests allowed for a given time window.');
+    } else if (e.message.includes('500')) {
+      this.log.error(`Failed to ${this.action}: Internal Server Error`);
+      this.debug('An unexpected error on the SmartThings servers has occurred. These errors should be rare.');
+    } else {
+      this.log.error(`Failed to ${this.action}`);
+    }
+    if (this.config.options?.debug === 'device') {
+      this.log.error(`Failed to ${this.action}, Error Message: ${JSON.stringify(e.message)}`);
+    }
+    if (this.config.options?.debug === 'debug' || this.debugMode) {
+      this.log.error(`Failed to ${this.action}, Error: ${JSON.stringify(e)}`);
+    }
+  }
+
   /**
    * If debug level logging is turned on, log to log.info
    * Otherwise send debug logs to log.debug
-   * this.debugMode = process.argv.includes('-D') || process.argv.includes('--debug');
    */
   debug(...log: any[]) {
     if (this.config.options?.debug === 'debug') {

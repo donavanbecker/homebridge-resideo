@@ -56,8 +56,6 @@ export interface devicesConfig extends device {
   deviceID: string;
   thermostat?: thermostat;
   leaksensor?: leaksensor;
-  roomsensor?: roomsensor;
-  roompriority?: roompriority;
   hide_device?: boolean;
 }
 
@@ -65,6 +63,8 @@ export type thermostat = {
   hide_fan?: boolean;
   hide_humidity?: boolean;
   thermostatSetpointStatus?: string;
+  roomsensor?: roomsensor;
+  roompriority?: roompriority;
 };
 
 export type leaksensor = {
@@ -74,6 +74,7 @@ export type leaksensor = {
 };
 
 export type roomsensor = {
+  hide_roomsensor?: boolean;
   hide_temperature?: boolean;
   hide_occupancy?: boolean;
   hide_motion?: boolean;

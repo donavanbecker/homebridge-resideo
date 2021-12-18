@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicValue, HAPStatus } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { skipWhile } from 'rxjs/operators';
@@ -26,6 +26,7 @@ export class RoomSensors {
   // Others
   accessoryId!: number;
   roomId!: number;
+  action!: string;
 
   // Updates
   SensorUpdateInProgress!: boolean;
@@ -85,7 +86,7 @@ export class RoomSensors {
     this.service.setCharacteristic(this.platform.Characteristic.ChargingState, 2);
 
     // Temperature Sensor Service
-    if (this.device.roomsensor?.hide_temperature) {
+    if (device.thermostat?.roomsensor?.hide_temperature) {
       this.platform.device(`Room Sensor: ${accessory.displayName} Removing Temperature Sensor Service`);
       this.temperatureService = this.accessory.getService(this.platform.Service.TemperatureSensor);
       accessory.removeService(this.temperatureService!);
@@ -112,7 +113,7 @@ export class RoomSensors {
     }
 
     // Occupancy Sensor Service
-    if (this.device.roomsensor?.hide_occupancy) {
+    if (device.thermostat?.roomsensor?.hide_occupancy) {
       this.platform.device(`Room Sensor: ${accessory.displayName} Removing Occupancy Sensor Service`);
       this.occupancyService = this.accessory.getService(this.platform.Service.OccupancySensor);
       accessory.removeService(this.occupancyService!);
@@ -129,7 +130,7 @@ export class RoomSensors {
     }
 
     // Humidity Sensor Service
-    if (this.device.roomsensor?.hide_humidity) {
+    if (device.thermostat?.roomsensor?.hide_humidity) {
       this.platform.device(`Room Sensor: ${accessory.displayName} Removing Humidity Sensor Service`);
       this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor);
       accessory.removeService(this.humidityService!);
@@ -177,13 +178,13 @@ export class RoomSensors {
     this.platform.device(`Room Sensor: ${this.accessory.displayName} StatusLowBattery: ${this.StatusLowBattery}`);
 
     // Set Temperature Sensor State
-    if (!this.device.roomsensor?.hide_temperature) {
+    if (!this.device.thermostat?.roomsensor?.hide_temperature) {
       this.CurrentTemperature = this.toCelsius(this.sensorAccessory.accessoryValue.indoorTemperature);
     }
     this.platform.device(`Room Sensor: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}°c`);
 
     // Set Occupancy Sensor State
-    if (!this.device.roomsensor?.hide_occupancy) {
+    if (!this.device.thermostat?.roomsensor?.hide_occupancy) {
       if (this.sensorAccessory.accessoryValue.occupancyDet) {
         this.OccupancyDetected = 1;
       } else {
@@ -192,7 +193,7 @@ export class RoomSensors {
     }
 
     // Set Humidity Sensor State
-    if (!this.device.roomsensor?.hide_humidity) {
+    if (!this.device.thermostat?.roomsensor?.hide_humidity) {
       this.CurrentRelativeHumidity = this.sensorAccessory.accessoryValue.indoorHumidity;
     }
     this.platform.device(`Room Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}%`);
@@ -208,10 +209,9 @@ export class RoomSensors {
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e: any) {
-      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to update status.`
-        + ` Error Message: ${JSON.stringify(e.message)}`);
-      this.platform.debug(`Room Sensor: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
-      this.apiError(e);
+      this.action = 'refreshStatus';
+      this.honeywellAPIError(e);
+      this.apiError();
     }
   }
 
@@ -226,7 +226,7 @@ export class RoomSensors {
       this.platform.device(`Room Sensor: ${this.accessory.displayName} updateCharacteristic StatusLowBattery: ${this.StatusLowBattery}`);
     }
     if (
-      this.device.roomsensor?.hide_temperature || this.CurrentTemperature === undefined
+      this.device.thermostat?.roomsensor?.hide_temperature || this.CurrentTemperature === undefined
       && Number.isNaN(this.CurrentTemperature)
     ) {
       this.platform.debug(`Room Sensor: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}`);
@@ -234,13 +234,13 @@ export class RoomSensors {
       this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
       this.platform.device(`Room Sensor: ${this.accessory.displayName} updateCharacteristic CurrentTemperature: ${this.CurrentTemperature}`);
     }
-    if (this.device.roomsensor?.hide_occupancy || this.OccupancyDetected === undefined) {
+    if (this.device.thermostat?.roomsensor?.hide_occupancy || this.OccupancyDetected === undefined) {
       this.platform.debug(`Room Sensor: ${this.accessory.displayName} OccupancyDetected: ${this.OccupancyDetected}`);
     } else {
       this.occupancyService?.updateCharacteristic(this.platform.Characteristic.OccupancyDetected, this.OccupancyDetected);
       this.platform.device(`Room Sensor: ${this.accessory.displayName} updateCharacteristic OccupancyDetected: ${this.OccupancyDetected}`);
     }
-    if (this.device.roomsensor?.hide_humidity || this.CurrentRelativeHumidity === undefined) {
+    if (this.device.thermostat?.roomsensor?.hide_humidity || this.CurrentRelativeHumidity === undefined) {
       this.platform.debug(`Room Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
     } else {
       this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
@@ -249,16 +249,47 @@ export class RoomSensors {
     }
   }
 
-  public apiError(e: any) {
-    this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, e);
-    if (!this.device.roomsensor?.hide_temperature) {
-      this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
+  public apiError() {
+    throw new this.platform.api.hap.HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+  }
+
+  public honeywellAPIError(e: any) {
+    if (e.message.includes('400')) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Bad Request`);
+      this.platform.debug('The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.');
+    } else if (e.message.includes('401')) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Unauthorized Request`);
+      this.platform.debug('Authorization for the API is required, but the request has not been authenticated.');
+    } else if (e.message.includes('403')) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Forbidden Request`);
+      this.platform.debug('The request has been authenticated but does not have appropriate permissions, or a requested resource is not found.');
+    } else if (e.message.includes('404')) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Requst Not Found`);
+      this.platform.debug('Specifies the requested path does not exist.');
+    } else if (e.message.includes('406')) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Request Not Acceptable`);
+      this.platform.debug('The client has requested a MIME type via the Accept header for a value not supported by the server.');
+    } else if (e.message.includes('415')) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Unsupported Requst Header`);
+      this.platform.debug('The client has defined a contentType header that is not supported by the server.');
+    } else if (e.message.includes('422')) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Unprocessable Entity`);
+      this.platform.debug('The client has made a valid request, but the server cannot process it.'
+        + ' This is often used for APIs for which certain limits have been exceeded.');
+    } else if (e.message.includes('429')) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Too Many Requests`);
+      this.platform.debug('The client has exceeded the number of requests allowed for a given time window.');
+    } else if (e.message.includes('500')) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Internal Server Error`);
+      this.platform.debug('An unexpected error on the SmartThings servers has occurred. These errors should be rare.');
+    } else {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action},`);
     }
-    if (!this.device.roomsensor?.hide_occupancy) {
-      this.occupancyService?.updateCharacteristic(this.platform.Characteristic.OccupancyDetected, e);
+    if (this.platform.config.options?.debug === 'device') {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to pushChanges, Error Message: ${JSON.stringify(e.message)}`);
     }
-    if (!this.device.roomsensor?.hide_humidity) {
-      this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
+    if (this.platform.config.options?.debug === 'debug' || this.platform.debugMode) {
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
     }
   }
 
