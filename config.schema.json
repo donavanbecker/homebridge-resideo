@@ -141,7 +141,8 @@
                     "nextPeriodTime": {
                       "title": "Next Period Time",
                       "type": "string",
-                      "placeholder": "18:00:00",
+                      "description": "How many hours from the current time do you want to put on a <em class='primary-text'>Temporary Hold</em>?",
+                      "placeholder": "4",
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID && model.options.devices[arrayIndices].thermostat.thermostatSetpointStatus === 'TemporaryHold');"
                       }
