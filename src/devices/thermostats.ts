@@ -512,7 +512,12 @@ export class Thermostats {
             const hour = currentDate.getHours() + Number(this.nextPeriodTimeHours);
             const minutes = currentDate.getMinutes();
             const seconds = currentDate.getSeconds();
-            this.nextPeriodTime = `${hour}:${minutes}:${seconds}`;
+            if (hour >= 24) {
+              const newhour = hour - 24;
+              this.nextPeriodTime = `${newhour}:${minutes}:${seconds}`;
+            } else {
+              this.nextPeriodTime = `${hour}:${minutes}:${seconds}`;
+            }
             payload.nextPeriodTime = this.nextPeriodTime;
             this.platform.log.warn(`Thermostat: ${this.accessory.displayName} send thermostatSetpointStatus: `
               + `${payload.thermostatSetpointStatus}, nextPeriodTime: ${payload.nextPeriodTime}, Model: ${this.device.deviceModel}`);

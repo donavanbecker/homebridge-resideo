@@ -141,14 +141,14 @@
                     "nextPeriodTime": {
                       "title": "Next Period Time",
                       "type": "string",
-                      "description": "How many hours from the current time do you want to put on a <em class='primary-text'>Temporary Hold</em>?",
+                      "description": "How many hours from the current time do you want to put on a <em class='primary-text'>Temporary Hold</em>? (Reminder Schedule will trump this Tempory Hold.)",
                       "placeholder": "4",
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID && model.options.devices[arrayIndices].thermostat.thermostatSetpointStatus === 'TemporaryHold');"
                       }
                     },
                     "roompriority": {
-                      "title": "Room Priority Settings (T9/T10 Only)",
+                      "title": "Room Priority Settings (T9-T10 Only)",
                       "type": "object",
                       "properties": {
                         "deviceType": {
@@ -200,7 +200,7 @@
                       }
                     },
                     "roomsensor": {
-                      "title": "Room Sensor Settings (T9/T10 Only)",
+                      "title": "Room Sensor Settings (T9-T10 Only)",
                       "type": "object",
                       "properties": {
                         "hide_roomsensor": {
