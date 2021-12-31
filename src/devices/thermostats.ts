@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory, CharacteristicValue, HAPStatus } from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, take, tap } from 'rxjs/operators';
@@ -249,7 +249,7 @@ export class Thermostats {
             this.action = 'refreshRoomPriority';
             this.honeywellAPIError(e);
             this.platform.refreshAccessToken();
-            this.apiError();
+            this.apiError(e);
           }
           try {
             await this.pushRoomChanges();
@@ -257,7 +257,7 @@ export class Thermostats {
             this.action = 'pushRoomChanges';
             this.honeywellAPIError(e);
             this.platform.refreshAccessToken();
-            this.apiError();
+            this.apiError(e);
           }
           this.roomUpdateInProgress = false;
           // Refresh the status from the API
@@ -283,7 +283,7 @@ export class Thermostats {
           this.action = 'pushChanges';
           this.honeywellAPIError(e);
           this.platform.refreshAccessToken();
-          this.apiError();
+          this.apiError(e);
         }
         this.thermostatUpdateInProgress = false;
         // Refresh the status from the API
@@ -309,7 +309,7 @@ export class Thermostats {
             this.action = 'pushFanChanges';
             this.honeywellAPIError(e);
             this.platform.refreshAccessToken();
-            this.apiError();
+            this.apiError(e);
           }
           this.fanUpdateInProgress = false;
           // Refresh the status from the API
@@ -452,7 +452,7 @@ export class Thermostats {
     } catch (e: any) {
       this.action = 'refreshStatus';
       this.honeywellAPIError(e);
-      this.apiError();
+      this.apiError(e);
     }
   }
 
@@ -616,7 +616,7 @@ export class Thermostats {
     } catch (e: any) {
       this.action = 'pushChanges';
       this.honeywellAPIError(e);
-      this.apiError();
+      this.apiError(e);
     }
   }
 
@@ -757,8 +757,22 @@ export class Thermostats {
     }
   }
 
-  public apiError() {
-    throw new this.platform.api.hap.HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+  public apiError(e: any) {
+    this.service.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
+    if (this.device.indoorHumidity && !this.device.thermostat?.hide_humidity) {
+      this.humidityService!.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
+    }
+    this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, e);
+    if (this.device.settings?.fan && !this.device.thermostat?.hide_fan) {
+      this.fanService?.updateCharacteristic(this.platform.Characteristic.TargetFanState, e);
+      this.fanService?.updateCharacteristic(this.platform.Characteristic.Active, e);
+    }
+    //throw new this.platform.api.hap.HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
   }
 
   public honeywellAPIError(e: any) {

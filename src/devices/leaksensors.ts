@@ -1,4 +1,4 @@
-import { Service, PlatformAccessory, CharacteristicValue, HAPStatus } from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 import { HoneywellHomePlatform } from '../platform';
 import { interval, Subject } from 'rxjs';
 import { skipWhile } from 'rxjs/operators';
@@ -217,7 +217,7 @@ export class LeakSensor {
     } catch (e: any) {
       this.action = 'refreshStatus';
       this.honeywellAPIError(e);
-      this.apiError();
+      this.apiError(e);
     }
   }
 
@@ -266,8 +266,14 @@ export class LeakSensor {
     }
   }
 
-  public apiError() {
-    throw new this.platform.api.hap.HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+  public apiError(e: any) {
+    this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, e);
+    this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, e);
+    if (!this.device.leaksensor?.hide_leak) {
+      this.leakService?.updateCharacteristic(this.platform.Characteristic.LeakDetected, e);
+      this.leakService?.updateCharacteristic(this.platform.Characteristic.StatusActive, e);
+    }
+    //throw new this.platform.api.hap.HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
   }
 
   public honeywellAPIError(e: any) {
