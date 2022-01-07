@@ -34,8 +34,6 @@ export class Thermostats {
   heatSetpoint!: number;
   coolSetpoint!: number;
   thermostatSetpointStatus!: string;
-  nextPeriodTime!: string;
-  nextPeriodTimeHours!: number;
   honeywellMode!: Array<string>;
   fanMode!: FanChangeableValues;
 
@@ -62,8 +60,7 @@ export class Thermostats {
   ) {
     // Thermostat Config
     this.platform.device(`Thermostat: ${this.accessory.displayName} Config: (hide_humidity: ${device.thermostat?.hide_humidity},`
-      + ` hide_fan: ${device.thermostat?.hide_fan}, nextPeriodTime: ${device.thermostat?.nextPeriodTime},`
-      + ` thermostatSetpointStatus: ${device.thermostat?.thermostatSetpointStatus})`);
+      + ` hide_fan: ${device.thermostat?.hide_fan}, thermostatSetpointStatus: ${device.thermostat?.thermostatSetpointStatus})`);
 
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
@@ -84,11 +81,6 @@ export class Thermostats {
       accessory.context.thermostatSetpointStatus = device.thermostat?.thermostatSetpointStatus;
       this.thermostatSetpointStatus = accessory.context.thermostatSetpointStatus;
       this.platform.device(`Thermostat: ${accessory.displayName} thermostatSetpointStatus: ${this.thermostatSetpointStatus}`);
-    }
-    if (this.nextPeriodTimeHours === undefined) {
-      accessory.context.nextPeriodTimeHours = device.thermostat?.nextPeriodTime;
-      this.nextPeriodTimeHours = accessory.context.nextPeriodTimeHours;
-      this.platform.device(`Thermostat: ${accessory.displayName} nextPeriodTimeHours: ${this.nextPeriodTimeHours}`);
     }
 
     // this is subject we use to track when we need to POST changes to the Honeywell API for Room Changes - T9 Only
@@ -446,7 +438,6 @@ export class Thermostats {
         from Honeywell Fan API: ${JSON.stringify(this.fanMode)}`);
       }
       this.pushChangesthermostatSetpointStatus();
-      this.pushChangesnextPeriodTime();
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e: any) {
@@ -498,29 +489,9 @@ export class Thermostats {
         default:
           this.pushChangesthermostatSetpointStatus();
           payload.thermostatSetpointStatus = this.thermostatSetpointStatus;
-          this.pushChangesnextPeriodTime();
           if (this.thermostatSetpointStatus === 'TemporaryHold') {
-            if (this.nextPeriodTimeHours === undefined) {
-              this.nextPeriodTimeHours = 4;
-              this.platform.device(`Thermostat: ${this.accessory.displayName} using default nextPeriodTimeHours: ${this.nextPeriodTimeHours}`);
-            } else {
-              this.platform.device(`Thermostat: ${this.accessory.displayName} nextPeriodTimeHours config set to `
-                + `${this.nextPeriodTimeHours}`);
-            }
-            const currentDate = new Date();
-            this.platform.device(`Thermostat: ${this.accessory.displayName} Date: ${currentDate}`);
-            const hour = currentDate.getHours() + Number(this.nextPeriodTimeHours);
-            const minutes = currentDate.getMinutes();
-            const seconds = currentDate.getSeconds();
-            if (hour >= 24) {
-              const newhour = hour - 24;
-              this.nextPeriodTime = `${newhour}:${minutes}:${seconds}`;
-            } else {
-              this.nextPeriodTime = `${hour}:${minutes}:${seconds}`;
-            }
-            payload.nextPeriodTime = this.nextPeriodTime;
             this.platform.log.warn(`Thermostat: ${this.accessory.displayName} send thermostatSetpointStatus: `
-              + `${payload.thermostatSetpointStatus}, nextPeriodTime: ${payload.nextPeriodTime}, Model: ${this.device.deviceModel}`);
+              + `${payload.thermostatSetpointStatus}, Model: ${this.device.deviceModel}`);
           } else {
             this.platform.device(`Thermostat: ${this.accessory.displayName} send thermostatSetpointStatus: `
               + `${payload.thermostatSetpointStatus}, Model: ${this.device.deviceModel}`);
@@ -631,13 +602,6 @@ export class Thermostats {
     }
   }
 
-  private pushChangesnextPeriodTime() {
-    if (this.thermostatSetpointStatus === 'TemporaryHold') {
-      this.platform.device(`Thermostat: ${this.accessory.displayName} nextPeriodTimeHours config set to `
-        + `${this.nextPeriodTimeHours}`);
-    }
-  }
-
   /**
    * Pushes the requested changes for Room Priority to the Honeywell API
    */
@@ -659,7 +623,7 @@ export class Thermostats {
       /**
        * For "LCC-" devices only.
        * "NoHold" will return to schedule.
-       * "TemporaryHold" will hold the set temperature until "nextPeriodTime".
+       * "TemporaryHold" will hold the set temperature until next schedule.
        * "PermanentHold" will hold the setpoint until user requests another change.
        */
       if (this.device.thermostat?.roompriority?.deviceType === 'Thermostat') {

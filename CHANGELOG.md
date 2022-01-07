@@ -2,12 +2,12 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
-## [Beta - Version 11.3.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.0) (2021-12-XX)
+## [Version 11.2.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.0) (2022-01-06)
 
 ### What's Changes
-* Added `nextPeriodTime` option to the config for the `thermostatSetpointStatus` option `TemporaryHold`.
+* Housekeeping and updated dependencies.
 
-**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.2.0...v11.3.0
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.2.0...v11.2.1
 
 ## [Version 11.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.2.0) (2021-12-18)
 

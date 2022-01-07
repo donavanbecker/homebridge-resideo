@@ -111,7 +111,7 @@
                     "thermostatSetpointStatus": {
                       "title": "Thermostat Setpoint Status (LCC Devices Only)",
                       "type": "string",
-                      "description": "[PermanentHold] will hold the setpoint until user requests another change.\n[NoHold] will return to schedule.\n[TemporaryHold] will hold the set temperature until [nextPeriodTime].",
+                      "description": "[PermanentHold] will hold the setpoint until user requests another change.\n[NoHold] will return to schedule.\n[TemporaryHold] will hold the set temperature until next schedule.",
                       "placeholder": "PermanentHold",
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID);"
@@ -137,15 +137,6 @@
                           ]
                         }
                       ]
-                    },
-                    "nextPeriodTime": {
-                      "title": "Next Period Time",
-                      "type": "string",
-                      "description": "How many hours from the current time do you want to put on a <em class='primary-text'>Temporary Hold</em>? (Reminder Schedule will trump this Tempory Hold.)",
-                      "placeholder": "4",
-                      "condition": {
-                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID && model.options.devices[arrayIndices].thermostat.thermostatSetpointStatus === 'TemporaryHold');"
-                      }
                     },
                     "roompriority": {
                       "title": "Room Priority Settings (T9-T10 Only)",
@@ -348,7 +339,6 @@
             "options.devices[].thermostat.hide_fan",
             "options.devices[].thermostat.hide_humidity",
             "options.devices[].thermostat.thermostatSetpointStatus",
-            "options.devices[].thermostat.nextPeriodTime",
             "options.devices[].thermostat.roompriority",
             "options.devices[].thermostat.roompriority.deviceType",
             "options.devices[].thermostat.roompriority.priorityType",
