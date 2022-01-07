@@ -111,7 +111,7 @@
                     "thermostatSetpointStatus": {
                       "title": "Thermostat Setpoint Status (LCC Devices Only)",
                       "type": "string",
-                      "description": "\"PermanentHold\" will hold the setpoint until user requests another change. \"NoHold\" will return to schedule. \"TemporaryHold\" will hold the set temperature until \"nextPeriodTime\".",
+                      "description": "[PermanentHold] will hold the setpoint until user requests another change.\n[NoHold] will return to schedule.\n[TemporaryHold] will hold the set temperature until next schedule.",
                       "placeholder": "PermanentHold",
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID);"
@@ -139,7 +139,7 @@
                       ]
                     },
                     "roompriority": {
-                      "title": "Room Priority Settings (T9/T10 Only)",
+                      "title": "Room Priority Settings (T9-T10 Only)",
                       "type": "object",
                       "properties": {
                         "deviceType": {
@@ -191,7 +191,7 @@
                       }
                     },
                     "roomsensor": {
-                      "title": "Room Sensor Settings (T9/T10 Only)",
+                      "title": "Room Sensor Settings (T9-T10 Only)",
                       "type": "object",
                       "properties": {
                         "hide_roomsensor": {

@@ -98,6 +98,7 @@ export type payload = {
   heatSetpoint: number;
   coolSetpoint: number;
   thermostatSetpointStatus?: string;
+  nextPeriodTime?: string;
   autoChangeoverActive?: boolean;
   thermostatSetpoint?: number;
   unit?: string;
