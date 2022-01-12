@@ -30,6 +30,10 @@ export class RoomSensorThermostat {
   honeywellMode!: Array<string>;
   deviceFan!: FanChangeableValues;
 
+  // Config
+  deviceLogging!: string;
+  deviceRefreshRate!: number;
+
   // Thermostat Update
   thermostatUpdateInProgress!: boolean;
   doThermostatUpdate!: Subject<void>;
@@ -50,6 +54,8 @@ export class RoomSensorThermostat {
     public sensorAccessory: sensorAccessory,
     public readonly group: T9groups,
   ) {
+    this.logs();
+    this.refreshRate();
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
       Off: platform.Characteristic.TargetHeatingCoolingState.OFF,
@@ -109,7 +115,7 @@ export class RoomSensorThermostat {
 
     // Set Min and Max
     if (device.changeableValues!.heatCoolMode === 'Heat') {
-      this.platform.device(`Room Sensor Thermostat: ${accessory.displayName} mode: ${device.changeableValues!.heatCoolMode}`);
+      this.debugLog(`Room Sensor Thermostat: ${accessory.displayName} mode: ${device.changeableValues!.heatCoolMode}`);
       this.service
         .getCharacteristic(this.platform.Characteristic.TargetTemperature)
         .setProps({
@@ -121,7 +127,7 @@ export class RoomSensorThermostat {
           return this.TargetTemperature;
         });
     } else {
-      this.platform.device(`Room Sensor Thermostat: ${accessory.displayName} mode: ${device.changeableValues!.heatCoolMode}`);
+      this.debugLog(`Room Sensor Thermostat: ${accessory.displayName} mode: ${device.changeableValues!.heatCoolMode}`);
       this.service
         .getCharacteristic(this.platform.Characteristic.TargetTemperature)
         .setProps({
@@ -238,6 +244,39 @@ export class RoomSensorThermostat {
       });
   }
 
+  refreshRate() {
+    if (this.device.thermostat?.roompriority?.refreshRate) {
+      this.deviceRefreshRate = this.accessory.context.refreshRate = this.device.thermostat.roompriority.refreshRate;
+      if (this.platform.debugMode || (this.deviceLogging === 'debug')) {
+        this.warnLog(`Bot: ${this.accessory.displayName} Using Device Config refreshRate: ${this.deviceRefreshRate}`);
+      }
+    } else if (this.platform.config.options!.refreshRate) {
+      this.deviceRefreshRate = this.accessory.context.refreshRate = this.platform.config.options!.refreshRate;
+      if (this.platform.debugMode || (this.deviceLogging === 'debug')) {
+        this.warnLog(`Bot: ${this.accessory.displayName} Using Platform Config refreshRate: ${this.deviceRefreshRate}`);
+      }
+    }
+  }
+
+  logs() {
+    if (this.platform.debugMode) {
+      this.deviceLogging = this.accessory.context.logging = 'debug';
+      this.warnLog(`Bot: ${this.accessory.displayName} Using Debug Mode Logging: ${this.deviceLogging}`);
+    } else if (this.device.thermostat?.roompriority?.logging) {
+      this.deviceLogging = this.accessory.context.logging = this.device.thermostat.roompriority.logging;
+      if (this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
+        this.warnLog(`Bot: ${this.accessory.displayName} Using Device Config Logging: ${this.deviceLogging}`);
+      }
+    } else if (this.platform.config.options?.logging) {
+      this.deviceLogging = this.accessory.context.logging = this.platform.config.options?.logging;
+      if (this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
+        this.warnLog(`Bot: ${this.accessory.displayName} Using Platform Config Logging: ${this.deviceLogging}`);
+      }
+    } else {
+      this.deviceLogging = this.accessory.context.logging = 'standard';
+    }
+  }
+
   /**
    * Parse the device status from the honeywell api
    */
@@ -280,7 +319,7 @@ export class RoomSensorThermostat {
       default:
         this.CurrentHeatingCoolingState = 0;
     }
-    this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} CurrentHeatingCoolingState: ${this.CurrentHeatingCoolingState}`);
+    this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} CurrentHeatingCoolingState: ${this.CurrentHeatingCoolingState}`);
 
     // Set the TargetTemperature value based on the current mode
     if (this.TargetHeatingCoolingState === this.platform.Characteristic.TargetHeatingCoolingState.HEAT) {
@@ -305,8 +344,8 @@ export class RoomSensorThermostat {
         },
       })).data;
       this.device = device;
-      this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} device: ${JSON.stringify(device)}`);
-      this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName}`
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} device: ${JSON.stringify(device)}`);
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName}`
         + ` Fetched update for: ${this.device.name} from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`);
 
       this.parseStatus();
@@ -332,18 +371,18 @@ export class RoomSensorThermostat {
                 const roomsensors = await this.platform.getCurrentSensorData(this.device, group, this.locationId);
                 if (roomsensors.rooms) {
                   const rooms = roomsensors.rooms;
-                  this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} roomsensors: ${JSON.stringify(roomsensors)}`);
+                  this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} roomsensors: ${JSON.stringify(roomsensors)}`);
                   for (const accessories of rooms) {
                     if (accessories) {
-                      this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} accessories: ${JSON.stringify(accessories)}`);
+                      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} accessories: ${JSON.stringify(accessories)}`);
                       for (const accessory of accessories.accessories) {
                         if (accessory.accessoryAttribute) {
                           if (accessory.accessoryAttribute.type) {
                             if (accessory.accessoryAttribute.type.startsWith('IndoorAirSensor')) {
                               this.sensorAccessory = accessory;
-                              this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName}`
+                              this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName}`
                                 + ` accessoryAttribute: ${JSON.stringify(this.sensorAccessory.accessoryAttribute)}`);
-                              this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName}`
+                              this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName}`
                                 + ` Name: ${this.sensorAccessory.accessoryAttribute.name},`
                                 + ` Software Version: ${this.sensorAccessory.accessoryAttribute.softwareRevision}`);
                             }
@@ -376,7 +415,7 @@ export class RoomSensorThermostat {
           },
         })
       ).data;
-      this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} roompriority: ${JSON.stringify(this.roompriority)}`);
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} roompriority: ${JSON.stringify(this.roompriority)}`);
     }
   }
 
@@ -384,7 +423,7 @@ export class RoomSensorThermostat {
    * Pushes the requested changes for Room Priority to the Honeywell API
    */
   async pushRoomChanges() {
-    this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} Room Priority,
+    this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Room Priority,
      Current Room: ${JSON.stringify(this.roompriority.currentPriority.selectedRooms)}, Changing Room: [${this.sensorAccessory.accessoryId}]`);
     if (`[${this.sensorAccessory.accessoryId}]` !== `[${this.roompriority.currentPriority.selectedRooms}]`) {
       const payload = {
@@ -421,7 +460,7 @@ export class RoomSensorThermostat {
             locationId: this.locationId,
           },
         });
-        this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} pushRoomChanges: ${JSON.stringify(payload)}`);
+        this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} pushRoomChanges: ${JSON.stringify(payload)}`);
       }
       // Refresh the status from the API
       await this.refreshSensorStatus();
@@ -444,7 +483,7 @@ export class RoomSensorThermostat {
         case this.platform.Characteristic.TargetHeatingCoolingState.HEAT:
           payload.heatSetpoint = this.toFahrenheit(Number(this.TargetTemperature));
           payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
-          this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName}`
+          this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName}`
             + ` TargetHeatingCoolingState (HEAT): ${this.TargetHeatingCoolingState},`
             + ` TargetTemperature: ${this.toFahrenheit(Number(this.TargetTemperature))} heatSetpoint,`
             + ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint`);
@@ -452,7 +491,7 @@ export class RoomSensorThermostat {
         case this.platform.Characteristic.TargetHeatingCoolingState.COOL:
           payload.coolSetpoint = this.toFahrenheit(Number(this.TargetTemperature));
           payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
-          this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName}`
+          this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName}`
             + ` TargetHeatingCoolingState (COOL): ${this.TargetHeatingCoolingState},`
             + ` TargetTemperature: ${this.toFahrenheit(Number(this.TargetTemperature))} coolSetpoint,`
             + ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`);
@@ -460,7 +499,7 @@ export class RoomSensorThermostat {
         case this.platform.Characteristic.TargetHeatingCoolingState.AUTO:
           payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
           payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
-          this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName}`
+          this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName}`
             + ` TargetHeatingCoolingState (AUTO): ${this.TargetHeatingCoolingState},`
             + ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint,`
             + ` HeatingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`);
@@ -468,7 +507,7 @@ export class RoomSensorThermostat {
         default:
           payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
           payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
-          this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName}`
+          this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName}`
             + ` TargetHeatingCoolingState (OFF): ${this.TargetHeatingCoolingState},`
             + ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint,`
             + ` HeatingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`);
@@ -481,7 +520,7 @@ export class RoomSensorThermostat {
           locationId: this.locationId,
         },
       });
-      this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(payload)}`);
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(payload)}`);
     } catch (e: any) {
       this.action = 'pushChanges';
       this.honeywellAPIError(e);
@@ -494,58 +533,58 @@ export class RoomSensorThermostat {
    */
   updateHomeKitCharacteristics() {
     if (this.TemperatureDisplayUnits === undefined) {
-      this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} TemperatureDisplayUnits: ${this.TemperatureDisplayUnits}`);
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} TemperatureDisplayUnits: ${this.TemperatureDisplayUnits}`);
     } else {
       this.service.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, this.TemperatureDisplayUnits);
-      this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName}`
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName}`
         + ` updateCharacteristic TemperatureDisplayUnits: ${this.TemperatureDisplayUnits}`);
     }
     if (this.CurrentTemperature === undefined) {
-      this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}`);
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}`);
     } else {
       this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
-      this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName}`
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName}`
         + ` updateCharacteristic CurrentTemperature: ${this.CurrentTemperature}`);
     }
     if (this.CurrentRelativeHumidity === undefined) {
-      this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
     } else {
       this.service.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
-      this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName}`
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName}`
         + ` updateCharacteristic CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
     }
     if (this.TargetTemperature === undefined) {
-      this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} TargetTemperature: ${this.TargetTemperature}`);
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} TargetTemperature: ${this.TargetTemperature}`);
     } else {
       this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
-      this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} updateCharacteristic TargetTemperature: ${this.TargetTemperature}`);
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} updateCharacteristic TargetTemperature: ${this.TargetTemperature}`);
     }
     if (this.HeatingThresholdTemperature === undefined) {
-      this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} HeatingThresholdTemperature: ${this.HeatingThresholdTemperature}`);
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} HeatingThresholdTemperature: ${this.HeatingThresholdTemperature}`);
     } else {
       this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, this.HeatingThresholdTemperature);
-      this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} updateCharacteristic`
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} updateCharacteristic`
         + ` HeatingThresholdTemperature: ${this.HeatingThresholdTemperature}`);
     }
     if (this.CoolingThresholdTemperature === undefined) {
-      this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} CoolingThresholdTemperature: ${this.CoolingThresholdTemperature}`);
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} CoolingThresholdTemperature: ${this.CoolingThresholdTemperature}`);
     } else {
       this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
-      this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} updateCharacteristic`
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} updateCharacteristic`
         + ` CoolingThresholdTemperature: ${this.CoolingThresholdTemperature}`);
     }
     if (this.TargetHeatingCoolingState === undefined) {
-      this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} TargetHeatingCoolingState: ${this.TargetHeatingCoolingState}`);
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} TargetHeatingCoolingState: ${this.TargetHeatingCoolingState}`);
     } else {
       this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, this.TargetHeatingCoolingState);
-      this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} updateCharacteristic`
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} updateCharacteristic`
         + ` TargetHeatingCoolingState: ${this.TargetHeatingCoolingState}`);
     }
     if (this.CurrentHeatingCoolingState === undefined) {
-      this.platform.debug(`Room Sensor Thermostat: ${this.accessory.displayName} CurrentHeatingCoolingState: ${this.CurrentHeatingCoolingState}`);
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} CurrentHeatingCoolingState: ${this.CurrentHeatingCoolingState}`);
     } else {
       this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, this.CurrentHeatingCoolingState);
-      this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} updateCharacteristic`
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} updateCharacteristic`
         + ` CurrentHeatingCoolingState: ${this.TargetHeatingCoolingState}`);
     }
   }
@@ -565,46 +604,46 @@ export class RoomSensorThermostat {
   public honeywellAPIError(e: any) {
     if (e.message.includes('400')) {
       this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Bad Request`);
-      this.platform.debug('The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.');
+      this.debugLog('The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.');
     } else if (e.message.includes('401')) {
       this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Unauthorized Request`);
-      this.platform.debug('Authorization for the API is required, but the request has not been authenticated.');
+      this.debugLog('Authorization for the API is required, but the request has not been authenticated.');
     } else if (e.message.includes('403')) {
       this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Forbidden Request`);
-      this.platform.debug('The request has been authenticated but does not have appropriate permissions, or a requested resource is not found.');
+      this.debugLog('The request has been authenticated but does not have appropriate permissions, or a requested resource is not found.');
     } else if (e.message.includes('404')) {
       this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Requst Not Found`);
-      this.platform.debug('Specifies the requested path does not exist.');
+      this.debugLog('Specifies the requested path does not exist.');
     } else if (e.message.includes('406')) {
       this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Request Not Acceptable`);
-      this.platform.debug('The client has requested a MIME type via the Accept header for a value not supported by the server.');
+      this.debugLog('The client has requested a MIME type via the Accept header for a value not supported by the server.');
     } else if (e.message.includes('415')) {
       this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Unsupported Requst Header`);
-      this.platform.debug('The client has defined a contentType header that is not supported by the server.');
+      this.debugLog('The client has defined a contentType header that is not supported by the server.');
     } else if (e.message.includes('422')) {
       this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Unprocessable Entity`);
-      this.platform.debug('The client has made a valid request, but the server cannot process it.'
+      this.debugLog('The client has made a valid request, but the server cannot process it.'
         + ' This is often used for APIs for which certain limits have been exceeded.');
     } else if (e.message.includes('429')) {
       this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Too Many Requests`);
-      this.platform.debug('The client has exceeded the number of requests allowed for a given time window.');
+      this.debugLog('The client has exceeded the number of requests allowed for a given time window.');
     } else if (e.message.includes('500')) {
       this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Internal Server Error`);
-      this.platform.debug('An unexpected error on the SmartThings servers has occurred. These errors should be rare.');
+      this.debugLog('An unexpected error on the SmartThings servers has occurred. These errors should be rare.');
     } else {
       this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action},`);
     }
-    if (this.platform.config.options?.debug === 'device') {
+    if (this.deviceLogging.includes('debug')) {
       this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to pushChanges, `
         + `Error Message: ${JSON.stringify(e.message)}`);
     }
-    if (this.platform.config.options?.debug === 'debug' || this.platform.debugMode) {
+    if (this.deviceLogging.includes('debug') || this.platform.debugMode) {
       this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
     }
   }
 
   private setTargetHeatingCoolingState(value: CharacteristicValue) {
-    this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} Set TargetHeatingCoolingState: ${value}`);
+    this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Set TargetHeatingCoolingState: ${value}`);
 
     this.TargetHeatingCoolingState = value;
 
@@ -622,25 +661,25 @@ export class RoomSensorThermostat {
   }
 
   private setHeatingThresholdTemperature(value: CharacteristicValue) {
-    this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} Set HeatingThresholdTemperature: ${value}`);
+    this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Set HeatingThresholdTemperature: ${value}`);
     this.HeatingThresholdTemperature = value;
     this.doThermostatUpdate.next();
   }
 
   private setCoolingThresholdTemperature(value: CharacteristicValue) {
-    this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} Set CoolingThresholdTemperature: ${value}`);
+    this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Set CoolingThresholdTemperature: ${value}`);
     this.CoolingThresholdTemperature = value;
     this.doThermostatUpdate.next();
   }
 
   private setTargetTemperature(value: CharacteristicValue) {
-    this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} Set TargetTemperature: ${value}`);
+    this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Set TargetTemperature: ${value}`);
     this.TargetTemperature = value;
     this.doThermostatUpdate.next();
   }
 
   private setTemperatureDisplayUnits(value: CharacteristicValue) {
-    this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} Set TemperatureDisplayUnits: ${value}`);
+    this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Set TemperatureDisplayUnits: ${value}`);
     this.platform.log.warn('Changing the Hardware Display Units from HomeKit is not supported.');
 
     // change the temp units back to the one the Honeywell API said the thermostat was set to
@@ -676,7 +715,7 @@ export class RoomSensorThermostat {
   }
 
   private TargetState() {
-    this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} allowedModes: ${this.device.allowedModes}`);
+    this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} allowedModes: ${this.device.allowedModes}`);
 
     const TargetState = [4];
     TargetState.pop();
@@ -692,7 +731,42 @@ export class RoomSensorThermostat {
     if (this.device.allowedModes!.includes('Auto')) {
       TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.AUTO);
     }
-    this.platform.device(`Room Sensor Thermostat: ${this.accessory.displayName} Only Show These Modes: ${JSON.stringify(TargetState)}`);
+    this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Only Show These Modes: ${JSON.stringify(TargetState)}`);
     return TargetState;
+  }
+
+  /**
+ * Logging for Device
+ */
+  infoLog(...log: any[]) {
+    if (this.enablingDeviceLogging()) {
+      this.platform.log.info(String(...log));
+    }
+  }
+
+  warnLog(...log: any[]) {
+    if (this.enablingDeviceLogging()) {
+      this.platform.log.warn(String(...log));
+    }
+  }
+
+  errorLog(...log: any[]) {
+    if (this.enablingDeviceLogging()) {
+      this.platform.log.error(String(...log));
+    }
+  }
+
+  debugLog(...log: any[]) {
+    if (this.enablingDeviceLogging()) {
+      if (this.deviceLogging === 'debug') {
+        this.platform.log.info('[DEBUG]', String(...log));
+      } else {
+        this.platform.log.debug(String(...log));
+      }
+    }
+  }
+
+  enablingDeviceLogging(): boolean {
+    return this.deviceLogging.includes('debug') || this.deviceLogging === 'standard';
   }
 }

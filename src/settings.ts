@@ -48,7 +48,7 @@ export type options = {
   refreshRate?: number;
   pushRate?: number;
   devices?: Array<devicesConfig>;
-  debug?: string;
+  logging?: string;
 };
 
 export interface devicesConfig extends device {
@@ -65,12 +65,16 @@ export type thermostat = {
   thermostatSetpointStatus?: string;
   roomsensor?: roomsensor;
   roompriority?: roompriority;
+  logging?: string;
+  refreshRate?: number;
 };
 
 export type leaksensor = {
   hide_humidity?: boolean;
   hide_temperature?: boolean;
   hide_leak?: boolean;
+  logging?: string;
+  refreshRate?: number;
 };
 
 export type roomsensor = {
@@ -79,11 +83,15 @@ export type roomsensor = {
   hide_occupancy?: boolean;
   hide_motion?: boolean;
   hide_humidity?: boolean;
+  logging?: string;
+  refreshRate?: number;
 };
 
 export type roompriority = {
   deviceType?: string;
   priorityType?: string;
+  logging?: string;
+  refreshRate?: number;
 };
 
 export type modes = {
