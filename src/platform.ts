@@ -133,7 +133,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    * It should be used to setup event handlers for characteristics and update respective values.
    */
   configureAccessory(accessory: PlatformAccessory) {
-    this.infoLog('Loading accessory from cache:', accessory.displayName);
+    this.infoLog(`Loading accessory from cache: ${accessory.displayName}`);
 
     // add the restored accessory to the accessories cache so we can track if it has already been registered
     this.accessories.push(accessory);
@@ -353,7 +353,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       for (const group of device.groups) {
         const roomsensors = await this.getCurrentSensorData(device, group, locationId);
         if (device.thermostat?.roompriority?.deviceType) {
-          this.infoLog('Total Rooms Found:', roomsensors.length);
+          this.infoLog(`Total Rooms Found: ${roomsensors.length}`);
         }
         for (const accessories of roomsensors) {
           if (accessories) {
@@ -387,10 +387,10 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    */
   private async discoverDevices() {
     if (this.locations) {
-      this.infoLog('Total Locations Found:', this.locations.length);
+      this.infoLog(`Total Locations Found: ${this.locations.length}`);
       // get the devices at each location
       for (const location of this.locations) {
-        this.infoLog('Total Devices Found at', location.name, ':', location.devices.length);
+        this.infoLog(`Total Devices Found at ${location.name}: ${location.devices.length}`);
         const locationId = location.locationID;
         this.locationinfo(location);
 
@@ -787,7 +787,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   public unregisterPlatformAccessories(existingAccessory: PlatformAccessory) {
     // remove platform accessories when no longer present
     this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
-    this.warnLog('Removing existing accessory from cache:', existingAccessory.displayName);
+    this.warnLog(`Removing existing accessory from cache: ${existingAccessory.displayName}`);
   }
 
   public locationinfo(location: location) {
