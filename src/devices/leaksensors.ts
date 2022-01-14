@@ -46,7 +46,7 @@ export class LeakSensor {
     this.refreshRate();
     // Leak Sensor Config
     if (this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
-      this.warnLog(`Leak Sensor: ${this.accessory.displayName} Config: ${device.leaksensor}`);
+      this.warnLog(`Leak Sensor: ${this.accessory.displayName} Config: ${JSON.stringify(device.leaksensor)}`);
     }
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doSensorUpdate = new Subject();

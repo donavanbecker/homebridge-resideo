@@ -58,7 +58,7 @@ export class RoomSensorThermostat {
     this.refreshRate();
     // Room Sensor Thermostat Config
     if (this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
-      this.warnLog(`Room Sensor Thermostat: ${this.accessory.displayName} Config: ${device.thermostat?.roompriority}`);
+      this.warnLog(`Room Sensor Thermostat: ${this.accessory.displayName} Config: ${JSON.stringify(device.thermostat?.roompriority)}`);
     }
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {

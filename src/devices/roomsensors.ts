@@ -48,7 +48,7 @@ export class RoomSensors {
     this.refreshRate();
     // Room Sensor Config
     if (this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
-      this.warnLog(`Room Sensor: ${this.accessory.displayName} Config: ${device.thermostat?.roomsensor}`);
+      this.warnLog(`Room Sensor: ${this.accessory.displayName} Config: ${JSON.stringify(device.thermostat?.roomsensor)}`);
     }
     // default placeholders
     this.CurrentTemperature;

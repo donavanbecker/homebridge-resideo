@@ -66,7 +66,7 @@ export class Thermostats {
     this.refreshRate();
     // Thermostat Config
     if (this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
-      this.warnLog(`Thermostat: ${this.accessory.displayName} Config: ${device.thermostat}`);
+      this.warnLog(`Thermostat: ${this.accessory.displayName} Config: ${JSON.stringify(device.thermostat)}`);
     }
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
