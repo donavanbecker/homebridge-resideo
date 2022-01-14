@@ -46,6 +46,8 @@ export class RoomSensors {
   ) {
     this.logs();
     this.refreshRate();
+    // Room Sensor Config
+    this.debugLog(`Room Sensor: ${this.accessory.displayName} Config: ${device.thermostat?.roomsensor}`);
     // default placeholders
     this.CurrentTemperature;
     this.StatusLowBattery;

@@ -65,8 +65,7 @@ export class Thermostats {
     this.logs();
     this.refreshRate();
     // Thermostat Config
-    this.debugLog(`Thermostat: ${this.accessory.displayName} Config: (hide_humidity: ${device.thermostat?.hide_humidity},`
-      + ` hide_fan: ${device.thermostat?.hide_fan}, thermostatSetpointStatus: ${device.thermostat?.thermostatSetpointStatus})`);
+    this.debugLog(`Thermostat: ${this.accessory.displayName} Config: ${device.thermostat}`);
 
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {

@@ -44,14 +44,8 @@ export class LeakSensor {
   ) {
     this.logs();
     this.refreshRate();
-    // default placeholders
-    this.StatusActive;
-    this.LeakDetected;
-    this.CurrentTemperature;
-    this.CurrentRelativeHumidity;
-    this.BatteryLevel;
-    this.ChargingState;
-    this.StatusLowBattery;
+    // Leak Sensor Config
+    this.debugLog(`Leak Sensor: ${this.accessory.displayName} Config: ${device.leaksensor}`);
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doSensorUpdate = new Subject();

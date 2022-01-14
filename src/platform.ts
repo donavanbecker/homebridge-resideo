@@ -512,7 +512,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
     if (existingAccessory) {
       // the accessory already exists
-      if (!device.hide_device && device.isAlive && !this.config.disablePlugin) {
+      if (!device.hide_device && !this.config.disablePlugin) {
         this.infoLog(`Restoring existing accessory from cache: ${existingAccessory.displayName} DeviceID: ${device.deviceID}`);
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
@@ -529,7 +529,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
-    } else if (!device.hide_device && device.isAlive && !this.config.disablePlugin) {
+    } else if (!device.hide_device && !this.config.disablePlugin) {
       // the accessory does not yet exist, so we need to create it
       this.infoLog(`Adding new accessory: ${device.userDefinedDeviceName} ${device.deviceClass} Device ID: ${device.deviceID}`);
 
@@ -568,7 +568,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
     if (existingAccessory) {
       // the accessory already exists
-      if (!device.hide_device && device.isAlive && !this.config.disablePlugin) {
+      if (!device.hide_device && !this.config.disablePlugin) {
         this.infoLog(`Restoring existing accessory from cache: ${existingAccessory.displayName} DeviceID: ${device.deviceID}`);
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
@@ -585,7 +585,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
-    } else if (!device.hide_device && device.isAlive && !this.config.disablePlugin) {
+    } else if (!device.hide_device && !this.config.disablePlugin) {
       // the accessory does not yet exist, so we need to create it
       this.infoLog(`Adding new accessory: ${device.userDefinedDeviceName} ${device.deviceClass} Device ID: ${device.deviceID}`);
 
@@ -624,7 +624,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
     if (existingAccessory) {
       // the accessory already exists
-      if (!device.hide_device && !device.thermostat?.roomsensor?.hide_roomsensor && device.isAlive && !this.config.disablePlugin) {
+      if (!device.hide_device && !device.thermostat?.roomsensor?.hide_roomsensor && !this.config.disablePlugin) {
         this.infoLog(`Restoring existing accessory from cache: ${existingAccessory.displayName} DeviceID: ${sensorAccessory.deviceID}`);
 
         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
@@ -642,7 +642,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
       }
-    } else if (!device.hide_device && !device.thermostat?.roomsensor?.hide_roomsensor && device.isAlive && !this.config.disablePlugin) {
+    } else if (!device.hide_device && !device.thermostat?.roomsensor?.hide_roomsensor && !this.config.disablePlugin) {
       // the accessory does not yet exist, so we need to create it
       this.infoLog(`Adding new accessory: ${sensorAccessory.accessoryAttribute.name} ${sensorAccessory.accessoryAttribute.type} `
         + `Device ID: ${sensorAccessory.deviceID}`);
@@ -688,7 +688,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     if (existingAccessory) {
       // the accessory already exists
       if (
-        device.isAlive && device.thermostat?.roompriority?.deviceType &&
+        device.thermostat?.roompriority?.deviceType &&
         !device.hide_device && !this.config.disablePlugin
       ) {
         this.infoLog(`Restoring existing accessory from cache: ${existingAccessory.displayName} DeviceID: ${sensorAccessory.deviceID}`);
@@ -709,7 +709,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         this.unregisterPlatformAccessories(existingAccessory);
       }
     } else if (
-      device.isAlive &&
       device.thermostat?.roompriority?.deviceType &&
       !device.hide_device &&
       !this.config.disablePlugin
