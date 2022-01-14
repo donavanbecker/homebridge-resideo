@@ -167,12 +167,12 @@ export class LeakSensor {
   refreshRate() {
     if (this.device.leaksensor?.refreshRate) {
       this.deviceRefreshRate = this.accessory.context.refreshRate = this.device.leaksensor.refreshRate;
-      if (this.platform.debugMode || this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
+      if (this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
         this.warnLog(`Bot: ${this.accessory.displayName} Using Device Config refreshRate: ${this.deviceRefreshRate}`);
       }
     } else if (this.platform.config.options!.refreshRate) {
       this.deviceRefreshRate = this.accessory.context.refreshRate = this.platform.config.options!.refreshRate;
-      if (this.platform.debugMode || (this.deviceLogging === 'debug')) {
+      if (this.deviceLogging === 'debug') {
         this.warnLog(`Bot: ${this.accessory.displayName} Using Platform Config refreshRate: ${this.deviceRefreshRate}`);
       }
     }
