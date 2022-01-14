@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 11.3.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.0) (2022-01-14)
+
+### What's Changes
+### Major Change To `Logging`:
+* Added the following Logging Options:
+    * `Standard`
+    * `None`
+    * `Debug`
+* Removed Device Logging Option, which was pushed into new logging under debug.
+* Added Device Logging Override for each Device, by using the Device Config.
+
+### Major Changes to `refreshRate`:
+* Added an option to override `refreshRate` for each Device, by using the Device Config.
+
+### Other Changes
+* Enhancments: Made Honeywell Device Settings more managable by using Tabs.
+* Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.2.1...v11.3.0
+
 ## [Version 11.2.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.0) (2022-01-06)
 
 ### What's Changes

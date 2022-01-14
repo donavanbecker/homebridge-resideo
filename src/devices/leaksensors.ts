@@ -28,6 +28,10 @@ export class LeakSensor {
   // Others
   action!: string;
 
+  // Config
+  deviceLogging!: string;
+  deviceRefreshRate!: number;
+
   // Updates
   SensorUpdateInProgress!: boolean;
   doSensorUpdate!: Subject<void>;
@@ -38,14 +42,10 @@ export class LeakSensor {
     public readonly locationId: location['locationID'],
     public device: device & devicesConfig,
   ) {
-    // default placeholders
-    this.StatusActive;
-    this.LeakDetected;
-    this.CurrentTemperature;
-    this.CurrentRelativeHumidity;
-    this.BatteryLevel;
-    this.ChargingState;
-    this.StatusLowBattery;
+    this.logs();
+    this.refreshRate();
+    // Leak Sensor Config
+    this.debugLog(`Leak Sensor: ${this.accessory.displayName} Config: ${device.leaksensor}`);
 
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doSensorUpdate = new Subject();
@@ -85,11 +85,11 @@ export class LeakSensor {
 
     // Leak Sensor Service
     if (this.device.leaksensor?.hide_leak) {
-      this.platform.device(`Leak Sensor: ${accessory.displayName} Removing Leak Sensor Service`);
+      this.debugLog(`Leak Sensor: ${accessory.displayName} Removing Leak Sensor Service`);
       this.leakService = this.accessory.getService(this.platform.Service.LeakSensor);
       accessory.removeService(this.leakService!);
     } else if (!this.leakService) {
-      this.platform.device(`Leak Sensor: ${accessory.displayName} Add Leak Sensor Service`);
+      this.debugLog(`Leak Sensor: ${accessory.displayName} Add Leak Sensor Service`);
       (this.leakService =
         this.accessory.getService(this.platform.Service.LeakSensor) ||
         this.accessory.addService(this.platform.Service.LeakSensor)), `${accessory.displayName} Leak Sensor`;
@@ -97,16 +97,16 @@ export class LeakSensor {
       this.leakService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Leak Sensor`);
 
     } else {
-      this.platform.device(`Leak Sensor: ${accessory.displayName} Leak Sensor Service Not Added`);
+      this.debugLog(`Leak Sensor: ${accessory.displayName} Leak Sensor Service Not Added`);
     }
 
     // Temperature Sensor Service
     if (this.device.leaksensor?.hide_temperature) {
-      this.platform.device(`Leak Sensor: ${accessory.displayName} Removing Temperature Sensor Service`);
+      this.debugLog(`Leak Sensor: ${accessory.displayName} Removing Temperature Sensor Service`);
       this.temperatureService = this.accessory.getService(this.platform.Service.TemperatureSensor);
       accessory.removeService(this.temperatureService!);
     } else if (!this.temperatureService) {
-      this.platform.device(`Leak Sensor: ${accessory.displayName} Add Temperature Sensor Service`);
+      this.debugLog(`Leak Sensor: ${accessory.displayName} Add Temperature Sensor Service`);
       (this.temperatureService =
         this.accessory.getService(this.platform.Service.TemperatureSensor) ||
         this.accessory.addService(this.platform.Service.TemperatureSensor)), `${accessory.displayName} Temperature Sensor`;
@@ -124,16 +124,16 @@ export class LeakSensor {
           return this.CurrentTemperature;
         });
     } else {
-      this.platform.device(`Leak Sensor: ${accessory.displayName} Temperature Sensor Service Not Added`);
+      this.debugLog(`Leak Sensor: ${accessory.displayName} Temperature Sensor Service Not Added`);
     }
 
     // Humidity Sensor Service
     if (this.device.leaksensor?.hide_humidity) {
-      this.platform.device(`Leak Sensor: ${accessory.displayName} Removing Humidity Sensor Service`);
+      this.debugLog(`Leak Sensor: ${accessory.displayName} Removing Humidity Sensor Service`);
       this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor);
       accessory.removeService(this.humidityService!);
     } else if (!this.humidityService) {
-      this.platform.device(`Leak Sensor: ${accessory.displayName} Add Humidity Sensor Service`);
+      this.debugLog(`Leak Sensor: ${accessory.displayName} Add Humidity Sensor Service`);
       (this.humidityService =
         this.accessory.getService(this.platform.Service.HumiditySensor) ||
         this.accessory.addService(this.platform.Service.HumiditySensor)), `${accessory.displayName} Humidity Sensor`;
@@ -149,7 +149,7 @@ export class LeakSensor {
           return this.CurrentRelativeHumidity;
         });
     } else {
-      this.platform.device(`Leak Sensor: ${accessory.displayName} Humidity Sensor Service Not Added`);
+      this.debugLog(`Leak Sensor: ${accessory.displayName} Humidity Sensor Service Not Added`);
     }
 
     // Retrieve initial values and updateHomekit
@@ -163,6 +163,39 @@ export class LeakSensor {
       });
   }
 
+  refreshRate() {
+    if (this.device.leaksensor?.refreshRate) {
+      this.deviceRefreshRate = this.accessory.context.refreshRate = this.device.leaksensor.refreshRate;
+      if (this.platform.debugMode || (this.deviceLogging === 'debug')) {
+        this.warnLog(`Bot: ${this.accessory.displayName} Using Device Config refreshRate: ${this.deviceRefreshRate}`);
+      }
+    } else if (this.platform.config.options!.refreshRate) {
+      this.deviceRefreshRate = this.accessory.context.refreshRate = this.platform.config.options!.refreshRate;
+      if (this.platform.debugMode || (this.deviceLogging === 'debug')) {
+        this.warnLog(`Bot: ${this.accessory.displayName} Using Platform Config refreshRate: ${this.deviceRefreshRate}`);
+      }
+    }
+  }
+
+  logs() {
+    if (this.platform.debugMode) {
+      this.deviceLogging = this.accessory.context.logging = 'debug';
+      this.warnLog(`Bot: ${this.accessory.displayName} Using Debug Mode Logging: ${this.deviceLogging}`);
+    } else if (this.device.leaksensor?.logging) {
+      this.deviceLogging = this.accessory.context.logging = this.device.leaksensor.logging;
+      if (this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
+        this.warnLog(`Bot: ${this.accessory.displayName} Using Device Config Logging: ${this.deviceLogging}`);
+      }
+    } else if (this.platform.config.options?.logging) {
+      this.deviceLogging = this.accessory.context.logging = this.platform.config.options?.logging;
+      if (this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
+        this.warnLog(`Bot: ${this.accessory.displayName} Using Platform Config Logging: ${this.deviceLogging}`);
+      }
+    } else {
+      this.deviceLogging = this.accessory.context.logging = 'standard';
+    }
+  }
+
   /**
    * Parse the device status from the honeywell api
    */
@@ -174,18 +207,18 @@ export class LeakSensor {
     } else {
       this.LeakDetected = 0;
     }
-    this.platform.device(`Leak Sensor: ${this.accessory.displayName} LeakDetected: ${this.LeakDetected}`);
+    this.debugLog(`Leak Sensor: ${this.accessory.displayName} LeakDetected: ${this.LeakDetected}`);
 
     // Temperature Service
     if (!this.device.leaksensor?.hide_temperature) {
       this.CurrentTemperature = this.device.currentSensorReadings.temperature;
-      this.platform.device(`Leak Sensor: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}°`);
+      this.debugLog(`Leak Sensor: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}°`);
     }
 
     // Humidity Service
     if (!this.device.leaksensor?.hide_humidity) {
       this.CurrentRelativeHumidity = this.device.currentSensorReadings.humidity;
-      this.platform.device(`Leak Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}%`);
+      this.debugLog(`Leak Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}%`);
     }
 
     // Battery Service
@@ -196,7 +229,7 @@ export class LeakSensor {
     } else {
       this.StatusLowBattery = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL;
     }
-    this.platform.device(`Leak Sensor: ${this.accessory.displayName} BatteryLevel: ${this.BatteryLevel},`
+    this.debugLog(`Leak Sensor: ${this.accessory.displayName} BatteryLevel: ${this.BatteryLevel},`
       + ` StatusLowBattery: ${this.StatusLowBattery}`);
   }
 
@@ -211,7 +244,7 @@ export class LeakSensor {
         },
       })).data;
       this.device = device;
-      this.platform.device(`Leak Sensor: ${this.accessory.displayName} device: ${JSON.stringify(this.device)}`);
+      this.debugLog(`Leak Sensor: ${this.accessory.displayName} device: ${JSON.stringify(this.device)}`);
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e: any) {
@@ -226,42 +259,42 @@ export class LeakSensor {
    */
   updateHomeKitCharacteristics() {
     if (this.BatteryLevel === undefined) {
-      this.platform.debug(`Leak Sensor: ${this.accessory.displayName} BatteryLevel: ${this.BatteryLevel}`);
+      this.debugLog(`Leak Sensor: ${this.accessory.displayName} BatteryLevel: ${this.BatteryLevel}`);
     } else {
       this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, this.BatteryLevel);
-      this.platform.device(`Leak Sensor: ${this.accessory.displayName} updateCharacteristic BatteryLevel: ${this.BatteryLevel}`);
+      this.debugLog(`Leak Sensor: ${this.accessory.displayName} updateCharacteristic BatteryLevel: ${this.BatteryLevel}`);
     }
     if (this.StatusLowBattery === undefined) {
-      this.platform.debug(`Leak Sensor: ${this.accessory.displayName} StatusLowBattery: ${this.StatusLowBattery}`);
+      this.debugLog(`Leak Sensor: ${this.accessory.displayName} StatusLowBattery: ${this.StatusLowBattery}`);
     } else {
       this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
-      this.platform.device(`Leak Sensor: ${this.accessory.displayName} updateCharacteristic StatusLowBattery: ${this.StatusLowBattery}`);
+      this.debugLog(`Leak Sensor: ${this.accessory.displayName} updateCharacteristic StatusLowBattery: ${this.StatusLowBattery}`);
     }
     if (!this.device.leaksensor?.hide_leak) {
       if (this.LeakDetected === undefined) {
-        this.platform.debug(`Leak Sensor: ${this.accessory.displayName} LeakDetected: ${this.LeakDetected}`);
+        this.debugLog(`Leak Sensor: ${this.accessory.displayName} LeakDetected: ${this.LeakDetected}`);
       } else {
         this.leakService?.updateCharacteristic(this.platform.Characteristic.LeakDetected, this.LeakDetected);
-        this.platform.device(`Leak Sensor: ${this.accessory.displayName} updateCharacteristic LeakDetected: ${this.LeakDetected}`);
+        this.debugLog(`Leak Sensor: ${this.accessory.displayName} updateCharacteristic LeakDetected: ${this.LeakDetected}`);
       }
       if (this.StatusActive === undefined) {
-        this.platform.debug(`Leak Sensor: ${this.accessory.displayName} StatusActive: ${this.StatusActive}`);
+        this.debugLog(`Leak Sensor: ${this.accessory.displayName} StatusActive: ${this.StatusActive}`);
       } else {
         this.leakService?.updateCharacteristic(this.platform.Characteristic.StatusActive, this.StatusActive);
-        this.platform.device(`Leak Sensor: ${this.accessory.displayName} updateCharacteristic StatusActive: ${this.StatusActive}`);
+        this.debugLog(`Leak Sensor: ${this.accessory.displayName} updateCharacteristic StatusActive: ${this.StatusActive}`);
       }
     }
     if (this.device.leaksensor?.hide_temperature && this.CurrentTemperature === undefined) {
-      this.platform.debug(`Leak Sensor: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}`);
+      this.debugLog(`Leak Sensor: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}`);
     } else {
       this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
-      this.platform.device(`Leak Sensor: ${this.accessory.displayName} updateCharacteristic CurrentTemperature: ${this.CurrentTemperature}`);
+      this.debugLog(`Leak Sensor: ${this.accessory.displayName} updateCharacteristic CurrentTemperature: ${this.CurrentTemperature}`);
     }
     if (this.device.leaksensor?.hide_humidity && this.CurrentRelativeHumidity === undefined) {
-      this.platform.debug(`Leak Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
+      this.debugLog(`Leak Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
     } else {
       this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
-      this.platform.device(`Leak Sensor: ${this.accessory.displayName}`
+      this.debugLog(`Leak Sensor: ${this.accessory.displayName}`
         + ` updateCharacteristic CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
     }
   }
@@ -279,40 +312,75 @@ export class LeakSensor {
   public honeywellAPIError(e: any) {
     if (e.message.includes('400')) {
       this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} failed to ${this.action}, Bad Request`);
-      this.platform.debug('The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.');
+      this.debugLog('The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.');
     } else if (e.message.includes('401')) {
       this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} failed to ${this.action}, Unauthorized Request`);
-      this.platform.debug('Authorization for the API is required, but the request has not been authenticated.');
+      this.debugLog('Authorization for the API is required, but the request has not been authenticated.');
     } else if (e.message.includes('403')) {
       this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} failed to ${this.action}, Forbidden Request`);
-      this.platform.debug('The request has been authenticated but does not have appropriate permissions, or a requested resource is not found.');
+      this.debugLog('The request has been authenticated but does not have appropriate permissions, or a requested resource is not found.');
     } else if (e.message.includes('404')) {
       this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} failed to ${this.action}, Requst Not Found`);
-      this.platform.debug('Specifies the requested path does not exist.');
+      this.debugLog('Specifies the requested path does not exist.');
     } else if (e.message.includes('406')) {
       this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} failed to ${this.action}, Request Not Acceptable`);
-      this.platform.debug('The client has requested a MIME type via the Accept header for a value not supported by the server.');
+      this.debugLog('The client has requested a MIME type via the Accept header for a value not supported by the server.');
     } else if (e.message.includes('415')) {
       this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} failed to ${this.action}, Unsupported Requst Header`);
-      this.platform.debug('The client has defined a contentType header that is not supported by the server.');
+      this.debugLog('The client has defined a contentType header that is not supported by the server.');
     } else if (e.message.includes('422')) {
       this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} failed to ${this.action}, Unprocessable Entity`);
-      this.platform.debug('The client has made a valid request, but the server cannot process it.'
+      this.debugLog('The client has made a valid request, but the server cannot process it.'
         + ' This is often used for APIs for which certain limits have been exceeded.');
     } else if (e.message.includes('429')) {
       this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} failed to ${this.action}, Too Many Requests`);
-      this.platform.debug('The client has exceeded the number of requests allowed for a given time window.');
+      this.debugLog('The client has exceeded the number of requests allowed for a given time window.');
     } else if (e.message.includes('500')) {
       this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} failed to ${this.action}, Internal Server Error`);
-      this.platform.debug('An unexpected error on the SmartThings servers has occurred. These errors should be rare.');
+      this.debugLog('An unexpected error on the SmartThings servers has occurred. These errors should be rare.');
     } else {
       this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} failed to ${this.action},`);
     }
-    if (this.platform.config.options?.debug === 'device') {
+    if (this.deviceLogging.includes('debug')) {
       this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} failed to pushChanges, Error Message: ${JSON.stringify(e.message)}`);
     }
-    if (this.platform.config.options?.debug === 'debug' || this.platform.debugMode) {
+    if (this.deviceLogging.includes('debug') || this.platform.debugMode) {
       this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
     }
+  }
+
+  /**
+ * Logging for Device
+ */
+  infoLog(...log: any[]) {
+    if (this.enablingDeviceLogging()) {
+      this.platform.log.info(String(...log));
+    }
+  }
+
+  warnLog(...log: any[]) {
+    if (this.enablingDeviceLogging()) {
+      this.platform.log.warn(String(...log));
+    }
+  }
+
+  errorLog(...log: any[]) {
+    if (this.enablingDeviceLogging()) {
+      this.platform.log.error(String(...log));
+    }
+  }
+
+  debugLog(...log: any[]) {
+    if (this.enablingDeviceLogging()) {
+      if (this.deviceLogging === 'debug') {
+        this.platform.log.info('[DEBUG]', String(...log));
+      } else {
+        this.platform.log.debug(String(...log));
+      }
+    }
+  }
+
+  enablingDeviceLogging(): boolean {
+    return this.deviceLogging.includes('debug') || this.deviceLogging === 'standard';
   }
 }
