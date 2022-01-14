@@ -44,10 +44,7 @@ export class LeakSensor {
   ) {
     this.logs();
     this.refreshRate();
-    // Leak Sensor Config
-    if (this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
-      this.warnLog(`Leak Sensor: ${this.accessory.displayName} Config: ${JSON.stringify(device.leaksensor)}`);
-    }
+    this.config(device);
     // this is subject we use to track when we need to POST changes to the Honeywell API
     this.doSensorUpdate = new Subject();
     this.SensorUpdateInProgress = false;
@@ -162,6 +159,12 @@ export class LeakSensor {
       .subscribe(() => {
         this.refreshStatus();
       });
+  }
+
+  private config(device: device & devicesConfig) {
+    if (device.leaksensor !== undefined) {
+      this.warnLog(`Leak Sensor: ${this.accessory.displayName} Config: ${JSON.stringify(device.leaksensor)}`);
+    }
   }
 
   refreshRate() {

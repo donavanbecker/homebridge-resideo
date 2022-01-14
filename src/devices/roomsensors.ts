@@ -46,10 +46,7 @@ export class RoomSensors {
   ) {
     this.logs();
     this.refreshRate();
-    // Room Sensor Config
-    if (this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
-      this.warnLog(`Room Sensor: ${this.accessory.displayName} Config: ${JSON.stringify(device.thermostat?.roomsensor)}`);
-    }
+    this.config(device);
     // default placeholders
     this.CurrentTemperature;
     this.StatusLowBattery;
@@ -173,6 +170,12 @@ export class RoomSensors {
       .subscribe(() => {
         this.refreshStatus();
       });
+  }
+
+  private config(device: device & devicesConfig) {
+    if (device.thermostat?.roomsensor !== undefined) {
+      this.warnLog(`Room Sensor: ${this.accessory.displayName} Config: ${JSON.stringify(device.thermostat?.roomsensor)}`);
+    }
   }
 
   refreshRate() {

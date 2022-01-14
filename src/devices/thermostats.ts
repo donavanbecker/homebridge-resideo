@@ -64,10 +64,7 @@ export class Thermostats {
   ) {
     this.logs();
     this.refreshRate();
-    // Thermostat Config
-    if (this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
-      this.warnLog(`Thermostat: ${this.accessory.displayName} Config: ${JSON.stringify(device.thermostat)}`);
-    }
+    this.config(device);
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
       Off: platform.Characteristic.TargetHeatingCoolingState.OFF,
@@ -318,6 +315,12 @@ export class Thermostats {
               this.refreshStatus();
             });
         });
+    }
+  }
+
+  private config(device: device & devicesConfig) {
+    if (device.thermostat !== undefined) {
+      this.warnLog(`Thermostat: ${this.accessory.displayName} Config: ${JSON.stringify(device.thermostat)}`);
     }
   }
 

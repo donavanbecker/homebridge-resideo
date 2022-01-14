@@ -56,10 +56,7 @@ export class RoomSensorThermostat {
   ) {
     this.logs();
     this.refreshRate();
-    // Room Sensor Thermostat Config
-    if (this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
-      this.warnLog(`Room Sensor Thermostat: ${this.accessory.displayName} Config: ${JSON.stringify(device.thermostat?.roompriority)}`);
-    }
+    this.config(device);
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
       Off: platform.Characteristic.TargetHeatingCoolingState.OFF,
@@ -246,6 +243,12 @@ export class RoomSensorThermostat {
             this.refreshStatus();
           });
       });
+  }
+
+  private config(device: device & devicesConfig) {
+    if (device.thermostat?.roompriority !== undefined) {
+      this.warnLog(`Room Sensor Thermostat: ${this.accessory.displayName} Config: ${JSON.stringify(device.thermostat?.roompriority)}`);
+    }
   }
 
   refreshRate() {
