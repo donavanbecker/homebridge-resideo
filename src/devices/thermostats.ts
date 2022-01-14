@@ -65,8 +65,9 @@ export class Thermostats {
     this.logs();
     this.refreshRate();
     // Thermostat Config
-    this.debugLog(`Thermostat: ${this.accessory.displayName} Config: ${device.thermostat}`);
-
+    if (this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
+      this.warnLog(`Thermostat: ${this.accessory.displayName} Config: ${device.thermostat}`);
+    }
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
       Off: platform.Characteristic.TargetHeatingCoolingState.OFF,
@@ -323,7 +324,7 @@ export class Thermostats {
   refreshRate() {
     if (this.device.thermostat?.refreshRate) {
       this.deviceRefreshRate = this.accessory.context.refreshRate = this.device.thermostat?.refreshRate;
-      if (this.platform.debugMode || (this.deviceLogging === 'debug')) {
+      if (this.platform.debugMode || this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
         this.warnLog(`Bot: ${this.accessory.displayName} Using Device Config refreshRate: ${this.deviceRefreshRate}`);
       }
     } else if (this.platform.config.options!.refreshRate) {

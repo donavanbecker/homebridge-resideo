@@ -57,7 +57,9 @@ export class RoomSensorThermostat {
     this.logs();
     this.refreshRate();
     // Room Sensor Thermostat Config
-    this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Config: ${device.thermostat?.roompriority}`);
+    if (this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
+      this.warnLog(`Room Sensor Thermostat: ${this.accessory.displayName} Config: ${device.thermostat?.roompriority}`);
+    }
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
       Off: platform.Characteristic.TargetHeatingCoolingState.OFF,
@@ -249,12 +251,12 @@ export class RoomSensorThermostat {
   refreshRate() {
     if (this.device.thermostat?.roompriority?.refreshRate) {
       this.deviceRefreshRate = this.accessory.context.refreshRate = this.device.thermostat.roompriority.refreshRate;
-      if (this.platform.debugMode || (this.deviceLogging === 'debug')) {
+      if (this.platform.debugMode || this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
         this.warnLog(`Bot: ${this.accessory.displayName} Using Device Config refreshRate: ${this.deviceRefreshRate}`);
       }
     } else if (this.platform.config.options!.refreshRate) {
       this.deviceRefreshRate = this.accessory.context.refreshRate = this.platform.config.options!.refreshRate;
-      if (this.platform.debugMode || (this.deviceLogging === 'debug')) {
+      if (this.platform.debugMode || this.deviceLogging === 'debug') {
         this.warnLog(`Bot: ${this.accessory.displayName} Using Platform Config refreshRate: ${this.deviceRefreshRate}`);
       }
     }

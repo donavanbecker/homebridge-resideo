@@ -47,7 +47,9 @@ export class RoomSensors {
     this.logs();
     this.refreshRate();
     // Room Sensor Config
-    this.debugLog(`Room Sensor: ${this.accessory.displayName} Config: ${device.thermostat?.roomsensor}`);
+    if (this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
+      this.warnLog(`Room Sensor: ${this.accessory.displayName} Config: ${device.thermostat?.roomsensor}`);
+    }
     // default placeholders
     this.CurrentTemperature;
     this.StatusLowBattery;
@@ -176,7 +178,7 @@ export class RoomSensors {
   refreshRate() {
     if (this.device.thermostat?.roomsensor?.refreshRate) {
       this.deviceRefreshRate = this.accessory.context.refreshRate = this.device.thermostat?.roomsensor?.refreshRate;
-      if (this.platform.debugMode || (this.deviceLogging === 'debug')) {
+      if (this.platform.debugMode || this.deviceLogging === 'debug' || this.deviceLogging === 'standard') {
         this.warnLog(`Bot: ${this.accessory.displayName} Using Device Config refreshRate: ${this.deviceRefreshRate}`);
       }
     } else if (this.platform.config.options!.refreshRate) {
