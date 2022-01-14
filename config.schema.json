@@ -472,20 +472,19 @@
       ]
     },
     {
-      "key": "options.devices",
-      "notitle": false,
-      "add": "Add Another Device",
       "type": "fieldset",
       "title": "Honeywell Device Settings",
       "expandable": true,
       "expanded": false,
-      "orderable": false,
-      "buttonText": "Add Device",
       "items": [
         {
-          "type": "div",
-          "displayFlex": true,
-          "flex-direction": "column",
+          "key": "options.devices",
+          "notitle": false,
+          "type": "tabarray",
+          "title": "{{ value.deviceID || 'New Honeywell Device' }}",
+          "expandable": true,
+          "expanded": false,
+          "orderable": false,
           "items": [
             "options.devices[].deviceID",
             "options.devices[].hide_device",

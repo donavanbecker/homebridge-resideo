@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file. This projec
 * Added an option to override `refreshRate` for each Device, by using the Device Config.
 
 ### Other Changes
+* Enhancments: Made Honeywell Device Settings more managable by using Tabs.
 * Housekeeping and updated dependencies.
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.2.1...v11.3.0
