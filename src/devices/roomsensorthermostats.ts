@@ -55,8 +55,8 @@ export class RoomSensorThermostat {
     public readonly group: T9groups,
   ) {
     this.logs(device);
-    this.config(device);
     this.refreshRate(device);
+    this.config(device);
     // Map Honeywell Modes to HomeKit Modes
     this.modes = {
       Off: platform.Characteristic.TargetHeatingCoolingState.OFF,

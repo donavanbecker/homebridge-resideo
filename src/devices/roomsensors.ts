@@ -45,8 +45,8 @@ export class RoomSensors {
     public readonly group: T9groups,
   ) {
     this.logs(device);
-    this.config(device);
     this.refreshRate(device);
+    this.config(device);
     // default placeholders
     this.CurrentTemperature;
     this.StatusLowBattery;
