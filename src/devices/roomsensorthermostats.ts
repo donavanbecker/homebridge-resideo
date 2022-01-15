@@ -252,8 +252,8 @@ export class RoomSensorThermostat {
   }
 
   refreshRate(device: device & devicesConfig) {
-    if (device.leaksensor?.refreshRate) {
-      this.deviceRefreshRate = this.accessory.context.refreshRate = device.leaksensor.refreshRate;
+    if (device.thermostat?.roompriority?.refreshRate) {
+      this.deviceRefreshRate = this.accessory.context.refreshRate = device.thermostat?.roompriority?.refreshRate;
       this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Device Config refreshRate: ${this.deviceRefreshRate}`);
     } else if (this.platform.config.options!.refreshRate) {
       this.deviceRefreshRate = this.accessory.context.refreshRate = this.platform.config.options!.refreshRate;
@@ -265,8 +265,8 @@ export class RoomSensorThermostat {
     if (this.platform.debugMode) {
       this.deviceLogging = this.accessory.context.logging = 'debugMode';
       this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Debug Mode Logging: ${this.deviceLogging}`);
-    } else if (device.leaksensor?.logging) {
-      this.deviceLogging = this.accessory.context.logging = device.leaksensor.logging;
+    } else if (device.thermostat?.roompriority?.logging) {
+      this.deviceLogging = this.accessory.context.logging = device.thermostat?.roompriority?.logging;
       this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Device Config Logging: ${this.deviceLogging}`);
     } else if (this.platform.config.options?.logging) {
       this.deviceLogging = this.accessory.context.logging = this.platform.config.options?.logging;
