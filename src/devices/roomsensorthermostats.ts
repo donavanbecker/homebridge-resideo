@@ -245,38 +245,6 @@ export class RoomSensorThermostat {
       });
   }
 
-  private config(device: device & devicesConfig) {
-    if (device.thermostat?.roompriority !== undefined) {
-      this.warnLog(`Room Sensor Thermostat: ${this.accessory.displayName} Config: ${JSON.stringify(device.thermostat?.roompriority)}`);
-    }
-  }
-
-  refreshRate(device: device & devicesConfig) {
-    if (device.thermostat?.roompriority?.refreshRate) {
-      this.deviceRefreshRate = this.accessory.context.refreshRate = device.thermostat?.roompriority?.refreshRate;
-      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Device Config refreshRate: ${this.deviceRefreshRate}`);
-    } else if (this.platform.config.options!.refreshRate) {
-      this.deviceRefreshRate = this.accessory.context.refreshRate = this.platform.config.options!.refreshRate;
-      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Platform Config refreshRate: ${this.deviceRefreshRate}`);
-    }
-  }
-
-  logs(device: device & devicesConfig) {
-    if (this.platform.debugMode) {
-      this.deviceLogging = this.accessory.context.logging = 'debugMode';
-      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Debug Mode Logging: ${this.deviceLogging}`);
-    } else if (device.thermostat?.roompriority?.logging) {
-      this.deviceLogging = this.accessory.context.logging = device.thermostat?.roompriority?.logging;
-      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Device Config Logging: ${this.deviceLogging}`);
-    } else if (this.platform.config.options?.logging) {
-      this.deviceLogging = this.accessory.context.logging = this.platform.config.options?.logging;
-      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Platform Config Logging: ${this.deviceLogging}`);
-    } else {
-      this.deviceLogging = this.accessory.context.logging = 'standard';
-      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Logging Not Set, Using: ${this.deviceLogging}`);
-    }
-  }
-
   /**
    * Parse the device status from the honeywell api
    */
@@ -733,6 +701,51 @@ export class RoomSensorThermostat {
     }
     this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Only Show These Modes: ${JSON.stringify(TargetState)}`);
     return TargetState;
+  }
+
+  config(device: device & devicesConfig) {
+    let config = {};
+    if (device.thermostat?.roompriority) {
+      config = device.thermostat?.roompriority;
+    }
+    if (device.thermostat?.roompriority?.logging !== undefined) {
+      config['logging'] = device.thermostat?.roompriority?.logging;
+    }
+    if (device.thermostat?.roompriority?.refreshRate !== undefined) {
+      config['refreshRate'] = device.thermostat?.roompriority?.refreshRate;
+    }
+    if (Object.entries(config).length !== 0) {
+      this.warnLog(`Room Sensor Thermostat: ${this.accessory.displayName} Config: ${JSON.stringify(config)}`);
+    }
+  }
+
+  refreshRate(device: device & devicesConfig) {
+    if (device.thermostat?.roompriority?.refreshRate) {
+      this.deviceRefreshRate = this.accessory.context.refreshRate = device.thermostat?.roompriority?.refreshRate;
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Device Config refreshRate: ${this.deviceRefreshRate}`);
+    } else if (device.refreshRate) {
+      this.deviceRefreshRate = this.accessory.context.refreshRate = device.refreshRate;
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Thermostat Device Config refreshRate: ${this.deviceRefreshRate}`);
+    } else if (this.platform.config.options!.refreshRate) {
+      this.deviceRefreshRate = this.accessory.context.refreshRate = this.platform.config.options!.refreshRate;
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Platform Config refreshRate: ${this.deviceRefreshRate}`);
+    }
+  }
+
+  logs(device: device & devicesConfig) {
+    if (this.platform.debugMode) {
+      this.deviceLogging = this.accessory.context.logging = 'debugMode';
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Debug Mode Logging: ${this.deviceLogging}`);
+    } else if (device.thermostat?.roompriority?.logging) {
+      this.deviceLogging = this.accessory.context.logging = device.thermostat?.roompriority?.logging;
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Device Config Logging: ${this.deviceLogging}`);
+    } else if (this.platform.config.options?.logging) {
+      this.deviceLogging = this.accessory.context.logging = this.platform.config.options?.logging;
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Platform Config Logging: ${this.deviceLogging}`);
+    } else {
+      this.deviceLogging = this.accessory.context.logging = 'standard';
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Logging Not Set, Using: ${this.deviceLogging}`);
+    }
   }
 
   /**
