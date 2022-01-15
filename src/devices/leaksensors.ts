@@ -162,14 +162,21 @@ export class LeakSensor {
   }
 
   config(device: device & devicesConfig) {
-    if (device.leaksensor !== undefined) {
-      this.warnLog(`Leak Sensor: ${this.accessory.displayName} Config: ${JSON.stringify(device.leaksensor)}`);
+    const config: any = device.leaksensor;
+    if (device.logging !== undefined) {
+      config['logging'] = device.logging;
+    }
+    if (device.refreshRate !== undefined) {
+      config['refreshRate'] = device.refreshRate;
+    }
+    if (config !== undefined) {
+      this.warnLog(`Leak Sensor: ${this.accessory.displayName} Config: ${JSON.stringify(config)}`);
     }
   }
 
   refreshRate(device: device & devicesConfig) {
-    if (device.leaksensor?.refreshRate) {
-      this.deviceRefreshRate = this.accessory.context.refreshRate = device.leaksensor.refreshRate;
+    if (device.refreshRate) {
+      this.deviceRefreshRate = this.accessory.context.refreshRate = device.refreshRate;
       this.debugLog(`Leak Sensor: ${this.accessory.displayName} Using Device Config refreshRate: ${this.deviceRefreshRate}`);
     } else if (this.platform.config.options!.refreshRate) {
       this.deviceRefreshRate = this.accessory.context.refreshRate = this.platform.config.options!.refreshRate;
@@ -181,8 +188,8 @@ export class LeakSensor {
     if (this.platform.debugMode) {
       this.deviceLogging = this.accessory.context.logging = 'debugMode';
       this.debugLog(`Leak Sensor: ${this.accessory.displayName} Using Debug Mode Logging: ${this.deviceLogging}`);
-    } else if (device.leaksensor?.logging) {
-      this.deviceLogging = this.accessory.context.logging = device.leaksensor.logging;
+    } else if (device.logging) {
+      this.deviceLogging = this.accessory.context.logging = device.logging;
       this.debugLog(`Leak Sensor: ${this.accessory.displayName} Using Device Config Logging: ${this.deviceLogging}`);
     } else if (this.platform.config.options?.logging) {
       this.deviceLogging = this.accessory.context.logging = this.platform.config.options?.logging;

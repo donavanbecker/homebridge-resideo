@@ -318,15 +318,22 @@ export class Thermostats {
     }
   }
 
-  private config(device: device & devicesConfig) {
-    if (device.thermostat !== undefined) {
-      this.warnLog(`Thermostat: ${this.accessory.displayName} Config: ${JSON.stringify(device.thermostat)}`);
+  config(device: device & devicesConfig) {
+    const config: any = device.thermostat;
+    if (device.logging !== undefined) {
+      config['logging'] = device.logging;
+    }
+    if (device.refreshRate !== undefined) {
+      config['refreshRate'] = device.refreshRate;
+    }
+    if (config !== undefined) {
+      this.warnLog(`Thermostat: ${this.accessory.displayName} Config: ${JSON.stringify(config)}`);
     }
   }
 
   refreshRate(device: device & devicesConfig) {
-    if (device.thermostat?.refreshRate) {
-      this.deviceRefreshRate = this.accessory.context.refreshRate = device.thermostat.refreshRate;
+    if (device.refreshRate) {
+      this.deviceRefreshRate = this.accessory.context.refreshRate = device.refreshRate;
       this.debugLog(`Thermostat: ${this.accessory.displayName} Using Device Config refreshRate: ${this.deviceRefreshRate}`);
     } else if (this.platform.config.options!.refreshRate) {
       this.deviceRefreshRate = this.accessory.context.refreshRate = this.platform.config.options!.refreshRate;
@@ -338,8 +345,8 @@ export class Thermostats {
     if (this.platform.debugMode) {
       this.deviceLogging = this.accessory.context.logging = 'debugMode';
       this.debugLog(`Thermostat: ${this.accessory.displayName} Using Debug Mode Logging: ${this.deviceLogging}`);
-    } else if (device.thermostat?.logging) {
-      this.deviceLogging = this.accessory.context.logging = device.thermostat.logging;
+    } else if (device.logging) {
+      this.deviceLogging = this.accessory.context.logging = device.logging;
       this.debugLog(`Thermostat: ${this.accessory.displayName} Using Device Config Logging: ${this.deviceLogging}`);
     } else if (this.platform.config.options?.logging) {
       this.deviceLogging = this.accessory.context.logging = this.platform.config.options?.logging;
