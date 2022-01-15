@@ -155,43 +155,6 @@
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID && (model.options.devices[arrayIndices].deviceModel === 'T9' || model.options.devices[arrayIndices].deviceModel === 'T10' || model.options.devices[arrayIndices].deviceModel === 'T5' || model.options.devices[arrayIndices].deviceModel === 'T6'));"
                       }
                     },
-                    "refreshRate": {
-                      "title": "Thermostat Refresh Rate",
-                      "type": "number",
-                      "minimum": 30,
-                      "placeholder": 360,
-                      "description": "Indicates the number of seconds between polls of Honeywell Home API.",
-                      "condition": {
-                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceID && model.options.devices[arrayIndices].deviceClass === 'Thermostat');"
-                      }
-                    },
-                    "logging": {
-                      "title": "Thermostat Logging Override Setting",
-                      "type": "string",
-                      "oneOf": [
-                        {
-                          "title": "Standard Logging",
-                          "enum": [
-                            "standard"
-                          ]
-                        },
-                        {
-                          "title": "No Logging",
-                          "enum": [
-                            "none"
-                          ]
-                        },
-                        {
-                          "title": "Debug Logging",
-                          "enum": [
-                            "debug"
-                          ]
-                        }
-                      ],
-                      "condition": {
-                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceID && model.options.devices[arrayIndices].deviceClass === 'Thermostat');"
-                      }
-                    },
                     "roompriority": {
                       "title": "Room Priority Settings (T9-T10 Only)",
                       "type": "object",
@@ -385,44 +348,44 @@
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'LeakDetector' && model.options.devices[arrayIndices].deviceID);"
                       }
-                    },
-                    "refreshRate": {
-                      "title": "Leak Detector Refresh Rate",
-                      "type": "number",
-                      "minimum": 30,
-                      "placeholder": 360,
-                      "description": "Indicates the number of seconds between polls of Honeywell Home API.",
-                      "condition": {
-                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'LeakDetector' && model.options.devices[arrayIndices].deviceID);"
-                      }
-                    },
-                    "logging": {
-                      "title": "Leak Detector Logging Override Setting",
-                      "type": "string",
-                      "oneOf": [
-                        {
-                          "title": "Standard Logging",
-                          "enum": [
-                            "standard"
-                          ]
-                        },
-                        {
-                          "title": "No Logging",
-                          "enum": [
-                            "none"
-                          ]
-                        },
-                        {
-                          "title": "Debug Logging",
-                          "enum": [
-                            "debug"
-                          ]
-                        }
-                      ],
-                      "condition": {
-                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'LeakDetector' && model.options.devices[arrayIndices].deviceID);"
-                      }
                     }
+                  }
+                },
+                "refreshRate": {
+                  "title": "Device Refresh Rate",
+                  "type": "number",
+                  "minimum": 30,
+                  "placeholder": 360,
+                  "description": "Indicates the number of seconds between polls of Honeywell Home API.",
+                  "condition": {
+                    "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceClass === 'LeakDetector' && model.options.devices[arrayIndices].deviceID);"
+                  }
+                },
+                "logging": {
+                  "title": "Device Logging Override Setting",
+                  "type": "string",
+                  "oneOf": [
+                    {
+                      "title": "Standard Logging",
+                      "enum": [
+                        "standard"
+                      ]
+                    },
+                    {
+                      "title": "No Logging",
+                      "enum": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "title": "Debug Logging",
+                      "enum": [
+                        "debug"
+                      ]
+                    }
+                  ],
+                  "condition": {
+                    "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceClass === 'LeakDetector' && model.options.devices[arrayIndices].deviceID);"
                   }
                 }
               },
@@ -520,8 +483,6 @@
             "options.devices[].thermostat.hide_fan",
             "options.devices[].thermostat.hide_humidity",
             "options.devices[].thermostat.thermostatSetpointStatus",
-            "options.devices[].thermostat.refreshRate",
-            "options.devices[].thermostat.logging",
             {
               "key": "options.devices[].thermostat.roompriority",
               "type": "fieldset",
@@ -551,8 +512,8 @@
             "options.devices[].leaksensor.hide_leak",
             "options.devices[].leaksensor.hide_temperature",
             "options.devices[].leaksensor.hide_humidity",
-            "options.devices[].leaksensor.refreshRate",
-            "options.devices[].leaksensor.logging"
+            "options.devices[].refreshRate",
+            "options.devices[].logging"
           ]
         }
       ]
