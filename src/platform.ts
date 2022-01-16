@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, Service, Characteristic } from 'homebridge';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import * as qs from 'querystring';
@@ -143,22 +142,32 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    * Verify the config passed to the plugin is valid
    */
   verifyConfig() {
-    /**
-     * Hidden Device Discovery Option
-     * This will disable adding any device and will just output info.
-     */
-    this.config.disablePlugin;
-
     this.config.options = this.config.options || {};
 
-    // Device Config
-    if (this.config.options.devices) {
-      for (const deviceConfig of this.config.options.devices!) {
-        if (!deviceConfig.hide_device && !deviceConfig.deviceClass) {
-          throw new Error('The devices config section is missing the "Device Type" in the config, Check Your Conifg.');
-        }
-        if (!deviceConfig.deviceID) {
-          throw new Error('The devices config section is missing the "Device ID" in the config, Check Your Conifg.');
+    const platformConfig = {};
+    if (this.config.options.logging) {
+      platformConfig['logging'] = this.config.options.logging;
+    }
+    if (this.config.options.logging) {
+      platformConfig['refreshRate'] = this.config.options.refreshRate;
+    }
+    if (this.config.options.logging) {
+      platformConfig['pushRate'] = this.config.options.pushRate;
+    }
+    if (Object.entries(platformConfig).length !== 0) {
+      this.warnLog(`Platform Config: ${JSON.stringify(platformConfig)}`);
+    }
+
+    if (this.config.options) {
+      // Device Config
+      if (this.config.options.devices) {
+        for (const deviceConfig of this.config.options.devices!) {
+          if (!deviceConfig.hide_device && !deviceConfig.deviceClass) {
+            throw new Error('The devices config section is missing the "Device Type" in the config, Check Your Conifg.');
+          }
+          if (!deviceConfig.deviceID) {
+            throw new Error('The devices config section is missing the "Device ID" in the config, Check Your Conifg.');
+          }
         }
       }
     }
@@ -174,13 +183,17 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     if (!this.config.options.refreshRate && !this.config.disablePlugin) {
       // default 120 seconds (2 minutes)
       this.config.options!.refreshRate! = 120;
-      this.warnLog('Using Default Refresh Rate of 2 Minutes.');
+      if (this.platformLogging?.includes('debug')) {
+        this.warnLog('Using Default Refresh Rate of 2 Minutes.');
+      }
     }
 
     if (!this.config.options.pushRate && !this.config.disablePlugin) {
       // default 100 milliseconds
       this.config.options!.pushRate! = 0.1;
-      this.warnLog('Using Default Push Rate.');
+      if (this.platformLogging?.includes('debug')) {
+        this.warnLog('Using Default Push Rate.');
+      }
     }
 
     if (!this.config.credentials) {
@@ -827,14 +840,14 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         this.warnLog(JSON.stringify(device.settings));
         if (device.settings.fan) {
           this.warnLog(JSON.stringify(device.settings.fan));
-          this.errorLog(`Device Fan Settings: ${device.settings.fan}`);
+          this.errorLog(`Device Fan Settings: ${JSON.stringify(device.settings.fan)}`);
           if (device.settings.fan.allowedModes) {
             this.warnLog(JSON.stringify(device.settings.fan.allowedModes));
             this.errorLog(`Device Fan Allowed Modes: ${device.settings.fan.allowedModes}`);
           }
           if (device.settings.fan.changeableValues) {
             this.warnLog(JSON.stringify(device.settings.fan.changeableValues));
-            this.errorLog(`Device Fan Changeable Values: ${device.settings.fan.changeableValues}`);
+            this.errorLog(`Device Fan Changeable Values: ${JSON.stringify(device.settings.fan.changeableValues)}`);
           }
         }
       }
