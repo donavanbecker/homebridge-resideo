@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, Service, Characteristic } from 'homebridge';
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import * as qs from 'querystring';
@@ -146,21 +145,21 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     this.config.options = this.config.options || {};
 
     const platformConfig = {};
-    if (this.config.options?.logging) {
-      platformConfig['logging'] = this.config.options?.logging;
+    if (this.config.options.logging) {
+      platformConfig['logging'] = this.config.options.logging;
     }
-    if (this.config.options?.logging) {
-      platformConfig['refreshRate'] = this.config.options?.refreshRate;
+    if (this.config.options.logging) {
+      platformConfig['refreshRate'] = this.config.options.refreshRate;
     }
-    if (this.config.options?.logging) {
-      platformConfig['pushRate'] = this.config.options?.pushRate;
+    if (this.config.options.logging) {
+      platformConfig['pushRate'] = this.config.options.pushRate;
     }
     if (Object.entries(platformConfig).length !== 0) {
       this.warnLog(`Platform Config: ${JSON.stringify(platformConfig)}`);
     }
 
-    // Device Config
     if (this.config.options) {
+      // Device Config
       if (this.config.options.devices) {
         for (const deviceConfig of this.config.options.devices!) {
           if (!deviceConfig.hide_device && !deviceConfig.deviceClass) {
@@ -841,14 +840,14 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         this.warnLog(JSON.stringify(device.settings));
         if (device.settings.fan) {
           this.warnLog(JSON.stringify(device.settings.fan));
-          this.errorLog(`Device Fan Settings: ${device.settings.fan}`);
+          this.errorLog(`Device Fan Settings: ${JSON.stringify(device.settings.fan)}`);
           if (device.settings.fan.allowedModes) {
             this.warnLog(JSON.stringify(device.settings.fan.allowedModes));
             this.errorLog(`Device Fan Allowed Modes: ${device.settings.fan.allowedModes}`);
           }
           if (device.settings.fan.changeableValues) {
             this.warnLog(JSON.stringify(device.settings.fan.changeableValues));
-            this.errorLog(`Device Fan Changeable Values: ${device.settings.fan.changeableValues}`);
+            this.errorLog(`Device Fan Changeable Values: ${JSON.stringify(device.settings.fan.changeableValues)}`);
           }
         }
       }
