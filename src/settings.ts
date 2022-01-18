@@ -1,34 +1,33 @@
-import { PlatformConfig } from 'homebridge';
+import { PlatformConfig } from "homebridge";
 /**
  * This is the name of the platform that users will use to register the plugin in the Homebridge config.json
  */
-export const PLATFORM_NAME = 'HoneywellHome';
+export const PLATFORM_NAME = "HoneywellHome";
 
 /**
  * This must match the name of your plugin as defined the package.json
  */
-export const PLUGIN_NAME = 'homebridge-honeywell-home';
+export const PLUGIN_NAME = "homebridge-honeywell-home";
 
 /**
  * This is the main url used to access honeywell API
  */
-export const AuthURL = 'https://api.honeywell.com/oauth2/token';
+export const AuthURL = "https://api.honeywell.com/oauth2/token";
 
 /**
  * This is the main url used to access honeywell API
  */
-export const LocationURL = 'https://api.honeywell.com/v2/locations';
+export const LocationURL = "https://api.honeywell.com/v2/locations";
 
 /**
  * This is the main url used to access honeywell API
  */
-export const DeviceURL = 'https://api.honeywell.com/v2/devices';
+export const DeviceURL = "https://api.honeywell.com/v2/devices";
 
 /**
  * This is the url used to access UI Login to honeywell API
  */
-export const UIurl = 'https://homebridge-honeywell.iot.oz.nu/user/refresh';
-
+export const UIurl = "https://homebridge-honeywell.iot.oz.nu/user/refresh";
 
 //Config
 export interface HoneywellPlatformConfig extends PlatformConfig {
@@ -252,48 +251,48 @@ export type FanChangeableValues = {
 export type AllowedSpeed = {
   item: string;
   value: Value;
-}
+};
 
 export type Value = {
   speed?: number;
   mode: string;
-}
+};
 
 export type VacationHold = {
   enabled: boolean;
-}
+};
 
 export type CurrentSchedulePeriod = {
   day: string;
   period: string;
-}
+};
 
 export type ScheduleCapabilities = {
   availableScheduleTypes: string[];
   schedulableFan: boolean;
-}
+};
 
 export type ScheduleType = {
   scheduleType: string;
   scheduleSubType: string;
-}
+};
 
 export type ChangeSource = {
   by: string;
   name: string;
-}
+};
 
 export type HardwareSettings = {
   brightness: number;
   maxBrightness: number;
-}
+};
 
 export type PartnerInfo = {
   singleOrMultiODUConfiguration: number;
   parentDeviceModelId: number;
   parentDeviceBrandId: number;
   oduName: string;
-}
+};
 
 export type DeviceSettings = {
   temp: Temp;
