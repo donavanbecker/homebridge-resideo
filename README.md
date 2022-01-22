@@ -24,7 +24,7 @@ plugin allows you to access your Honeywell Home Device(s) from HomeKit with
 ## Configuration
 
 1. Login / create an account at https://developer.honeywellhome.com/user
-    - Your Honeywell Home Developer Account, this account is different then your Honeywell Home Account that you log into the Honeywell Home App with
+   - Your Honeywell Home Developer Account, this account is different then your Honeywell Home Account that you log into the Honeywell Home App with
 2. Click **Create New App**
 3. Give your application a name
 4. Copy the hostname found on #3 of the Intro Page into the Callback URL field
@@ -47,13 +47,12 @@ plugin allows you to access your Honeywell Home Device(s) from HomeKit with
 7. Login to your [https://www.honeywellhome.com](https://account.honeywellhome.com).
 8. Click Allow
 9. Select Devices
-    - I would recommend selecting all devices since you can restrict the devices you don't want in the Home app later, by DeviceID.
+   - I would recommend selecting all devices since you can restrict the devices you don't want in the Home app later, by DeviceID.
 10. Click Connect
 11. Click Save
     - If you plan on adding this plugin into a child bridge, I would configure that at this time before restarting Homebridge.
-       - Reminder that you will have to add this child bridge into the home app to get honeywell accessories to show up.
+      - Reminder that you will have to add this child bridge into the home app to get honeywell accessories to show up.
 12. Restart Homebridge
-
 
 ## Supported Honeywell Devices
 

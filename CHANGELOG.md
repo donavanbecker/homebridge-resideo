@@ -2,83 +2,104 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 11.3.4](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.4) (2022-01-22)
+
+### What's Changes
+
+- Fixed: Issue where device logging and refreshRate wouldn't display.
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.3.3...v11.3.4
+
 ## [Version 11.3.3](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.3) (2022-01-15)
 
 ### What's Changes
-* Fixed: Only log config if it is set.
+
+- Fixed: Only log config if it is set.
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.3.2...v11.3.3
 
 ## [Version 11.3.2](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.2) (2022-01-14)
 
 ### What's Changes
-* Fix: Device Logging and refreshRate not apply to Devices.
+
+- Fix: Device Logging and refreshRate not apply to Devices.
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.3.1...v11.3.2
 
 ## [Version 11.3.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.1) (2022-01-14)
 
 ### What's Changes
-* Housekeeping on Logging and refreshRate.
+
+- Housekeeping on Logging and refreshRate.
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.3.0...v11.3.1
 
 ## [Version 11.3.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.0) (2022-01-14)
 
 ### What's Changes
+
 ### Major Change To `Logging`:
-* Added the following Logging Options:
-    * `Standard`
-    * `None`
-    * `Debug`
-* Removed Device Logging Option, which was pushed into new logging under debug.
-* Added Device Logging Override for each Device, by using the Device Config.
+
+- Added the following Logging Options:
+  - `Standard`
+  - `None`
+  - `Debug`
+- Removed Device Logging Option, which was pushed into new logging under debug.
+- Added Device Logging Override for each Device, by using the Device Config.
 
 ### Major Changes to `refreshRate`:
-* Added an option to override `refreshRate` for each Device, by using the Device Config.
+
+- Added an option to override `refreshRate` for each Device, by using the Device Config.
 
 ### Other Changes
-* Enhancments: Made Honeywell Device Settings more managable by using Tabs.
-* Housekeeping and updated dependencies.
+
+- Enhancments: Made Honeywell Device Settings more managable by using Tabs.
+- Housekeeping and updated dependencies.
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.2.1...v11.3.0
 
 ## [Version 11.2.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.0) (2022-01-06)
 
 ### What's Changes
-* Housekeeping and updated dependencies.
+
+- Housekeeping and updated dependencies.
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.2.0...v11.2.1
 
 ## [Version 11.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.2.0) (2021-12-18)
 
 ### What's Changes
-* Fixed Bug: Changing the temperature doesn't work. [#613](https://github.com/donavanbecker/homebridge-honeywell-home/issues/613)
-* Moved the `Room Sensor` and `Room Priority` settings under `Thermostat` DeviceClass, since they are all tied to the Thermostat.
+
+- Fixed Bug: Changing the temperature doesn't work. [#613](https://github.com/donavanbecker/homebridge-honeywell-home/issues/613)
+- Moved the `Room Sensor` and `Room Priority` settings under `Thermostat` DeviceClass, since they are all tied to the Thermostat.
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.1.2...v11.2.0
 
 ## [Version 11.1.2](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.1.2) (2021-12-15)
 
 ### What's Changes
-* Fixed: `config.schema.json` room priority parameter.
+
+- Fixed: `config.schema.json` room priority parameter.
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.1.1...v11.1.2
 
 ## [Version 11.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.1.1) (2021-12-15)
 
 ### What's Changes
-* Fixed Bug: Changing the temperature doesn't work. [#598](https://github.com/donavanbecker/homebridge-honeywell-home/issues/598)
-* Fixed Bug: Changelog has incorrect link for full changelog. [#605](https://github.com/donavanbecker/homebridge-honeywell-home/issues/605)
-* Housekeeping and updated dependencies.
+
+- Fixed Bug: Changing the temperature doesn't work. [#598](https://github.com/donavanbecker/homebridge-honeywell-home/issues/598)
+- Fixed Bug: Changelog has incorrect link for full changelog. [#605](https://github.com/donavanbecker/homebridge-honeywell-home/issues/605)
+- Housekeeping and updated dependencies.
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.1.0...v11.1.1
 
 ## [Version 11.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.1.0) (2021-11-19)
 
 ### What's Changes
-* Add Device Configs, So that each device can be customized for itself.
-    * ANY CONFIGS SET MUST BE REMOVED AND REPLACED WITH THIS NEW DEVICE CONFIGS
+
+- Add Device Configs, So that each device can be customized for itself.
+  - ANY CONFIGS SET MUST BE REMOVED AND REPLACED WITH THIS NEW DEVICE CONFIGS
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.4...v11.1.0
 
@@ -86,7 +107,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Changes
 
-* Allow `refreshRate` to be set to 30 Seconds or Higher.
+- Allow `refreshRate` to be set to 30 Seconds or Higher.
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.3...v11.0.4
 
@@ -114,7 +135,7 @@ All notable changes to this project will be documented in this file. This projec
 ### Changes
 
 - Changed the way that devices are named and stored in cache
-  - *You will have to Clear Cache on your devices and re-add them because of this.*
+  - _You will have to Clear Cache on your devices and re-add them because of this._
 - Replace Device Discovery with Plugin Device Logging Config Setting to show more logs.
 - Housekeeping and updated dependencies.
 
@@ -142,7 +163,7 @@ All notable changes to this project will be documented in this file. This projec
 ### Changes
 
 - Implimented A Local Authentication HTTP Server that runs when opening Plugin Settings.
-  - URL(Callback URL *) that will be used to Link or Relink your Honeywell Account, will now be your local IP.
+  - URL(Callback URL \*) that will be used to Link or Relink your Honeywell Account, will now be your local IP.
 - Housekeeping and updated dependencies.
 
 ## [Version 9.6.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.5.2...v9.6.0) (2021-07-31)

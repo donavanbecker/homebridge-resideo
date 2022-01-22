@@ -1,8 +1,8 @@
-import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
-import { HoneywellHomePlatform } from '../platform';
+import { CharacteristicValue, PlatformAccessory, Service } from 'homebridge';
 import { interval, Subject } from 'rxjs';
 import { skipWhile } from 'rxjs/operators';
-import { DeviceURL, location, device, devicesConfig } from '../settings';
+import { HoneywellHomePlatform } from '../platform';
+import * as settings from '../settings';
 
 /**
  * Platform Accessory
@@ -39,8 +39,8 @@ export class LeakSensor {
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId: location['locationID'],
-    public device: device & devicesConfig,
+    public readonly locationId: settings.location['locationID'],
+    public device: settings.device & settings.devicesConfig,
   ) {
     this.logs(device);
     this.refreshRate(device);
@@ -56,13 +56,13 @@ export class LeakSensor {
       .setCharacteristic(this.platform.Characteristic.Model, device.deviceType)
       .setCharacteristic(this.platform.Characteristic.SerialNumber, device.deviceID)
       .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision)
-      .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(accessory.context.firmwareRevision);
+      .getCharacteristic(this.platform.Characteristic.FirmwareRevision)
+      .updateValue(accessory.context.firmwareRevision);
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
-    (this.service =
-      this.accessory.getService(this.platform.Service.Battery) ||
-      this.accessory.addService(this.platform.Service.Battery)), `${accessory.displayName} Battery`;
+    (this.service = this.accessory.getService(this.platform.Service.Battery) || this.accessory.addService(this.platform.Service.Battery)),
+    `${accessory.displayName} Battery`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -88,12 +88,10 @@ export class LeakSensor {
       accessory.removeService(this.leakService!);
     } else if (!this.leakService) {
       this.debugLog(`Leak Sensor: ${accessory.displayName} Add Leak Sensor Service`);
-      (this.leakService =
-        this.accessory.getService(this.platform.Service.LeakSensor) ||
-        this.accessory.addService(this.platform.Service.LeakSensor)), `${accessory.displayName} Leak Sensor`;
+      (this.leakService = this.accessory.getService(this.platform.Service.LeakSensor) || this.accessory.addService(this.platform.Service.LeakSensor)),
+      `${accessory.displayName} Leak Sensor`;
 
       this.leakService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Leak Sensor`);
-
     } else {
       this.debugLog(`Leak Sensor: ${accessory.displayName} Leak Sensor Service Not Added`);
     }
@@ -106,8 +104,8 @@ export class LeakSensor {
     } else if (!this.temperatureService) {
       this.debugLog(`Leak Sensor: ${accessory.displayName} Add Temperature Sensor Service`);
       (this.temperatureService =
-        this.accessory.getService(this.platform.Service.TemperatureSensor) ||
-        this.accessory.addService(this.platform.Service.TemperatureSensor)), `${accessory.displayName} Temperature Sensor`;
+        this.accessory.getService(this.platform.Service.TemperatureSensor) || this.accessory.addService(this.platform.Service.TemperatureSensor)),
+      `${accessory.displayName} Temperature Sensor`;
 
       this.temperatureService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Temperature Sensor`);
 
@@ -133,8 +131,8 @@ export class LeakSensor {
     } else if (!this.humidityService) {
       this.debugLog(`Leak Sensor: ${accessory.displayName} Add Humidity Sensor Service`);
       (this.humidityService =
-        this.accessory.getService(this.platform.Service.HumiditySensor) ||
-        this.accessory.addService(this.platform.Service.HumiditySensor)), `${accessory.displayName} Humidity Sensor`;
+        this.accessory.getService(this.platform.Service.HumiditySensor) || this.accessory.addService(this.platform.Service.HumiditySensor)),
+      `${accessory.displayName} Humidity Sensor`;
 
       this.humidityService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Humidity Sensor`);
 
@@ -194,8 +192,7 @@ export class LeakSensor {
     } else {
       this.StatusLowBattery = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL;
     }
-    this.debugLog(`Leak Sensor: ${this.accessory.displayName} BatteryLevel: ${this.BatteryLevel},`
-      + ` StatusLowBattery: ${this.StatusLowBattery}`);
+    this.debugLog(`Leak Sensor: ${this.accessory.displayName} BatteryLevel: ${this.BatteryLevel},` + ` StatusLowBattery: ${this.StatusLowBattery}`);
   }
 
   /**
@@ -203,11 +200,13 @@ export class LeakSensor {
    */
   async refreshStatus() {
     try {
-      const device: any = (await this.platform.axios.get(`${DeviceURL}/waterLeakDetectors/${this.device.deviceID}`, {
-        params: {
-          locationId: this.locationId,
-        },
-      })).data;
+      const device: any = (
+        await this.platform.axios.get(`${settings.DeviceURL}/waterLeakDetectors/${this.device.deviceID}`, {
+          params: {
+            locationId: this.locationId,
+          },
+        })
+      ).data;
       this.device = device;
       this.debugLog(`Leak Sensor: ${this.accessory.displayName} device: ${JSON.stringify(this.device)}`);
       this.parseStatus();
@@ -259,8 +258,7 @@ export class LeakSensor {
       this.debugLog(`Leak Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
     } else {
       this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
-      this.debugLog(`Leak Sensor: ${this.accessory.displayName}`
-        + ` updateCharacteristic CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
+      this.debugLog(`Leak Sensor: ${this.accessory.displayName}` + ` updateCharacteristic CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
     }
   }
 
@@ -295,8 +293,10 @@ export class LeakSensor {
       this.debugLog('The client has defined a contentType header that is not supported by the server.');
     } else if (e.message.includes('422')) {
       this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} failed to ${this.action}, Unprocessable Entity`);
-      this.debugLog('The client has made a valid request, but the server cannot process it.'
-        + ' This is often used for APIs for which certain limits have been exceeded.');
+      this.debugLog(
+        'The client has made a valid request, but the server cannot process it.' +
+          ' This is often used for APIs for which certain limits have been exceeded.',
+      );
     } else if (e.message.includes('429')) {
       this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} failed to ${this.action}, Too Many Requests`);
       this.debugLog('The client has exceeded the number of requests allowed for a given time window.');
@@ -314,7 +314,7 @@ export class LeakSensor {
     }
   }
 
-  config(device: device & devicesConfig) {
+  config(device: settings.device & settings.devicesConfig) {
     let config = {};
     if (device.leaksensor) {
       config = device.leaksensor;
@@ -330,7 +330,7 @@ export class LeakSensor {
     }
   }
 
-  refreshRate(device: device & devicesConfig) {
+  refreshRate(device: settings.device & settings.devicesConfig) {
     if (device.refreshRate) {
       this.deviceRefreshRate = this.accessory.context.refreshRate = device.refreshRate;
       this.debugLog(`Leak Sensor: ${this.accessory.displayName} Using Device Config refreshRate: ${this.deviceRefreshRate}`);
@@ -340,7 +340,7 @@ export class LeakSensor {
     }
   }
 
-  logs(device: device & devicesConfig) {
+  logs(device: settings.device & settings.devicesConfig) {
     if (this.platform.debugMode) {
       this.deviceLogging = this.accessory.context.logging = 'debugMode';
       this.debugLog(`Leak Sensor: ${this.accessory.displayName} Using Debug Mode Logging: ${this.deviceLogging}`);
@@ -357,8 +357,8 @@ export class LeakSensor {
   }
 
   /**
- * Logging for Device
- */
+   * Logging for Device
+   */
   infoLog(...log: any[]) {
     if (this.enablingDeviceLogging()) {
       this.platform.log.info(String(...log));

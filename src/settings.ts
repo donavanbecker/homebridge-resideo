@@ -29,7 +29,6 @@ export const DeviceURL = 'https://api.honeywell.com/v2/devices';
  */
 export const UIurl = 'https://homebridge-honeywell.iot.oz.nu/user/refresh';
 
-
 //Config
 export interface HoneywellPlatformConfig extends PlatformConfig {
   credentials?: credentials;
@@ -252,48 +251,48 @@ export type FanChangeableValues = {
 export type AllowedSpeed = {
   item: string;
   value: Value;
-}
+};
 
 export type Value = {
   speed?: number;
   mode: string;
-}
+};
 
 export type VacationHold = {
   enabled: boolean;
-}
+};
 
 export type CurrentSchedulePeriod = {
   day: string;
   period: string;
-}
+};
 
 export type ScheduleCapabilities = {
   availableScheduleTypes: string[];
   schedulableFan: boolean;
-}
+};
 
 export type ScheduleType = {
   scheduleType: string;
   scheduleSubType: string;
-}
+};
 
 export type ChangeSource = {
   by: string;
   name: string;
-}
+};
 
 export type HardwareSettings = {
   brightness: number;
   maxBrightness: number;
-}
+};
 
 export type PartnerInfo = {
   singleOrMultiODUConfiguration: number;
   parentDeviceModelId: number;
   parentDeviceBrandId: number;
   oduName: string;
-}
+};
 
 export type DeviceSettings = {
   temp: Temp;

@@ -1,8 +1,8 @@
-import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
-import { HoneywellHomePlatform } from '../platform';
+import { CharacteristicValue, PlatformAccessory, Service } from 'homebridge';
 import { interval, Subject } from 'rxjs';
 import { skipWhile } from 'rxjs/operators';
-import { location, sensorAccessory, device, devicesConfig, T9groups } from '../settings';
+import { HoneywellHomePlatform } from '../platform';
+import * as settings from '../settings';
 
 /**
  * Platform Accessory
@@ -39,10 +39,10 @@ export class RoomSensors {
   constructor(
     private readonly platform: HoneywellHomePlatform,
     private accessory: PlatformAccessory,
-    public readonly locationId: location['locationID'],
-    public device: device & devicesConfig,
-    public sensorAccessory: sensorAccessory,
-    public readonly group: T9groups,
+    public readonly locationId: settings.location['locationID'],
+    public device: settings.device & settings.devicesConfig,
+    public sensorAccessory: settings.sensorAccessory,
+    public readonly group: settings.T9groups,
   ) {
     this.logs(device);
     this.refreshRate(device);
@@ -65,15 +65,14 @@ export class RoomSensors {
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(this.platform.Characteristic.Model, sensorAccessory.accessoryAttribute.model)
       .setCharacteristic(this.platform.Characteristic.SerialNumber, sensorAccessory.deviceID)
-      .setCharacteristic(
-        this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision)
-      .getCharacteristic(this.platform.Characteristic.FirmwareRevision).updateValue(accessory.context.firmwareRevision);
+      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision)
+      .getCharacteristic(this.platform.Characteristic.FirmwareRevision)
+      .updateValue(accessory.context.firmwareRevision);
 
     // get the BatteryService service if it exists, otherwise create a new Battery service
     // you can create multiple services for each accessory
-    (this.service =
-      this.accessory.getService(this.platform.Service.Battery) ||
-      this.accessory.addService(this.platform.Service.Battery)), `${accessory.displayName} Battery`;
+    (this.service = this.accessory.getService(this.platform.Service.Battery) || this.accessory.addService(this.platform.Service.Battery)),
+    `${accessory.displayName} Battery`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
@@ -100,8 +99,8 @@ export class RoomSensors {
     } else if (!this.temperatureService) {
       this.debugLog(`Room Sensor: ${accessory.displayName} Add Temperature Sensor Service`);
       (this.temperatureService =
-        this.accessory.getService(this.platform.Service.TemperatureSensor) ||
-        this.accessory.addService(this.platform.Service.TemperatureSensor)), `${accessory.displayName} Temperature Sensor`;
+        this.accessory.getService(this.platform.Service.TemperatureSensor) || this.accessory.addService(this.platform.Service.TemperatureSensor)),
+      `${accessory.displayName} Temperature Sensor`;
 
       this.temperatureService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Temperature Sensor`);
 
@@ -127,11 +126,10 @@ export class RoomSensors {
     } else if (!this.occupancyService) {
       this.debugLog(`Room Sensor: ${accessory.displayName} Add Occupancy Sensor Service`);
       (this.occupancyService =
-        this.accessory.getService(this.platform.Service.OccupancySensor) ||
-        this.accessory.addService(this.platform.Service.OccupancySensor)), `${accessory.displayName} Occupancy Sensor`;
+        this.accessory.getService(this.platform.Service.OccupancySensor) || this.accessory.addService(this.platform.Service.OccupancySensor)),
+      `${accessory.displayName} Occupancy Sensor`;
 
       this.occupancyService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Occupancy Sensor`);
-
     } else {
       this.debugLog(`Room Sensor: ${accessory.displayName} Occupancy Sensor Service Not Added`);
     }
@@ -144,8 +142,8 @@ export class RoomSensors {
     } else if (!this.humidityService) {
       this.debugLog(`Room Sensor: ${accessory.displayName} Add Humidity Sensor Service`);
       (this.humidityService =
-        this.accessory.getService(this.platform.Service.HumiditySensor) ||
-        this.accessory.addService(this.platform.Service.HumiditySensor)), `${accessory.displayName} Humidity Sensor`;
+        this.accessory.getService(this.platform.Service.HumiditySensor) || this.accessory.addService(this.platform.Service.HumiditySensor)),
+      `${accessory.displayName} Humidity Sensor`;
 
       this.humidityService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Humidity Sensor`);
 
@@ -232,10 +230,7 @@ export class RoomSensors {
       this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
       this.debugLog(`Room Sensor: ${this.accessory.displayName} updateCharacteristic StatusLowBattery: ${this.StatusLowBattery}`);
     }
-    if (
-      this.device.thermostat?.roomsensor?.hide_temperature || this.CurrentTemperature === undefined
-      && Number.isNaN(this.CurrentTemperature)
-    ) {
+    if (this.device.thermostat?.roomsensor?.hide_temperature || (this.CurrentTemperature === undefined && Number.isNaN(this.CurrentTemperature))) {
       this.debugLog(`Room Sensor: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}`);
     } else {
       this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
@@ -251,8 +246,7 @@ export class RoomSensors {
       this.debugLog(`Room Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
     } else {
       this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
-      this.debugLog(`Room Sensor: ${this.accessory.displayName}`
-        + ` updateCharacteristic CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
+      this.debugLog(`Room Sensor: ${this.accessory.displayName}` + ` updateCharacteristic CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
     }
   }
 
@@ -285,8 +279,10 @@ export class RoomSensors {
       this.debugLog('The client has defined a contentType header that is not supported by the server.');
     } else if (e.message.includes('422')) {
       this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Unprocessable Entity`);
-      this.debugLog('The client has made a valid request, but the server cannot process it.'
-        + ' This is often used for APIs for which certain limits have been exceeded.');
+      this.debugLog(
+        'The client has made a valid request, but the server cannot process it.' +
+          ' This is often used for APIs for which certain limits have been exceeded.',
+      );
     } else if (e.message.includes('429')) {
       this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Too Many Requests`);
       this.debugLog('The client has exceeded the number of requests allowed for a given time window.');
@@ -316,7 +312,7 @@ export class RoomSensors {
     return Math.round((5 / 9) * (value - 32) * 2) / 2;
   }
 
-  config(device: device & devicesConfig) {
+  config(device: settings.device & settings.devicesConfig) {
     let config = {};
     if (device.thermostat?.roomsensor) {
       config = device.thermostat?.roomsensor;
@@ -332,7 +328,7 @@ export class RoomSensors {
     }
   }
 
-  refreshRate(device: device & devicesConfig) {
+  refreshRate(device: settings.device & settings.devicesConfig) {
     if (device.thermostat?.roomsensor?.refreshRate) {
       this.deviceRefreshRate = this.accessory.context.refreshRate = device.thermostat?.roomsensor?.refreshRate;
       this.debugLog(`Room Sensor: ${this.accessory.displayName} Using Device Config refreshRate: ${this.deviceRefreshRate}`);
@@ -345,7 +341,7 @@ export class RoomSensors {
     }
   }
 
-  logs(device: device & devicesConfig) {
+  logs(device: settings.device & settings.devicesConfig) {
     if (this.platform.debugMode) {
       this.deviceLogging = this.accessory.context.logging = 'debugMode';
       this.debugLog(`Room Sensor: ${this.accessory.displayName} Using Debug Mode Logging: ${this.deviceLogging}`);
@@ -362,8 +358,8 @@ export class RoomSensors {
   }
 
   /**
- * Logging for Device
- */
+   * Logging for Device
+   */
   infoLog(...log: any[]) {
     if (this.enablingDeviceLogging()) {
       this.platform.log.info(String(...log));
