@@ -1,8 +1,8 @@
-import * as homebridge from "homebridge";
-import * as rxjs from "rxjs";
-import * as operators from "rxjs/operators";
-import * as platform from "../platform";
-import * as settings from "../settings";
+import * as homebridge from 'homebridge';
+import * as rxjs from 'rxjs';
+import * as operators from 'rxjs/operators';
+import * as platform from '../platform';
+import * as settings from '../settings';
 
 /**
  * Platform Accessory
@@ -49,7 +49,7 @@ export class RoomSensorThermostat {
   constructor(
     private readonly platform: platform.HoneywellHomePlatform,
     private accessory: homebridge.PlatformAccessory,
-    public readonly locationId: settings.location["locationID"],
+    public readonly locationId: settings.location['locationID'],
     public device: settings.device & settings.devicesConfig,
     public sensorAccessory: settings.sensorAccessory,
     public readonly group: settings.T9groups,
@@ -67,7 +67,7 @@ export class RoomSensorThermostat {
 
     // Map HomeKit Modes to Honeywell Modes
     // Don't change the order of these!
-    this.honeywellMode = ["Off", "Heat", "Cool", "Auto"];
+    this.honeywellMode = ['Off', 'Heat', 'Cool', 'Auto'];
 
     // default placeholders
     this.CurrentTemperature;
@@ -88,10 +88,10 @@ export class RoomSensorThermostat {
     // set accessory information
     accessory
       .getService(this.platform.Service.AccessoryInformation)!
-      .setCharacteristic(this.platform.Characteristic.Manufacturer, "Honeywell")
+      .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
       .setCharacteristic(
         this.platform.Characteristic.Model,
-        sensorAccessory.accessoryAttribute.model || "1100",
+        sensorAccessory.accessoryAttribute.model || '1100',
       )
       .setCharacteristic(
         this.platform.Characteristic.SerialNumber,
@@ -129,7 +129,7 @@ export class RoomSensorThermostat {
     this.parseStatus();
 
     // Set Min and Max
-    if (device.changeableValues!.heatCoolMode === "Heat") {
+    if (device.changeableValues!.heatCoolMode === 'Heat') {
       this.debugLog(
         `Room Sensor Thermostat: ${accessory.displayName} mode: ${
           device.changeableValues!.heatCoolMode
@@ -213,7 +213,7 @@ export class RoomSensorThermostat {
 
     // Watch for thermostat change events
     // We put in a debounce of 100ms so we don't make duplicate calls
-    if (device.thermostat?.roompriority?.deviceType === "Thermostat") {
+    if (device.thermostat?.roompriority?.deviceType === 'Thermostat') {
       this.doRoomUpdate
         .pipe(
           operators.tap(() => {
@@ -225,14 +225,14 @@ export class RoomSensorThermostat {
           try {
             await this.refreshRoomPriority();
           } catch (e: any) {
-            this.action = "refreshRoomPriority";
+            this.action = 'refreshRoomPriority';
             this.honeywellAPIError(e);
             this.apiError(e);
           }
           try {
             await this.pushRoomChanges();
           } catch (e: any) {
-            this.action = "pushRoomChanges";
+            this.action = 'pushRoomChanges';
             this.honeywellAPIError(e);
             this.apiError(e);
           }
@@ -258,7 +258,7 @@ export class RoomSensorThermostat {
         try {
           await this.pushChanges();
         } catch (e: any) {
-          this.action = "pushChanges";
+          this.action = 'pushChanges';
           this.honeywellAPIError(e);
           this.apiError(e);
         }
@@ -278,11 +278,11 @@ export class RoomSensorThermostat {
    * Parse the device status from the honeywell api
    */
   parseStatus() {
-    if (this.device.units === "Fahrenheit") {
+    if (this.device.units === 'Fahrenheit') {
       this.TemperatureDisplayUnits =
         this.platform.Characteristic.TemperatureDisplayUnits.FAHRENHEIT;
     }
-    if (this.device.units === "Celsius") {
+    if (this.device.units === 'Celsius') {
       this.TemperatureDisplayUnits =
         this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS;
     }
@@ -317,10 +317,10 @@ export class RoomSensorThermostat {
      * CurrentHeatingCoolingState =  OFF = 0, HEAT = 1, COOL = 2
      */
     switch (this.device.operationStatus!.mode) {
-      case "Heat":
+      case 'Heat':
         this.CurrentHeatingCoolingState = 1;
         break;
-      case "Cool":
+      case 'Cool':
         this.CurrentHeatingCoolingState = 2;
         break;
       default:
@@ -380,7 +380,7 @@ export class RoomSensorThermostat {
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e: any) {
-      this.action = "refreshStatus";
+      this.action = 'refreshStatus';
       this.honeywellAPIError(e);
       this.apiError(e);
     }
@@ -391,9 +391,9 @@ export class RoomSensorThermostat {
    */
   async refreshSensorStatus() {
     try {
-      if (this.device.thermostat?.roompriority?.deviceType === "Thermostat") {
-        if (this.device.deviceID.startsWith("LCC")) {
-          if (this.device.deviceModel.startsWith("T9")) {
+      if (this.device.thermostat?.roompriority?.deviceType === 'Thermostat') {
+        if (this.device.deviceID.startsWith('LCC')) {
+          if (this.device.deviceModel.startsWith('T9')) {
             if (this.device.groups) {
               const groups = this.device.groups;
               for (const group of groups) {
@@ -421,7 +421,7 @@ export class RoomSensorThermostat {
                           if (accessory.accessoryAttribute.type) {
                             if (
                               accessory.accessoryAttribute.type.startsWith(
-                                "IndoorAirSensor",
+                                'IndoorAirSensor',
                               )
                             ) {
                               this.sensorAccessory = accessory;
@@ -451,14 +451,14 @@ export class RoomSensorThermostat {
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e: any) {
-      this.action = "refreshSensorStatus";
+      this.action = 'refreshSensorStatus';
       this.honeywellAPIError(e);
       this.apiError(e);
     }
   }
 
   public async refreshRoomPriority() {
-    if (this.device.thermostat?.roompriority?.deviceType === "Thermostat") {
+    if (this.device.thermostat?.roompriority?.deviceType === 'Thermostat') {
       this.roompriority = (
         await this.platform.axios.get(
           `${settings.DeviceURL}/thermostats/${this.device.deviceID}/priority`,
@@ -497,7 +497,7 @@ export class RoomSensorThermostat {
         },
       } as any;
 
-      if (this.device.thermostat?.roompriority?.priorityType === "PickARoom") {
+      if (this.device.thermostat?.roompriority?.priorityType === 'PickARoom') {
         payload.currentPriority.selectedRooms = [
           this.sensorAccessory.accessoryId,
         ];
@@ -509,21 +509,21 @@ export class RoomSensorThermostat {
        * "TemporaryHold" will hold the set temperature until "nextPeriodTime".
        * "PermanentHold" will hold the setpoint until user requests another change.
        */
-      if (this.device.thermostat?.roompriority?.deviceType === "Thermostat") {
-        if (this.device.thermostat?.roompriority.priorityType === "FollowMe") {
+      if (this.device.thermostat?.roompriority?.deviceType === 'Thermostat') {
+        if (this.device.thermostat?.roompriority.priorityType === 'FollowMe') {
           this.platform.log.info(
             `Room Sensor Thermostat: ${this.accessory.displayName} sent request to Honeywell API, Priority Type: ` +
               `${this.device.thermostat?.roompriority.priorityType} Built-in Occupancy Sensor(s) Will be used to set Priority Automatically.`,
           );
         } else if (
-          this.device.thermostat?.roompriority.priorityType === "WholeHouse"
+          this.device.thermostat?.roompriority.priorityType === 'WholeHouse'
         ) {
           this.platform.log.info(
             `Room Sensor Thermostat: ${this.accessory.displayName} sent request to Honeywell API,` +
               ` Priority Type: ${this.device.thermostat?.roompriority.priorityType}`,
           );
         } else if (
-          this.device.thermostat?.roompriority.priorityType === "PickARoom"
+          this.device.thermostat?.roompriority.priorityType === 'PickARoom'
         ) {
           this.platform.log.info(
             `Room Sensor Thermostat: ${this.accessory.displayName} sent request to Honeywell API,` +
@@ -661,7 +661,7 @@ export class RoomSensorThermostat {
         } pushChanges: ${JSON.stringify(payload)}`,
       );
     } catch (e: any) {
-      this.action = "pushChanges";
+      this.action = 'pushChanges';
       this.honeywellAPIError(e);
       this.apiError(e);
     }
@@ -821,80 +821,80 @@ export class RoomSensorThermostat {
   }
 
   public honeywellAPIError(e: any) {
-    if (e.message.includes("400")) {
+    if (e.message.includes('400')) {
       this.platform.log.error(
         `Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Bad Request`,
       );
       this.debugLog(
-        "The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.",
+        'The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.',
       );
-    } else if (e.message.includes("401")) {
+    } else if (e.message.includes('401')) {
       this.platform.log.error(
         `Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Unauthorized Request`,
       );
       this.debugLog(
-        "Authorization for the API is required, but the request has not been authenticated.",
+        'Authorization for the API is required, but the request has not been authenticated.',
       );
-    } else if (e.message.includes("403")) {
+    } else if (e.message.includes('403')) {
       this.platform.log.error(
         `Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Forbidden Request`,
       );
       this.debugLog(
-        "The request has been authenticated but does not have appropriate permissions, or a requested resource is not found.",
+        'The request has been authenticated but does not have appropriate permissions, or a requested resource is not found.',
       );
-    } else if (e.message.includes("404")) {
+    } else if (e.message.includes('404')) {
       this.platform.log.error(
         `Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Requst Not Found`,
       );
-      this.debugLog("Specifies the requested path does not exist.");
-    } else if (e.message.includes("406")) {
+      this.debugLog('Specifies the requested path does not exist.');
+    } else if (e.message.includes('406')) {
       this.platform.log.error(
         `Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Request Not Acceptable`,
       );
       this.debugLog(
-        "The client has requested a MIME type via the Accept header for a value not supported by the server.",
+        'The client has requested a MIME type via the Accept header for a value not supported by the server.',
       );
-    } else if (e.message.includes("415")) {
+    } else if (e.message.includes('415')) {
       this.platform.log.error(
         `Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Unsupported Requst Header`,
       );
       this.debugLog(
-        "The client has defined a contentType header that is not supported by the server.",
+        'The client has defined a contentType header that is not supported by the server.',
       );
-    } else if (e.message.includes("422")) {
+    } else if (e.message.includes('422')) {
       this.platform.log.error(
         `Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Unprocessable Entity`,
       );
       this.debugLog(
-        "The client has made a valid request, but the server cannot process it." +
-          " This is often used for APIs for which certain limits have been exceeded.",
+        'The client has made a valid request, but the server cannot process it.' +
+          ' This is often used for APIs for which certain limits have been exceeded.',
       );
-    } else if (e.message.includes("429")) {
+    } else if (e.message.includes('429')) {
       this.platform.log.error(
         `Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Too Many Requests`,
       );
       this.debugLog(
-        "The client has exceeded the number of requests allowed for a given time window.",
+        'The client has exceeded the number of requests allowed for a given time window.',
       );
-    } else if (e.message.includes("500")) {
+    } else if (e.message.includes('500')) {
       this.platform.log.error(
         `Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Internal Server Error`,
       );
       this.debugLog(
-        "An unexpected error on the SmartThings servers has occurred. These errors should be rare.",
+        'An unexpected error on the SmartThings servers has occurred. These errors should be rare.',
       );
     } else {
       this.platform.log.error(
         `Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action},`,
       );
     }
-    if (this.deviceLogging.includes("debug")) {
+    if (this.deviceLogging.includes('debug')) {
       this.platform.log.error(
         `Room Sensor Thermostat: ${this.accessory.displayName} failed to pushChanges, ` +
           `Error Message: ${JSON.stringify(e.message)}`,
       );
     }
-    if (this.deviceLogging.includes("debug") || this.platform.debugMode) {
+    if (this.deviceLogging.includes('debug') || this.platform.debugMode) {
       this.platform.log.error(
         `Room Sensor Thermostat: ${
           this.accessory.displayName
@@ -969,7 +969,7 @@ export class RoomSensorThermostat {
       `Room Sensor Thermostat: ${this.accessory.displayName} Set TemperatureDisplayUnits: ${value}`,
     );
     this.platform.log.warn(
-      "Changing the Hardware Display Units from HomeKit is not supported.",
+      'Changing the Hardware Display Units from HomeKit is not supported.',
     );
 
     // change the temp units back to the one the Honeywell API said the thermostat was set to
@@ -1017,22 +1017,22 @@ export class RoomSensorThermostat {
 
     const TargetState = [4];
     TargetState.pop();
-    if (this.device.allowedModes!.includes("Cool")) {
+    if (this.device.allowedModes!.includes('Cool')) {
       TargetState.push(
         this.platform.Characteristic.TargetHeatingCoolingState.COOL,
       );
     }
-    if (this.device.allowedModes!.includes("Heat")) {
+    if (this.device.allowedModes!.includes('Heat')) {
       TargetState.push(
         this.platform.Characteristic.TargetHeatingCoolingState.HEAT,
       );
     }
-    if (this.device.allowedModes!.includes("Off")) {
+    if (this.device.allowedModes!.includes('Off')) {
       TargetState.push(
         this.platform.Characteristic.TargetHeatingCoolingState.OFF,
       );
     }
-    if (this.device.allowedModes!.includes("Auto")) {
+    if (this.device.allowedModes!.includes('Auto')) {
       TargetState.push(
         this.platform.Characteristic.TargetHeatingCoolingState.AUTO,
       );
@@ -1051,10 +1051,10 @@ export class RoomSensorThermostat {
       config = device.thermostat?.roompriority;
     }
     if (device.thermostat?.roompriority?.logging !== undefined) {
-      config["logging"] = device.thermostat?.roompriority?.logging;
+      config['logging'] = device.thermostat?.roompriority?.logging;
     }
     if (device.thermostat?.roompriority?.refreshRate !== undefined) {
-      config["refreshRate"] = device.thermostat?.roompriority?.refreshRate;
+      config['refreshRate'] = device.thermostat?.roompriority?.refreshRate;
     }
     if (Object.entries(config).length !== 0) {
       this.warnLog(
@@ -1089,7 +1089,7 @@ export class RoomSensorThermostat {
 
   logs(device: settings.device & settings.devicesConfig) {
     if (this.platform.debugMode) {
-      this.deviceLogging = this.accessory.context.logging = "debugMode";
+      this.deviceLogging = this.accessory.context.logging = 'debugMode';
       this.debugLog(
         `Room Sensor Thermostat: ${this.accessory.displayName} Using Debug Mode Logging: ${this.deviceLogging}`,
       );
@@ -1106,7 +1106,7 @@ export class RoomSensorThermostat {
         `Room Sensor Thermostat: ${this.accessory.displayName} Using Platform Config Logging: ${this.deviceLogging}`,
       );
     } else {
-      this.deviceLogging = this.accessory.context.logging = "standard";
+      this.deviceLogging = this.accessory.context.logging = 'standard';
       this.debugLog(
         `Room Sensor Thermostat: ${this.accessory.displayName} Logging Not Set, Using: ${this.deviceLogging}`,
       );
@@ -1136,8 +1136,8 @@ export class RoomSensorThermostat {
 
   debugLog(...log: any[]) {
     if (this.enablingDeviceLogging()) {
-      if (this.deviceLogging === "debug") {
-        this.platform.log.info("[DEBUG]", String(...log));
+      if (this.deviceLogging === 'debug') {
+        this.platform.log.info('[DEBUG]', String(...log));
       } else {
         this.platform.log.debug(String(...log));
       }
@@ -1146,7 +1146,7 @@ export class RoomSensorThermostat {
 
   enablingDeviceLogging(): boolean {
     return (
-      this.deviceLogging === "standard" || this.deviceLogging.includes("debug")
+      this.deviceLogging === 'standard' || this.deviceLogging.includes('debug')
     );
   }
 }
