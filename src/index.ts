@@ -1,10 +1,10 @@
-import * as homebridge from 'homebridge';
-import * as platform from './platform';
-import * as settings from './settings';
+import { API } from 'homebridge';
+import { HoneywellHomePlatform } from './platform';
+import { PLATFORM_NAME } from './settings';
 
 /**
  * This method registers the platform with Homebridge
  */
-export = (api: homebridge.API): void => {
-  api.registerPlatform(settings.PLATFORM_NAME, platform.HoneywellHomePlatform);
+export = (api: API): void => {
+  api.registerPlatform(PLATFORM_NAME, HoneywellHomePlatform);
 };

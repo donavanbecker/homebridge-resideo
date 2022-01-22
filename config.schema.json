@@ -43,12 +43,7 @@
             "default": "Keep your tokens a secret!"
           }
         },
-        "required": [
-          "consumerKey",
-          "consumerSecret",
-          "refreshToken",
-          "notice"
-        ]
+        "required": ["consumerKey", "consumerSecret", "refreshToken", "notice"]
       },
       "options": {
         "type": "object",
@@ -77,15 +72,11 @@
                   "oneOf": [
                     {
                       "title": "Thermostat",
-                      "enum": [
-                        "Thermostat"
-                      ]
+                      "enum": ["Thermostat"]
                     },
                     {
                       "title": "Leak Sensor",
-                      "enum": [
-                        "LeakDetector"
-                      ]
+                      "enum": ["LeakDetector"]
                     }
                   ],
                   "condition": {
@@ -97,13 +88,7 @@
                   "type": "string",
                   "placeholder": "T5",
                   "typeahead": {
-                    "source": [
-                      "T9",
-                      "T10",
-                      "T5",
-                      "T6",
-                      "Round"
-                    ]
+                    "source": ["T9", "T10", "T5", "T6", "Round"]
                   },
                   "condition": {
                     "functionBody": "return (model.options && model.options.devices && model.options.devices[arrayIndices].deviceID && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat');"
@@ -134,21 +119,15 @@
                       "oneOf": [
                         {
                           "title": "Permanent Hold",
-                          "enum": [
-                            "PermanentHold"
-                          ]
+                          "enum": ["PermanentHold"]
                         },
                         {
                           "title": "No Hold",
-                          "enum": [
-                            "NoHold"
-                          ]
+                          "enum": ["NoHold"]
                         },
                         {
                           "title": "Temporary Hold",
-                          "enum": [
-                            "TemporaryHold"
-                          ]
+                          "enum": ["TemporaryHold"]
                         }
                       ],
                       "condition": {
@@ -165,9 +144,7 @@
                           "oneOf": [
                             {
                               "title": "Thermostat",
-                              "enum": [
-                                "Thermostat"
-                              ]
+                              "enum": ["Thermostat"]
                             }
                           ],
                           "condition": {
@@ -181,21 +158,15 @@
                           "oneOf": [
                             {
                               "title": "Pick A Room",
-                              "enum": [
-                                "PickARoom"
-                              ]
+                              "enum": ["PickARoom"]
                             },
                             {
                               "title": "Whole House",
-                              "enum": [
-                                "WholeHouse"
-                              ]
+                              "enum": ["WholeHouse"]
                             },
                             {
                               "title": "Follow Me",
-                              "enum": [
-                                "FollowMe"
-                              ]
+                              "enum": ["FollowMe"]
                             }
                           ],
                           "condition": {
@@ -218,21 +189,15 @@
                           "oneOf": [
                             {
                               "title": "Standard Logging",
-                              "enum": [
-                                "standard"
-                              ]
+                              "enum": ["standard"]
                             },
                             {
                               "title": "No Logging",
-                              "enum": [
-                                "none"
-                              ]
+                              "enum": ["none"]
                             },
                             {
                               "title": "Debug Logging",
-                              "enum": [
-                                "debug"
-                              ]
+                              "enum": ["debug"]
                             }
                           ],
                           "condition": {
@@ -240,10 +205,7 @@
                           }
                         }
                       },
-                      "required": [
-                        "deviceType",
-                        "priorityType"
-                      ],
+                      "required": ["deviceType", "priorityType"],
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceID && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && (model.options.devices[arrayIndices].deviceModel === 'T9' || model.options.devices[arrayIndices].deviceModel === 'T10'));"
                       }
@@ -296,21 +258,15 @@
                           "oneOf": [
                             {
                               "title": "Standard Logging",
-                              "enum": [
-                                "standard"
-                              ]
+                              "enum": ["standard"]
                             },
                             {
                               "title": "No Logging",
-                              "enum": [
-                                "none"
-                              ]
+                              "enum": ["none"]
                             },
                             {
                               "title": "Debug Logging",
-                              "enum": [
-                                "debug"
-                              ]
+                              "enum": ["debug"]
                             }
                           ],
                           "condition": {
@@ -367,21 +323,15 @@
                   "oneOf": [
                     {
                       "title": "Standard Logging",
-                      "enum": [
-                        "standard"
-                      ]
+                      "enum": ["standard"]
                     },
                     {
                       "title": "No Logging",
-                      "enum": [
-                        "none"
-                      ]
+                      "enum": ["none"]
                     },
                     {
                       "title": "Debug Logging",
-                      "enum": [
-                        "debug"
-                      ]
+                      "enum": ["debug"]
                     }
                   ],
                   "condition": {
@@ -389,10 +339,7 @@
                   }
                 }
               },
-              "required": [
-                "deviceID",
-                "deviceClass"
-              ]
+              "required": ["deviceID", "deviceClass"]
             }
           },
           "refreshRate": {
@@ -414,21 +361,15 @@
             "oneOf": [
               {
                 "title": "Standard Logging",
-                "enum": [
-                  "standard"
-                ]
+                "enum": ["standard"]
               },
               {
                 "title": "No Logging",
-                "enum": [
-                  "none"
-                ]
+                "enum": ["none"]
               },
               {
                 "title": "Debug Logging",
-                "enum": [
-                  "debug"
-                ]
+                "enum": ["debug"]
               }
             ]
           }
@@ -440,10 +381,7 @@
         "description": "DO NOT USE, UNLESS YOU WANT TO REMOVE ACCESSORIES FROM CACHE."
       }
     },
-    "required": [
-      "name",
-      "credentials"
-    ]
+    "required": ["name", "credentials"]
   },
   "layout": [
     {
