@@ -226,20 +226,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         ).data;
       } else {
         this.warnLog('Please re-link your account in the Homebridge UI.');
-        // if no consumerSecret is defined, attempt to use the shared consumerSecret
-
-        try {
-          result = (
-            await axios.post(settings.UIurl, {
-              consumerKey: this.config.credentials!.consumerKey,
-              refresh_token: this.config.credentials!.refreshToken,
-            })
-          ).data;
-        } catch (e: any) {
-          this.action = 'exchange refresh token for an access token.';
-          this.apiError(e);
-          throw e;
-        }
       }
 
       this.config.credentials!.accessToken = result.access_token;
