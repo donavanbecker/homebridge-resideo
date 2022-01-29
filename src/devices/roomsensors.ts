@@ -11,7 +11,7 @@ import * as settings from '../settings';
  */
 export class RoomSensors {
   // Services
-  private service: Service;
+  service: Service;
   temperatureService?: Service;
   occupancyService?: Service;
   humidityService?: Service;
@@ -165,15 +165,15 @@ export class RoomSensors {
     // Start an update interval
     interval(this.platform.config.options!.refreshRate! * 1000)
       .pipe(skipWhile(() => this.SensorUpdateInProgress))
-      .subscribe(() => {
-        this.refreshStatus();
+      .subscribe(async () => {
+        await this.refreshStatus();
       });
   }
 
   /**
    * Parse the device status from the honeywell api
    */
-  parseStatus() {
+  async parseStatus(): Promise<void> {
     // Set Room Sensor State
     if (this.sensorAccessory.accessoryValue.batteryStatus.startsWith('Ok')) {
       this.StatusLowBattery = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL;
@@ -207,7 +207,7 @@ export class RoomSensors {
   /**
    * Asks the Honeywell Home API for the latest device information
    */
-  async refreshStatus() {
+  async refreshStatus(): Promise<void> {
     try {
       const roomsensors = await this.platform.getCurrentSensorData(this.device, this.group, this.locationId);
       this.sensorAccessory = roomsensors[this.roomId][this.accessoryId];
@@ -223,7 +223,7 @@ export class RoomSensors {
   /**
    * Updates the status for each of the HomeKit Characteristics
    */
-  updateHomeKitCharacteristics() {
+  async updateHomeKitCharacteristics(): Promise<void> {
     if (this.StatusLowBattery === undefined) {
       this.debugLog(`Room Sensor: ${this.accessory.displayName} StatusLowBattery: ${this.StatusLowBattery}`);
     } else {
@@ -250,7 +250,7 @@ export class RoomSensors {
     }
   }
 
-  public apiError(e: any) {
+  async apiError(e: any): Promise<void> {
     this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, e);
     if (!this.device.thermostat?.roomsensor?.hide_temperature) {
       this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
@@ -258,7 +258,7 @@ export class RoomSensors {
     //throw new this.platform.api.hap.HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
   }
 
-  public honeywellAPIError(e: any) {
+  async honeywellAPIError(e: any): Promise<void> {
     if (e.message.includes('400')) {
       this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Bad Request`);
       this.debugLog('The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.');
@@ -303,7 +303,7 @@ export class RoomSensors {
   /**
    * Converts the value to celsius if the temperature units are in Fahrenheit
    */
-  toCelsius(value: number) {
+  toCelsius(value: number): number {
     if (this.TemperatureDisplayUnits === this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS) {
       return value;
     }
@@ -312,7 +312,7 @@ export class RoomSensors {
     return Math.round((5 / 9) * (value - 32) * 2) / 2;
   }
 
-  config(device: settings.device & settings.devicesConfig) {
+  async config(device: settings.device & settings.devicesConfig): Promise<void> {
     let config = {};
     if (device.thermostat?.roomsensor) {
       config = device.thermostat?.roomsensor;
@@ -328,7 +328,7 @@ export class RoomSensors {
     }
   }
 
-  refreshRate(device: settings.device & settings.devicesConfig) {
+  async refreshRate(device: settings.device & settings.devicesConfig): Promise<void> {
     if (device.thermostat?.roomsensor?.refreshRate) {
       this.deviceRefreshRate = this.accessory.context.refreshRate = device.thermostat?.roomsensor?.refreshRate;
       this.debugLog(`Room Sensor: ${this.accessory.displayName} Using Device Config refreshRate: ${this.deviceRefreshRate}`);
@@ -341,7 +341,7 @@ export class RoomSensors {
     }
   }
 
-  logs(device: settings.device & settings.devicesConfig) {
+  async logs(device: settings.device & settings.devicesConfig): Promise<void> {
     if (this.platform.debugMode) {
       this.deviceLogging = this.accessory.context.logging = 'debugMode';
       this.debugLog(`Room Sensor: ${this.accessory.displayName} Using Debug Mode Logging: ${this.deviceLogging}`);
@@ -360,25 +360,25 @@ export class RoomSensors {
   /**
    * Logging for Device
    */
-  infoLog(...log: any[]) {
+  infoLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
       this.platform.log.info(String(...log));
     }
   }
 
-  warnLog(...log: any[]) {
+  warnLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
       this.platform.log.warn(String(...log));
     }
   }
 
-  errorLog(...log: any[]) {
+  errorLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
       this.platform.log.error(String(...log));
     }
   }
 
-  debugLog(...log: any[]) {
+  debugLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
       if (this.deviceLogging === 'debug') {
         this.platform.log.info('[DEBUG]', String(...log));

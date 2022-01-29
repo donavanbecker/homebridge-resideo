@@ -11,7 +11,7 @@ import * as settings from '../settings';
  */
 export class RoomSensorThermostat {
   // Services
-  private service: Service;
+  service: Service;
 
   // CharacteristicValue
   TargetTemperature!: CharacteristicValue;
@@ -168,9 +168,9 @@ export class RoomSensorThermostat {
     // Start an update interval
     interval(this.platform.config.options!.refreshRate! * 1000)
       .pipe(skipWhile(() => this.thermostatUpdateInProgress))
-      .subscribe(() => {
-        this.refreshStatus();
-        this.refreshSensorStatus();
+      .subscribe(async () => {
+        await this.refreshStatus();
+        await this.refreshSensorStatus();
       });
 
     // Watch for thermostat change events
@@ -203,8 +203,8 @@ export class RoomSensorThermostat {
           interval(5000)
             .pipe(skipWhile(() => this.thermostatUpdateInProgress))
             .pipe(take(1))
-            .subscribe(() => {
-              this.refreshStatus();
+            .subscribe(async () => {
+              await this.refreshStatus();
             });
         });
     }
@@ -228,8 +228,8 @@ export class RoomSensorThermostat {
         interval(5000)
           .pipe(skipWhile(() => this.thermostatUpdateInProgress))
           .pipe(take(1))
-          .subscribe(() => {
-            this.refreshStatus();
+          .subscribe(async () => {
+            await this.refreshStatus();
           });
       });
   }
@@ -237,7 +237,7 @@ export class RoomSensorThermostat {
   /**
    * Parse the device status from the honeywell api
    */
-  parseStatus() {
+  async parseStatus(): Promise<void> {
     if (this.device.units === 'Fahrenheit') {
       this.TemperatureDisplayUnits = this.platform.Characteristic.TemperatureDisplayUnits.FAHRENHEIT;
     }
@@ -293,7 +293,7 @@ export class RoomSensorThermostat {
   /**
    * Asks the Honeywell Home API for the latest device information
    */
-  async refreshStatus() {
+  async refreshStatus(): Promise<void> {
     try {
       const device: any = (
         await this.platform.axios.get(`${settings.DeviceURL}/thermostats/${this.device.deviceID}`, {
@@ -321,7 +321,7 @@ export class RoomSensorThermostat {
   /**
    * Asks the Honeywell Home API for the latest device information
    */
-  async refreshSensorStatus() {
+  async refreshSensorStatus(): Promise<void> {
     try {
       if (this.device.thermostat?.roompriority?.deviceType === 'Thermostat') {
         if (this.device.deviceID.startsWith('LCC')) {
@@ -371,7 +371,7 @@ export class RoomSensorThermostat {
     }
   }
 
-  public async refreshRoomPriority() {
+  async refreshRoomPriority(): Promise<void> {
     if (this.device.thermostat?.roompriority?.deviceType === 'Thermostat') {
       this.roompriority = (
         await this.platform.axios.get(`${settings.DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
@@ -387,7 +387,7 @@ export class RoomSensorThermostat {
   /**
    * Pushes the requested changes for Room Priority to the Honeywell API
    */
-  async pushRoomChanges() {
+  async pushRoomChanges(): Promise<void> {
     this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Room Priority,
      Current Room: ${JSON.stringify(this.roompriority.currentPriority.selectedRooms)}, Changing Room: [${this.sensorAccessory.accessoryId}]`);
     if (`[${this.sensorAccessory.accessoryId}]` !== `[${this.roompriority.currentPriority.selectedRooms}]`) {
@@ -441,7 +441,7 @@ export class RoomSensorThermostat {
   /**
    * Pushes the requested changes to the Honeywell API
    */
-  async pushChanges() {
+  async pushChanges(): Promise<void> {
     try {
       const payload = {
         mode: this.honeywellMode[Number(this.TargetHeatingCoolingState)],
@@ -510,7 +510,7 @@ export class RoomSensorThermostat {
   /**
    * Updates the status for each of the HomeKit Characteristics
    */
-  updateHomeKitCharacteristics() {
+  async updateHomeKitCharacteristics(): Promise<void> {
     if (this.TemperatureDisplayUnits === undefined) {
       this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} TemperatureDisplayUnits: ${this.TemperatureDisplayUnits}`);
     } else {
@@ -577,7 +577,7 @@ export class RoomSensorThermostat {
     }
   }
 
-  public apiError(e: any) {
+  async apiError(e: any): Promise<void> {
     this.service.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, e);
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
     this.service.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, e);
@@ -589,7 +589,7 @@ export class RoomSensorThermostat {
     //throw new this.platform.api.hap.HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
   }
 
-  public honeywellAPIError(e: any) {
+  async honeywellAPIError(e: any): Promise<void> {
     if (e.message.includes('400')) {
       this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Bad Request`);
       this.debugLog('The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.');
@@ -633,7 +633,7 @@ export class RoomSensorThermostat {
     }
   }
 
-  private setTargetHeatingCoolingState(value: CharacteristicValue) {
+  async setTargetHeatingCoolingState(value: CharacteristicValue): Promise<void> {
     this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Set TargetHeatingCoolingState: ${value}`);
 
     this.TargetHeatingCoolingState = value;
@@ -651,25 +651,25 @@ export class RoomSensorThermostat {
     }
   }
 
-  private setHeatingThresholdTemperature(value: CharacteristicValue) {
+  async setHeatingThresholdTemperature(value: CharacteristicValue): Promise<void> {
     this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Set HeatingThresholdTemperature: ${value}`);
     this.HeatingThresholdTemperature = value;
     this.doThermostatUpdate.next();
   }
 
-  private setCoolingThresholdTemperature(value: CharacteristicValue) {
+  async setCoolingThresholdTemperature(value: CharacteristicValue): Promise<void> {
     this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Set CoolingThresholdTemperature: ${value}`);
     this.CoolingThresholdTemperature = value;
     this.doThermostatUpdate.next();
   }
 
-  private setTargetTemperature(value: CharacteristicValue) {
+  async setTargetTemperature(value: CharacteristicValue): Promise<void> {
     this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Set TargetTemperature: ${value}`);
     this.TargetTemperature = value;
     this.doThermostatUpdate.next();
   }
 
-  private setTemperatureDisplayUnits(value: CharacteristicValue) {
+  async setTemperatureDisplayUnits(value: CharacteristicValue): Promise<void> {
     this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Set TemperatureDisplayUnits: ${value}`);
     this.platform.log.warn('Changing the Hardware Display Units from HomeKit is not supported.');
 
@@ -682,7 +682,7 @@ export class RoomSensorThermostat {
   /**
    * Converts the value to celsius if the temperature units are in Fahrenheit
    */
-  toCelsius(value: number) {
+  toCelsius(value: number): number {
     if (this.TemperatureDisplayUnits === this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS) {
       return value;
     }
@@ -694,7 +694,7 @@ export class RoomSensorThermostat {
   /**
    * Converts the value to fahrenheit if the temperature units are in Fahrenheit
    */
-  toFahrenheit(value: number) {
+  toFahrenheit(value: number): number {
     if (this.TemperatureDisplayUnits === this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS) {
       return value;
     }
@@ -702,7 +702,7 @@ export class RoomSensorThermostat {
     return Math.round((value * 9) / 5 + 32);
   }
 
-  private TargetState() {
+  TargetState(): number[] {
     this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} allowedModes: ${this.device.allowedModes}`);
 
     const TargetState = [4];
@@ -723,7 +723,7 @@ export class RoomSensorThermostat {
     return TargetState;
   }
 
-  config(device: settings.device & settings.devicesConfig) {
+  async config(device: settings.device & settings.devicesConfig): Promise<void> {
     let config = {};
     if (device.thermostat?.roompriority) {
       config = device.thermostat?.roompriority;
@@ -739,7 +739,7 @@ export class RoomSensorThermostat {
     }
   }
 
-  refreshRate(device: settings.device & settings.devicesConfig) {
+  async refreshRate(device: settings.device & settings.devicesConfig): Promise<void> {
     if (device.thermostat?.roompriority?.refreshRate) {
       this.deviceRefreshRate = this.accessory.context.refreshRate = device.thermostat?.roompriority?.refreshRate;
       this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Device Config refreshRate: ${this.deviceRefreshRate}`);
@@ -752,7 +752,7 @@ export class RoomSensorThermostat {
     }
   }
 
-  logs(device: settings.device & settings.devicesConfig) {
+  async logs(device: settings.device & settings.devicesConfig): Promise<void> {
     if (this.platform.debugMode) {
       this.deviceLogging = this.accessory.context.logging = 'debugMode';
       this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Debug Mode Logging: ${this.deviceLogging}`);
@@ -771,25 +771,25 @@ export class RoomSensorThermostat {
   /**
    * Logging for Device
    */
-  infoLog(...log: any[]) {
+  infoLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
       this.platform.log.info(String(...log));
     }
   }
 
-  warnLog(...log: any[]) {
+  warnLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
       this.platform.log.warn(String(...log));
     }
   }
 
-  errorLog(...log: any[]) {
+  errorLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
       this.platform.log.error(String(...log));
     }
   }
 
-  debugLog(...log: any[]) {
+  debugLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
       if (this.deviceLogging === 'debug') {
         this.platform.log.info('[DEBUG]', String(...log));
