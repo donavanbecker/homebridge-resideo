@@ -11,7 +11,7 @@ import * as settings from '../settings';
  */
 export class LeakSensor {
   // Services
-  private service: Service;
+  service: Service;
   temperatureService?: Service;
   humidityService?: Service;
   leakService?: Service;
@@ -154,15 +154,15 @@ export class LeakSensor {
     // Start an update interval
     interval(this.platform.config.options!.refreshRate! * 1000)
       .pipe(skipWhile(() => this.SensorUpdateInProgress))
-      .subscribe(() => {
-        this.refreshStatus();
+      .subscribe(async () => {
+        await this.refreshStatus();
       });
   }
 
   /**
    * Parse the device status from the honeywell api
    */
-  parseStatus() {
+  async parseStatus(): Promise<void> {
     // Leak Service
     this.StatusActive = this.device.hasDeviceCheckedIn;
     if (this.device.waterPresent === true) {
@@ -198,7 +198,7 @@ export class LeakSensor {
   /**
    * Asks the Honeywell Home API for the latest device information
    */
-  async refreshStatus() {
+  async refreshStatus(): Promise<void> {
     try {
       const device: any = (
         await this.platform.axios.get(`${settings.DeviceURL}/waterLeakDetectors/${this.device.deviceID}`, {
@@ -221,7 +221,7 @@ export class LeakSensor {
   /**
    * Updates the status for each of the HomeKit Characteristics
    */
-  updateHomeKitCharacteristics() {
+  async updateHomeKitCharacteristics(): Promise<void> {
     if (this.BatteryLevel === undefined) {
       this.debugLog(`Leak Sensor: ${this.accessory.displayName} BatteryLevel: ${this.BatteryLevel}`);
     } else {
@@ -262,7 +262,7 @@ export class LeakSensor {
     }
   }
 
-  public apiError(e: any) {
+  async apiError(e: any): Promise<void> {
     this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, e);
     this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, e);
     if (!this.device.leaksensor?.hide_leak) {
@@ -272,7 +272,7 @@ export class LeakSensor {
     //throw new this.platform.api.hap.HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
   }
 
-  public honeywellAPIError(e: any) {
+  async honeywellAPIError(e: any): Promise<void> {
     if (e.message.includes('400')) {
       this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} failed to ${this.action}, Bad Request`);
       this.debugLog('The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.');
@@ -314,7 +314,7 @@ export class LeakSensor {
     }
   }
 
-  config(device: settings.device & settings.devicesConfig) {
+  async config(device: settings.device & settings.devicesConfig): Promise<void> {
     let config = {};
     if (device.leaksensor) {
       config = device.leaksensor;
@@ -330,7 +330,7 @@ export class LeakSensor {
     }
   }
 
-  refreshRate(device: settings.device & settings.devicesConfig) {
+  async refreshRate(device: settings.device & settings.devicesConfig): Promise<void> {
     if (device.refreshRate) {
       this.deviceRefreshRate = this.accessory.context.refreshRate = device.refreshRate;
       this.debugLog(`Leak Sensor: ${this.accessory.displayName} Using Device Config refreshRate: ${this.deviceRefreshRate}`);
@@ -340,7 +340,7 @@ export class LeakSensor {
     }
   }
 
-  logs(device: settings.device & settings.devicesConfig) {
+  async logs(device: settings.device & settings.devicesConfig): Promise<void> {
     if (this.platform.debugMode) {
       this.deviceLogging = this.accessory.context.logging = 'debugMode';
       this.debugLog(`Leak Sensor: ${this.accessory.displayName} Using Debug Mode Logging: ${this.deviceLogging}`);
@@ -359,25 +359,25 @@ export class LeakSensor {
   /**
    * Logging for Device
    */
-  infoLog(...log: any[]) {
+  infoLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
       this.platform.log.info(String(...log));
     }
   }
 
-  warnLog(...log: any[]) {
+  warnLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
       this.platform.log.warn(String(...log));
     }
   }
 
-  errorLog(...log: any[]) {
+  errorLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
       this.platform.log.error(String(...log));
     }
   }
 
-  debugLog(...log: any[]) {
+  debugLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
       if (this.deviceLogging === 'debug') {
         this.platform.log.info('[DEBUG]', String(...log));

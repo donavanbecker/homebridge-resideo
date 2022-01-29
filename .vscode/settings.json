@@ -15,9 +15,7 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "typescript.format.enable": true,
-  "editor.rulers": [
-    150
-  ],
+  "editor.rulers": [150],
   "eslint.enable": true,
   "eslint.workingDirectories": [
     {
