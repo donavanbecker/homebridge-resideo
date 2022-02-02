@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Version 11.3.6](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.6) (2022-02-01)
 
-### What's Changes
+## What's Changes
 
 - Housekeeping and updated dependencies.
 
@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Version 11.3.5](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.5) (2022-01-29)
 
-### What's Changes
+## What's Changes
 
 - Housekeeping and updated dependencies.
 
@@ -20,7 +20,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Version 11.3.4](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.4) (2022-01-22)
 
-### What's Changes
+## What's Changes
 
 - Fixed: Issue where device logging and refreshRate wouldn't display.
 - Housekeeping and updated dependencies.
@@ -29,7 +29,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Version 11.3.3](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.3) (2022-01-15)
 
-### What's Changes
+## What's Changes
 
 - Fixed: Only log config if it is set.
 
@@ -37,7 +37,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Version 11.3.2](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.2) (2022-01-14)
 
-### What's Changes
+## What's Changes
 
 - Fix: Device Logging and refreshRate not apply to Devices.
 
@@ -45,7 +45,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Version 11.3.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.1) (2022-01-14)
 
-### What's Changes
+## What's Changes
 
 - Housekeeping on Logging and refreshRate.
 
@@ -53,7 +53,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Version 11.3.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.0) (2022-01-14)
 
-### What's Changes
+## What's Changes
 
 ### Major Change To `Logging`:
 
@@ -77,7 +77,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Version 11.2.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.0) (2022-01-06)
 
-### What's Changes
+## What's Changes
 
 - Housekeeping and updated dependencies.
 
@@ -85,7 +85,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Version 11.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.2.0) (2021-12-18)
 
-### What's Changes
+## What's Changes
 
 - Fixed Bug: Changing the temperature doesn't work. [#613](https://github.com/donavanbecker/homebridge-honeywell-home/issues/613)
 - Moved the `Room Sensor` and `Room Priority` settings under `Thermostat` DeviceClass, since they are all tied to the Thermostat.
@@ -94,7 +94,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Version 11.1.2](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.1.2) (2021-12-15)
 
-### What's Changes
+## What's Changes
 
 - Fixed: `config.schema.json` room priority parameter.
 
@@ -102,7 +102,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Version 11.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.1.1) (2021-12-15)
 
-### What's Changes
+## What's Changes
 
 - Fixed Bug: Changing the temperature doesn't work. [#598](https://github.com/donavanbecker/homebridge-honeywell-home/issues/598)
 - Fixed Bug: Changelog has incorrect link for full changelog. [#605](https://github.com/donavanbecker/homebridge-honeywell-home/issues/605)
@@ -112,7 +112,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Version 11.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.1.0) (2021-11-19)
 
-### What's Changes
+## What's Changes
 
 - Add Device Configs, So that each device can be customized for itself.
   - ANY CONFIGS SET MUST BE REMOVED AND REPLACED WITH THIS NEW DEVICE CONFIGS
@@ -121,237 +121,303 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [Version 11.0.4](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.0.4) (2021-11-13)
 
-### Changes
+## What's Changes
 
 - Allow `refreshRate` to be set to 30 Seconds or Higher.
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.3...v11.0.4
 
-## [Version 11.0.3](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.2...v11.0.3) (2021-11-12)
+## [Version 11.0.3](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/11.0.3) (2021-11-12)
 
-### Changes
-
-- Housekeeping and updated dependencies.
-
-## [Version 11.0.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.1...v11.0.2) (2021-10-28)
-
-### Changes
+## What's Changes
 
 - Housekeeping and updated dependencies.
 
-## [Version 11.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.0...v11.0.1) (2021-10-21)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.2...v11.0.3
 
-### Changes
+## [Version 11.0.2](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.0.2) (2021-10-28)
+
+## What's Changes
+
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.1...v11.0.2
+
+## [Version 11.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.0.1) (2021-10-21)
+
+## What's Changes
 
 - Fix for [#580](https://github.com/donavanbecker/homebridge-honeywell-home/issues/580)'s `failed to update status` error.
 - Housekeeping and updated dependencies.
 
-## [Version 11.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v10.1.1...v11.0.0) (2021-10-20)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.0.0...v11.0.1
 
-### Changes
+## [Version 11.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.0.0) (2021-10-20)
+
+## What's Changes
 
 - Changed the way that devices are named and stored in cache
   - _You will have to Clear Cache on your devices and re-add them because of this._
 - Replace Device Discovery with Plugin Device Logging Config Setting to show more logs.
 - Housekeeping and updated dependencies.
 
-## [Version 10.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v10.1.0...v10.1.1) (2021-10-02)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v10.1.1...v11.0.0
 
-### Changes
+## [Version 10.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v10.1.1) (2021-10-02)
+
+## What's Changes
 
 - Housekeeping and updated dependencies.
 
-## [Version 10.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v10.0.1...v10.0.1) (2021-09-19)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v10.1.0...v10.1.1
 
-### Changes
+## [Version 10.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v10.1.0) (2021-09-19)
+
+## What's Changes
 
 - Implment Plugin Debug Logging.
 - Fix for Round Thermostats Auto mode, thanks to [@mowens](https://github.com/mowens) for PR [#558](https://github.com/donavanbecker/homebridge-honeywell-home/pull/558)
 
-## [Version 10.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v10.0.0...v10.0.1) (2021-09-05)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v10.0.1...v10.1.0
 
-### Changes
+## [Version 10.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v10.0.1) (2021-09-05)
+
+## What's Changes
 
 - Housekeeping and updated dependencies.
 
-## [Version 10.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.6.0...v10.0.0) (2021-08-21)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v10.0.0...v10.0.1
 
-### Changes
+## [Version 10.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v10.0.0) (2021-08-21)
+
+## What's Changes
 
 - Implimented A Local Authentication HTTP Server that runs when opening Plugin Settings.
   - URL(Callback URL \*) that will be used to Link or Relink your Honeywell Account, will now be your local IP.
 - Housekeeping and updated dependencies.
 
-## [Version 9.6.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.5.2...v9.6.0) (2021-07-31)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.6.0...v10.0.0
 
-### Changes
+## [Version 9.6.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v9.6.0) (2021-07-31)
+
+## What's Changes
 
 - Add a Copy to Clipboard Button, for Honeywell Linking URL.
 - Add a Back To Intro Arrow, To get back to intro if no config has been saved.
 - Add a link and unlink notification.
 
-## [Version 9.5.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.5.1...v9.5.2) (2021-07-28)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.5.2...v9.6.0
 
-### Changes
+## [Version 9.5.2](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v9.5.2) (2021-07-28)
+
+## What's Changes
 
 - Custom UI updates.
 
-## [Version 9.5.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.5.0...v9.5.1) (2021-07-27)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.5.1...v9.5.2
 
-### Changes
+## [Version 9.5.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v9.5.1) (2021-07-27)
+
+## What's Changes
 
 - Fix Custom UI not loading.
 
-## [Version 9.5.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.4.4...v9.5.0) (2021-07-27)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.5.0...v9.5.1
 
-### Changes
+## [Version 9.5.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v9.5.0) (2021-07-27)
+
+## What's Changes
 
 - Implement Custom UI for Linking, Re-Linking, and Un-Linking.
 - Added Option to Disable Plugin in the Config.
 
-## [Version 9.4.4](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.4.3...v9.4.4) (2021-07-22)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.4.4...v9.5.0
 
-### Changes
+## [Version 9.4.4](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v9.4.4) (2021-07-22)
 
-- Housekeeping and updated dependencies.
-
-## [Version 9.4.3](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.4.2...v9.4.3) (2021-06-15)
-
-### Changes
+## What's Changes
 
 - Housekeeping and updated dependencies.
 
-## [Version 9.4.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.4.1...v9.4.2) (2021-05-25)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.4.2...v9.4.4
 
-### Changes
+## [Version 9.4.3](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v9.4.3) (2021-06-15)
 
-- Housekeeping and updated dependencies.
-
-## [Version 9.4.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.4.0...v9.4.1) (2021-03-08)
-
-### Changes
+## What's Changes
 
 - Housekeeping and updated dependencies.
 
-## [Version 9.4.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.3.3...v9.4.0) (2021-03-02)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.2.2...v9.4.3
 
-### Changes
+## [Version 9.4.2](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v9.4.2) (2021-05-25)
+
+## What's Changes
+
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.4.1...v9.4.2
+
+## [Version 9.4.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v9.4.1) (2021-03-08)
+
+## What's Changes
+
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.4.0...v9.4.1
+
+## [Version 9.4.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v9.4.0) (2021-03-02)
+
+## What's Changes
 
 - Better handling of Homebridge 1.3.0 functions.
 - Housekeeping and updated dependencies.
 
-## [Version 9.3.3](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.3.2...v9.3.3) (2021-03-01)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.3.3...v9.4.0
 
-### Changes
+## [Version 9.3.3](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v9.3.3) (2021-03-01)
+
+## What's Changes
 
 - Housekeeping and updated dependencies.
 
-## [Version 9.3.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.3.1...v9.3.2) (2021-02-25)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.3.2...v9.3.3
 
-### Changes
+## [Version 9.3.2](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v9.3.2) (2021-02-25)
+
+## What's Changes
 
 - Fix issue with not config potentially not working in some cases.
 
-## [Version 9.3.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.3.0...v9.3.1) (2021-02-25)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.3.1...v9.3.2
 
-### Changes
+## [Version 9.3.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v9.3.1) (2021-02-25)
+
+## What's Changes
 
 - Correct issue with `config.schema.json`.
 - Fix issue with not hiding sensors when not compatible with device or hidden with config.
 
-## [Version 9.3.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.2.0...v9.3.0) (2021-02-23)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.3.0...v9.3.1
 
-### Changes
+## [Version 9.3.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v9.3.0) (2021-02-23)
+
+## What's Changes
 
 - Added Characteristic updating to FirmwareRevision.
 - Updated BatteryService Characteristic to Battery to meeting Homebridge 1.3.0 Standards.
 - Housekeeping and updated dependencies.
 
-## [Version 9.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.1.0...v9.2.0) (2021-02-22)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.2.0...v9.3.0
 
-### Changes
+## [Version 9.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v9.2.0) (2021-02-22)
+
+## What's Changes
 
 - Add support and set new requirement for Homebridge v1.3.0.
 - Fixed Issue where thermostat was sending update when just clicking into Thermostat, plugin now waits for changes.
 - Characteristics are now only updated if defined with a valid `CharacteristicValue`.
 
-## [Version 9.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.0.0...v9.1.0) (2021-02-16)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.1.0...v9.2.0
 
-### Changes
+## [Version 9.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v9.1.0) (2021-02-16)
+
+## What's Changes
 
 - Moved Humidity Sensor to is own Service so that it displays as it on devices.
   - Added option to config to disable humidity sensor.
 - Fixed Leaksensor Display issue with rouding tempature and humidity.
 
-## [Version 9.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.4.0...v9.0.0) (2021-02-16)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v9.0.0...v9.1.0
 
-### Changes
+## [Version 9.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v9.0.0) (2021-02-16)
+
+## What's Changes
 
 - Combined all Thermostat Models into 1 Thermostat file, making for easier updating of features and configurations.
 - Created DeviceIDs for Roomsensors and Roomsensor Thermostats so that they can be removed.
 - Added `PushRate`, which allows you to control how long the plugins waits before pushing an update to the Honeywell API.
   - this can lower the nubmer of pushes being sent.
 
-## [Version 8.4.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.3.2...v8.4.0) (2021-02-08)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.4.0...v9.0.0
 
-### Changes
+## [Version 8.4.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v8.4.0) (2021-02-08)
+
+## What's Changes
 
 - Fixed an issue where API Updates were pushed, with no changes.
 - Fixed Issue with `config.schema.json` displaying issue.
 - Added API Errror Handling to update Characteristics in HomeKit.
 
-## [Version 8.3.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.3.1...v8.3.2) (2021-01-14)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.3.2...v8.4.0
 
-### Changes
+## [Version 8.3.2](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v8.3.2) (2021-01-14)
+
+## What's Changes
 
 - Update Dependencies.
 
-## [Version 8.3.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.3.0...v8.3.1) (2021-01-08)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.3.1...v8.3.2
 
-### Changes
+## [Version 8.3.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v8.3.1) (2021-01-08)
+
+## What's Changes
 
 - Fixed warning logs for Homebridge Beta `v1.3.0`.
 - More Code Clean up.
 
-## [Version 8.3.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.2.0...v8.3.0) (2021-01-04)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.3.0...v8.3.1
 
-### Changes
+## [Version 8.3.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v8.3.0) (2021-01-04)
+
+## What's Changes
 
 - Allow for Hiding Devices based off of `DeviceID` instead of `DeviceType`.
 - Fix issue with Leak Sensors not updating new sensor data.
 - Changing `ttl` code to `refreshRate`, Configs will need to be update to not use default Refresh Rate.
 - Code Clean up.
 
-## [Version 8.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.1.1...v8.2.0) (2020-12-25)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.2.0...v8.3.0
 
-### Changes
+## [Version 8.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/8.2.0) (2020-12-25)
+
+## What's Changes
 
 - Refractored Plugin to reported respond to API better. Thanks [NorthernMan54](https://github.com/NorthernMan54).
 - For T9 Users, Room Sensors display their own info, instead of display only 1 Room Sensors info. Thanks [NorthernMan54](https://github.com/NorthernMan54).
 - For T9 Users, Motion Sensor has been removed. Since data cannot be pulled quick enough, and has been inaccurate from API.
 - Updated other dependencies.
 
-## [Version 8.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.1.0...v8.1.1) (2020-11-18)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.1.1...v8.2.0
 
-### Changes
+## [Version 8.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v8.1.1) (2020-11-18)
+
+## What's Changes
 
 - Updated other dependencies.
 
-## [Version 8.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.0.1...v8.1.0) (2020-10-24)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.1.0...v8.1.1
 
-### Changes
+## [Version 8.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v8.1.0) (2020-10-24)
+
+## What's Changes
 
 - Fix for `Cannot set property 'ttl' of undefined`.
 - Updated other dependencies.
 
-## [Version 8.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.0.0...v8.0.1) (2020-09-28)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.0.1...v8.1.0
 
-### Changes
+## [Version 8.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v8.0.1) (2020-09-28)
+
+## What's Changes
 
 - Move Homebridge dependency up to latest homebridge.
 - Updated other dependencies.
 
-## [Version 8.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v7.0.1...v8.0.0) (2020-09-16)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v8.0.0...v8.0.1
+
+## [Version 8.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v8.0.0) (2020-09-16)
+
+## What's Changes
 
 ### Major Changes
 
@@ -360,20 +426,26 @@ All notable changes to this project will be documented in this file. This projec
     - This allows you to Display a Thermostat in the Room where your Room Sensors are and then set priority to that room.
 - Completely reworked the way that Room Sensors discovered.
 
-### Changes
+## Other Changes
 
 - You can now set the Thermostat Setpoint Status to: NoHold, PermanentHold, or TemporaryHold.
 - You can now set the Room Priority Type to: PickARoom, WholeHouse, or FollowMe.
 - Fix for CurrentHeatingCoolingState not showing the correct state.
 
-## [Version 7.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v7.0.0...v7.0.1) (2020-08-29)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v7.0.1...v8.0.0
 
-### Changes
+## [Version 7.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v7.0.1) (2020-08-29)
+
+## What's Changes
 
 - Small little cosmetic changes.
 - Update UI Server Portal dependencies.
 
-## [Version 7.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v6.2.0...v7.0.0) (2020-08-29)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v7.0.0...v7.0.1
+
+## [Version 7.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v7.0.0) (2020-08-29)
+
+## What's Changes
 
 ### Major Changes
 
@@ -383,39 +455,51 @@ All notable changes to this project will be documented in this file. This projec
   - [homebridge-honeywell-home-roomsensors](https://github.com/donavanbecker/homebridge-honeywell-home-roomsensors)
   - [homebridge-honeywell-leak](https://github.com/donavanbecker/homebridge-honeywell-leak)
 
-### Changes
+## Other Changes
 
 - Added support to Hide Thermstats.
 - Added support to Hide Thermstats Fans.
 - Added support to Hide Leak Sensors.
 - Added support to Hide Room Sensors.
 
-## [Version 6.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v6.1.0...v6.2.0) (2020-08-24)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v6.2.0...v7.0.0
 
-### Changes
+## [Version 6.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v6.2.0) (2020-08-24)
+
+## What's Changes
 
 - Added support for plugin to recognize if fan is present or not.
 - Added support to know between LCC and TCC devices.
 
-## [Version 6.1.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v6.1.1...v6.1.2) (2020-08-11)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v6.1.2...v6.2.0
 
-### Changes
+## [Version 6.1.2](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v6.1.2) (2020-08-11)
 
-- Updated `package.json`.
+## What's Changes
 
-## [Version 6.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v6.1.0...v6.1.1) (2020-08-10)
+- Housekeeping and updated dependencies.
 
-### Changes
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v6.1.2...v6.2.0
 
-- Updated `package.json`.
+## [Version 6.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v6.1.1) (2020-08-10)
 
-## [Version 6.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v6.0.0...v6.1.0) (2020-07-30)
+## What's Changes
 
-### Changes
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v6.1.0...v6.1.1
+
+## [Version 6.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v6.1.0) (2020-07-30)
+
+## What's Changes
 
 - If refresh token expires, the new refresh token that is fetched will now be saved to `config.json`.
 
-## [Version 6.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.1.1...v6.0.0) (2020-07-28)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v6.0.0...v6.1.0
+
+## [Version 6.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v6.0.0) (2020-07-28)
+
+## What's Changes
 
 ### Major Changes
 
@@ -428,18 +512,22 @@ All notable changes to this project will be documented in this file. This projec
 - Find firmware of device at startup and add to accessory context.
 - removed provisioning criteria for Honeywell Round Thermostats to be added to plugin.
 
-## [Version 5.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.1.0...v5.1.1) (2020-07-15)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.1.1...v6.0.0
 
-### Changes
+## [Version 5.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v5.1.1) (2020-07-15)
+
+## What's Changes
 
 - Added more logging for offline devices
 
   - now displays deviceID.
   - now displays if device is Alive, Provisioned, and Class `Thermostat`.
 
-## [Version 5.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.7...v5.1.0) (2020-07-14)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.1.0...v5.1.1
 
-#### Feature Change
+## [Version 5.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v5.1.0) (2020-07-14)
+
+## What's Changes
 
 - Added Support for Fan Control: `Auto`, `Circulate`, and `On`.
   - If Target Fan Mode is `MANUAL` and Active is `ACTIVE` in Homekit, then the fan will be set to Honywell Mode `On`.
@@ -447,227 +535,261 @@ All notable changes to this project will be documented in this file. This projec
   - If Target Fan Mode is `AUTO` and Active is `INACTIVE` in Homekit, then the fan will be set to Honywell Mode `Auto`.
   - If Target Fan Mode is `AUTO` and Active is `ACTIVE` in Homekit, then the fan will be set to Honywell Mode `Auto`.
 
-## [Version 5.0.7](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.6...v5.0.7) (2020-07-07)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.7...v5.1.0
 
-#### Changes
+## [Version 5.0.7](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v5.0.7) (2020-07-07)
 
-- update dependencies
+### What's Changes
 
-## [Version 5.0.6](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.5...v5.0.6) (2020-05-13)
+- Housekeeping and updated dependencies.
 
-#### Changes
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.6...v5.0.7
 
-- repo updates, no new features or bug fixes.
+## [Version 5.0.6](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v5.0.6) (2020-05-13)
 
-## [Version 5.0.5](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.4...v5.0.5) (2020-04-11)
+### What's Changes
 
-#### Changes
+- Housekeeping and updated dependencies.
 
-- update engine dependencies
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.5...v5.0.6
 
-## [Version 5.0.4](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.3...v5.0.4) (2020-04-11)
+## [Version 5.0.5](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v5.0.5) (2020-04-11)
 
-#### Changes
+### What's Changes
 
-- remove devDependencies for homebridge-config-ui-x and homebridge
-- update node engine dependencies
+- Housekeeping and updated dependencies.
 
-## [Version 5.0.3](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.2...v5.0.3) (2020-04-08)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.4...v5.0.5
 
-#### Changes
+## [Version 5.0.4](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v5.0.4) (2020-04-11)
 
-- Update devDependencies for homebridge-config-ui-x and homebridge
+### What's Changes
 
-## [Version 5.0.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.1...v5.0.2) (2020-03-30)
+- Housekeeping and updated dependencies.
 
-#### Changes
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.3...v5.0.4
 
-- Pin dependencies [\#140](https://github.com/donavanbecker/homebridge-honeywell-home/pull/140) ([renovate[bot]](https://github.com/apps/renovate))
+## [Version 5.0.3](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v5.0.3) (2020-04-08)
 
-## [Version 5.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.0...5.0.1) (2020-03-26)
+### What's Changes
 
-#### Changes
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.2...v5.0.3
+
+## [Version 5.0.2](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v5.0.2) (2020-03-30)
+
+### What's Changes
+
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.1...v5.0.2
+
+## [Version 5.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v5.0.1) (2020-03-26)
+
+### What's Changes
 
 - Honeywell - "rate limit has been exhausted" [\#106](https://github.com/donavanbecker/homebridge-honeywell-home/issues/106)
-- 5.0.1 [\#131](https://github.com/donavanbecker/homebridge-honeywell-home/pull/131) ([donavanbecker](https://github.com/donavanbecker))
-- Update angularcli monorepo [\#130](https://github.com/donavanbecker/homebridge-honeywell-home/pull/130) ([renovate[bot]](https://github.com/apps/renovate))
-- Update angularcli monorepo [\#129](https://github.com/donavanbecker/homebridge-honeywell-home/pull/129) ([renovate[bot]](https://github.com/apps/renovate))
-- Update angularcli monorepo [\#128](https://github.com/donavanbecker/homebridge-honeywell-home/pull/128) ([renovate[bot]](https://github.com/apps/renovate))
-- Update angularcli monorepo [\#127](https://github.com/donavanbecker/homebridge-honeywell-home/pull/127) ([renovate[bot]](https://github.com/apps/renovate))
-- Update angularcli monorepo [\#126](https://github.com/donavanbecker/homebridge-honeywell-home/pull/126) ([renovate[bot]](https://github.com/apps/renovate))
-- Labeler - Workflow [\#125](https://github.com/donavanbecker/homebridge-honeywell-home/pull/125) ([donavanbecker](https://github.com/donavanbecker))
-- Stale - Workflow [\#124](https://github.com/donavanbecker/homebridge-honeywell-home/pull/124) ([donavanbecker](https://github.com/donavanbecker))
-- Update angular monorepo to v9.1.0 [\#123](https://github.com/donavanbecker/homebridge-honeywell-home/pull/123) ([renovate[bot]](https://github.com/apps/renovate))
-- Update dependency @types/node to v12.12.31 [\#122](https://github.com/donavanbecker/homebridge-honeywell-home/pull/122) ([renovate[bot]](https://github.com/apps/renovate))
-- Update dependency helmet to v3.22.0 [\#121](https://github.com/donavanbecker/homebridge-honeywell-home/pull/121) ([renovate[bot]](https://github.com/apps/renovate))
-- Update dependency @types/jasmine to v3.5.10 [\#120](https://github.com/donavanbecker/homebridge-honeywell-home/pull/120) ([renovate[bot]](https://github.com/apps/renovate))
-- Merge from Master [\#119](https://github.com/donavanbecker/homebridge-honeywell-home/pull/119) ([donavanbecker](https://github.com/donavanbecker))
-- Merge From Master [\#118](https://github.com/donavanbecker/homebridge-honeywell-home/pull/118) ([donavanbecker](https://github.com/donavanbecker))
+- Housekeeping and updated dependencies.
 
-## [Version 5.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.4...5.0.0) (2020-03-22)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v5.0.0...v5.0.1
 
-#### Features
+## [Version 5.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v5.0.0) (2020-03-22)
 
-- workflow to beta [\#113](https://github.com/donavanbecker/homebridge-honeywell-home/pull/113) ([donavanbecker](https://github.com/donavanbecker))
+## What's Changes
+
 - Secrets, Minimum TTL, Logging, Update Readme, and Changelog.md [\#112](https://github.com/donavanbecker/homebridge-honeywell-home/pull/112) ([donavanbecker](https://github.com/donavanbecker))
 - Secrets, Minimum TTL and Logging [\#110](https://github.com/donavanbecker/homebridge-honeywell-home/pull/110) ([oznu](https://github.com/oznu))
+- Housekeeping and updated dependencies.
 
-#### Dependency Updates
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.4...v5.0.0
 
-- Update dependency ts-node to v8.8.1 [\#114](https://github.com/donavanbecker/homebridge-honeywell-home/pull/114) ([renovate[bot]](https://github.com/apps/renovate))
-- Update dependency ts-node to v8.8.0 [\#111](https://github.com/donavanbecker/homebridge-honeywell-home/pull/111) ([renovate[bot]](https://github.com/apps/renovate))
+## [Version 4.4.4](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.4.4) (2020-03-20)
 
-## [Version 4.4.4](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.3...v4.4.4) (2020-03-20)
+## What's Changes
 
-#### Dependency Updates
+- Housekeeping and updated dependencies.
 
-- Update angularcli monorepo [#109](https://github.com/donavanbecker/homebridge-honeywell-home/pull/109)
-- Update dependency ts-node to v8.7.0 [#108](https://github.com/donavanbecker/homebridge-honeywell-home/pull/108)
-- Update angular monorepo to v9.0.7 [#107](https://github.com/donavanbecker/homebridge-honeywell-home/pull/107)
-- Update dependency zone.js to v0.10.3 [#105](https://github.com/donavanbecker/homebridge-honeywell-home/pull/105)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.3...v4.4.4
 
-## [Version 4.4.3](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.2...v4.4.3) (2020-03-16)
+## [Version 4.4.3](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.4.3) (2020-03-16)
 
-#### Security Update
+## What's Changes
 
 - Minimist Vulnerability Update from 1.2.0 to 1.2.5
 
-## [Version 4.4.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.1...v4.4.2) (2020-03-14)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.2...v4.4.3
 
-#### Dependency Updates
+## [Version 4.4.2](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.4.2) (2020-03-14)
 
-- Security Bump - minimist from 1.2.0 to 1.2.5 [#104](https://github.com/donavanbecker/homebridge-honeywell-home/pull/104)
-- Update dependency @types/node to v12.12.30 [#103](https://github.com/donavanbecker/homebridge-honeywell-home/pull/103)
-- Update dependency tslint to v6 [#101](https://github.com/donavanbecker/homebridge-honeywell-home/pull/101)
-- Update angularcli monorepo [#100](https://github.com/donavanbecker/homebridge-honeywell-home/pull/100)
-- Update angular monorepo to v9.0.6 [#99](https://github.com/donavanbecker/homebridge-honeywell-home/pull/99)
-- Update dependency @types/jasmine to v3.5.9 [#98](https://github.com/donavanbecker/homebridge-honeywell-home/pull/98)
+## What's Changes
 
-## [Version 4.4.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.0...v4.4.1) (2020-03-06)
+- Housekeeping and updated dependencies.
 
-#### Update to Config Schema to Support [Version 4.4.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.4.0) Rate limit Update
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.1...v4.4.2
 
+## [Version 4.4.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.4.1) (2020-03-06)
+
+## What's Changes
+
+- Update to Config Schema to Support [Version 4.4.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.4.0) Rate limit Update
 - Please refrain from setting your optional `ttl` config lower then 1800, to better support everyone that uses this plugin.
 
-## [Version 4.4.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.3.2...v4.4.0) (2020-03-06)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.4.0...v4.4.1
 
-#### Honeywell Rate Limit
+## [Version 4.4.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.4.0) (2020-03-06)
 
-##### Made a [change](https://github.com/donavanbecker/homebridge-honeywell-home/blob/0ab08b50288b84faf40263952a85f3f5727f8e0e/index.js#L80) to the rate limit to better serve all users of this plugin that use it with [Config UI X](https://github.com/oznu/homebridge-config-ui-x)
+## What's Changes
 
+- Made a [change](https://github.com/donavanbecker/homebridge-honeywell-home/blob/0ab08b50288b84faf40263952a85f3f5727f8e0e/index.js#L80) to the rate limit to better serve all users of this plugin that use it with [Config UI X](https://github.com/oznu/homebridge-config-ui-x)
 - Hopefully this will help lower the `rate limit has been exhausted` log you may be getting.
 - Please change your configs and `ttl` setting to be 1800 or more if you are setting it in options.
 
-## [Version 4.3.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.3.1...v4.3.2) (2020-03-05)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.3.2...v4.4.0
 
-#### Dependency Updates
+## [Version 4.3.2](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.3.2) (2020-03-05)
 
-- Update dependency @types/jasmine to v3.5.8 [#97](https://github.com/donavanbecker/homebridge-honeywell-home/pull/97)
-- Update angularcli monorepo [#96](https://github.com/donavanbecker/homebridge-honeywell-home/pull/96)
-- Update angular monorepo to v9.0.5 [#95](https://github.com/donavanbecker/homebridge-honeywell-home/pull/95)
-- Update dependency typescript to v3.8.3 [#94](https://github.com/donavanbecker/homebridge-honeywell-home/pull/94)
-- Update dependency @types/node to v12.12.29 [#93](https://github.com/donavanbecker/homebridge-honeywell-home/pull/93)
-- Update angularcli monorepo [#92](https://github.com/donavanbecker/homebridge-honeywell-home/pull/92)
-- Update angular monorepo to v9.0.4 [#91](https://github.com/donavanbecker/homebridge-honeywell-home/pull/91)
-- Update dependency @types/jasmine to v3.5.7 [#90](https://github.com/donavanbecker/homebridge-honeywell-home/pull/90)
-- Update dependency helmet to v3.21.3 [#89](https://github.com/donavanbecker/homebridge-honeywell-home/pull/89)
+## What's Changes
 
-## [Version 4.3.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.3.0...v4.3.1) (2020-02-21)
+- Housekeeping and updated dependencies.
 
-#### Dependency Updates
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.3.1...v4.3.2
 
-- Update dependency typescript to v3.8.2 [#87](https://github.com/donavanbecker/homebridge-honeywell-home/pull/87)
-- Update angularcli monorepo [#86](https://github.com/donavanbecker/homebridge-honeywell-home/pull/86)
-- Update angular monorepo to v9.0.2 [#85](https://github.com/donavanbecker/homebridge-honeywell-home/pull/85)
-- Update dependency @types/node to v12.12.28 [#84](https://github.com/donavanbecker/homebridge-honeywell-home/pull/84)
-- Update dependency @types/jasmine to v3.5.6 [#83](https://github.com/donavanbecker/homebridge-honeywell-home/pull/83)
+## [Version 4.3.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.3.1) (2020-02-21)
 
-## [Version 4.3.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.2.0...v4.3.0) (2020-02-15)
+## What's Changes
 
-#### Major Dependency Updates
+- Housekeeping and updated dependencies.
 
-- Update dependency @types/jasmine to v3.5.4 [#81](https://github.com/donavanbecker/homebridge-honeywell-home/pull/81)
-- Update angularcli monorepo [#80](https://github.com/donavanbecker/homebridge-honeywell-home/pull/80)
-- Update angular monorepo to v9.0.1 [79](https://github.com/donavanbecker/homebridge-honeywell-home/pull/79)
-- Update dependency @types/node to v12.12.27 [78](https://github.com/donavanbecker/homebridge-honeywell-home/pull/78)
-- Update dependency request to v2.88.2 [77](https://github.com/donavanbecker/homebridge-honeywell-home/pull/77)
-- Bump request from 2.88.0 to 2.88.2 [76](https://github.com/donavanbecker/homebridge-honeywell-home/pull/76)
-- Update dependency rimraf to v3.0.2 [75](https://github.com/donavanbecker/homebridge-honeywell-home/pull/75)
-- Update dependency @auth0/angular-jwt to v4 [74](https://github.com/donavanbecker/homebridge-honeywell-home/pull/74)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.3.0...v4.3.1
 
-## [Version 4.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.1.1...v4.2.0) (2020-02-06)
+## [Version 4.3.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.3.0) (2020-02-15)
 
-#### Major Dependency Updates
+## What's Changes
 
-- Update dependency @types/jasmine to v3.5.3 [#70](https://github.com/donavanbecker/homebridge-honeywell-home/pull/70)
-- Update dependency @angular-devkit/build-angular to v0.900.1 [#71](https://github.com/donavanbecker/homebridge-honeywell-home/pull/71)
-- Update dependency @angular/cli to v9 [#72](https://github.com/donavanbecker/homebridge-honeywell-home/pull/72)
-- Update angular monorepo to v9 (major) [#73](https://github.com/donavanbecker/homebridge-honeywell-home/pull/73)
+- Housekeeping and updated dependencies.
 
-## [Version 4.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.1.0...v4.1.1) (2020-01-23)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.2.0...v4.3.0
+
+## [Version 4.2.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.2.0) (2020-02-06)
+
+## What's Changes
+
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.1.1...v4.2.0
+
+## [Version 4.1.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.1.1) (2020-01-23)
+
+## What's Changes
 
 - Update API Refresh to 10 minute minimum so that all users don't get refresh token errors.
-- Updated Dependencies
+- Housekeeping and updated dependencies.
 
-## [Version 4.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.0.4...v4.1.0) (2020-01-18)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.1.0...v4.1.1
+
+## [Version 4.1.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.1.0) (2020-01-18)
+
+## What's Changes
 
 - Updated the API refresh so that it is to Honeywell's standards.
 
-## [Version 4.0.4](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.0.3...v4.0.4) (2020-01-17)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.0.4...v4.1.0
 
-- Update Dependencies.
+## [Version 4.0.4](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.0.4) (2020-01-17)
 
-## [Version 4.0.3](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.0.2...v4.0.3) (2020-01-16)
+## What's Changes
 
-- Update dependencies and working on adding Changelog.
+- Housekeeping and updated dependencies.
 
-## [Version 4.0.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.0.1...v4.0.2) (2020-01-10)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.0.3...v4.0.4
 
-- Update on dependencies.
+## [Version 4.0.3](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.0.3) (2020-01-16)
 
-## [Version 4.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.0.0...v4.0.1) (2020-01-09)
+## What's Changes
 
-- Updated dependencies and wiki link on Readme.
+- Added Changelog.
+- Housekeeping and updated dependencies.
 
-## [Version 4.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v3.0.5...v4.0.0) (2020-01-07)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.0.2...v4.0.3
 
-- Updated Readme
+## [Version 4.0.2](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.0.2) (2020-01-10)
+
+## What's Changes
+
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.0.1...v4.0.2
+
+## [Version 4.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.0.1) (2020-01-09)
+
+## What's Changes
+
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v4.0.0...v4.0.1
+
+## [Version 4.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v4.0.0) (2020-01-07)
+
+## What's Changes
+
 - Adds the capability to write to the Honeywell Home API
 
-## [Version 3.0.5](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v3.0.4...v3.0.5) (2020-01-04)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v3.0.5...v4.0.0
 
-- Update dependencies and add node_module cache to github Publish
+## [Version 3.0.5](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v3.0.5) (2020-01-04)
 
-## [Version 3.0.4](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v3.0.3...v3.0.4) (2020-01-04)
+## What's Changes
 
-- Updated Dependencies
+- Housekeeping and updated dependencies.
 
-## [Version 3.0.3](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v3.0.2...v3.0.3) (2020-01-03)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v3.0.4...v3.0.5
 
-- Update Plugin Title
+## [Version 3.0.4](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v3.0.4) (2020-01-04)
 
-## [Version 3.0.2](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v3.0.1...v3.0.2) (2020-01-03)
+## What's Changes
 
-- Just updated the Readme with Badges
+- Housekeeping and updated dependencies.
 
-## [Version 3.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v3.0.0...v3.0.1) (2020-01-02)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v3.0.3...v3.0.4
 
-- Fixed GitHub Link and removed platform.config.json
+## [Version 3.0.3](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v3.0.3) (2020-01-03)
 
-## [Version 3.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v2.6.1...v3.0.0) (2020-01-02)
+## What's Changes
+
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v3.0.2...v3.0.3
+
+## [Version 3.0.2](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v3.0.2) (2020-01-03)
+
+## What's Changes
+
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v3.0.1...v3.0.2
+
+## [Version 3.0.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v3.0.1) (2020-01-02)
+
+## What's Changes
+
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v3.0.0...v3.0.1
+
+## [Version 3.0.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v3.0.0) (2020-01-02)
+
+## What's Changes
 
 - Adds [@oznu](https://github.com/oznu)‘s zero-config portal ui for [homebridge-config-ui-x](https://github.com/oznu/homebridge-config-ui-x)
 
-## [Version 2.6.1](https://github.com/donavanbecker/homebridge-honeywell-home/compare/v2.3.0...v2.6.1) (2020-01-01)
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v2.6.1...v3.0.0
 
-- Added GitHub Action to Publish to NPM
+## [Version 2.6.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v2.6.1) (2020-01-01)
 
-## [Version 2.3.0](https://github.com/donavanbecker/homebridge-honeywell-home/compare/d302603ed1...v2.3.0) (2019-12-31)
+## What's Changes
 
-- Updated Platform Name to HoneywellHome
+- No Changelogs for 2.6.0 and Lower.
+- Housekeeping and updated dependencies.
 
-## Before 2.3.0
-
-### No Changelog
-
-- No Changelog before 2.3.0
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v1.0.0...v2.6.1
