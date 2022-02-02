@@ -309,9 +309,6 @@ export class LeakSensor {
     if (this.deviceLogging.includes('debug')) {
       this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} failed to pushChanges, Error Message: ${JSON.stringify(e.message)}`);
     }
-    if (this.deviceLogging.includes('debug') || this.platform.debugMode) {
-      this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
-    }
   }
 
   async config(device: settings.device & settings.devicesConfig): Promise<void> {

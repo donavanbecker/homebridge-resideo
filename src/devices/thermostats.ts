@@ -816,9 +816,6 @@ export class Thermostats {
     if (this.deviceLogging.includes('debug')) {
       this.errorLog(`Thermostat: ${this.accessory.displayName} failed to pushChanges, Error Message: ${JSON.stringify(e.message)}`);
     }
-    if (this.deviceLogging.includes('debug') || this.platform.debugMode) {
-      this.errorLog(`Thermostat: ${this.accessory.displayName} Error: ${JSON.stringify(e)}`);
-    }
   }
 
   async setTargetHeatingCoolingState(value: CharacteristicValue): Promise<void> {
