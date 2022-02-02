@@ -376,7 +376,9 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       this.infoLog(`Total Locations Found: ${this.locations.length}`);
       // get the devices at each location
       for (const location of this.locations) {
-        this.infoLog(`Total Devices Found at ${location.name}: ${location.devices.length}`);
+        if (location.devices.length !== 0) {
+          this.infoLog(`Total Devices Found at ${location.name}: ${location.devices.length}`);
+        }
         const locationId = location.locationID;
         this.locationinfo(location);
 
