@@ -43,8 +43,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       return;
     }
 
-    this.debugMode = process.argv.includes('-D') || process.argv.includes('--debug');
-
     // HOOBS notice
     if (__dirname.includes('hoobs')) {
       this.warnLog('This plugin has not been tested under HOOBS, it is highly recommended that ' + 'you switch to Homebridge: https://git.io/Jtxb0');
@@ -96,17 +94,19 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     this.debugMode = process.argv.includes('-D') || process.argv.includes('--debug');
     if (this.config.options?.logging === 'debug' || this.config.options?.logging === 'standard' || this.config.options?.logging === 'none') {
       this.platformLogging = this.config.options!.logging;
-      if (this.debugMode) {
-        this.warnLog(`Using Config Logging: ${this.platformLogging}`);
+      if (this.platformLogging.includes('debug')) {
+        this.log.warn(`Using Config Logging: ${this.platformLogging}`);
       }
     } else if (this.debugMode) {
-      if (this.debugMode) {
-        this.warnLog('Using debugMode Logging');
-      }
       this.platformLogging = 'debugMode';
+      if (this.platformLogging?.includes('debug')) {
+        this.log.warn(`Using ${this.platformLogging} Logging`);
+      }
     } else {
-      this.warnLog('Using Standard Logging');
       this.platformLogging = 'standard';
+      if (this.platformLogging?.includes('debug')) {
+        this.log.warn(`Using ${this.platformLogging} Logging`);
+      }
     }
   }
 
@@ -115,7 +115,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    * It should be used to setup event handlers for characteristics and update respective values.
    */
   configureAccessory(accessory: PlatformAccessory) {
-    this.infoLog(`Loading accessory from cache: ${accessory.displayName}`);
+    this.debugLog(`Loading accessory from cache: ${accessory.displayName}`);
 
     // add the restored accessory to the accessories cache so we can track if it has already been registered
     this.accessories.push(accessory);
@@ -893,9 +893,6 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
     }
     if (this.platformLogging?.includes('debug')) {
       this.errorLog(`Failed to ${this.action}, Error Message: ${JSON.stringify(e.message)}`);
-    }
-    if (this.platformLogging?.includes('debug')) {
-      this.errorLog(`Failed to ${this.action}, Error: ${JSON.stringify(e)}`);
     }
   }
 
