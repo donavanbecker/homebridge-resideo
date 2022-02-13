@@ -186,6 +186,8 @@
                         "logging": {
                           "title": "Room Sensor Thermostat Logging Override Setting",
                           "type": "string",
+                          "default": "standard",
+                          "required": true,
                           "oneOf": [
                             {
                               "title": "Standard Logging",
@@ -255,6 +257,8 @@
                         "logging": {
                           "title": "Room Sensor Logging Override Setting",
                           "type": "string",
+                          "default": "standard",
+                          "required": true,
                           "oneOf": [
                             {
                               "title": "Standard Logging",
@@ -339,7 +343,7 @@
                   }
                 }
               },
-              "required": ["deviceID", "deviceClass"]
+              "required": ["deviceID", "deviceClass", "logging"]
             }
           },
           "refreshRate": {
@@ -358,6 +362,8 @@
           "logging": {
             "title": "Logging Setting",
             "type": "string",
+            "default": "standard",
+            "required": true,
             "oneOf": [
               {
                 "title": "Standard Logging",

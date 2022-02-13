@@ -339,7 +339,11 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
       for (const group of device.groups) {
         const roomsensors = await this.getCurrentSensorData(device, group, locationId);
         if (device.thermostat?.roompriority?.deviceType) {
-          this.infoLog(`Total Rooms Found: ${roomsensors.length}`);
+          if (roomsensors.length !== 0) {
+            this.infoLog(`Total Rooms Found: ${roomsensors.length}`);
+          } else {
+            this.debugLog(`Total Rooms Found: ${roomsensors.length}`);
+          }
         }
         for (const accessories of roomsensors) {
           if (accessories) {
@@ -373,10 +377,18 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
    */
   private async discoverDevices() {
     if (this.locations) {
-      this.infoLog(`Total Locations Found: ${this.locations.length}`);
+      if (this.locations.length !== 0) {
+        this.infoLog(`Total Locations Found: ${this.locations.length}`);
+      } else {
+        this.debugLog(`Total Locations Found: ${this.locations.length}`);
+      }
       // get the devices at each location
       for (const location of this.locations) {
-        this.infoLog(`Total Devices Found at ${location.name}: ${location.devices.length}`);
+        if (location.devices.length !== 0) {
+          this.infoLog(`Total Devices Found at ${location.name}: ${location.devices.length}`);
+        } else {
+          this.debugLog(`Total Devices Found at ${location.name}: ${location.devices.length}`);
+        }
         const locationId = location.locationID;
         this.locationinfo(location);
 
