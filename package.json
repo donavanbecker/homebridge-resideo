@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge Honeywell Home",
   "name": "homebridge-honeywell-home",
-  "version": "11.3.7",
+  "version": "11.3.8",
   "description": "The [Homebridge](https://homebridge.io) Honeywell Home plugin allows you to access your [Honeywell Home](https://honeywellhome.com) device(s) from HomeKit.",
   "author": "donavanbecker",
   "license": "Apache-2.0",
@@ -57,14 +57,14 @@
     "leak"
   ],
   "dependencies": {
-    "axios": "^0.25.0",
+    "axios": "^0.26.0",
     "rxjs": "^7.5.4",
     "@homebridge/plugin-ui-utils": "^0.0.19"
   },
   "devDependencies": {
-    "@types/node": "^17.0.17",
-    "@typescript-eslint/eslint-plugin": "^5.11.0",
-    "@typescript-eslint/parser": "^5.11.0",
+    "@types/node": "^17.0.18",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
     "eslint": "^8.9.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-prettier": "4.0.0",
