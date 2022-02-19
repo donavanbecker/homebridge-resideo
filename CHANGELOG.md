@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 11.4.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.4.0) (2022-02-XX)
+
+## What's Changes
+
+- Added option to retry after receiving Honeywell API Error.
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.3.8...v11.4.0
+
 ## [Version 11.3.8](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.3.8) (2022-02-15)
 
 ## What's Changes

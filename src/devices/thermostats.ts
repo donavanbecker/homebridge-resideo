@@ -780,6 +780,49 @@ export class Thermostats {
   }
 
   async honeywellAPIError(e: any): Promise<void> {
+    if (this.device.retry) {
+      if (this.action === 'pushChanges') {
+        // Refresh the status from the API
+        interval(5000)
+          .pipe(skipWhile(() => this.thermostatUpdateInProgress))
+          .pipe(take(1))
+          .subscribe(async () => {
+            await this.pushChanges();
+          });
+      } else if (this.action === 'refreshRoomPriority') {
+        // Refresh the status from the API
+        interval(5000)
+          .pipe(skipWhile(() => this.thermostatUpdateInProgress))
+          .pipe(take(1))
+          .subscribe(async () => {
+            await this.refreshRoomPriority();
+          });
+      } else if (this.action === 'pushRoomChanges') {
+        // Refresh the status from the API
+        interval(5000)
+          .pipe(skipWhile(() => this.thermostatUpdateInProgress))
+          .pipe(take(1))
+          .subscribe(async () => {
+            await this.pushRoomChanges();
+          });
+      } else if (this.action === 'pushFanChanges') {
+        // Refresh the status from the API
+        interval(5000)
+          .pipe(skipWhile(() => this.thermostatUpdateInProgress))
+          .pipe(take(1))
+          .subscribe(async () => {
+            await this.pushFanChanges();
+          });
+      } else if (this.action === 'refreshStatus') {
+        // Refresh the status from the API
+        interval(5000)
+          .pipe(skipWhile(() => this.thermostatUpdateInProgress))
+          .pipe(take(1))
+          .subscribe(async () => {
+            await this.refreshStatus();
+          });
+      }
+    }
     if (e.message.includes('400')) {
       this.errorLog(`Thermostat: ${this.accessory.displayName} failed to ${this.action}, Bad Request`);
       this.debugLog('The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.');

@@ -311,6 +311,11 @@
                     }
                   }
                 },
+                "retry": {
+                  "title": "Retry",
+                  "type": "boolean",
+                  "description": "Retry after receiving a Honeywell API Error."
+                },
                 "refreshRate": {
                   "title": "Device Refresh Rate",
                   "type": "number",

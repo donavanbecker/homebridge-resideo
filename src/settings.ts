@@ -58,6 +58,7 @@ export interface devicesConfig extends device {
   hide_device?: boolean;
   logging?: string;
   refreshRate?: number;
+  retry?: boolean;
 }
 
 export type thermostat = {
