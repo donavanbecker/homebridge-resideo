@@ -461,6 +461,7 @@
                 "options.devices[].thermostat.roomsensor.logging"
               ]
             },
+            "options.devices[].retry",
             "options.devices[].refreshRate",
             "options.devices[].logging"
           ]

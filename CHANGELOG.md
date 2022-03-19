@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
-## [Version 11.4.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.4.0) (2022-02-XX)
+## [Version 11.4.0](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.4.0) (2022-03-19)
 
 ## What's Changes
 
