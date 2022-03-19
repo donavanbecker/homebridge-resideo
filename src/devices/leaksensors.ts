@@ -1,6 +1,6 @@
 import { CharacteristicValue, PlatformAccessory, Service } from 'homebridge';
 import { interval, Subject } from 'rxjs';
-import { skipWhile } from 'rxjs/operators';
+import { skipWhile, take } from 'rxjs/operators';
 import { HoneywellHomePlatform } from '../platform';
 import * as settings from '../settings';
 
@@ -273,6 +273,17 @@ export class LeakSensor {
   }
 
   async honeywellAPIError(e: any): Promise<void> {
+    if (this.device.retry) {
+      if (this.action === 'refreshStatus') {
+        // Refresh the status from the API
+        interval(5000)
+          .pipe(skipWhile(() => this.SensorUpdateInProgress))
+          .pipe(take(1))
+          .subscribe(async () => {
+            await this.refreshStatus();
+          });
+      }
+    }
     if (e.message.includes('400')) {
       this.platform.log.error(`Leak Sensor: ${this.accessory.displayName} failed to ${this.action}, Bad Request`);
       this.debugLog('The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.');
