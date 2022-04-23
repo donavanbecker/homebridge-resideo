@@ -1,6 +1,7 @@
 name: AutoDependabot
 
 on:
+  pull_request:
   push:
     branches:
     - beta
