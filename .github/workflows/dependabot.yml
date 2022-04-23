@@ -1,8 +1,9 @@
-name: automerge-dependabot
+name: AutoDependabot
 
 on:
-  schedule:
-    - cron: '0 7 * * *'
+  push:
+    branches:
+    - beta
 
 jobs:
   automerge:
