@@ -57,7 +57,7 @@
     "leak"
   ],
   "dependencies": {
-    "axios": "^0.26.1",
+    "axios": "^0.27.2",
     "rxjs": "^7.5.5",
     "@homebridge/plugin-ui-utils": "^0.0.19"
   },
