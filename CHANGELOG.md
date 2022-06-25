@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 11.4.2](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.4.2) (2022-06-25)
+
+## What's Changes
+- Fix issue where logging was causing invalid Config.
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.4.1...v11.4.2
+
 ## [Version 11.4.1](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.4.1) (2022-05-04)
 
 ## What's Changes

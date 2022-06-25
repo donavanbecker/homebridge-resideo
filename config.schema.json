@@ -186,8 +186,6 @@
                         "logging": {
                           "title": "Room Sensor Thermostat Logging Override Setting",
                           "type": "string",
-                          "default": "standard",
-                          "required": true,
                           "oneOf": [
                             {
                               "title": "Standard Logging",
@@ -207,7 +205,7 @@
                           }
                         }
                       },
-                      "required": ["deviceType", "priorityType"],
+                      "required": ["deviceType", "priorityType", "logging"],
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceID && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && (model.options.devices[arrayIndices].deviceModel === 'T9' || model.options.devices[arrayIndices].deviceModel === 'T10'));"
                       }
@@ -257,8 +255,6 @@
                         "logging": {
                           "title": "Room Sensor Logging Override Setting",
                           "type": "string",
-                          "default": "standard",
-                          "required": true,
                           "oneOf": [
                             {
                               "title": "Standard Logging",
@@ -281,7 +277,8 @@
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID && (model.options.devices[arrayIndices].deviceModel === 'T9' || model.options.devices[arrayIndices].deviceModel === 'T10') && !model.options.devices[arrayIndices].thermostat.roomsensor.hide_roomsensor);"
                       }
-                    }
+                    },
+                    "required": ["logging"]
                   }
                 },
                 "leaksensor": {
@@ -367,8 +364,6 @@
           "logging": {
             "title": "Logging Setting",
             "type": "string",
-            "default": "standard",
-            "required": true,
             "oneOf": [
               {
                 "title": "Standard Logging",
@@ -384,7 +379,8 @@
               }
             ]
           }
-        }
+        },
+        "required": ["logging"]
       },
       "disablePlugin": {
         "title": "Disable Plugin",
