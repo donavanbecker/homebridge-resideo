@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 11.4.3](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.4.3) (2022-08-30)
+
+## What's Changes
+- Fix for redirect URL issue, Fixes [#379](https://github.com/donavanbecker/homebridge-honeywell-home/issues/739#issuecomment-1231567271).
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.4.2...v11.4.3
+
 ## [Version 11.4.2](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.4.2) (2022-06-25)
 
 ## What's Changes
