@@ -276,9 +276,9 @@
                       },
                       "condition": {
                         "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID && (model.options.devices[arrayIndices].deviceModel === 'T9' || model.options.devices[arrayIndices].deviceModel === 'T10') && !model.options.devices[arrayIndices].thermostat.roomsensor.hide_roomsensor);"
-                      },
-                      "required": ["logging"]
-                    }
+                      }
+                    },
+                    "required": ["logging"]
                   }
                 },
                 "leaksensor": {

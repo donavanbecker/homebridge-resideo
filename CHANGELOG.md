@@ -2,14 +2,6 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
-## [Version 11.4.4](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.4.4) (2022-09-04)
-
-## What's Changes
-- Fix for Config Settings not opening, Fixes [#737](https://github.com/donavanbecker/homebridge-honeywell-home/issues/737).
-- Housekeeping and updated dependencies.
-
-**Full Changelog**: https://github.com/donavanbecker/homebridge-honeywell-home/compare/v11.4.3...v11.4.4
-
 ## [Version 11.4.3](https://github.com/donavanbecker/homebridge-honeywell-home/releases/tag/v11.4.3) (2022-08-30)
 
 ## What's Changes
