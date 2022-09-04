@@ -279,7 +279,7 @@
                       },
                       "required": ["logging"]
                     }
-                  }
+                    }
                 },
                 "leaksensor": {
                   "title": "Leak Sensor",
