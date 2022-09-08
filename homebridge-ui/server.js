@@ -29,7 +29,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
               this.secret = query.secret;
               this.hostname = query.host;
               const url = 'https://api.honeywell.com/oauth2/authorize?' +
-                'response_type=code&redirect_uri=' + encodeURI('http://' + this.hostname + ':8585') + '&' +
+                'response_type=code&redirect_uri=' + encodeURI('http://' + this.hostname + ':8585/auth') + '&' +
                 'client_id=' + query.key;
               res.end('<script>window.location.replace(\'' + url + '\');</script>');
               break;
@@ -46,7 +46,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
                 curlString += '-d "';
                 curlString += 'grant_type=authorization_code&';
                 curlString += 'code=' + code + '&';
-                curlString += 'redirect_uri=' + encodeURI('http://' + this.hostname + ':8585');
+                curlString += 'redirect_uri=' + encodeURI('http://' + this.hostname + ':8585/auth');
                 curlString += '" ';
                 curlString += '"https://api.honeywell.com/oauth2/token"';
                 try {
