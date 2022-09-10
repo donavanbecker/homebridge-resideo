@@ -254,7 +254,7 @@
          }
          showIntro = () => {
             const introLink = document.getElementById('introLink')
-            document.getElementById('copyMe').value = 'http://' + hostname + ':8585'
+            document.getElementById('copyMe').value = 'http://' + hostname + ':8585/'
             introLink.addEventListener('click', () => {
                homebridge.showSpinner()
                document.getElementById('pageIntro').style.display = 'none'
