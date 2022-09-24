@@ -313,6 +313,14 @@
                   "type": "boolean",
                   "description": "Retry after receiving a Resideo API Error."
                 },
+                "firmware": {
+                  "title": "Firmware Override",
+                  "type": "string",
+                  "placeholder": "1.2.8",
+                  "condition": {
+                    "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceId);"
+                  }
+                },
                 "refreshRate": {
                   "title": "Device Refresh Rate",
                   "type": "number",
@@ -425,6 +433,7 @@
             "options.devices[].hide_device",
             "options.devices[].deviceClass",
             "options.devices[].deviceModel",
+            "options.devices[].firmware",
             "options.devices[].thermostat.hide_fan",
             "options.devices[].thermostat.hide_humidity",
             "options.devices[].thermostat.thermostatSetpointStatus",

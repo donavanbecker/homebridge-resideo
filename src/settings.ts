@@ -59,6 +59,7 @@ export interface devicesConfig extends device {
   logging?: string;
   refreshRate?: number;
   retry?: boolean;
+  firmware?: string;
 }
 
 export type thermostat = {

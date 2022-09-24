@@ -570,7 +570,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
         existingAccessory.displayName = device.userDefinedDeviceName;
         existingAccessory.context.deviceID = device.deviceID;
         existingAccessory.context.model = device.deviceClass;
-        existingAccessory.context.firmwareRevision = this.version;
+        this.leaksensorFirmwareExistingAccessory(device, existingAccessory);
         this.api.updatePlatformAccessories([existingAccessory]);
 
         // create the accessory handler for the restored accessory
@@ -592,7 +592,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       accessory.context.device = device;
       accessory.context.deviceID = device.deviceID;
       accessory.context.model = device.deviceClass;
-      accessory.context.firmwareRevision = this.version;
+      this.leaksensorFirmwareNewAccessory(device, accessory);
 
       // accessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
       // create the accessory handler for the newly create accessory
@@ -630,7 +630,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
         existingAccessory.displayName = sensorAccessory.accessoryAttribute.name;
         existingAccessory.context.deviceID = sensorAccessory.deviceID;
         existingAccessory.context.model = sensorAccessory.accessoryAttribute.model;
-        existingAccessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision || this.version;
+        this.roomsensorFirmwareExistingAccessory(existingAccessory, sensorAccessory);
         this.api.updatePlatformAccessories([existingAccessory]);
 
         // create the accessory handler for the restored accessory
@@ -657,7 +657,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       // the `context` property can be used to store any data about the accessory you may need
       accessory.context.deviceID = sensorAccessory.deviceID;
       accessory.context.model = sensorAccessory.accessoryAttribute.model;
-      accessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision || this.version;
+      this.roomsensorFirmwareNewAccessory(accessory, sensorAccessory);
 
       // create the accessory handler for the newly create accessory
       // this is imported from `roomSensor.ts`
@@ -701,7 +701,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
         existingAccessory.displayName = sensorAccessory.accessoryAttribute.name;
         existingAccessory.context.deviceID = sensorAccessory.deviceID;
         existingAccessory.context.model = sensorAccessory.accessoryAttribute.model;
-        existingAccessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision || this.version;
+        this.roomsensorFirmwareExistingAccessory(existingAccessory, sensorAccessory);
         this.api.updatePlatformAccessories([existingAccessory]);
 
         // create the accessory handler for the restored accessory
@@ -728,7 +728,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       // the `context` property can be used to store any data about the accessory you may need
       accessory.context.deviceID = sensorAccessory.deviceID;
       accessory.context.model = sensorAccessory.accessoryAttribute.model;
-      accessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision || this.version;
+      this.roomsensorFirmwareNewAccessory(accessory, sensorAccessory);
 
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
@@ -753,18 +753,54 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  public async thermostatFirmwareNewAccessory(device: settings.device & settings.devicesConfig, accessory: PlatformAccessory, location: any) {
-    if (device.deviceModel.startsWith('T9')) {
-      try {
-        accessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
-      } catch (e: any) {
-        this.action = 'Get T9 Firmware Version';
-        this.apiError(e);
-      }
-    } else if (device.deviceModel.startsWith('Round') || device.deviceModel.startsWith('Unknown') || device.deviceModel.startsWith('D6')) {
-      accessory.context.firmwareRevision = device.thermostatVersion;
+  private leaksensorFirmwareNewAccessory(device: settings.device & settings.devicesConfig, accessory: PlatformAccessory) {
+    if (device.firmware) {
+      accessory.context.firmwareRevision = device.firmware;
     } else {
       accessory.context.firmwareRevision = this.version;
+    }
+  }
+
+  private leaksensorFirmwareExistingAccessory(device: settings.device & settings.devicesConfig, existingAccessory: PlatformAccessory) {
+    if (device.firmware) {
+      existingAccessory.context.firmwareRevision = device.firmware;
+    } else {
+      existingAccessory.context.firmwareRevision = this.version;
+    }
+  }
+
+  private roomsensorFirmwareNewAccessory(accessory, sensorAccessory: settings.sensorAccessory) {
+    if (accessory.firmware) {
+      accessory.context.firmwareRevision = accessory.firmware;
+    } else {
+      accessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision || this.version;
+    }
+  }
+
+  private roomsensorFirmwareExistingAccessory(existingAccessory, sensorAccessory: settings.sensorAccessory) {
+    if (existingAccessory.firmware) {
+      existingAccessory.context.firmwareRevision = existingAccessory.firmware;
+    } else {
+      existingAccessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision || this.version;
+    }
+  }
+
+  public async thermostatFirmwareNewAccessory(device: settings.device & settings.devicesConfig, accessory: PlatformAccessory, location: any) {
+    if (device.firmware) {
+      accessory.context.firmwareRevision = device.firmware;
+    } else {
+      if (device.deviceModel.startsWith('T9')) {
+        try {
+          accessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
+        } catch (e: any) {
+          this.action = 'Get T9 Firmware Version';
+          this.apiError(e);
+        }
+      } else if (device.deviceModel.startsWith('Round') || device.deviceModel.startsWith('Unknown') || device.deviceModel.startsWith('D6')) {
+        accessory.context.firmwareRevision = device.thermostatVersion;
+      } else {
+        accessory.context.firmwareRevision = this.version;
+      }
     }
   }
 
@@ -773,17 +809,21 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     existingAccessory: PlatformAccessory,
     location: any,
   ) {
-    if (device.deviceModel.startsWith('T9')) {
-      try {
-        existingAccessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
-      } catch (e: any) {
-        this.action = 'Get T9 Firmware Version';
-        this.apiError(e);
-      }
-    } else if (device.deviceModel.startsWith('Round') || device.deviceModel.startsWith('Unknown') || device.deviceModel.startsWith('D6')) {
-      existingAccessory.context.firmwareRevision = device.thermostatVersion;
+    if (device.firmware) {
+      existingAccessory.context.firmwareRevision = device.firmware;
     } else {
-      existingAccessory.context.firmwareRevision = this.version;
+      if (device.deviceModel.startsWith('T9')) {
+        try {
+          existingAccessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
+        } catch (e: any) {
+          this.action = 'Get T9 Firmware Version';
+          this.apiError(e);
+        }
+      } else if (device.deviceModel.startsWith('Round') || device.deviceModel.startsWith('Unknown') || device.deviceModel.startsWith('D6')) {
+        existingAccessory.context.firmwareRevision = device.thermostatVersion;
+      } else {
+        existingAccessory.context.firmwareRevision = this.version;
+      }
     }
   }
 
