@@ -433,7 +433,6 @@
             "options.devices[].hide_device",
             "options.devices[].deviceClass",
             "options.devices[].deviceModel",
-            "options.devices[].firmware",
             "options.devices[].thermostat.hide_fan",
             "options.devices[].thermostat.hide_humidity",
             "options.devices[].thermostat.thermostatSetpointStatus",
@@ -467,6 +466,7 @@
               ]
             },
             "options.devices[].retry",
+            "options.devices[].firmware",
             "options.devices[].refreshRate",
             "options.devices[].logging"
           ]
