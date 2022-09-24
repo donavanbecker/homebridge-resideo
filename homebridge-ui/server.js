@@ -15,7 +15,7 @@ const url = require('url');
 class PluginUiServer extends HomebridgePluginUiServer {
   constructor() {
     super();
-    this.onRequest('Start Honeywell Login Server', () => {
+    this.onRequest('Start Resideo Login Server', () => {
       const runningServer = http.createServer(async (req, res) => {
         try {
           res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -102,7 +102,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
     this.onRequest('/getCachedAccessories', async () => {
       try {
         // Define the plugin and create the array to return
-        const plugin = 'homebridge-honeywell-home';
+        const plugin = 'homebridge-resideo';
         const devicesToReturn = [];
 
         // The path and file of the cached accessories

@@ -1,7 +1,7 @@
 import { CharacteristicValue, PlatformAccessory, Service } from 'homebridge';
 import { interval, Subject } from 'rxjs';
 import { debounceTime, skipWhile, take, tap } from 'rxjs/operators';
-import { HoneywellHomePlatform } from '../platform';
+import { ResideoPlatform } from '../platform';
 import * as settings from '../settings';
 
 /**
@@ -34,7 +34,7 @@ export class Thermostats {
   heatSetpoint!: number;
   coolSetpoint!: number;
   thermostatSetpointStatus!: string;
-  honeywellMode!: Array<string>;
+  resideoMode!: Array<string>;
   fanMode!: settings.FanChangeableValues;
 
   // Others - T9 Only
@@ -57,7 +57,7 @@ export class Thermostats {
   doRoomUpdate!: Subject<void>;
 
   constructor(
-    private readonly platform: HoneywellHomePlatform,
+    private readonly platform: ResideoPlatform,
     private accessory: PlatformAccessory,
     public readonly locationId: settings.location['locationID'],
     public device: settings.device & settings.devicesConfig,
@@ -65,7 +65,7 @@ export class Thermostats {
     this.logs(device);
     this.refreshRate(device);
     this.config(device);
-    // Map Honeywell Modes to HomeKit Modes
+    // Map Resideo Modes to HomeKit Modes
     this.modes = {
       Off: platform.Characteristic.TargetHeatingCoolingState.OFF,
       Heat: platform.Characteristic.TargetHeatingCoolingState.HEAT,
@@ -73,9 +73,9 @@ export class Thermostats {
       Auto: platform.Characteristic.TargetHeatingCoolingState.AUTO,
     };
 
-    // Map HomeKit Modes to Honeywell Modes
+    // Map HomeKit Modes to Resideo Modes
     // Don't change the order of these!
-    this.honeywellMode = ['Off', 'Heat', 'Cool', 'Auto'];
+    this.resideoMode = ['Off', 'Heat', 'Cool', 'Auto'];
 
     // default placeholders
     this.Active = this.platform.Characteristic.Active.INACTIVE;
@@ -86,10 +86,10 @@ export class Thermostats {
       this.debugLog(`Thermostat: ${accessory.displayName} thermostatSetpointStatus: ${this.thermostatSetpointStatus}`);
     }
 
-    // this is subject we use to track when we need to POST changes to the Honeywell API for Room Changes - T9 Only
+    // this is subject we use to track when we need to POST changes to the Resideo API for Room Changes - T9 Only
     this.doRoomUpdate = new Subject();
     this.roomUpdateInProgress = false;
-    // this is subject we use to track when we need to POST changes to the Honeywell API
+    // this is subject we use to track when we need to POST changes to the Resideo API
     this.doThermostatUpdate = new Subject();
     this.thermostatUpdateInProgress = false;
     this.doFanUpdate = new Subject();
@@ -98,7 +98,7 @@ export class Thermostats {
     // set accessory information
     accessory
       .getService(this.platform.Service.AccessoryInformation)!
-      .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
+      .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Resideo')
       .setCharacteristic(this.platform.Characteristic.Model, device.deviceModel)
       .setCharacteristic(this.platform.Characteristic.SerialNumber, device.deviceID)
       .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision)
@@ -235,7 +235,7 @@ export class Thermostats {
             await this.refreshRoomPriority();
           } catch (e: any) {
             this.action = 'refreshRoomPriority';
-            this.honeywellAPIError(e);
+            this.resideoAPIError(e);
             this.platform.refreshAccessToken();
             this.apiError(e);
           }
@@ -243,7 +243,7 @@ export class Thermostats {
             await this.pushRoomChanges();
           } catch (e: any) {
             this.action = 'pushRoomChanges';
-            this.honeywellAPIError(e);
+            this.resideoAPIError(e);
             this.platform.refreshAccessToken();
             this.apiError(e);
           }
@@ -269,7 +269,7 @@ export class Thermostats {
           await this.pushChanges();
         } catch (e: any) {
           this.action = 'pushChanges';
-          this.honeywellAPIError(e);
+          this.resideoAPIError(e);
           this.platform.refreshAccessToken();
           this.apiError(e);
         }
@@ -295,7 +295,7 @@ export class Thermostats {
             await this.pushFanChanges();
           } catch (e: any) {
             this.action = 'pushFanChanges';
-            this.honeywellAPIError(e);
+            this.resideoAPIError(e);
             this.platform.refreshAccessToken();
             this.apiError(e);
           }
@@ -312,7 +312,7 @@ export class Thermostats {
   }
 
   /**
-   * Parse the device status from the honeywell api
+   * Parse the device status from the Resideo api
    */
   async parseStatus(): Promise<void> {
     this.debugLog(`Thermostat: ${this.accessory.displayName} parseStatus`);
@@ -425,7 +425,7 @@ export class Thermostats {
   }
 
   /**
-   * Asks the Honeywell Home API for the latest device information
+   * Asks the Resideo Home API for the latest device information
    */
   async refreshStatus(): Promise<void> {
     try {
@@ -439,7 +439,7 @@ export class Thermostats {
       this.device = device;
       this.debugLog(`Thermostat: ${this.accessory.displayName} device: ${JSON.stringify(this.device)}`);
       this.debugLog(`Thermostat: ${this.accessory.displayName} refreshStatus for ${this.device.name}
-       from Honeywell API: ${JSON.stringify(this.device.changeableValues)}`);
+       from Resideo API: ${JSON.stringify(this.device.changeableValues)}`);
       await this.refreshRoomPriority();
       if (this.device.settings?.fan && !device.thermostat?.hide_fan) {
         const fanMode: any = (
@@ -452,14 +452,14 @@ export class Thermostats {
         this.fanMode = fanMode;
         this.debugLog(`Thermostat: ${this.accessory.displayName} fanMode: ${JSON.stringify(this.fanMode)}`);
         this.debugLog(`Thermostat: ${this.accessory.displayName} refreshStatus for ${this.device.name} Fan
-        from Honeywell Fan API: ${JSON.stringify(this.fanMode)}`);
+        from Resideo Fan API: ${JSON.stringify(this.fanMode)}`);
       }
       this.pushChangesthermostatSetpointStatus();
       this.parseStatus();
       this.updateHomeKitCharacteristics();
     } catch (e: any) {
       this.action = 'refreshStatus';
-      this.honeywellAPIError(e);
+      this.resideoAPIError(e);
       this.apiError(e);
     }
   }
@@ -478,7 +478,7 @@ export class Thermostats {
   }
 
   /**
-   * Pushes the requested changes to the Honeywell API
+   * Pushes the requested changes to the Resideo API
    */
   async pushChanges(): Promise<void> {
     try {
@@ -490,10 +490,10 @@ export class Thermostats {
           this.debugLog(`Thermostat: ${this.accessory.displayName} didn't send TargetHeatingCoolingState,` + ` Model:  ${this.device.deviceModel}`);
           break;
         default:
-          payload.mode = this.honeywellMode[Number(this.TargetHeatingCoolingState)];
+          payload.mode = this.resideoMode[Number(this.TargetHeatingCoolingState)];
           this.debugLog(
             `Thermostat: ${this.accessory.displayName} send TargetHeatingCoolingState` +
-              ` mode: ${this.honeywellMode[Number(this.TargetHeatingCoolingState)]}`,
+              ` mode: ${this.resideoMode[Number(this.TargetHeatingCoolingState)]}`,
           );
       }
 
@@ -565,7 +565,7 @@ export class Thermostats {
               break;
           }
           this.infoLog(
-            `Thermostat: ${this.accessory.displayName} sent request to Honeywell API thermostatSetpoint:` +
+            `Thermostat: ${this.accessory.displayName} sent request to Resideo API thermostatSetpoint:` +
               ` ${payload.thermostatSetpoint}, unit: ${payload.unit}`,
           );
 
@@ -609,7 +609,7 @@ export class Thermostats {
                   ` HeatingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`,
               );
           }
-          this.infoLog(`Room Sensor Thermostat: ${this.accessory.displayName} set request (${JSON.stringify(payload)}) to Honeywell API.`);
+          this.infoLog(`Room Sensor Thermostat: ${this.accessory.displayName} set request (${JSON.stringify(payload)}) to Resideo API.`);
       }
 
       // Attempt to make the API request
@@ -621,7 +621,7 @@ export class Thermostats {
       this.debugLog(`Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(payload)}`);
     } catch (e: any) {
       this.action = 'pushChanges';
-      this.honeywellAPIError(e);
+      this.resideoAPIError(e);
       this.apiError(e);
     }
   }
@@ -637,7 +637,7 @@ export class Thermostats {
   }
 
   /**
-   * Pushes the requested changes for Room Priority to the Honeywell API
+   * Pushes the requested changes for Room Priority to the Resideo API
    */
   async pushRoomChanges(): Promise<void> {
     this.debugLog(`Thermostat Room Priority for ${this.accessory.displayName}
@@ -663,14 +663,14 @@ export class Thermostats {
       if (this.device.thermostat?.roompriority?.deviceType === 'Thermostat') {
         if (this.device.priorityType === 'FollowMe') {
           this.infoLog(
-            `Sending request for ${this.accessory.displayName} to Honeywell API Priority Type:` +
+            `Sending request for ${this.accessory.displayName} to Resideo API Priority Type:` +
               ` ${this.device.priorityType}, Built-in Occupancy Sensor(s) Will be used to set Priority Automatically`,
           );
         } else if (this.device.priorityType === 'WholeHouse') {
-          this.infoLog(`Sending request for ${this.accessory.displayName} to Honeywell API Priority Type:` + ` ${this.device.priorityType}`);
+          this.infoLog(`Sending request for ${this.accessory.displayName} to Resideo API Priority Type:` + ` ${this.device.priorityType}`);
         } else if (this.device.priorityType === 'PickARoom') {
           this.infoLog(
-            `Sending request for ${this.accessory.displayName} to Honeywell API Room Priority:` +
+            `Sending request for ${this.accessory.displayName} to Resideo API Room Priority:` +
               ` ${this.device.inBuiltSensorState!.roomName}, Priority Type: ${this.device.thermostat?.roompriority.priorityType}`,
           );
         }
@@ -779,7 +779,7 @@ export class Thermostats {
     //throw new this.platform.api.hap.HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
   }
 
-  async honeywellAPIError(e: any): Promise<void> {
+  async resideoAPIError(e: any): Promise<void> {
     if (this.device.retry) {
       if (this.action === 'pushChanges') {
         // Refresh the status from the API
@@ -903,7 +903,7 @@ export class Thermostats {
     this.debugLog(`Thermostat: ${this.accessory.displayName} Set TemperatureDisplayUnits: ${value}`);
     this.warnLog('Changing the Hardware Display Units from HomeKit is not supported.');
 
-    // change the temp units back to the one the Honeywell API said the thermostat was set to
+    // change the temp units back to the one the Resideo API said the thermostat was set to
     setTimeout(() => {
       this.service.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, this.TemperatureDisplayUnits);
     }, 100);
@@ -933,7 +933,7 @@ export class Thermostats {
   }
 
   /**
-   * Pushes the requested changes for Fan to the Honeywell API
+   * Pushes the requested changes for Fan to the Resideo API
    */
   async pushFanChanges(): Promise<void> {
     let payload = {
@@ -962,7 +962,7 @@ export class Thermostats {
         };
       }
 
-      this.infoLog(`Sending request for ${this.accessory.displayName} to Honeywell API Fan Mode: ${payload.mode}`);
+      this.infoLog(`Sending request for ${this.accessory.displayName} to Resideo API Fan Mode: ${payload.mode}`);
       // Make the API request
       await this.platform.axios.post(`${settings.DeviceURL}/thermostats/${this.device.deviceID}/fan`, payload, {
         params: {

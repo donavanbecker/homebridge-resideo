@@ -1,5 +1,5 @@
-# Add 'branding' to any file changes within 'honeywell' folder
-branding: honeywell/*
+# Add 'branding' to any file changes within 'resideo' folder
+branding: resideo/*
 
 # Add 'enhancement' label to any change to index.js file
 enhancement:

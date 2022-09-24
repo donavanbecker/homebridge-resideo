@@ -2,35 +2,35 @@ import { PlatformConfig } from 'homebridge';
 /**
  * This is the name of the platform that users will use to register the plugin in the Homebridge config.json
  */
-export const PLATFORM_NAME = 'HoneywellHome';
+export const PLATFORM_NAME = 'Resideo';
 
 /**
  * This must match the name of your plugin as defined the package.json
  */
-export const PLUGIN_NAME = 'homebridge-honeywell-home';
+export const PLUGIN_NAME = 'homebridge-resideo';
 
 /**
- * This is the main url used to access honeywell API
+ * This is the main url used to access Resideo API
  */
 export const AuthURL = 'https://api.honeywell.com/oauth2/token';
 
 /**
- * This is the main url used to access honeywell API
+ * This is the main url used to access Resideo API
  */
 export const LocationURL = 'https://api.honeywell.com/v2/locations';
 
 /**
- * This is the main url used to access honeywell API
+ * This is the main url used to access Resideo API
  */
 export const DeviceURL = 'https://api.honeywell.com/v2/devices';
 
 /**
- * This is the url used to access UI Login to honeywell API
+ * This is the url used to access UI Login to Resideo API
  */
 export const UIurl = 'https://homebridge-honeywell.iot.oz.nu/user/refresh';
 
 //Config
-export interface HoneywellPlatformConfig extends PlatformConfig {
+export interface ResideoPlatformConfig extends PlatformConfig {
   credentials?: credentials;
   disablePlugin?: boolean;
   options?: options | Record<string, never>;

@@ -1,7 +1,7 @@
 import { CharacteristicValue, PlatformAccessory, Service } from 'homebridge';
 import { interval, Subject } from 'rxjs';
 import { skipWhile, take } from 'rxjs/operators';
-import { HoneywellHomePlatform } from '../platform';
+import { ResideoPlatform } from '../platform';
 import * as settings from '../settings';
 
 /**
@@ -37,7 +37,7 @@ export class LeakSensor {
   doSensorUpdate!: Subject<void>;
 
   constructor(
-    private readonly platform: HoneywellHomePlatform,
+    private readonly platform: ResideoPlatform,
     private accessory: PlatformAccessory,
     public readonly locationId: settings.location['locationID'],
     public device: settings.device & settings.devicesConfig,
@@ -45,14 +45,14 @@ export class LeakSensor {
     this.logs(device);
     this.refreshRate(device);
     this.config(device);
-    // this is subject we use to track when we need to POST changes to the Honeywell API
+    // this is subject we use to track when we need to POST changes to the Resideo API
     this.doSensorUpdate = new Subject();
     this.SensorUpdateInProgress = false;
 
     // set accessory information
     accessory
       .getService(this.platform.Service.AccessoryInformation)!
-      .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Honeywell')
+      .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Resideo')
       .setCharacteristic(this.platform.Characteristic.Model, device.deviceType)
       .setCharacteristic(this.platform.Characteristic.SerialNumber, device.deviceID)
       .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision)
@@ -160,7 +160,7 @@ export class LeakSensor {
   }
 
   /**
-   * Parse the device status from the honeywell api
+   * Parse the device status from the Resideo api
    */
   async parseStatus(): Promise<void> {
     // Leak Service
@@ -196,7 +196,7 @@ export class LeakSensor {
   }
 
   /**
-   * Asks the Honeywell Home API for the latest device information
+   * Asks the Resideo Home API for the latest device information
    */
   async refreshStatus(): Promise<void> {
     try {
@@ -213,7 +213,7 @@ export class LeakSensor {
       this.updateHomeKitCharacteristics();
     } catch (e: any) {
       this.action = 'refreshStatus';
-      this.honeywellAPIError(e);
+      this.resideoAPIError(e);
       this.apiError(e);
     }
   }
@@ -272,7 +272,7 @@ export class LeakSensor {
     //throw new this.platform.api.hap.HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
   }
 
-  async honeywellAPIError(e: any): Promise<void> {
+  async resideoAPIError(e: any): Promise<void> {
     if (this.device.retry) {
       if (this.action === 'refreshStatus') {
         // Refresh the status from the API

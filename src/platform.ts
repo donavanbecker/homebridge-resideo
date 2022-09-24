@@ -13,7 +13,7 @@ import * as settings from './settings';
  * This class is the main constructor for your plugin, this is where you should
  * parse the user config and discover/register accessories with Homebridge.
  */
-export class HoneywellHomePlatform implements DynamicPlatformPlugin {
+export class ResideoPlatform implements DynamicPlatformPlugin {
   public readonly Service: typeof Service = this.api.hap.Service;
   public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
 
@@ -35,7 +35,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
   action!: string;
   platformLogging!: string;
 
-  constructor(public readonly log: Logger, public readonly config: settings.HoneywellPlatformConfig, public readonly api: API) {
+  constructor(public readonly log: Logger, public readonly config: settings.ResideoPlatformConfig, public readonly api: API) {
     this.logs();
     this.debugLog(`Finished initializing platform: ${this.config.name}`);
     // only load if configured
@@ -394,14 +394,14 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
 
         const deviceLists = location.devices;
         if (!this.config.options?.devices) {
-          this.debugLog(`No Honeywell Device Config: ${JSON.stringify(this.config.options?.devices)}`);
+          this.debugLog(`No Resideo Device Config: ${JSON.stringify(this.config.options?.devices)}`);
           const devices = deviceLists.map((v: any) => v);
           for (const device of devices) {
             this.deviceinfo(device);
             await this.deviceClass(device, location, locationId);
           }
         } else {
-          this.debugLog(`Honeywell Device Config Set: ${JSON.stringify(this.config.options?.devices)}`);
+          this.debugLog(`Resideo Device Config Set: ${JSON.stringify(this.config.options?.devices)}`);
           const deviceConfigs = this.config.options?.devices;
 
           const mergeBydeviceID = (a1: { deviceID: string }[], a2: any[]) =>
@@ -411,7 +411,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
             }));
 
           const devices = mergeBydeviceID(deviceLists, deviceConfigs);
-          this.debugLog(`Honeywell Devices: ${JSON.stringify(devices)}`);
+          this.debugLog(`Resideo Devices: ${JSON.stringify(devices)}`);
           for (const device of devices) {
             this.deviceinfo(device);
             await this.deviceClass(device, location, locationId);
@@ -419,7 +419,7 @@ export class HoneywellHomePlatform implements DynamicPlatformPlugin {
         }
       }
     } else {
-      this.errorLog('Failed to Discover Locations. Re-Link Your Honeywell Home Account.');
+      this.errorLog('Failed to Discover Locations. Re-Link Your Resideo Account.');
     }
   }
 

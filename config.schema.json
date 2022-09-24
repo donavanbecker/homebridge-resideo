@@ -1,17 +1,17 @@
 {
-  "pluginAlias": "HoneywellHome",
+  "pluginAlias": "Resideo",
   "pluginType": "platform",
   "singular": true,
   "customUi": true,
-  "headerDisplay": "<p align='center'><img width='250px' src='https://user-images.githubusercontent.com/3979615/71876008-d99d7400-3179-11ea-909b-9d2a3d1e670f.png'></p>\n\nThe **Homebridge Honeywell Home** plugin allows you to control Honeywell Home thermostats and also view your Leak and Room Sensors from HomeKit. \n\nTo get started link your Honeywell Home account using the button below.",
-  "footerDisplay": "Your Honeywell Home account has been linked. Please raise any issues on our [project page](https://github.com/donavanbecker/homebridge-honeywell-home/issues).\n\nIf you would like to have other Honeywell Devices besides Thermostat, Leak Sensors, or Room Sensors added to this plugin fill out [Feature Request Form](https://github.com/donavanbecker/homebridge-honeywell-home/issues/new?assignees=&labels=&template=feature_request.md).",
+  "headerDisplay": "<p align='center'><img width='250px' src='https://user-images.githubusercontent.com/3979615/71876008-d99d7400-3179-11ea-909b-9d2a3d1e670f.png'></p>\n\nThe **Homebridge Resideo** plugin allows you to control Resideo thermostats and also view your Leak and Room Sensors from HomeKit. \n\nTo get started link your Resideo account using the button below.",
+  "footerDisplay": "Your Resideo account has been linked. Please raise any issues on our [project page](https://github.com/donavanbecker/homebridge-resideo/issues).\n\nIf you would like to have other Resideo Devices besides Thermostat, Leak Sensors, or Room Sensors added to this plugin fill out [Feature Request Form](https://github.com/donavanbecker/homebridge-resideo/issues/new?assignees=&labels=&template=feature_request.md).",
   "schema": {
     "type": "object",
     "properties": {
       "name": {
         "type": "string",
         "title": "Name",
-        "default": "HoneywellHome"
+        "default": "Resideo"
       },
       "credentials": {
         "type": "object",
@@ -178,7 +178,7 @@
                           "type": "number",
                           "minimum": 30,
                           "placeholder": 360,
-                          "description": "Indicates the number of seconds between polls of Honeywell Home API.",
+                          "description": "Indicates the number of seconds between polls of Resideo API.",
                           "condition": {
                             "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceID && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && (model.options.devices[arrayIndices].deviceModel === 'T9' || model.options.devices[arrayIndices].deviceModel === 'T10'));"
                           }
@@ -247,7 +247,7 @@
                           "type": "number",
                           "minimum": 30,
                           "placeholder": 360,
-                          "description": "Indicates the number of seconds between polls of Honeywell Home API.",
+                          "description": "Indicates the number of seconds between polls of Resideo API.",
                           "condition": {
                             "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID && (model.options.devices[arrayIndices].deviceModel === 'T9' || model.options.devices[arrayIndices].deviceModel === 'T10') && !model.options.devices[arrayIndices].thermostat.roomsensor.hide_roomsensor);"
                           }
@@ -311,14 +311,14 @@
                 "retry": {
                   "title": "Retry",
                   "type": "boolean",
-                  "description": "Retry after receiving a Honeywell API Error."
+                  "description": "Retry after receiving a Resideo API Error."
                 },
                 "refreshRate": {
                   "title": "Device Refresh Rate",
                   "type": "number",
                   "minimum": 30,
                   "placeholder": 360,
-                  "description": "Indicates the number of seconds between polls of Honeywell Home API.",
+                  "description": "Indicates the number of seconds between polls of Resideo API.",
                   "condition": {
                     "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && (model.options.devices[arrayIndices].deviceClass === 'Thermostat' || model.options.devices[arrayIndices].deviceClass === 'LeakDetector') && model.options.devices[arrayIndices].deviceID);"
                   }
@@ -353,7 +353,7 @@
             "type": "number",
             "minimum": 30,
             "placeholder": 120,
-            "description": "Indicates the number of seconds between polls of the Honeywell Home service."
+            "description": "Indicates the number of seconds between polls of the Resideo service."
           },
           "pushRate": {
             "title": "Push Rate",
@@ -393,7 +393,7 @@
   "layout": [
     {
       "type": "fieldset",
-      "title": "Honeywell Home Account Info",
+      "title": "Resideo Account Info",
       "expandable": true,
       "expanded": false,
       "items": [
@@ -408,7 +408,7 @@
     },
     {
       "type": "fieldset",
-      "title": "Honeywell Device Settings",
+      "title": "Resideo Device Settings",
       "expandable": true,
       "expanded": false,
       "items": [
@@ -416,7 +416,7 @@
           "key": "options.devices",
           "notitle": true,
           "type": "tabarray",
-          "title": "{{ value.deviceID || 'New Honeywell Device' }}",
+          "title": "{{ value.deviceID || 'New Resideo Device' }}",
           "expandable": true,
           "expanded": false,
           "orderable": false,
@@ -472,7 +472,7 @@
       "items": [
         {
           "type": "help",
-          "helpvalue": "<h5>Refresh Rate</h5><em class='primary-text'>Refresh Rate indicates the number of seconds between polls of the Honeywell Home service.</em>"
+          "helpvalue": "<h5>Refresh Rate</h5><em class='primary-text'>Refresh Rate indicates the number of seconds between polls of the Resideo service.</em>"
         },
         {
           "key": "options.refreshRate",
@@ -480,7 +480,7 @@
         },
         {
           "type": "help",
-          "helpvalue": "<h5>Push Rate</h5><em class='primary-text'>Push Rate indicates the number of seconds between pushes to Honeywell Home API.</em>"
+          "helpvalue": "<h5>Push Rate</h5><em class='primary-text'>Push Rate indicates the number of seconds between pushes to Resideo API.</em>"
         },
         {
           "key": "options.pushRate",
