@@ -1,10 +1,10 @@
 <p class="text-center">
    <img
-      src="https://raw.githubusercontent.com/donavanbecker/homebridge-honeywell-home/latest/honeywell/Homebridge_x_Honeywell.svg"
-      alt="homebridge-honeywell-home logo" style="width: 60%;" />
+      src="https://raw.githubusercontent.com/donavanbecker/homebridge-resideo/latest/resideo/Homebridge_x_Resideo.svg"
+      alt="homebridge-resideo logo" style="width: 60%;" />
 </p>
 <div id="pageIntro" style="display: none;">
-   <p class="lead text-center">Thank you for installing <strong>homebridge-honeywell-home</strong></p>
+   <p class="lead text-center">Thank you for installing <strong>homebridge-resideo</strong></p>
    <p class="lead text-center">Before continuing:</p>
    <ol>
       <li class="mb-3">Login / create an account at <a href="https://developer.honeywellhome.com/user" target="_blank"
@@ -107,49 +107,49 @@
    </div>
 </div>
 <div id="pageSupport" class="mt-4" style="display: none;">
-   <p class="text-center lead">Thank you for using <strong>homebridge-honeywell-home</strong></p>
+   <p class="text-center lead">Thank you for using <strong>homebridge-resideo</strong></p>
    <p class="text-center">The links below will take you to our GitHub wiki</p>
    <h5>Setup</h5>
    <ul>
       <li>
-         <a href="https://github.com/donavanbecker/homebridge-honeywell-home/wiki" target="_blank">Wiki Home</a>
+         <a href="https://github.com/donavanbecker/homebridge-resideo/wiki" target="_blank">Wiki Home</a>
       </li>
       <li>
-         <a href="https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Configuration"
+         <a href="https://github.com/donavanbecker/homebridge-resideo/wiki/Configuration"
             target="_blank">Configuration</a>
       </li>
       <li>
-         <a href="https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Beta-Version" target="_blank">Beta
+         <a href="https://github.com/donavanbecker/homebridge-resideo/wiki/Beta-Version" target="_blank">Beta
             Version</a>
       </li>
       <li>
-         <a href="https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Node-Version" target="_blank">Node
+         <a href="https://github.com/donavanbecker/homebridge-resideo/wiki/Node-Version" target="_blank">Node
             Version</a>
       </li>
       <li>
-         <a href="https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Uninstallation"
+         <a href="https://github.com/donavanbecker/homebridge-resideo/wiki/Uninstallation"
             target="_blank">Uninstallation</a>
       </li>
    </ul>
    <h5>Features</h5>
    <ul>
       <li>
-         <a href="https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Supported-Devices"
+         <a href="https://github.com/donavanbecker/homebridge-resideo/wiki/Supported-Devices"
             target="_blank">Supported Devices</a>
       </li>
       <li>
-         <a href="https://github.com/donavanbecker/homebridge-honeywell-home/wiki/Fan-Modes" target="_blank">Fan
+         <a href="https://github.com/donavanbecker/homebridge-resideo/wiki/Fan-Modes" target="_blank">Fan
             Modes</a>
       </li>
    </ul>
    <h5>Help/About</h5>
    <ul>
       <li>
-         <a href="https://github.com/donavanbecker/homebridge-honeywell-home/issues/new/choose" target="_blank">Support
+         <a href="https://github.com/donavanbecker/homebridge-resideo/issues/new/choose" target="_blank">Support
             Request</a>
       </li>
       <li>
-         <a href="https://github.com/donavanbecker/homebridge-honeywell-home/blob/latest/CHANGELOG.md"
+         <a href="https://github.com/donavanbecker/homebridge-resideo/blob/latest/CHANGELOG.md"
             target="_blank">Changelog</a>
       </li>
       <li>
@@ -159,7 +159,7 @@
    <h5>Disclaimer</h5>
    <ul>
       <li>
-         I am in no way affiliated with Honeywell and this plugin is a personal project that I maintain in
+         I am in no way affiliated with Resideo and this plugin is a personal project that I maintain in
          my free time.
       </li>
       <li>
@@ -173,7 +173,7 @@
          const currentConfig = await homebridge.getPluginConfig()
          const hostname = window.location.hostname
          try {
-            await homebridge.request('Start Honeywell Login Server')
+            await homebridge.request('Start Resideo Login Server')
          } catch (err) {
             const msg = err.message
             homebridge.toast.error(msg, 'HTTP Server Not Started')
@@ -190,7 +190,7 @@
                   }
                   await homebridge.updatePluginConfig(currentConfig)
                   await homebridge.savePluginConfig()
-                  homebridge.toast.success("Successfully Linked Honeywell Home Account", "homebridge-honeywell-home")
+                  homebridge.toast.success("Successfully Linked Resideo Account", "homebridge-resideo")
                   document.getElementById('backToIntro').style.display = 'none'
                   document.getElementById('linkButton').style.display = 'none'
                   document.getElementById('unLinkButton').style.display = 'none'
@@ -429,7 +429,7 @@
                showDisabledBanner()
             }
          } else {
-            currentConfig.push({ name: 'HoneywellHome' })
+            currentConfig.push({ name: 'Resideo' })
             await homebridge.updatePluginConfig(currentConfig)
             showIntro()
          }
