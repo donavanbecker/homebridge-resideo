@@ -1,6 +1,6 @@
 <span align="center">
 
-<a href="https://github.com/homebridge/verified/blob/latest/verified-plugins.json"><img alt="homebridge-verified" src="https://raw.githubusercontent.com/donavanbecker/homebridge-resideo/latest/resideo/Homebridge_x_Resideo.svg?sanitize=true" width="500px"></a>
+<a href="https://github.com/homebridge/verified/blob/latest/verified-plugins.json"><img alt="homebridge-verified" src="https://raw.githubusercontent.com/donavanbecker/homebridge-resideo/latest/resideo/Homebridge_x_Resideo.svg?sanitize=true" width="350px"></a>
 
 # Homebridge Resideo
 
@@ -31,7 +31,7 @@ plugin allows you to access your Resideo Device(s) from HomeKit with
 
 <p align="center">
 
-<img src="https://user-images.githubusercontent.com/9875439/133935459-091af658-b51c-4d69-987c-028b67b45e84.png" width="400px">
+<img src="https://user-images.githubusercontent.com/9875439/192078620-6998511c-1c11-4e06-b7e1-475b22ef5180.png" width="300px">
 
 </p>
 
@@ -40,7 +40,7 @@ plugin allows you to access your Resideo Device(s) from HomeKit with
 
 <p align="center">
 
-<img src="https://user-images.githubusercontent.com/9875439/133935243-1a0db200-e47a-46d4-9060-114e2704876f.png" width="400px">
+<img src="https://user-images.githubusercontent.com/9875439/192078614-e568d121-e0e4-4123-bdda-4238e8a6e601.png" width="300px">
 
 </p>
 
