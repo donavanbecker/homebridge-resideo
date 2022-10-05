@@ -280,7 +280,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       pluginConfig.credentials.refreshToken = newRefreshToken;
 
       // save the config, ensuring we maintain pretty json
-      writeFileSync(this.api.user.configPath(), superStringify(currentConfig, null, 4));
+      writeFileSync(this.api.user.configPath(), JSON.stringify(currentConfig, null, 4));
       this.debugLog('Homebridge config.json has been updated with new refresh token.');
     } catch (e: any) {
       this.action = 'refresh token in config';
