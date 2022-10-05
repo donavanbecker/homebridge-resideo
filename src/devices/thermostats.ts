@@ -1,5 +1,6 @@
 import { CharacteristicValue, PlatformAccessory, Service } from 'homebridge';
 import { interval, Subject } from 'rxjs';
+import superStringify from 'super-stringify';
 import { debounceTime, skipWhile, take, tap } from 'rxjs/operators';
 import { ResideoPlatform } from '../platform';
 import * as settings from '../settings';
@@ -171,7 +172,7 @@ export class Thermostats {
       accessory.removeService(this.fanService!);
     } else if (!this.fanService && device.settings?.fan) {
       this.debugLog(`Thermostat: ${accessory.displayName} Add Fanv2 Service`);
-      this.debugLog(`Thermostat: ${accessory.displayName} Available Fan Settings ${JSON.stringify(device.settings.fan)}`);
+      this.debugLog(`Thermostat: ${accessory.displayName} Available Fan Settings ${superStringify(device.settings.fan)}`);
       (this.fanService = this.accessory.getService(this.platform.Service.Fanv2) || this.accessory.addService(this.platform.Service.Fanv2)),
       `${accessory.displayName} Fan`;
 
@@ -409,7 +410,7 @@ export class Thermostats {
     // Set the Target Fan State
     if (this.device.settings?.fan && !this.device.thermostat?.hide_fan) {
       if (this.fanMode) {
-        this.debugLog(`Thermostat: ${this.accessory.displayName} Fan: ${JSON.stringify(this.fanMode)}`);
+        this.debugLog(`Thermostat: ${this.accessory.displayName} Fan: ${superStringify(this.fanMode)}`);
         if (this.fanMode.mode === 'Auto') {
           this.TargetFanState = this.platform.Characteristic.TargetFanState.AUTO;
           this.Active = this.platform.Characteristic.Active.INACTIVE;
@@ -437,9 +438,9 @@ export class Thermostats {
         })
       ).data;
       this.device = device;
-      this.debugLog(`Thermostat: ${this.accessory.displayName} device: ${JSON.stringify(this.device)}`);
+      this.debugLog(`Thermostat: ${this.accessory.displayName} device: ${superStringify(this.device)}`);
       this.debugLog(`Thermostat: ${this.accessory.displayName} refreshStatus for ${this.device.name}
-       from Resideo API: ${JSON.stringify(this.device.changeableValues)}`);
+       from Resideo API: ${superStringify(this.device.changeableValues)}`);
       await this.refreshRoomPriority();
       if (this.device.settings?.fan && !device.thermostat?.hide_fan) {
         const fanMode: any = (
@@ -450,9 +451,9 @@ export class Thermostats {
           })
         ).data;
         this.fanMode = fanMode;
-        this.debugLog(`Thermostat: ${this.accessory.displayName} fanMode: ${JSON.stringify(this.fanMode)}`);
+        this.debugLog(`Thermostat: ${this.accessory.displayName} fanMode: ${superStringify(this.fanMode)}`);
         this.debugLog(`Thermostat: ${this.accessory.displayName} refreshStatus for ${this.device.name} Fan
-        from Resideo Fan API: ${JSON.stringify(this.fanMode)}`);
+        from Resideo Fan API: ${superStringify(this.fanMode)}`);
       }
       this.pushChangesthermostatSetpointStatus();
       this.parseStatus();
@@ -473,7 +474,7 @@ export class Thermostats {
           },
         })
       ).data;
-      this.debugLog(`Thermostat: ${this.accessory.displayName} Priority: ${JSON.stringify(this.roompriority.data)}`);
+      this.debugLog(`Thermostat: ${this.accessory.displayName} Priority: ${superStringify(this.roompriority.data)}`);
     }
   }
 
@@ -554,7 +555,7 @@ export class Thermostats {
 
       switch (this.device.deviceModel) {
         case 'Unknown':
-          this.errorLog(JSON.stringify(this.device));
+          this.errorLog(superStringify(this.device));
           payload.thermostatSetpoint = this.toFahrenheit(Number(this.TargetTemperature));
           switch (this.device.units) {
             case 'Fahrenheit':
@@ -609,7 +610,7 @@ export class Thermostats {
                   ` HeatingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`,
               );
           }
-          this.infoLog(`Room Sensor Thermostat: ${this.accessory.displayName} set request (${JSON.stringify(payload)}) to Resideo API.`);
+          this.infoLog(`Room Sensor Thermostat: ${this.accessory.displayName} set request (${superStringify(payload)}) to Resideo API.`);
       }
 
       // Attempt to make the API request
@@ -618,7 +619,7 @@ export class Thermostats {
           locationId: this.locationId,
         },
       });
-      this.debugLog(`Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(payload)}`);
+      this.debugLog(`Thermostat: ${this.accessory.displayName} pushChanges: ${superStringify(payload)}`);
     } catch (e: any) {
       this.action = 'pushChanges';
       this.resideoAPIError(e);
@@ -641,7 +642,7 @@ export class Thermostats {
    */
   async pushRoomChanges(): Promise<void> {
     this.debugLog(`Thermostat Room Priority for ${this.accessory.displayName}
-     Current Room: ${JSON.stringify(this.roompriority.currentPriority.selectedRooms)},
+     Current Room: ${superStringify(this.roompriority.currentPriority.selectedRooms)},
      Changing Room: [${this.device.inBuiltSensorState!.roomId}]`);
     if (`[${this.device.inBuiltSensorState!.roomId}]` !== `[${this.roompriority.currentPriority.selectedRooms}]`) {
       const payload = {
@@ -680,7 +681,7 @@ export class Thermostats {
             locationId: this.locationId,
           },
         });
-        this.debugLog(`Thermostat: ${this.accessory.displayName} pushRoomChanges: ${JSON.stringify(payload)}`);
+        this.debugLog(`Thermostat: ${this.accessory.displayName} pushRoomChanges: ${superStringify(payload)}`);
       }
     }
   }
@@ -857,7 +858,7 @@ export class Thermostats {
       this.errorLog(`Thermostat: ${this.accessory.displayName} failed to ${this.action},`);
     }
     if (this.deviceLogging.includes('debug')) {
-      this.errorLog(`Thermostat: ${this.accessory.displayName} failed to pushChanges, Error Message: ${JSON.stringify(e.message)}`);
+      this.errorLog(`Thermostat: ${this.accessory.displayName} failed to pushChanges, Error Message: ${superStringify(e.message)}`);
     }
   }
 
@@ -969,7 +970,7 @@ export class Thermostats {
           locationId: this.locationId,
         },
       });
-      this.debugLog(`Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(payload)}`);
+      this.debugLog(`Thermostat: ${this.accessory.displayName} pushChanges: ${superStringify(payload)}`);
     }
   }
 
@@ -1005,7 +1006,7 @@ export class Thermostats {
     if (this.device.allowedModes?.includes('Auto')) {
       TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.AUTO);
     }
-    this.debugLog(`Thermostat: ${this.accessory.displayName} Only Show These Modes: ${JSON.stringify(TargetState)}`);
+    this.debugLog(`Thermostat: ${this.accessory.displayName} Only Show These Modes: ${superStringify(TargetState)}`);
     return TargetState;
   }
 
@@ -1021,7 +1022,7 @@ export class Thermostats {
       config['refreshRate'] = device.refreshRate;
     }
     if (Object.entries(config).length !== 0) {
-      this.warnLog(`Thermostat: ${this.accessory.displayName} Config: ${JSON.stringify(config)}`);
+      this.warnLog(`Thermostat: ${this.accessory.displayName} Config: ${superStringify(config)}`);
     }
   }
 

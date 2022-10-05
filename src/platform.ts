@@ -2,6 +2,7 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { readFileSync, writeFileSync } from 'fs';
 import { API, Characteristic, DynamicPlatformPlugin, Logger, PlatformAccessory, Service } from 'homebridge';
 import { stringify } from 'querystring';
+import superStringify from 'super-stringify';
 import { LeakSensor } from './devices/leaksensors';
 import { RoomSensors } from './devices/roomsensors';
 import { RoomSensorThermostat } from './devices/roomsensorthermostats';
@@ -138,7 +139,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       platformConfig['pushRate'] = this.config.options.pushRate;
     }
     if (Object.entries(platformConfig).length !== 0) {
-      this.warnLog(`Platform Config: ${JSON.stringify(platformConfig)}`);
+      this.warnLog(`Platform Config: ${superStringify(platformConfig)}`);
     }
 
     if (this.config.options) {
@@ -279,7 +280,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       pluginConfig.credentials.refreshToken = newRefreshToken;
 
       // save the config, ensuring we maintain pretty json
-      writeFileSync(this.api.user.configPath(), JSON.stringify(currentConfig, null, 4));
+      writeFileSync(this.api.user.configPath(), superStringify(currentConfig, null, 4));
       this.debugLog('Homebridge config.json has been updated with new refresh token.');
     } catch (e: any) {
       this.action = 'refresh token in config';
@@ -355,7 +356,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
                 sensorAccessory.accessoryAttribute.type.startsWith('Thermostat')
               ) {
                 this.debugLog(`Software Revision ${group.id} ${sensorAccessory.roomId} ${sensorAccessory.accessoryId} 
-                ${sensorAccessory.accessoryAttribute.name} ${JSON.stringify(sensorAccessory.accessoryAttribute.softwareRevision)}`);
+                ${sensorAccessory.accessoryAttribute.name} ${superStringify(sensorAccessory.accessoryAttribute.softwareRevision)}`);
                 return sensorAccessory.accessoryAttribute.softwareRevision;
               } else {
                 this.debugLog(`No Thermostat ${device} ${group} ${locationId}`);
@@ -394,14 +395,14 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
 
         const deviceLists = location.devices;
         if (!this.config.options?.devices) {
-          this.debugLog(`No Resideo Device Config: ${JSON.stringify(this.config.options?.devices)}`);
+          this.debugLog(`No Resideo Device Config: ${superStringify(this.config.options?.devices)}`);
           const devices = deviceLists.map((v: any) => v);
           for (const device of devices) {
             this.deviceinfo(device);
             await this.deviceClass(device, location, locationId);
           }
         } else {
-          this.debugLog(`Resideo Device Config Set: ${JSON.stringify(this.config.options?.devices)}`);
+          this.debugLog(`Resideo Device Config Set: ${superStringify(this.config.options?.devices)}`);
           const deviceConfigs = this.config.options?.devices;
 
           const mergeBydeviceID = (a1: { deviceID: string }[], a2: any[]) =>
@@ -411,7 +412,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
             }));
 
           const devices = mergeBydeviceID(deviceLists, deviceConfigs);
-          this.debugLog(`Resideo Devices: ${JSON.stringify(devices)}`);
+          this.debugLog(`Resideo Devices: ${superStringify(devices)}`);
           for (const device of devices) {
             this.deviceinfo(device);
             await this.deviceClass(device, location, locationId);
@@ -836,7 +837,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
   public locationinfo(location: settings.location) {
     if (this.platformLogging?.includes('debug')) {
       if (location) {
-        this.warnLog(JSON.stringify(location));
+        this.warnLog(superStringify(location));
       }
     }
   }
@@ -852,55 +853,55 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     groups: settings.device['groups'] & settings.devicesConfig;
   }) {
     if (this.platformLogging?.includes('debug')) {
-      this.warnLog(JSON.stringify(device));
+      this.warnLog(superStringify(device));
       if (device.deviceID) {
-        this.warnLog(JSON.stringify(device.deviceID));
+        this.warnLog(superStringify(device.deviceID));
         this.errorLog(`Device ID: ${device.deviceID}`);
       }
       if (device.deviceType) {
-        this.warnLog(JSON.stringify(device.deviceType));
+        this.warnLog(superStringify(device.deviceType));
         this.errorLog(`Device Type: ${device.deviceType}`);
       }
       if (device.deviceClass) {
-        this.warnLog(JSON.stringify(device.deviceClass));
+        this.warnLog(superStringify(device.deviceClass));
         this.errorLog(`Device Class: ${device.deviceClass}`);
       }
       if (device.deviceModel) {
-        this.warnLog(JSON.stringify(device.deviceModel));
+        this.warnLog(superStringify(device.deviceModel));
         this.errorLog(`Device Model: ${device.deviceModel}`);
       }
       if (device.priorityType) {
-        this.warnLog(JSON.stringify(device.priorityType));
+        this.warnLog(superStringify(device.priorityType));
         this.errorLog(`Device Priority Type: ${device.priorityType}`);
       }
       if (device.settings) {
-        this.warnLog(JSON.stringify(device.settings));
+        this.warnLog(superStringify(device.settings));
         if (device.settings.fan) {
-          this.warnLog(JSON.stringify(device.settings.fan));
-          this.errorLog(`Device Fan Settings: ${JSON.stringify(device.settings.fan)}`);
+          this.warnLog(superStringify(device.settings.fan));
+          this.errorLog(`Device Fan Settings: ${superStringify(device.settings.fan)}`);
           if (device.settings.fan.allowedModes) {
-            this.warnLog(JSON.stringify(device.settings.fan.allowedModes));
+            this.warnLog(superStringify(device.settings.fan.allowedModes));
             this.errorLog(`Device Fan Allowed Modes: ${device.settings.fan.allowedModes}`);
           }
           if (device.settings.fan.changeableValues) {
-            this.warnLog(JSON.stringify(device.settings.fan.changeableValues));
-            this.errorLog(`Device Fan Changeable Values: ${JSON.stringify(device.settings.fan.changeableValues)}`);
+            this.warnLog(superStringify(device.settings.fan.changeableValues));
+            this.errorLog(`Device Fan Changeable Values: ${superStringify(device.settings.fan.changeableValues)}`);
           }
         }
       }
       if (device.inBuiltSensorState) {
-        this.warnLog(JSON.stringify(device.inBuiltSensorState));
+        this.warnLog(superStringify(device.inBuiltSensorState));
         if (device.inBuiltSensorState.roomId) {
-          this.warnLog(JSON.stringify(device.inBuiltSensorState.roomId));
+          this.warnLog(superStringify(device.inBuiltSensorState.roomId));
           this.errorLog(`Device Built In Sensor Room ID: ${device.inBuiltSensorState.roomId}`);
         }
         if (device.inBuiltSensorState.roomName) {
-          this.warnLog(JSON.stringify(device.inBuiltSensorState.roomName));
+          this.warnLog(superStringify(device.inBuiltSensorState.roomName));
           this.errorLog(`Device Built In Sensor Room Name: ${device.inBuiltSensorState.roomName}`);
         }
       }
       if (device.groups) {
-        this.warnLog(JSON.stringify(device.groups));
+        this.warnLog(superStringify(device.groups));
 
         for (const group of device.groups) {
           this.errorLog(`Group: ${group.id}`);
@@ -944,7 +945,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       this.errorLog(`Failed to ${this.action}`);
     }
     if (this.platformLogging?.includes('debug')) {
-      this.errorLog(`Failed to ${this.action}, Error Message: ${JSON.stringify(e.message)}`);
+      this.errorLog(`Failed to ${this.action}, Error Message: ${superStringify(e.message)}`);
     }
   }
 
