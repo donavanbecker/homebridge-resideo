@@ -28,8 +28,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
   locations?: any;
   firmware!: settings.accessoryAttribute['softwareRevision'];
   sensorAccessory!: settings.sensorAccessory;
-  version = require('../package.json').version; // eslint-disable-line @typescript-eslint/no-var-requires
-
+  version = process.env.npm_package_version!;
   public sensorData = [];
   private refreshInterval!: NodeJS.Timeout;
   debugMode!: boolean;
