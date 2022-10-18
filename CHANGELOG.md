@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ## What's Changes
 - Added Config to allow manually setting firmware version.
+- Housekeeping and updated dependencies.
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-resideo/compare/v1.0.0...v1.1.0
 
