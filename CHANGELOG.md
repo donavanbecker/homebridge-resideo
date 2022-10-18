@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
-## [Beta - Version 1.1.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.1.0) (2022-09-XX)
+## [Version 1.1.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.1.0) (2022-10-18)
 
 ## What's Changes
 - Added Config to allow manually setting firmware version.

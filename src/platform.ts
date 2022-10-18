@@ -952,25 +952,41 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
    * If device level logging is turned on, log to log.warn
    * Otherwise send debug logs to log.debug
    */
-  infoLog(...log: any[]) {
+  infoLog(...log: any[]): void {
     if (this.enablingPlatfromLogging()) {
       this.log.info(String(...log));
     }
   }
 
-  warnLog(...log: any[]) {
+  warnLog(...log: any[]): void {
     if (this.enablingPlatfromLogging()) {
       this.log.warn(String(...log));
     }
   }
 
-  errorLog(...log: any[]) {
+  debugWarnLog(...log: any[]): void {
+    if (this.enablingPlatfromLogging()) {
+      if (this.platformLogging?.includes('debug')) {
+        this.log.warn('[DEBUG]', String(...log));
+      }
+    }
+  }
+
+  errorLog(...log: any[]): void {
     if (this.enablingPlatfromLogging()) {
       this.log.error(String(...log));
     }
   }
 
-  debugLog(...log: any[]) {
+  debugErrorLog(...log: any[]): void {
+    if (this.enablingPlatfromLogging()) {
+      if (this.platformLogging?.includes('debug')) {
+        this.log.error('[DEBUG]', String(...log));
+      }
+    }
+  }
+
+  debugLog(...log: any[]): void {
     if (this.enablingPlatfromLogging()) {
       if (this.platformLogging === 'debugMode') {
         this.log.debug(String(...log));
