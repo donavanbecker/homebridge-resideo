@@ -1,5 +1,6 @@
 import { CharacteristicValue, PlatformAccessory, Service } from 'homebridge';
 import { interval, Subject } from 'rxjs';
+import superStringify from 'super-stringify';
 import { debounceTime, skipWhile, take, tap } from 'rxjs/operators';
 import { ResideoPlatform } from '../platform';
 import * as settings from '../settings';
@@ -303,10 +304,10 @@ export class RoomSensorThermostat {
         })
       ).data;
       this.device = device;
-      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} device: ${JSON.stringify(device)}`);
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} device: ${superStringify(device)}`);
       this.debugLog(
         `Room Sensor Thermostat: ${this.accessory.displayName}` +
-          ` Fetched update for: ${this.device.name} from Resideo API: ${JSON.stringify(this.device.changeableValues)}`,
+          ` Fetched update for: ${this.device.name} from Resideo API: ${superStringify(this.device.changeableValues)}`,
       );
 
       this.parseStatus();
@@ -332,10 +333,10 @@ export class RoomSensorThermostat {
                 const roomsensors = await this.platform.getCurrentSensorData(this.device, group, this.locationId);
                 if (roomsensors.rooms) {
                   const rooms = roomsensors.rooms;
-                  this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} roomsensors: ${JSON.stringify(roomsensors)}`);
+                  this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} roomsensors: ${superStringify(roomsensors)}`);
                   for (const accessories of rooms) {
                     if (accessories) {
-                      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} accessories: ${JSON.stringify(accessories)}`);
+                      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} accessories: ${superStringify(accessories)}`);
                       for (const accessory of accessories.accessories) {
                         if (accessory.accessoryAttribute) {
                           if (accessory.accessoryAttribute.type) {
@@ -343,7 +344,7 @@ export class RoomSensorThermostat {
                               this.sensorAccessory = accessory;
                               this.debugLog(
                                 `Room Sensor Thermostat: ${this.accessory.displayName}` +
-                                  ` accessoryAttribute: ${JSON.stringify(this.sensorAccessory.accessoryAttribute)}`,
+                                  ` accessoryAttribute: ${superStringify(this.sensorAccessory.accessoryAttribute)}`,
                               );
                               this.debugLog(
                                 `Room Sensor Thermostat: ${this.accessory.displayName}` +
@@ -380,7 +381,7 @@ export class RoomSensorThermostat {
           },
         })
       ).data;
-      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} roompriority: ${JSON.stringify(this.roompriority)}`);
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} roompriority: ${superStringify(this.roompriority)}`);
     }
   }
 
@@ -389,7 +390,7 @@ export class RoomSensorThermostat {
    */
   async pushRoomChanges(): Promise<void> {
     this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Room Priority,
-     Current Room: ${JSON.stringify(this.roompriority.currentPriority.selectedRooms)}, Changing Room: [${this.sensorAccessory.accessoryId}]`);
+     Current Room: ${superStringify(this.roompriority.currentPriority.selectedRooms)}, Changing Room: [${this.sensorAccessory.accessoryId}]`);
     if (`[${this.sensorAccessory.accessoryId}]` !== `[${this.roompriority.currentPriority.selectedRooms}]`) {
       const payload = {
         currentPriority: {
@@ -431,7 +432,7 @@ export class RoomSensorThermostat {
             locationId: this.locationId,
           },
         });
-        this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} pushRoomChanges: ${JSON.stringify(payload)}`);
+        this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} pushRoomChanges: ${superStringify(payload)}`);
       }
       // Refresh the status from the API
       await this.refreshSensorStatus();
@@ -491,7 +492,7 @@ export class RoomSensorThermostat {
               ` HeatingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`,
           );
       }
-      this.platform.log.info(`Room Sensor Thermostat: ${this.accessory.displayName} set request (${JSON.stringify(payload)}) to Resideo API.`);
+      this.platform.log.info(`Room Sensor Thermostat: ${this.accessory.displayName} set request (${superStringify(payload)}) to Resideo API.`);
 
       // Make the API request
       await this.platform.axios.post(`${settings.DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
@@ -499,7 +500,7 @@ export class RoomSensorThermostat {
           locationId: this.locationId,
         },
       });
-      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(payload)}`);
+      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} pushChanges: ${superStringify(payload)}`);
     } catch (e: any) {
       this.action = 'pushChanges';
       this.resideoAPIError(e);
@@ -660,7 +661,7 @@ export class RoomSensorThermostat {
     }
     if (this.deviceLogging.includes('debug')) {
       this.platform.log.error(
-        `Room Sensor Thermostat: ${this.accessory.displayName} failed to pushChanges, ` + `Error Message: ${JSON.stringify(e.message)}`,
+        `Room Sensor Thermostat: ${this.accessory.displayName} failed to pushChanges, ` + `Error Message: ${superStringify(e.message)}`,
       );
     }
   }
@@ -751,7 +752,7 @@ export class RoomSensorThermostat {
     if (this.device.allowedModes!.includes('Auto')) {
       TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.AUTO);
     }
-    this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Only Show These Modes: ${JSON.stringify(TargetState)}`);
+    this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Only Show These Modes: ${superStringify(TargetState)}`);
     return TargetState;
   }
 
@@ -767,7 +768,7 @@ export class RoomSensorThermostat {
       config['refreshRate'] = device.thermostat?.roompriority?.refreshRate;
     }
     if (Object.entries(config).length !== 0) {
-      this.warnLog(`Room Sensor Thermostat: ${this.accessory.displayName} Config: ${JSON.stringify(config)}`);
+      this.warnLog(`Room Sensor Thermostat: ${this.accessory.displayName} Config: ${superStringify(config)}`);
     }
   }
 
@@ -815,9 +816,25 @@ export class RoomSensorThermostat {
     }
   }
 
+  debugWarnLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      if (this.deviceLogging?.includes('debug')) {
+        this.platform.log.warn('[DEBUG]', String(...log));
+      }
+    }
+  }
+
   errorLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
       this.platform.log.error(String(...log));
+    }
+  }
+
+  debugErrorLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      if (this.deviceLogging?.includes('debug')) {
+        this.platform.log.error('[DEBUG]', String(...log));
+      }
     }
   }
 
@@ -832,6 +849,6 @@ export class RoomSensorThermostat {
   }
 
   enablingDeviceLogging(): boolean {
-    return this.deviceLogging === 'standard' || this.deviceLogging.includes('debug');
+    return this.deviceLogging.includes('debug') || this.deviceLogging === 'standard';
   }
 }

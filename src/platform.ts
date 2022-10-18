@@ -2,6 +2,7 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { readFileSync, writeFileSync } from 'fs';
 import { API, Characteristic, DynamicPlatformPlugin, Logger, PlatformAccessory, Service } from 'homebridge';
 import { stringify } from 'querystring';
+import superStringify from 'super-stringify';
 import { LeakSensor } from './devices/leaksensors';
 import { RoomSensors } from './devices/roomsensors';
 import { RoomSensorThermostat } from './devices/roomsensorthermostats';
@@ -27,8 +28,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
   locations?: any;
   firmware!: settings.accessoryAttribute['softwareRevision'];
   sensorAccessory!: settings.sensorAccessory;
-  version = require('../package.json').version; // eslint-disable-line @typescript-eslint/no-var-requires
-
+  version = process.env.npm_package_version!;
   public sensorData = [];
   private refreshInterval!: NodeJS.Timeout;
   debugMode!: boolean;
@@ -138,7 +138,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       platformConfig['pushRate'] = this.config.options.pushRate;
     }
     if (Object.entries(platformConfig).length !== 0) {
-      this.warnLog(`Platform Config: ${JSON.stringify(platformConfig)}`);
+      this.warnLog(`Platform Config: ${superStringify(platformConfig)}`);
     }
 
     if (this.config.options) {
@@ -355,7 +355,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
                 sensorAccessory.accessoryAttribute.type.startsWith('Thermostat')
               ) {
                 this.debugLog(`Software Revision ${group.id} ${sensorAccessory.roomId} ${sensorAccessory.accessoryId} 
-                ${sensorAccessory.accessoryAttribute.name} ${JSON.stringify(sensorAccessory.accessoryAttribute.softwareRevision)}`);
+                ${sensorAccessory.accessoryAttribute.name} ${superStringify(sensorAccessory.accessoryAttribute.softwareRevision)}`);
                 return sensorAccessory.accessoryAttribute.softwareRevision;
               } else {
                 this.debugLog(`No Thermostat ${device} ${group} ${locationId}`);
@@ -394,14 +394,14 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
 
         const deviceLists = location.devices;
         if (!this.config.options?.devices) {
-          this.debugLog(`No Resideo Device Config: ${JSON.stringify(this.config.options?.devices)}`);
+          this.debugLog(`No Resideo Device Config: ${superStringify(this.config.options?.devices)}`);
           const devices = deviceLists.map((v: any) => v);
           for (const device of devices) {
             this.deviceinfo(device);
             await this.deviceClass(device, location, locationId);
           }
         } else {
-          this.debugLog(`Resideo Device Config Set: ${JSON.stringify(this.config.options?.devices)}`);
+          this.debugLog(`Resideo Device Config Set: ${superStringify(this.config.options?.devices)}`);
           const deviceConfigs = this.config.options?.devices;
 
           const mergeBydeviceID = (a1: { deviceID: string }[], a2: any[]) =>
@@ -411,7 +411,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
             }));
 
           const devices = mergeBydeviceID(deviceLists, deviceConfigs);
-          this.debugLog(`Resideo Devices: ${JSON.stringify(devices)}`);
+          this.debugLog(`Resideo Devices: ${superStringify(devices)}`);
           for (const device of devices) {
             this.deviceinfo(device);
             await this.deviceClass(device, location, locationId);
@@ -570,7 +570,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
         existingAccessory.displayName = device.userDefinedDeviceName;
         existingAccessory.context.deviceID = device.deviceID;
         existingAccessory.context.model = device.deviceClass;
-        existingAccessory.context.firmwareRevision = this.version;
+        this.leaksensorFirmwareExistingAccessory(device, existingAccessory);
         this.api.updatePlatformAccessories([existingAccessory]);
 
         // create the accessory handler for the restored accessory
@@ -592,7 +592,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       accessory.context.device = device;
       accessory.context.deviceID = device.deviceID;
       accessory.context.model = device.deviceClass;
-      accessory.context.firmwareRevision = this.version;
+      this.leaksensorFirmwareNewAccessory(device, accessory);
 
       // accessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
       // create the accessory handler for the newly create accessory
@@ -630,7 +630,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
         existingAccessory.displayName = sensorAccessory.accessoryAttribute.name;
         existingAccessory.context.deviceID = sensorAccessory.deviceID;
         existingAccessory.context.model = sensorAccessory.accessoryAttribute.model;
-        existingAccessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision || this.version;
+        this.roomsensorFirmwareExistingAccessory(existingAccessory, sensorAccessory);
         this.api.updatePlatformAccessories([existingAccessory]);
 
         // create the accessory handler for the restored accessory
@@ -657,7 +657,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       // the `context` property can be used to store any data about the accessory you may need
       accessory.context.deviceID = sensorAccessory.deviceID;
       accessory.context.model = sensorAccessory.accessoryAttribute.model;
-      accessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision || this.version;
+      this.roomsensorFirmwareNewAccessory(accessory, sensorAccessory);
 
       // create the accessory handler for the newly create accessory
       // this is imported from `roomSensor.ts`
@@ -701,7 +701,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
         existingAccessory.displayName = sensorAccessory.accessoryAttribute.name;
         existingAccessory.context.deviceID = sensorAccessory.deviceID;
         existingAccessory.context.model = sensorAccessory.accessoryAttribute.model;
-        existingAccessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision || this.version;
+        this.roomsensorFirmwareExistingAccessory(existingAccessory, sensorAccessory);
         this.api.updatePlatformAccessories([existingAccessory]);
 
         // create the accessory handler for the restored accessory
@@ -728,7 +728,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       // the `context` property can be used to store any data about the accessory you may need
       accessory.context.deviceID = sensorAccessory.deviceID;
       accessory.context.model = sensorAccessory.accessoryAttribute.model;
-      accessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision || this.version;
+      this.roomsensorFirmwareNewAccessory(accessory, sensorAccessory);
 
       // create the accessory handler for the newly create accessory
       // this is imported from `platformAccessory.ts`
@@ -753,18 +753,54 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  public async thermostatFirmwareNewAccessory(device: settings.device & settings.devicesConfig, accessory: PlatformAccessory, location: any) {
-    if (device.deviceModel.startsWith('T9')) {
-      try {
-        accessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
-      } catch (e: any) {
-        this.action = 'Get T9 Firmware Version';
-        this.apiError(e);
-      }
-    } else if (device.deviceModel.startsWith('Round') || device.deviceModel.startsWith('Unknown') || device.deviceModel.startsWith('D6')) {
-      accessory.context.firmwareRevision = device.thermostatVersion;
+  private leaksensorFirmwareNewAccessory(device: settings.device & settings.devicesConfig, accessory: PlatformAccessory) {
+    if (device.firmware) {
+      accessory.context.firmwareRevision = device.firmware;
     } else {
       accessory.context.firmwareRevision = this.version;
+    }
+  }
+
+  private leaksensorFirmwareExistingAccessory(device: settings.device & settings.devicesConfig, existingAccessory: PlatformAccessory) {
+    if (device.firmware) {
+      existingAccessory.context.firmwareRevision = device.firmware;
+    } else {
+      existingAccessory.context.firmwareRevision = this.version;
+    }
+  }
+
+  private roomsensorFirmwareNewAccessory(accessory, sensorAccessory: settings.sensorAccessory) {
+    if (accessory.firmware) {
+      accessory.context.firmwareRevision = accessory.firmware;
+    } else {
+      accessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision || this.version;
+    }
+  }
+
+  private roomsensorFirmwareExistingAccessory(existingAccessory, sensorAccessory: settings.sensorAccessory) {
+    if (existingAccessory.firmware) {
+      existingAccessory.context.firmwareRevision = existingAccessory.firmware;
+    } else {
+      existingAccessory.context.firmwareRevision = sensorAccessory.accessoryAttribute.softwareRevision || this.version;
+    }
+  }
+
+  public async thermostatFirmwareNewAccessory(device: settings.device & settings.devicesConfig, accessory: PlatformAccessory, location: any) {
+    if (device.firmware) {
+      accessory.context.firmwareRevision = device.firmware;
+    } else {
+      if (device.deviceModel.startsWith('T9')) {
+        try {
+          accessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
+        } catch (e: any) {
+          this.action = 'Get T9 Firmware Version';
+          this.apiError(e);
+        }
+      } else if (device.deviceModel.startsWith('Round') || device.deviceModel.startsWith('Unknown') || device.deviceModel.startsWith('D6')) {
+        accessory.context.firmwareRevision = device.thermostatVersion;
+      } else {
+        accessory.context.firmwareRevision = this.version;
+      }
     }
   }
 
@@ -773,17 +809,21 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     existingAccessory: PlatformAccessory,
     location: any,
   ) {
-    if (device.deviceModel.startsWith('T9')) {
-      try {
-        existingAccessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
-      } catch (e: any) {
-        this.action = 'Get T9 Firmware Version';
-        this.apiError(e);
-      }
-    } else if (device.deviceModel.startsWith('Round') || device.deviceModel.startsWith('Unknown') || device.deviceModel.startsWith('D6')) {
-      existingAccessory.context.firmwareRevision = device.thermostatVersion;
+    if (device.firmware) {
+      existingAccessory.context.firmwareRevision = device.firmware;
     } else {
-      existingAccessory.context.firmwareRevision = this.version;
+      if (device.deviceModel.startsWith('T9')) {
+        try {
+          existingAccessory.context.firmwareRevision = await this.getSoftwareRevision(location.locationID, device);
+        } catch (e: any) {
+          this.action = 'Get T9 Firmware Version';
+          this.apiError(e);
+        }
+      } else if (device.deviceModel.startsWith('Round') || device.deviceModel.startsWith('Unknown') || device.deviceModel.startsWith('D6')) {
+        existingAccessory.context.firmwareRevision = device.thermostatVersion;
+      } else {
+        existingAccessory.context.firmwareRevision = this.version;
+      }
     }
   }
 
@@ -796,7 +836,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
   public locationinfo(location: settings.location) {
     if (this.platformLogging?.includes('debug')) {
       if (location) {
-        this.warnLog(JSON.stringify(location));
+        this.warnLog(superStringify(location));
       }
     }
   }
@@ -812,55 +852,55 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     groups: settings.device['groups'] & settings.devicesConfig;
   }) {
     if (this.platformLogging?.includes('debug')) {
-      this.warnLog(JSON.stringify(device));
+      this.warnLog(superStringify(device));
       if (device.deviceID) {
-        this.warnLog(JSON.stringify(device.deviceID));
+        this.warnLog(superStringify(device.deviceID));
         this.errorLog(`Device ID: ${device.deviceID}`);
       }
       if (device.deviceType) {
-        this.warnLog(JSON.stringify(device.deviceType));
+        this.warnLog(superStringify(device.deviceType));
         this.errorLog(`Device Type: ${device.deviceType}`);
       }
       if (device.deviceClass) {
-        this.warnLog(JSON.stringify(device.deviceClass));
+        this.warnLog(superStringify(device.deviceClass));
         this.errorLog(`Device Class: ${device.deviceClass}`);
       }
       if (device.deviceModel) {
-        this.warnLog(JSON.stringify(device.deviceModel));
+        this.warnLog(superStringify(device.deviceModel));
         this.errorLog(`Device Model: ${device.deviceModel}`);
       }
       if (device.priorityType) {
-        this.warnLog(JSON.stringify(device.priorityType));
+        this.warnLog(superStringify(device.priorityType));
         this.errorLog(`Device Priority Type: ${device.priorityType}`);
       }
       if (device.settings) {
-        this.warnLog(JSON.stringify(device.settings));
+        this.warnLog(superStringify(device.settings));
         if (device.settings.fan) {
-          this.warnLog(JSON.stringify(device.settings.fan));
-          this.errorLog(`Device Fan Settings: ${JSON.stringify(device.settings.fan)}`);
+          this.warnLog(superStringify(device.settings.fan));
+          this.errorLog(`Device Fan Settings: ${superStringify(device.settings.fan)}`);
           if (device.settings.fan.allowedModes) {
-            this.warnLog(JSON.stringify(device.settings.fan.allowedModes));
+            this.warnLog(superStringify(device.settings.fan.allowedModes));
             this.errorLog(`Device Fan Allowed Modes: ${device.settings.fan.allowedModes}`);
           }
           if (device.settings.fan.changeableValues) {
-            this.warnLog(JSON.stringify(device.settings.fan.changeableValues));
-            this.errorLog(`Device Fan Changeable Values: ${JSON.stringify(device.settings.fan.changeableValues)}`);
+            this.warnLog(superStringify(device.settings.fan.changeableValues));
+            this.errorLog(`Device Fan Changeable Values: ${superStringify(device.settings.fan.changeableValues)}`);
           }
         }
       }
       if (device.inBuiltSensorState) {
-        this.warnLog(JSON.stringify(device.inBuiltSensorState));
+        this.warnLog(superStringify(device.inBuiltSensorState));
         if (device.inBuiltSensorState.roomId) {
-          this.warnLog(JSON.stringify(device.inBuiltSensorState.roomId));
+          this.warnLog(superStringify(device.inBuiltSensorState.roomId));
           this.errorLog(`Device Built In Sensor Room ID: ${device.inBuiltSensorState.roomId}`);
         }
         if (device.inBuiltSensorState.roomName) {
-          this.warnLog(JSON.stringify(device.inBuiltSensorState.roomName));
+          this.warnLog(superStringify(device.inBuiltSensorState.roomName));
           this.errorLog(`Device Built In Sensor Room Name: ${device.inBuiltSensorState.roomName}`);
         }
       }
       if (device.groups) {
-        this.warnLog(JSON.stringify(device.groups));
+        this.warnLog(superStringify(device.groups));
 
         for (const group of device.groups) {
           this.errorLog(`Group: ${group.id}`);
@@ -904,7 +944,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       this.errorLog(`Failed to ${this.action}`);
     }
     if (this.platformLogging?.includes('debug')) {
-      this.errorLog(`Failed to ${this.action}, Error Message: ${JSON.stringify(e.message)}`);
+      this.errorLog(`Failed to ${this.action}, Error Message: ${superStringify(e.message)}`);
     }
   }
 
@@ -912,25 +952,41 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
    * If device level logging is turned on, log to log.warn
    * Otherwise send debug logs to log.debug
    */
-  infoLog(...log: any[]) {
+  infoLog(...log: any[]): void {
     if (this.enablingPlatfromLogging()) {
       this.log.info(String(...log));
     }
   }
 
-  warnLog(...log: any[]) {
+  warnLog(...log: any[]): void {
     if (this.enablingPlatfromLogging()) {
       this.log.warn(String(...log));
     }
   }
 
-  errorLog(...log: any[]) {
+  debugWarnLog(...log: any[]): void {
+    if (this.enablingPlatfromLogging()) {
+      if (this.platformLogging?.includes('debug')) {
+        this.log.warn('[DEBUG]', String(...log));
+      }
+    }
+  }
+
+  errorLog(...log: any[]): void {
     if (this.enablingPlatfromLogging()) {
       this.log.error(String(...log));
     }
   }
 
-  debugLog(...log: any[]) {
+  debugErrorLog(...log: any[]): void {
+    if (this.enablingPlatfromLogging()) {
+      if (this.platformLogging?.includes('debug')) {
+        this.log.error('[DEBUG]', String(...log));
+      }
+    }
+  }
+
+  debugLog(...log: any[]): void {
     if (this.enablingPlatfromLogging()) {
       if (this.platformLogging === 'debugMode') {
         this.log.debug(String(...log));

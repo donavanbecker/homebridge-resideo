@@ -11,6 +11,7 @@ const exec = util.promisify(require('child_process').exec);
 const fs = require('fs');
 const http = require('http');
 const url = require('url');
+const superStringify = require('super-stringify');
 
 class PluginUiServer extends HomebridgePluginUiServer {
   constructor() {
@@ -64,7 +65,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
                     res.end('oops.');
                   }
                 } catch (err) {
-                  res.end('<strong>An error occurred:</strong><br>' + JSON.stringify(err) + '<br><br>Close this window and start again');
+                  res.end('<strong>An error occurred:</strong><br>' + superStringify(err) + '<br><br>Close this window and start again');
                 }
               } else {
                 res.end('<strong>An error occurred:</strong><br>no code received<br><br>Close this window and start again');

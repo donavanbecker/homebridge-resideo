@@ -313,6 +313,14 @@
                   "type": "boolean",
                   "description": "Retry after receiving a Resideo API Error."
                 },
+                "firmware": {
+                  "title": "Firmware Override",
+                  "type": "string",
+                  "placeholder": "1.2.8",
+                  "condition": {
+                    "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceID);"
+                  }
+                },
                 "refreshRate": {
                   "title": "Device Refresh Rate",
                   "type": "number",
@@ -458,6 +466,7 @@
               ]
             },
             "options.devices[].retry",
+            "options.devices[].firmware",
             "options.devices[].refreshRate",
             "options.devices[].logging"
           ]

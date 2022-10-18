@@ -1,5 +1,6 @@
 import { CharacteristicValue, PlatformAccessory, Service } from 'homebridge';
 import { interval, Subject } from 'rxjs';
+import superStringify from 'super-stringify';
 import { skipWhile, take } from 'rxjs/operators';
 import { ResideoPlatform } from '../platform';
 import * as settings from '../settings';
@@ -304,7 +305,7 @@ export class RoomSensors {
       this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action},`);
     }
     if (this.deviceLogging.includes('debug')) {
-      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to pushChanges, Error Message: ${JSON.stringify(e.message)}`);
+      this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to pushChanges, Error Message: ${superStringify(e.message)}`);
     }
   }
 
@@ -332,7 +333,7 @@ export class RoomSensors {
       config['refreshRate'] = device.thermostat?.roomsensor?.refreshRate;
     }
     if (Object.entries(config).length !== 0) {
-      this.warnLog(`Room Sensor: ${this.accessory.displayName} Config: ${JSON.stringify(config)}`);
+      this.warnLog(`Room Sensor: ${this.accessory.displayName} Config: ${superStringify(config)}`);
     }
   }
 
@@ -380,9 +381,25 @@ export class RoomSensors {
     }
   }
 
+  debugWarnLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      if (this.deviceLogging?.includes('debug')) {
+        this.platform.log.warn('[DEBUG]', String(...log));
+      }
+    }
+  }
+
   errorLog(...log: any[]): void {
     if (this.enablingDeviceLogging()) {
       this.platform.log.error(String(...log));
+    }
+  }
+
+  debugErrorLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      if (this.deviceLogging?.includes('debug')) {
+        this.platform.log.error('[DEBUG]', String(...log));
+      }
     }
   }
 
