@@ -59,6 +59,14 @@
                   "type": "string",
                   "placeholder": "81F3UT59513F"
                 },
+                "configDeviceName": {
+                  "title": "Device Name",
+                  "type": "string",
+                  "placeholder": "Hallway Thermostat",
+                  "condition": {
+                    "functionBody": "return (model.options && model.options.devices && model.options.devices[arrayIndices].deviceID);"
+                  }
+                },
                 "hide_device": {
                   "title": "Hide Device",
                   "type": "boolean",
@@ -311,7 +319,17 @@
                 "retry": {
                   "title": "Retry",
                   "type": "boolean",
-                  "description": "Retry after receiving a Resideo API Error."
+                  "description": "Retry after receiving a Resideo API Error.",
+                  "condition": {
+                    "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceID);"
+                  }
+                },
+                "external": {
+                  "title": "External Accessory",
+                  "type": "boolean",
+                  "condition": {
+                    "functionBody": "return (model.options && model.options.devices && model.options.devices[arrayIndices].deviceID && !model.options.devices[arrayIndices].hide_device);"
+                  }
                 },
                 "firmware": {
                   "title": "Firmware Override",
@@ -424,11 +442,12 @@
           "key": "options.devices",
           "notitle": true,
           "type": "tabarray",
-          "title": "{{ value.deviceID || 'New Resideo Device' }}",
+          "title": "{{ value.configDeviceName || value.deviceID || 'New Resideo Device' }}",
           "expandable": true,
           "expanded": false,
           "orderable": false,
           "items": [
+            "options.devices[].configDeviceName",
             "options.devices[].deviceID",
             "options.devices[].hide_device",
             "options.devices[].deviceClass",
@@ -467,6 +486,7 @@
             },
             "options.devices[].retry",
             "options.devices[].firmware",
+            "options.devices[].external",
             "options.devices[].refreshRate",
             "options.devices[].logging"
           ]
