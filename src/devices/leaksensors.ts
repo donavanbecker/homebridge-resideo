@@ -335,7 +335,7 @@ export class LeakSensor {
       config['refreshRate'] = device.refreshRate;
     }
     if (Object.entries(config).length !== 0) {
-      this.warnLog(`Leak Sensor: ${this.accessory.displayName} Config: ${superStringify(config)}`);
+      this.infoLog(`Leak Sensor: ${this.accessory.displayName} Config: ${superStringify(config)}`);
     }
   }
 

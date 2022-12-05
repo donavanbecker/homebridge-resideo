@@ -1022,7 +1022,7 @@ export class Thermostats {
       config['refreshRate'] = device.refreshRate;
     }
     if (Object.entries(config).length !== 0) {
-      this.warnLog(`Thermostat: ${this.accessory.displayName} Config: ${superStringify(config)}`);
+      this.infoLog(`Thermostat: ${this.accessory.displayName} Config: ${superStringify(config)}`);
     }
   }
 
