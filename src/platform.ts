@@ -527,8 +527,9 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       }
     } else if (!device.hide_device && !this.config.disablePlugin) {
       // the accessory does not yet exist, so we need to create it
-      this.infoLog(`Adding new accessory: ${device.userDefinedDeviceName} ${device.deviceClass} Device ID: ${device.deviceID}`);
-
+      if (!device.external) {
+        this.infoLog(`Adding new accessory: ${device.userDefinedDeviceName} ${device.deviceClass} Device ID: ${device.deviceID}`);
+      }
       // create a new accessory
       const accessory = new this.api.platformAccessory(device.userDefinedDeviceName, uuid);
 
@@ -543,8 +544,8 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       new Thermostats(this, accessory, locationId, device);
       this.debugLog(`${device.deviceClass} uuid: ${device.deviceID}-${device.deviceClass} (${accessory.UUID})`);
 
-      // link the accessory to your platform
-      this.api.registerPlatformAccessories(settings.PLUGIN_NAME, settings.PLATFORM_NAME, [accessory]);
+      // publish device externally or link the accessory to your platform
+      this.externalOrPlatform(device, accessory);
       this.accessories.push(accessory);
     } else {
       if (this.platformLogging?.includes('debug')) {
@@ -582,7 +583,9 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       }
     } else if (!device.hide_device && !this.config.disablePlugin) {
       // the accessory does not yet exist, so we need to create it
-      this.infoLog(`Adding new accessory: ${device.userDefinedDeviceName} ${device.deviceClass} Device ID: ${device.deviceID}`);
+      if (!device.external) {
+        this.infoLog(`Adding new accessory: ${device.userDefinedDeviceName} ${device.deviceClass} Device ID: ${device.deviceID}`);
+      }
 
       // create a new accessory
       const accessory = new this.api.platformAccessory(device.userDefinedDeviceName, uuid);
@@ -600,8 +603,8 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       new LeakSensor(this, accessory, locationId, device);
       this.debugLog(`${device.deviceClass} uuid: ${device.deviceID}-${device.deviceClass} (${accessory.UUID})`);
 
-      // link the accessory to your platform
-      this.api.registerPlatformAccessories(settings.PLUGIN_NAME, settings.PLATFORM_NAME, [accessory]);
+      // publish device externally or link the accessory to your platform
+      this.externalOrPlatform(device, accessory);
       this.accessories.push(accessory);
     } else {
       if (this.platformLogging?.includes('debug')) {
@@ -645,10 +648,10 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       }
     } else if (!device.hide_device && !device.thermostat?.roomsensor?.hide_roomsensor && !this.config.disablePlugin) {
       // the accessory does not yet exist, so we need to create it
-      this.infoLog(
-        `Adding new accessory: ${sensorAccessory.accessoryAttribute.name} ${sensorAccessory.accessoryAttribute.type} ` +
-          `Device ID: ${sensorAccessory.deviceID}`,
-      );
+      if (!device.external) {
+        this.infoLog(`Adding new accessory: ${sensorAccessory.accessoryAttribute.name} ${sensorAccessory.accessoryAttribute.type} ` +
+          `Device ID: ${sensorAccessory.deviceID}`);
+      }
 
       // create a new accessory
       const accessory = new this.api.platformAccessory(sensorAccessory.accessoryAttribute.name, uuid);
@@ -666,8 +669,9 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
         `${sensorAccessory.accessoryAttribute.type}` +
           ` uuid: ${sensorAccessory.accessoryAttribute.type}-${sensorAccessory.accessoryId}-RoomSensor, (${accessory.UUID})`,
       );
-      // link the accessory to your platform
-      this.api.registerPlatformAccessories(settings.PLUGIN_NAME, settings.PLATFORM_NAME, [accessory]);
+
+      // publish device externally or link the accessory to your platform
+      this.externalOrPlatform(device, accessory);
       this.accessories.push(accessory);
     } else {
       if (this.platformLogging?.includes('debug')) {
@@ -716,10 +720,10 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       }
     } else if (device.thermostat?.roompriority?.deviceType && !device.hide_device && !this.config.disablePlugin) {
       // the accessory does not yet exist, so we need to create it
-      this.infoLog(
-        `Adding new accessory: ${sensorAccessory.accessoryAttribute.name} ${sensorAccessory.accessoryAttribute.type} ` +
-          `Device ID: ${sensorAccessory.deviceID}`,
-      );
+      if (!device.external) {
+        this.infoLog(`Adding new accessory: ${sensorAccessory.accessoryAttribute.name} ${sensorAccessory.accessoryAttribute.type} ` +
+          `Device ID: ${sensorAccessory.deviceID}`);
+      }
 
       // create a new accessory
       const accessory = new this.api.platformAccessory(sensorAccessory.accessoryAttribute.name, uuid);
@@ -739,8 +743,8 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
           `RoomSensorThermostat, (${accessory.UUID})`,
       );
 
-      // link the accessory to your platform
-      this.api.registerPlatformAccessories(settings.PLUGIN_NAME, settings.PLATFORM_NAME, [accessory]);
+      // publish device externally or link the accessory to your platform
+      this.externalOrPlatform(device, accessory);
       this.accessories.push(accessory);
     } else {
       if (this.platformLogging?.includes('debug')) {
@@ -825,6 +829,20 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
         existingAccessory.context.firmwareRevision = this.version;
       }
     }
+  }
+
+  public async externalOrPlatform(device: settings.device & settings.devicesConfig, accessory: PlatformAccessory) {
+    if (device.external) {
+      this.debugWarnLog(`${accessory.displayName} External Accessory Mode`);
+      this.externalAccessory(accessory);
+    } else {
+      this.debugLog(`${accessory.displayName} External Accessory Mode: ${device.external}`);
+      this.api.registerPlatformAccessories(settings.PLUGIN_NAME, settings.PLATFORM_NAME, [accessory]);
+    }
+  }
+
+  public async externalAccessory(accessory: PlatformAccessory) {
+    this.api.publishExternalAccessories(settings.PLUGIN_NAME, [accessory]);
   }
 
   public unregisterPlatformAccessories(existingAccessory: PlatformAccessory) {

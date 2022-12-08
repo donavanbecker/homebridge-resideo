@@ -768,7 +768,7 @@ export class RoomSensorThermostat {
       config['refreshRate'] = device.thermostat?.roompriority?.refreshRate;
     }
     if (Object.entries(config).length !== 0) {
-      this.warnLog(`Room Sensor Thermostat: ${this.accessory.displayName} Config: ${superStringify(config)}`);
+      this.infoLog(`Room Sensor Thermostat: ${this.accessory.displayName} Config: ${superStringify(config)}`);
     }
   }
 

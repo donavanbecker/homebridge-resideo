@@ -56,6 +56,7 @@ export interface devicesConfig extends device {
   thermostat?: thermostat;
   leaksensor?: leaksensor;
   hide_device?: boolean;
+  external?: boolean;
   logging?: string;
   refreshRate?: number;
   retry?: boolean;

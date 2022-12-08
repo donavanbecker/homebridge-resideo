@@ -333,7 +333,7 @@ export class RoomSensors {
       config['refreshRate'] = device.thermostat?.roomsensor?.refreshRate;
     }
     if (Object.entries(config).length !== 0) {
-      this.warnLog(`Room Sensor: ${this.accessory.displayName} Config: ${superStringify(config)}`);
+      this.infoLog(`Room Sensor: ${this.accessory.displayName} Config: ${superStringify(config)}`);
     }
   }
 

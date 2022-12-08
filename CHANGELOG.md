@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 1.2.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.2.0) (2022-12-08)
+
+## What's Changes
+- Added Config that allows device(s) to be published as an external accessory.
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-resideo/compare/v1.1.0...v1.2.0
+
 ## [Version 1.1.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.1.0) (2022-10-18)
 
 ## What's Changes
