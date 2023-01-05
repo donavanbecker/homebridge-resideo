@@ -105,6 +105,14 @@
                 "thermostat": {
                   "type": "object",
                   "properties": {
+                    "show_auto": {
+                      "title": "Show Auto Mode",
+                      "description": "Will show Auto mode, even if device API doesn't show it.",
+                      "type": "boolean",
+                      "condition": {
+                        "functionBody": "return (model.options && model.options.devices && !model.options.devices[arrayIndices].hide_device && model.options.devices[arrayIndices].deviceClass === 'Thermostat' && model.options.devices[arrayIndices].deviceID);"
+                      }
+                    },
                     "hide_fan": {
                       "title": "Hide Thermostat Fan",
                       "type": "boolean",
@@ -452,6 +460,7 @@
             "options.devices[].hide_device",
             "options.devices[].deviceClass",
             "options.devices[].deviceModel",
+            "options.devices[].thermostat.show_auto",
             "options.devices[].thermostat.hide_fan",
             "options.devices[].thermostat.hide_humidity",
             "options.devices[].thermostat.thermostatSetpointStatus",
