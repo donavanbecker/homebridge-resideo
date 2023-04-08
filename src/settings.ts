@@ -64,6 +64,7 @@ export interface devicesConfig extends device {
 }
 
 export type thermostat = {
+  show_auto?: boolean;
   hide_fan?: boolean;
   hide_humidity?: boolean;
   thermostatSetpointStatus?: string;

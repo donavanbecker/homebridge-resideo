@@ -1003,7 +1003,7 @@ export class Thermostats {
     if (this.device.allowedModes?.includes('Off')) {
       TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.OFF);
     }
-    if (this.device.allowedModes?.includes('Auto')) {
+    if (this.device.allowedModes?.includes('Auto') || this.device.thermostat?.show_auto) {
       TargetState.push(this.platform.Characteristic.TargetHeatingCoolingState.AUTO);
     }
     this.debugLog(`Thermostat: ${this.accessory.displayName} Only Show These Modes: ${superStringify(TargetState)}`);
