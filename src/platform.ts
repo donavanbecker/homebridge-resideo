@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { readFileSync, writeFileSync } from 'fs';
 import { API, Characteristic, DynamicPlatformPlugin, Logger, PlatformAccessory, Service } from 'homebridge';
 import { stringify } from 'querystring';
@@ -59,7 +59,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     }
 
     // setup axios interceptor to add headers / api key to each request
-    this.axios.interceptors.request.use((request: AxiosRequestConfig) => {
+    this.axios.interceptors.request.use((request: InternalAxiosRequestConfig) => {
       request.headers!.Authorization = `Bearer ${this.config.credentials?.accessToken}`;
       request.params = request.params || {};
       request.params.apikey = this.config.credentials?.consumerKey;
