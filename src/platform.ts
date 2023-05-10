@@ -4,6 +4,7 @@ import { API, Characteristic, DynamicPlatformPlugin, Logger, PlatformAccessory, 
 import { stringify } from 'querystring';
 import superStringify from 'super-stringify';
 import { LeakSensor } from './devices/leaksensors';
+import { Valve } from './devices/valve';
 import { RoomSensors } from './devices/roomsensors';
 import { RoomSensorThermostat } from './devices/roomsensorthermostats';
 import { Thermostats } from './devices/thermostats';
@@ -425,6 +426,10 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
 
   private async deviceClass(device: settings.device & settings.devicesConfig, location: any, locationId: any) {
     switch (device.deviceClass) {
+      case 'ShutoffValve':
+        this.debugLog(`Discovered ${device.userDefinedDeviceName} ${device.deviceClass} @ ${location.name}`);
+        this.Valve(device, locationId);
+        break;
       case 'LeakDetector':
         this.debugLog(`Discovered ${device.userDefinedDeviceName} ${device.deviceClass} @ ${location.name}`);
         this.Leak(device, locationId);
@@ -614,6 +619,65 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     }
   }
 
+  private Valve(device: settings.device & settings.devicesConfig, locationId: settings.location['locationID']) {
+    const uuid = this.api.hap.uuid.generate(`${device.deviceID}-${device.deviceClass}`);
+
+    // see if an accessory with the same uuid has already been registered and restored from
+    // the cached devices we stored in the `configureAccessory` method above
+    const existingAccessory = this.accessories.find((accessory) => accessory.UUID === uuid);
+
+    if (existingAccessory) {
+      // the accessory already exists
+      if (!device.hide_device && !this.config.disablePlugin) {
+        this.infoLog(`Restoring existing accessory from cache: ${existingAccessory.displayName} DeviceID: ${device.deviceID}`);
+
+        // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
+        existingAccessory.displayName = device.userDefinedDeviceName;
+        existingAccessory.context.deviceID = device.deviceID;
+        existingAccessory.context.model = device.deviceClass;
+        this.valveFirmwareExistingAccessory(device, existingAccessory);
+        this.api.updatePlatformAccessories([existingAccessory]);
+
+        // create the accessory handler for the restored accessory
+        // this is imported from `platformAccessory.ts`
+        new Valve(this, existingAccessory, locationId, device);
+        this.debugLog(`${device.deviceClass} uuid: ${device.deviceID}-${device.deviceClass} (${existingAccessory.UUID})`);
+      } else {
+        this.unregisterPlatformAccessories(existingAccessory);
+      }
+    } else if (!device.hide_device && !this.config.disablePlugin) {
+      // the accessory does not yet exist, so we need to create it
+      if (!device.external) {
+        this.infoLog(`Adding new accessory: ${device.userDefinedDeviceName} ${device.deviceClass} Device ID: ${device.deviceID}`);
+      }
+
+      // create a new accessory
+      const accessory = new this.api.platformAccessory(device.userDefinedDeviceName, uuid);
+
+      // store a copy of the device object in the `accessory.context`
+      // the `context` property can be used to store any data about the accessory you may need
+      accessory.context.device = device;
+      accessory.context.deviceID = device.deviceID;
+      accessory.context.model = device.deviceClass;
+      this.valveFirmwareNewAccessory(device, accessory);
+
+      // accessory.context.firmwareRevision = findaccessories.accessoryAttribute.softwareRevision;
+      // create the accessory handler for the newly create accessory
+      // this is imported from `/Sensors/valve.ts`
+      new Valve(this, accessory, locationId, device);
+      this.debugLog(`${device.deviceClass} uuid: ${device.deviceID}-${device.deviceClass} (${accessory.UUID})`);
+
+      // publish device externally or link the accessory to your platform
+      this.externalOrPlatform(device, accessory);
+      this.accessories.push(accessory);
+    } else {
+      if (this.platformLogging?.includes('debug')) {
+        this.errorLog(`Unable to Register new device: ${device.userDefinedDeviceName} ${device.deviceType} ` + ` DeviceID: ${device.deviceID}`);
+        this.errorLog('Check Config to see if DeviceID is being Hidden.');
+      }
+    }
+  }
+
   private createRoomSensors(
     device: settings.device & settings.devicesConfig,
     locationId: settings.location['locationID'],
@@ -766,6 +830,22 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
   }
 
   private leaksensorFirmwareExistingAccessory(device: settings.device & settings.devicesConfig, existingAccessory: PlatformAccessory) {
+    if (device.firmware) {
+      existingAccessory.context.firmwareRevision = device.firmware;
+    } else {
+      existingAccessory.context.firmwareRevision = this.version;
+    }
+  }
+
+  private valveFirmwareNewAccessory(device: settings.device & settings.devicesConfig, accessory: PlatformAccessory) {
+    if (device.firmware) {
+      accessory.context.firmwareRevision = device.firmware;
+    } else {
+      accessory.context.firmwareRevision = this.version;
+    }
+  }
+
+  private valveFirmwareExistingAccessory(device: settings.device & settings.devicesConfig, existingAccessory: PlatformAccessory) {
     if (device.firmware) {
       existingAccessory.context.firmwareRevision = device.firmware;
     } else {
