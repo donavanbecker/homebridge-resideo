@@ -155,6 +155,7 @@ export class LeakSensor {
     }
 
     // Retrieve initial values and updateHomekit
+    this.refreshStatus();
     this.updateHomeKitCharacteristics();
 
     // Start an update interval

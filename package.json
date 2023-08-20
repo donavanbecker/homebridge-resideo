@@ -1,7 +1,7 @@
 {
   "displayName": "Homebridge Resideo",
   "name": "homebridge-resideo",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "The [Homebridge](https://homebridge.io) Resideo plugin allows you to access your [Resideo](https://resideo.com) device(s) from HomeKit.",
   "author": "donavanbecker",
   "license": "Apache-2.0",
