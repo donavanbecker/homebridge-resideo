@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 1.4.1](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.4.1) (2023-08-19)
+
+## What's Changes
+- Fixed LeakSensor Inital status not pulling on restart.
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-resideo/compare/v1.4.0...v1.4.1
+
 ## [Version 1.4.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.4.0) (2023-08-19)
 
 ## What's Changes
