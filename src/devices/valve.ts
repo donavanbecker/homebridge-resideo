@@ -16,13 +16,18 @@ export class Valve {
 
   // CharacteristicValue
   Active!: CharacteristicValue;
+  InUse!: CharacteristicValue;
+  ValveType!: CharacteristicValue;
 
   // Others
   action!: string;
+  isAlive!: boolean;
+  valveStatus!: string;
 
   // Config
   deviceLogging!: string;
   deviceRefreshRate!: number;
+  valvetype!: number;
 
   // Updates
   SensorUpdateInProgress!: boolean;
@@ -37,6 +42,7 @@ export class Valve {
     this.logs(device);
     this.refreshRate(device);
     this.config(device);
+    this.valveType(device);
     // this is subject we use to track when we need to POST changes to the Resideo API
     this.doSensorUpdate = new Subject();
     this.SensorUpdateInProgress = false;
@@ -71,16 +77,15 @@ export class Valve {
     this.parseStatus();
 
     // create handlers for required characteristics
-    this.service.getCharacteristic(this.platform.Characteristic.Active)
-      .onGet(this.handleActiveGet.bind(this))
-      .onSet(this.handleActiveSet.bind(this));
+    this.service.getCharacteristic(this.platform.Characteristic.Active).onSet(this.setActive.bind(this));
 
     this.service.getCharacteristic(this.platform.Characteristic.InUse)
-      .onGet(this.handleInUseGet.bind(this));
+      .onGet(() => {
+        return this.InUse!;
+      });
 
-    this.service.getCharacteristic(this.platform.Characteristic.ValveType)
-      .onGet(this.handleValveTypeGet.bind(this));
-
+    // Set Valve Type
+    this.service.setCharacteristic(this.platform.Characteristic.ValveType, this.valvetype);
 
     // Retrieve initial values and updateHomekit
     this.updateHomeKitCharacteristics();
@@ -97,8 +102,19 @@ export class Valve {
    * Parse the device status from the Resideo api
    */
   async parseStatus(): Promise<void> {
-    // Leak Service
-    this.Active = this.device.isAlive;
+    // Active
+    if (this.isAlive) {
+      this.Active = this.platform.Characteristic.Active.ACTIVE;
+    } else {
+      this.Active = this.platform.Characteristic.Active.INACTIVE;
+    }
+
+    // InUse
+    if (this.valveStatus === 'Open') {
+      this.InUse = this.platform.Characteristic.InUse.IN_USE;
+    } else {
+      this.InUse = this.platform.Characteristic.InUse.NOT_IN_USE;
+    }
   }
 
   /**
@@ -114,6 +130,8 @@ export class Valve {
         })
       ).data;
       this.device = device;
+      this.isAlive = device.isAlive;
+      this.valveStatus = device.actuatorValve.valveStatus;
       this.debugLog(`Valve: ${this.accessory.displayName} device: ${superStringify(this.device)}`);
       this.parseStatus();
       this.updateHomeKitCharacteristics();
@@ -134,24 +152,18 @@ export class Valve {
       this.service.updateCharacteristic(this.platform.Characteristic.Active, this.Active);
       this.debugLog(`Valve: ${this.accessory.displayName} updateCharacteristic Active: ${this.Active}`);
     }
-  }
-
-  /**
-   * Handle requests to get the current value of the "Active" characteristic
-   */
-  handleActiveGet() {
-    this.debugLog('Triggered GET Active');
-
-    // set this to a valid value for Active
-    const currentValue = this.platform.Characteristic.Active.INACTIVE;
-
-    return currentValue;
+    if (this.InUse === undefined) {
+      this.debugLog(`Valve: ${this.accessory.displayName} InUse: ${this.InUse}`);
+    } else {
+      this.service.updateCharacteristic(this.platform.Characteristic.InUse, this.InUse);
+      this.debugLog(`Valve: ${this.accessory.displayName} updateCharacteristic InUse: ${this.InUse}`);
+    }
   }
 
   /**
    * Handle requests to set the "Active" characteristic
    */
-  handleActiveSet(value) {
+  setActive(value) {
     this.debugLog('Triggered SET Active:', value);
   }
 
@@ -163,19 +175,6 @@ export class Valve {
 
     // set this to a valid value for InUse
     const currentValue = this.platform.Characteristic.InUse.NOT_IN_USE;
-
-    return currentValue;
-  }
-
-
-  /**
-   * Handle requests to get the current value of the "Valve Type" characteristic
-   */
-  handleValveTypeGet() {
-    this.debugLog('Triggered GET ValveType');
-
-    // set this to a valid value for ValveType
-    const currentValue = this.platform.Characteristic.ValveType.GENERIC_VALVE;
 
     return currentValue;
   }
@@ -231,6 +230,18 @@ export class Valve {
     }
     if (this.deviceLogging.includes('debug')) {
       this.platform.log.error(`Valve: ${this.accessory.displayName} failed to pushChanges, Error Message: ${superStringify(e.message)}`);
+    }
+  }
+
+  async valveType(device: settings.device & settings.devicesConfig): Promise<void> {
+    if (device.valve?.valveType === 1) {
+      this.valvetype = this.platform.Characteristic.ValveType.IRRIGATION;
+    } else if (device.valve?.valveType === 2){
+      this.valvetype = this.platform.Characteristic.ValveType.SHOWER_HEAD;
+    } else if (device.valve?.valveType === 3) {
+      this.valvetype = this.platform.Characteristic.ValveType.WATER_FAUCET;
+    } else {
+      this.valvetype = this.platform.Characteristic.ValveType.GENERIC_VALVE;
     }
   }
 

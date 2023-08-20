@@ -54,6 +54,7 @@ export interface devicesConfig extends device {
   deviceClass: string;
   deviceID: string;
   thermostat?: thermostat;
+  valve?: valve;
   leaksensor?: leaksensor;
   hide_device?: boolean;
   external?: boolean;
@@ -93,6 +94,10 @@ export type roompriority = {
   priorityType?: string;
   logging?: string;
   refreshRate?: number;
+};
+
+export type valve = {
+  valveType?: number;
 };
 
 export type modes = {
