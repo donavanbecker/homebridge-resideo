@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 1.4.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.4.0) (2023-08-19)
+
+## What's Changes
+- Added Support for reading status of L5 Water Shutoff.
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-resideo/compare/v1.3.0...v1.4.0
+
 ## [Version 1.3.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.3.0) (2023-04-08)
 
 ## What's Changes

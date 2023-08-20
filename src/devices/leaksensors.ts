@@ -28,6 +28,11 @@ export class LeakSensor {
 
   // Others
   action!: string;
+  temperature!: number;
+  hasDeviceCheckedIn!: boolean;
+  humidity!: number;
+  batteryRemaining!: number;
+  waterPresent!: boolean;
 
   // Config
   deviceLogging!: string;
@@ -164,9 +169,10 @@ export class LeakSensor {
    * Parse the device status from the Resideo api
    */
   async parseStatus(): Promise<void> {
+    // Active
+    this.StatusActive = this.hasDeviceCheckedIn;
     // Leak Service
-    this.StatusActive = this.device.hasDeviceCheckedIn;
-    if (this.device.waterPresent === true) {
+    if (this.waterPresent === true) {
       this.LeakDetected = 1;
     } else {
       this.LeakDetected = 0;
@@ -175,13 +181,13 @@ export class LeakSensor {
 
     // Temperature Service
     if (!this.device.leaksensor?.hide_temperature) {
-      this.CurrentTemperature = this.device.currentSensorReadings.temperature;
+      this.CurrentTemperature = this.temperature;
       this.debugLog(`Leak Sensor: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}°`);
     }
 
     // Humidity Service
     if (!this.device.leaksensor?.hide_humidity) {
-      this.CurrentRelativeHumidity = this.device.currentSensorReadings.humidity;
+      this.CurrentRelativeHumidity = this.humidity;
       this.debugLog(`Leak Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}%`);
     }
 
@@ -209,6 +215,11 @@ export class LeakSensor {
         })
       ).data;
       this.device = device;
+      this.batteryRemaining = Number(device.batteryRemaining);
+      this.waterPresent = device.waterPresent;
+      this.humidity = device.currentSensorReadings.humidity;
+      this.hasDeviceCheckedIn = device.hasDeviceCheckedIn;
+      this.temperature = device.currentSensorReadings.temperature;
       this.debugLog(`Leak Sensor: ${this.accessory.displayName} device: ${superStringify(this.device)}`);
       this.parseStatus();
       this.updateHomeKitCharacteristics();
@@ -249,14 +260,18 @@ export class LeakSensor {
         this.debugLog(`Leak Sensor: ${this.accessory.displayName} updateCharacteristic StatusActive: ${this.StatusActive}`);
       }
     }
-    if (this.device.leaksensor?.hide_temperature && this.CurrentTemperature === undefined) {
-      this.debugLog(`Leak Sensor: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}`);
+    if (this.device.leaksensor?.hide_temperature || this.CurrentTemperature === undefined) {
+      if (!this.device.leaksensor?.hide_temperature) {
+        this.debugLog(`Leak Sensor: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}`);
+      }
     } else {
       this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
       this.debugLog(`Leak Sensor: ${this.accessory.displayName} updateCharacteristic CurrentTemperature: ${this.CurrentTemperature}`);
     }
-    if (this.device.leaksensor?.hide_humidity && this.CurrentRelativeHumidity === undefined) {
-      this.debugLog(`Leak Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
+    if (this.device.leaksensor?.hide_humidity || this.CurrentRelativeHumidity === undefined) {
+      if (!this.device.leaksensor?.hide_humidity) {
+        this.debugLog(`Leak Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
+      }
     } else {
       this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
       this.debugLog(`Leak Sensor: ${this.accessory.displayName}` + ` updateCharacteristic CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
