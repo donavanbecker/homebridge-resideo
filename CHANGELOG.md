@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [Version 1.4.2](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.4.2) (2023-08-27)
+
+## What's Changes
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-resideo/compare/v1.4.1...v1.4.2
+
 ## [Version 1.4.1](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.4.1) (2023-08-19)
 
 ## What's Changes
