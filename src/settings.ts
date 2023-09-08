@@ -69,6 +69,7 @@ export type thermostat = {
   hide_fan?: boolean;
   hide_humidity?: boolean;
   thermostatSetpointStatus?: string;
+  statefulStatus?: boolean;
   roomsensor?: roomsensor;
   roompriority?: roompriority;
 };
@@ -105,6 +106,12 @@ export type modes = {
   Heat: number;
   Cool: number;
   Auto: number;
+};
+
+export type holdModes = {
+  NoHold: number;
+  TemporaryHold: number;
+  PermanentHold: number;
 };
 
 export type payload = {
