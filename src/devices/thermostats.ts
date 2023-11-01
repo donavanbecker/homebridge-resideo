@@ -14,16 +14,19 @@ export class Thermostats {
   service!: Service;
   fanService?: Service;
   humidityService?: Service;
+  statefulService?: Service;
 
   // Thermostat Characteristics
   TargetTemperature!: CharacteristicValue;
   CurrentTemperature!: CharacteristicValue;
   CurrentRelativeHumidity?: CharacteristicValue;
   TemperatureDisplayUnits!: CharacteristicValue;
+  ProgrammableSwitchEvent!: CharacteristicValue;
   TargetHeatingCoolingState!: CharacteristicValue;
   CurrentHeatingCoolingState!: CharacteristicValue;
   CoolingThresholdTemperature!: CharacteristicValue;
   HeatingThresholdTemperature!: CharacteristicValue;
+  ProgrammableSwitchOutputState!: CharacteristicValue;
 
   // Fan Characteristics
   Active!: CharacteristicValue;
@@ -31,11 +34,13 @@ export class Thermostats {
 
   // Others
   modes: settings.modes;
+  holdModes: settings.holdModes;
   action!: string;
   heatSetpoint!: number;
   coolSetpoint!: number;
   thermostatSetpointStatus!: string;
   resideoMode!: Array<string>;
+  resideoHold!: Array<string>;
   fanMode!: settings.FanChangeableValues;
 
   // Others - T9 Only
@@ -73,10 +78,17 @@ export class Thermostats {
       Cool: platform.Characteristic.TargetHeatingCoolingState.COOL,
       Auto: platform.Characteristic.TargetHeatingCoolingState.AUTO,
     };
+    // Map Resideo Hold Modes to HomeKit StatefulProgrammableSwitch Events
+    this.holdModes = {
+      NoHold: platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS,
+      TemporaryHold:	platform.Characteristic.ProgrammableSwitchEvent.DOUBLE_PRESS,
+      PermanentHold:	platform.Characteristic.ProgrammableSwitchEvent.LONG_PRESS,
+    };
 
     // Map HomeKit Modes to Resideo Modes
     // Don't change the order of these!
     this.resideoMode = ['Off', 'Heat', 'Cool', 'Auto'];
+    this.resideoHold = ['NoHold', 'TemporaryHold', 'PermanentHold'];
 
     // default placeholders
     this.Active = this.platform.Characteristic.Active.INACTIVE;
@@ -209,6 +221,27 @@ export class Thermostats {
     } else {
       this.debugLog(`Thermostat: ${accessory.displayName} Humidity Sensor Service Not Added`);
     }
+
+    // get the StatefulProgrammableSwitch service if it exists, otherwise create a new StatefulProgrammableSwitch service
+    // you can create multiple services for each accessory
+    (this.statefulService =
+      accessory.getService(this.platform.Service.StatefulProgrammableSwitch) ||
+      accessory.addService(this.platform.Service.StatefulProgrammableSwitch)),
+    `${accessory.displayName} ${device.deviceModel}`;
+
+    this.statefulService.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
+    if (!this.statefulService.testCharacteristic(this.platform.Characteristic.ConfiguredName)) {
+      this.statefulService.addCharacteristic(this.platform.Characteristic.ConfiguredName, accessory.displayName);
+    }
+
+    // create handlers for required characteristics
+    this.statefulService.getCharacteristic(this.platform.Characteristic.ProgrammableSwitchEvent)
+      .onGet(this.handleProgrammableSwitchEventGet.bind(this));
+
+    this.statefulService
+      .getCharacteristic(this.platform.Characteristic.ProgrammableSwitchOutputState)
+      .onGet(this.handleProgrammableSwitchOutputStateGet.bind(this))
+      .onSet(this.handleProgrammableSwitchOutputStateSet.bind(this));
 
     // Retrieve initial values and updateHomekit
     this.refreshStatus();
@@ -911,6 +944,38 @@ export class Thermostats {
   }
 
   /**
+   * Handle requests to get the current value of the "Programmable Switch Event" characteristic
+   */
+  handleProgrammableSwitchEventGet() {
+    this.debugLog('Triggered GET ProgrammableSwitchEvent');
+
+    // set this to a valid value for ProgrammableSwitchEvent
+    const currentValue = this.platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS;
+
+    return currentValue;
+  }
+
+
+  /**
+   * Handle requests to get the current value of the "Programmable Switch Output State" characteristic
+   */
+  handleProgrammableSwitchOutputStateGet() {
+    this.debugLog('Triggered GET ProgrammableSwitchOutputState');
+
+    // set this to a valid value for ProgrammableSwitchOutputState
+    const currentValue = 1;
+
+    return currentValue;
+  }
+
+  /**
+   * Handle requests to set the "Programmable Switch Output State" characteristic
+   */
+  handleProgrammableSwitchOutputStateSet(value) {
+    this.debugLog('Triggered SET ProgrammableSwitchOutputState:', value);
+  }
+
+  /**
    * Converts the value to celsius if the temperature units are in Fahrenheit
    */
   toCelsius(value: number): number {
@@ -1067,7 +1132,7 @@ export class Thermostats {
     }
   }
 
-  debugWarnLog({ log = [] }: { log?: any[]; } = {}): void {
+  debugWarnLog({ log = [] }: { log?: any[] } = {}): void {
     if (this.enablingDeviceLogging()) {
       if (this.deviceLogging?.includes('debug')) {
         this.platform.log.warn('[DEBUG]', String(...log));
