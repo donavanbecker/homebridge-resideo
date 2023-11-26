@@ -1,13 +1,14 @@
 {
-  "displayName": "Homebridge Resideo",
+  "displayName": "Resideo",
   "name": "homebridge-resideo",
-  "version": "1.4.3",
+  "version": "24.1.0",
   "description": "The [Homebridge](https://homebridge.io) Resideo plugin allows you to access your [Resideo](https://resideo.com) device(s) from HomeKit.",
   "author": "donavanbecker",
   "license": "Apache-2.0",
+  "pluginIcon": "branding/icon.png",
   "repository": {
     "type": "git",
-    "url": "git://github.com/donavanbecker/homebridge-resideo.git"
+    "url": "https://github.com/donavanbecker/homebridge-resideo.git"
   },
   "bugs": {
     "url": "https://github.com/donavanbecker/homebridge-resideo/issues"
@@ -57,17 +58,17 @@
     "leak"
   ],
   "dependencies": {
-    "axios": "1.6.0",
+    "axios": "1.6.2",
     "rxjs": "^7.8.1",
     "@homebridge/plugin-ui-utils": "^1.0.0",
     "super-stringify": "^1.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20.8.10",
-    "@typescript-eslint/eslint-plugin": "^6.9.1",
-    "@typescript-eslint/parser": "^6.9.1",
-    "eslint": "^8.52.0",
-    "homebridge": "^1.6.1",
+    "@types/node": "^20.9.1",
+    "@typescript-eslint/eslint-plugin": "^6.11.0",
+    "@typescript-eslint/parser": "^6.11.0",
+    "eslint": "^8.53.0",
+    "homebridge": "^1.7.0",
     "nodemon": "^3.0.1",
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.1",
