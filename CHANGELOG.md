@@ -2,35 +2,50 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
-## [Version 1.4.5](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.4.5) (2023-12-15)
+## [2.0.0-beta](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v2.0.0) (2024-XX-XX)
 
-## What's Changes
+### What's Changes
+- Moved from CommonJS to ES Module
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-resideo/compare/v1.4.6...v2.0.0
+
+## [1.4.6](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.4.6) (2024-01-16)
+
+### What's Changes
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-resideo/compare/v1.4.5...v1.4.6
+
+## [1.4.5](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.4.5) (2023-12-15)
+
+### What's Changes
 - Housekeeping and updated dependencies.
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-resideo/compare/v1.4.4...v1.4.5
 
-## [Version 1.4.4](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.4.4) (2023-11-26)
+## [1.4.4](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.4.4) (2023-11-26)
 
 ## What's Changes
 - Housekeeping and updated dependencies.
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-resideo/compare/v1.4.3...v1.4.4
 
-## [Version 1.4.3](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.4.3) (2023-10-31)
+## [1.4.3](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.4.3) (2023-10-31)
 
 ## What's Changes
 - Housekeeping and updated dependencies.
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-resideo/compare/v1.4.2...v1.4.3
 
-## [Version 1.4.2](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.4.2) (2023-08-27)
+## [1.4.2](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.4.2) (2023-08-27)
 
 ## What's Changes
 - Housekeeping and updated dependencies.
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-resideo/compare/v1.4.1...v1.4.2
 
-## [Version 1.4.1](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.4.1) (2023-08-19)
+## [1.4.1](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.4.1) (2023-08-19)
 
 ## What's Changes
 - Fixed LeakSensor Inital status not pulling on restart.
@@ -38,7 +53,7 @@ All notable changes to this project will be documented in this file. This projec
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-resideo/compare/v1.4.0...v1.4.1
 
-## [Version 1.4.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.4.0) (2023-08-19)
+## [1.4.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.4.0) (2023-08-19)
 
 ## What's Changes
 - Added Support for reading status of L5 Water Shutoff.
@@ -46,7 +61,7 @@ All notable changes to this project will be documented in this file. This projec
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-resideo/compare/v1.3.0...v1.4.0
 
-## [Version 1.3.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.3.0) (2023-04-08)
+## [1.3.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.3.0) (2023-04-08)
 
 ## What's Changes
 - Added Config that allows `Auto` mode to be enabled for Thermostats even if API doesn't have `Auto` enabled.
@@ -55,7 +70,7 @@ All notable changes to this project will be documented in this file. This projec
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-resideo/compare/v1.2.0...v1.3.0
 
-## [Version 1.2.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.2.0) (2022-12-08)
+## [1.2.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.2.0) (2022-12-08)
 
 ## What's Changes
 - Added Config that allows device(s) to be published as an external accessory.
@@ -63,7 +78,7 @@ All notable changes to this project will be documented in this file. This projec
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-resideo/compare/v1.1.0...v1.2.0
 
-## [Version 1.1.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.1.0) (2022-10-18)
+## [1.1.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.1.0) (2022-10-18)
 
 ## What's Changes
 - Added Config to allow manually setting firmware version.
@@ -71,7 +86,7 @@ All notable changes to this project will be documented in this file. This projec
 
 **Full Changelog**: https://github.com/donavanbecker/homebridge-resideo/compare/v1.0.0...v1.1.0
 
-## [Version 1.0.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.0.0) (2022-09-23)
+## [1.0.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v1.0.0) (2022-09-23)
 
 ## What's Changes
 - Move from `homebridge-honeywell-home` to `homebridge-resideo`

@@ -50,7 +50,7 @@ export type options = {
   logging?: string;
 };
 
-export interface devicesConfig extends device {
+export interface devicesConfig extends resideoDevice {
   deviceClass: string;
   deviceID: string;
   thermostat?: thermostat;
@@ -129,10 +129,10 @@ export type payload = {
 export type location = {
   locationID: number;
   name: string;
-  devices: Array<device>;
+  devices: Array<resideoDevice>;
 };
 
-export type device = {
+export type resideoDevice = {
   groups?: Array<T9groups>;
   inBuiltSensorState?: inBuiltSensorState;
   settings?: Settings;

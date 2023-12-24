@@ -1,7 +1,7 @@
 {
   "displayName": "Resideo",
   "name": "homebridge-resideo",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "description": "The Resideo plugin allows you to access your Resideo device(s) from HomeKit.",
   "author": "donavanbecker",
   "license": "Apache-2.0",
@@ -24,7 +24,7 @@
     "lint": "eslint src/**.ts",
     "watch": "npm run build && npm link && nodemon",
     "build": "rimraf ./dist && tsc",
-    "prepublishOnly": "npm run update && npm run lint && npm run build",
+    "prepublishOnly": "npm run lint && npm run build",
     "postpublish": "npm run clean",
     "clean": "rimraf ./dist",
     "test": "eslint src/**.ts"
@@ -58,18 +58,17 @@
     "leak"
   ],
   "dependencies": {
-    "axios": "1.6.2",
-    "rxjs": "^7.8.1",
-    "@homebridge/plugin-ui-utils": "^1.0.0",
-    "super-stringify": "^1.0.0"
+    "@homebridge/plugin-ui-utils": "^1.0.1",
+    "undici": "^6.3.0",
+    "rxjs": "^7.8.1"
   },
   "devDependencies": {
-    "@types/node": "^20.10.4",
-    "@typescript-eslint/eslint-plugin": "^6.14.0",
-    "@typescript-eslint/parser": "^6.14.0",
-    "eslint": "^8.55.0",
+    "@types/node": "^20.11.4",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
     "homebridge": "^1.7.0",
-    "nodemon": "^3.0.2",
+    "nodemon": "^3.0.3",
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3",

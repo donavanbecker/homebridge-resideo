@@ -1,9 +1,17 @@
+<<<<<<< Updated upstream
 import { CharacteristicValue, PlatformAccessory, Service } from 'homebridge';
 import { interval, Subject } from 'rxjs';
 import superStringify from 'super-stringify';
 import { skipWhile, take } from 'rxjs/operators';
 import { ResideoPlatform } from '../platform';
 import * as settings from '../settings';
+=======
+import { Subject, interval } from 'rxjs';
+import { take, skipWhile } from 'rxjs/operators';
+import { ResideoPlatform } from '../platform.js';
+import { Service, PlatformAccessory, CharacteristicValue, API, HAP, Logging } from 'homebridge';
+import { devicesConfig, location, resideoDevice, ResideoPlatformConfig, sensorAccessory, T9groups } from '../settings.js';
+>>>>>>> Stashed changes
 
 /**
  * Platform Accessory
@@ -11,6 +19,13 @@ import * as settings from '../settings';
  * Each accessory may expose multiple services of different service types.
  */
 export class RoomSensors {
+<<<<<<< Updated upstream
+=======
+  public readonly api: API;
+  public readonly log: Logging;
+  public readonly config!: ResideoPlatformConfig;
+  protected readonly hap: HAP;
+>>>>>>> Stashed changes
   // Services
   service: Service;
   temperatureService?: Service;
@@ -39,6 +54,7 @@ export class RoomSensors {
 
   constructor(
     private readonly platform: ResideoPlatform,
+<<<<<<< Updated upstream
     private accessory: PlatformAccessory,
     public readonly locationId: settings.location['locationID'],
     public device: settings.device & settings.devicesConfig,
@@ -53,8 +69,27 @@ export class RoomSensors {
     this.StatusLowBattery;
     this.OccupancyDetected;
     this.CurrentRelativeHumidity;
+=======
+    private readonly accessory: PlatformAccessory,
+    public readonly locationId: location['locationID'],
+    public device: resideoDevice & devicesConfig,
+    public sensorAccessory: sensorAccessory,
+    public readonly group: T9groups,
+  ) {
+    this.api = this.platform.api;
+    this.log = this.platform.log;
+    this.config = this.platform.config;
+    this.hap = this.api.hap;
+
+    this.StatusLowBattery = this.accessory.context.StatusLowBattery || this.hap.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL;
+    this.OccupancyDetected = this.accessory.context.OccupancyDetected || this.hap.Characteristic.OccupancyDetected.OCCUPANCY_NOT_DETECTED;
+    this.CurrentTemperature = this.accessory.context.CurrentTemperature || 20;
+    this.CurrentRelativeHumidity = this.accessory.context.CurrentRelativeHumidity || 50;
+    this.TemperatureDisplayUnits = this.accessory.context.TemperatureDisplayUnits || this.hap.Characteristic.TemperatureDisplayUnits.CELSIUS;
+>>>>>>> Stashed changes
     this.accessoryId = sensorAccessory.accessoryId;
     this.roomId = sensorAccessory.roomId;
+    accessory.context.FirmwareRevision = 'v2.0.0';
 
     // this is subject we use to track when we need to POST changes to the Resideo API
     this.doSensorUpdate = new Subject();
@@ -62,6 +97,7 @@ export class RoomSensors {
 
     // set accessory information
     accessory
+<<<<<<< Updated upstream
       .getService(this.platform.Service.AccessoryInformation)!
       .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Resideo')
       .setCharacteristic(this.platform.Characteristic.Model, sensorAccessory.accessoryAttribute.model)
@@ -69,6 +105,13 @@ export class RoomSensors {
       .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision)
       .getCharacteristic(this.platform.Characteristic.FirmwareRevision)
       .updateValue(accessory.context.firmwareRevision);
+=======
+      .getService(this.hap.Service.AccessoryInformation)!
+      .setCharacteristic(this.hap.Characteristic.Manufacturer, 'Resideo')
+      .setCharacteristic(this.hap.Characteristic.Model, sensorAccessory.accessoryAttribute.model)
+      .setCharacteristic(this.hap.Characteristic.SerialNumber, sensorAccessory.deviceID)
+      .setCharacteristic(this.hap.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
+>>>>>>> Stashed changes
 
     // get the BatteryService service if it exists, otherwise create a new Battery service
     // you can create multiple services for each accessory
@@ -94,11 +137,16 @@ export class RoomSensors {
 
     // Temperature Sensor Service
     if (device.thermostat?.roomsensor?.hide_temperature) {
+<<<<<<< Updated upstream
       this.debugLog(`Room Sensor: ${accessory.displayName} Removing Temperature Sensor Service`);
       this.temperatureService = this.accessory.getService(this.platform.Service.TemperatureSensor);
+=======
+      this.log.debug(`Room Sensor: ${accessory.displayName} Removing Temperature Sensor Service`);
+      this.temperatureService = this.accessory.getService(this.hap.Service.TemperatureSensor);
+>>>>>>> Stashed changes
       accessory.removeService(this.temperatureService!);
     } else if (!this.temperatureService) {
-      this.debugLog(`Room Sensor: ${accessory.displayName} Add Temperature Sensor Service`);
+      this.log.debug(`Room Sensor: ${accessory.displayName} Add Temperature Sensor Service`);
       (this.temperatureService =
         this.accessory.getService(this.platform.Service.TemperatureSensor) || this.accessory.addService(this.platform.Service.TemperatureSensor)),
       `${accessory.displayName} Temperature Sensor`;
@@ -116,32 +164,42 @@ export class RoomSensors {
           return this.CurrentTemperature;
         });
     } else {
-      this.debugLog(`Room Sensor: ${accessory.displayName} Temperature Sensor Service Not Added`);
+      this.log.debug(`Room Sensor: ${accessory.displayName} Temperature Sensor Service Not Added`);
     }
 
     // Occupancy Sensor Service
     if (device.thermostat?.roomsensor?.hide_occupancy) {
+<<<<<<< Updated upstream
       this.debugLog(`Room Sensor: ${accessory.displayName} Removing Occupancy Sensor Service`);
       this.occupancyService = this.accessory.getService(this.platform.Service.OccupancySensor);
+=======
+      this.log.debug(`Room Sensor: ${accessory.displayName} Removing Occupancy Sensor Service`);
+      this.occupancyService = this.accessory.getService(this.hap.Service.OccupancySensor);
+>>>>>>> Stashed changes
       accessory.removeService(this.occupancyService!);
     } else if (!this.occupancyService) {
-      this.debugLog(`Room Sensor: ${accessory.displayName} Add Occupancy Sensor Service`);
+      this.log.debug(`Room Sensor: ${accessory.displayName} Add Occupancy Sensor Service`);
       (this.occupancyService =
         this.accessory.getService(this.platform.Service.OccupancySensor) || this.accessory.addService(this.platform.Service.OccupancySensor)),
       `${accessory.displayName} Occupancy Sensor`;
 
       this.occupancyService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Occupancy Sensor`);
     } else {
-      this.debugLog(`Room Sensor: ${accessory.displayName} Occupancy Sensor Service Not Added`);
+      this.log.debug(`Room Sensor: ${accessory.displayName} Occupancy Sensor Service Not Added`);
     }
 
     // Humidity Sensor Service
     if (device.thermostat?.roomsensor?.hide_humidity) {
+<<<<<<< Updated upstream
       this.debugLog(`Room Sensor: ${accessory.displayName} Removing Humidity Sensor Service`);
       this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor);
+=======
+      this.log.debug(`Room Sensor: ${accessory.displayName} Removing Humidity Sensor Service`);
+      this.humidityService = this.accessory.getService(this.hap.Service.HumiditySensor);
+>>>>>>> Stashed changes
       accessory.removeService(this.humidityService!);
     } else if (!this.humidityService) {
-      this.debugLog(`Room Sensor: ${accessory.displayName} Add Humidity Sensor Service`);
+      this.log.debug(`Room Sensor: ${accessory.displayName} Add Humidity Sensor Service`);
       (this.humidityService =
         this.accessory.getService(this.platform.Service.HumiditySensor) || this.accessory.addService(this.platform.Service.HumiditySensor)),
       `${accessory.displayName} Humidity Sensor`;
@@ -157,7 +215,7 @@ export class RoomSensors {
           return this.CurrentRelativeHumidity;
         });
     } else {
-      this.debugLog(`Room Sensor: ${accessory.displayName} Humidity Sensor Service Not Added`);
+      this.log.debug(`Room Sensor: ${accessory.displayName} Humidity Sensor Service Not Added`);
     }
 
     // Retrieve initial values and updateHomekit
@@ -181,13 +239,13 @@ export class RoomSensors {
     } else {
       this.StatusLowBattery = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW;
     }
-    this.debugLog(`Room Sensor: ${this.accessory.displayName} StatusLowBattery: ${this.StatusLowBattery}`);
+    this.log.debug(`Room Sensor: ${this.accessory.displayName} StatusLowBattery: ${this.StatusLowBattery}`);
 
     // Set Temperature Sensor State
     if (!this.device.thermostat?.roomsensor?.hide_temperature) {
       this.CurrentTemperature = this.toCelsius(this.sensorAccessory.accessoryValue.indoorTemperature);
     }
-    this.debugLog(`Room Sensor: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}°c`);
+    this.log.debug(`Room Sensor: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}°c`);
 
     // Set Occupancy Sensor State
     if (!this.device.thermostat?.roomsensor?.hide_occupancy) {
@@ -202,7 +260,7 @@ export class RoomSensors {
     if (!this.device.thermostat?.roomsensor?.hide_humidity) {
       this.CurrentRelativeHumidity = this.sensorAccessory.accessoryValue.indoorHumidity;
     }
-    this.debugLog(`Room Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}%`);
+    this.log.debug(`Room Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}%`);
   }
 
   /**
@@ -226,28 +284,48 @@ export class RoomSensors {
    */
   async updateHomeKitCharacteristics(): Promise<void> {
     if (this.StatusLowBattery === undefined) {
-      this.debugLog(`Room Sensor: ${this.accessory.displayName} StatusLowBattery: ${this.StatusLowBattery}`);
+      this.log.debug(`Room Sensor: ${this.accessory.displayName} StatusLowBattery: ${this.StatusLowBattery}`);
     } else {
+<<<<<<< Updated upstream
       this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, this.StatusLowBattery);
       this.debugLog(`Room Sensor: ${this.accessory.displayName} updateCharacteristic StatusLowBattery: ${this.StatusLowBattery}`);
+=======
+      this.service.updateCharacteristic(this.hap.Characteristic.StatusLowBattery, this.StatusLowBattery);
+      this.log.debug(`Room Sensor: ${this.accessory.displayName} updateCharacteristic StatusLowBattery: ${this.StatusLowBattery}`);
+>>>>>>> Stashed changes
     }
     if (this.device.thermostat?.roomsensor?.hide_temperature || (this.CurrentTemperature === undefined && Number.isNaN(this.CurrentTemperature))) {
-      this.debugLog(`Room Sensor: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}`);
+      this.log.debug(`Room Sensor: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}`);
     } else {
+<<<<<<< Updated upstream
       this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
       this.debugLog(`Room Sensor: ${this.accessory.displayName} updateCharacteristic CurrentTemperature: ${this.CurrentTemperature}`);
+=======
+      this.temperatureService?.updateCharacteristic(this.hap.Characteristic.CurrentTemperature, this.CurrentTemperature);
+      this.log.debug(`Room Sensor: ${this.accessory.displayName} updateCharacteristic CurrentTemperature: ${this.CurrentTemperature}`);
+>>>>>>> Stashed changes
     }
     if (this.device.thermostat?.roomsensor?.hide_occupancy || this.OccupancyDetected === undefined) {
-      this.debugLog(`Room Sensor: ${this.accessory.displayName} OccupancyDetected: ${this.OccupancyDetected}`);
+      this.log.debug(`Room Sensor: ${this.accessory.displayName} OccupancyDetected: ${this.OccupancyDetected}`);
     } else {
+<<<<<<< Updated upstream
       this.occupancyService?.updateCharacteristic(this.platform.Characteristic.OccupancyDetected, this.OccupancyDetected);
       this.debugLog(`Room Sensor: ${this.accessory.displayName} updateCharacteristic OccupancyDetected: ${this.OccupancyDetected}`);
+=======
+      this.occupancyService?.updateCharacteristic(this.hap.Characteristic.OccupancyDetected, this.OccupancyDetected);
+      this.log.debug(`Room Sensor: ${this.accessory.displayName} updateCharacteristic OccupancyDetected: ${this.OccupancyDetected}`);
+>>>>>>> Stashed changes
     }
     if (this.device.thermostat?.roomsensor?.hide_humidity || this.CurrentRelativeHumidity === undefined) {
-      this.debugLog(`Room Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
+      this.log.debug(`Room Sensor: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
     } else {
+<<<<<<< Updated upstream
       this.humidityService?.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
       this.debugLog(`Room Sensor: ${this.accessory.displayName}` + ` updateCharacteristic CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
+=======
+      this.humidityService?.updateCharacteristic(this.hap.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
+      this.log.debug(`Room Sensor: ${this.accessory.displayName}` + ` updateCharacteristic CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
+>>>>>>> Stashed changes
     }
   }
 
@@ -272,6 +350,7 @@ export class RoomSensors {
       }
     }
     if (e.message.includes('400')) {
+<<<<<<< Updated upstream
       this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Bad Request`);
       this.debugLog('The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.');
     } else if (e.message.includes('401')) {
@@ -292,10 +371,33 @@ export class RoomSensors {
     } else if (e.message.includes('422')) {
       this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Unprocessable Entity`);
       this.debugLog(
+=======
+      this.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Bad Request`);
+      this.log.debug('The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.');
+    } else if (e.message.includes('401')) {
+      this.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Unauthorized Request`);
+      this.log.debug('Authorization for the API is required, but the request has not been authenticated.');
+    } else if (e.message.includes('403')) {
+      this.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Forbidden Request`);
+      this.log.debug('The request has been authenticated but does not have appropriate permissions, or a requested resource is not found.');
+    } else if (e.message.includes('404')) {
+      this.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Requst Not Found`);
+      this.log.debug('Specifies the requested path does not exist.');
+    } else if (e.message.includes('406')) {
+      this.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Request Not Acceptable`);
+      this.log.debug('The client has requested a MIME type via the Accept header for a value not supported by the server.');
+    } else if (e.message.includes('415')) {
+      this.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Unsupported Requst Header`);
+      this.log.debug('The client has defined a contentType header that is not supported by the server.');
+    } else if (e.message.includes('422')) {
+      this.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Unprocessable Entity`);
+      this.log.debug(
+>>>>>>> Stashed changes
         'The client has made a valid request, but the server cannot process it.' +
           ' This is often used for APIs for which certain limits have been exceeded.',
       );
     } else if (e.message.includes('429')) {
+<<<<<<< Updated upstream
       this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Too Many Requests`);
       this.debugLog('The client has exceeded the number of requests allowed for a given time window.');
     } else if (e.message.includes('500')) {
@@ -306,6 +408,53 @@ export class RoomSensors {
     }
     if (this.deviceLogging.includes('debug')) {
       this.platform.log.error(`Room Sensor: ${this.accessory.displayName} failed to pushChanges, Error Message: ${superStringify(e.message)}`);
+=======
+      this.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Too Many Requests`);
+      this.log.debug('The client has exceeded the number of requests allowed for a given time window.');
+    } else if (e.message.includes('500')) {
+      this.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action}, Internal Server Error`);
+      this.log.debug('An unexpected error on the SmartThings servers has occurred. These errors should be rare.');
+    } else {
+      this.log.error(`Room Sensor: ${this.accessory.displayName} failed to ${this.action},`);
+    }
+    if (this.deviceLogging.includes('debug')) {
+      this.log.error(`Room Sensor: ${this.accessory.displayName} failed to pushChanges, Error Message: ${JSON.stringify(e.message)}`);
+    }
+  }
+
+  async statusCode(statusCode: number): Promise<void> {
+    /**
+    * Meater API Status Codes (https://github.com/apption-labs/meater-cloud-public-rest-api)
+    *
+    * Standard Response Codes: 200(OK), 201(Created), 204(No Content)
+    * https://github.com/apption-labs/meater-cloud-public-rest-api#standard-response
+    *
+    * Error Response: 400(Bad Request), 401(Unauthorized), 404(Not Found), 429(Too Many Requests), 500(Internal Server Error)
+    * https://github.com/apption-labs/meater-cloud-public-rest-api#error-response
+    **/
+    switch (statusCode) {
+      case 200:
+        this.log.debug(`${this.accessory.displayName} Standard Response, statusCode: ${statusCode}`);
+        break;
+      case 400:
+        this.log.error(`${this.accessory.displayName} Bad Request, statusCode: ${statusCode}`);
+        break;
+      case 401:
+        this.log.error(`${this.accessory.displayName} Unauthorized, statusCode: ${statusCode}`);
+        break;
+      case 404:
+        this.log.error(`${this.accessory.displayName} Not Found, statusCode: ${statusCode}`);
+        break;
+      case 429:
+        this.log.error(`${this.accessory.displayName} Too Many Requests, statusCode: ${statusCode}`);
+        break;
+      case 500:
+        this.log.error(`${this.accessory.displayName} Internal Server Error (Meater Server), statusCode: ${statusCode}`);
+        break;
+      default:
+        this.log.info(
+          `${this.accessory.displayName} Unknown statusCode: ${statusCode}, Report Bugs Here: https://bit.ly/homebridge-meater-bug-report`);
+>>>>>>> Stashed changes
     }
   }
 
@@ -320,6 +469,7 @@ export class RoomSensors {
     // celsius should be to the nearest 0.5 degree
     return Math.round((5 / 9) * (value - 32) * 2) / 2;
   }
+<<<<<<< Updated upstream
 
   async config(device: settings.device & settings.devicesConfig): Promise<void> {
     let config = {};
@@ -416,4 +566,6 @@ export class RoomSensors {
   enablingDeviceLogging(): boolean {
     return this.deviceLogging.includes('debug') || this.deviceLogging === 'standard';
   }
+=======
+>>>>>>> Stashed changes
 }
