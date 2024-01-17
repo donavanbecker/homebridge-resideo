@@ -85,6 +85,10 @@
                     {
                       "title": "Leak Sensor",
                       "enum": ["LeakDetector"]
+                    },
+                    {
+                      "title": "Shut Off Valve",
+                      "enum": ["ShutoffValve"]
                     }
                   ],
                   "condition": {

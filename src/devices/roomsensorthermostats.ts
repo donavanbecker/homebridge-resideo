@@ -1,11 +1,3 @@
-<<<<<<< Updated upstream
-import { CharacteristicValue, PlatformAccessory, Service } from 'homebridge';
-import { interval, Subject } from 'rxjs';
-import superStringify from 'super-stringify';
-import { debounceTime, skipWhile, take, tap } from 'rxjs/operators';
-import { ResideoPlatform } from '../platform';
-import * as settings from '../settings';
-=======
 import { request } from 'undici';
 import { interval, Subject } from 'rxjs';
 import { ResideoPlatform } from '../platform.js';
@@ -14,7 +6,6 @@ import { Service, PlatformAccessory, CharacteristicValue, API, HAP, Logging } fr
 import {
   FanChangeableValues, devicesConfig, modes, resideoDevice, sensorAccessory, T9groups, location, DeviceURL, payload, ResideoPlatformConfig,
 } from '../settings.js';
->>>>>>> Stashed changes
 
 /**
  * Platform Accessory
@@ -22,13 +13,10 @@ import {
  * Each accessory may expose multiple services of different service types.
  */
 export class RoomSensorThermostat {
-<<<<<<< Updated upstream
-=======
   public readonly api: API;
   public readonly log: Logging;
   public readonly config!: ResideoPlatformConfig;
   protected readonly hap: HAP;
->>>>>>> Stashed changes
   // Services
   service: Service;
 
@@ -43,11 +31,11 @@ export class RoomSensorThermostat {
   HeatingThresholdTemperature!: CharacteristicValue;
 
   // Others
-  modes: settings.modes;
+  modes: modes;
   action!: string;
   roompriority: any;
   resideoMode!: Array<string>;
-  deviceFan!: settings.FanChangeableValues;
+  deviceFan!: FanChangeableValues;
 
   // Config
   deviceLogging!: string;
@@ -67,17 +55,6 @@ export class RoomSensorThermostat {
 
   constructor(
     private readonly platform: ResideoPlatform,
-<<<<<<< Updated upstream
-    private accessory: PlatformAccessory,
-    public readonly locationId: settings.location['locationID'],
-    public device: settings.device & settings.devicesConfig,
-    public sensorAccessory: settings.sensorAccessory,
-    public readonly group: settings.T9groups,
-  ) {
-    this.logs(device);
-    this.refreshRate(device);
-    this.config(device);
-=======
     private readonly accessory: PlatformAccessory,
     public readonly locationId: location['locationID'],
     public device: resideoDevice & devicesConfig,
@@ -97,8 +74,10 @@ export class RoomSensorThermostat {
     this.CurrentHeatingCoolingState = this.accessory.context.CurrentHeatingCoolingState || this.hap.Characteristic.CurrentHeatingCoolingState.OFF;
     this.CoolingThresholdTemperature = this.accessory.context.CoolingThresholdTemperature || 20;
     this.HeatingThresholdTemperature = this.accessory.context.HeatingThresholdTemperature || 22;
+    accessory.context.FirmwareRevision = 'v2.0.0';
 
->>>>>>> Stashed changes
+    this.deviceLogging = this.device.logging || this.config.options?.logging || 'standard';
+
     // Map Resideo Modes to HomeKit Modes
     this.modes = {
       Off: platform.Characteristic.TargetHeatingCoolingState.OFF,
@@ -129,21 +108,11 @@ export class RoomSensorThermostat {
 
     // set accessory information
     accessory
-<<<<<<< Updated upstream
-      .getService(this.platform.Service.AccessoryInformation)!
-      .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Resideo')
-      .setCharacteristic(this.platform.Characteristic.Model, sensorAccessory.accessoryAttribute.model || '1100')
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, sensorAccessory.deviceID)
-      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision)
-      .getCharacteristic(this.platform.Characteristic.FirmwareRevision)
-      .updateValue(accessory.context.firmwareRevision);
-=======
       .getService(this.hap.Service.AccessoryInformation)!
       .setCharacteristic(this.hap.Characteristic.Manufacturer, 'Resideo')
       .setCharacteristic(this.hap.Characteristic.Model, sensorAccessory.accessoryAttribute.model || '1100')
       .setCharacteristic(this.hap.Characteristic.SerialNumber, sensorAccessory.deviceID)
-      .setCharacteristic(this.hap.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
->>>>>>> Stashed changes
+      .setCharacteristic(this.hap.Characteristic.FirmwareRevision, accessory.context.firmwareRevision || 'v2.0.0');
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
@@ -345,26 +314,23 @@ export class RoomSensorThermostat {
    */
   async refreshStatus(): Promise<void> {
     try {
-<<<<<<< Updated upstream
-      const device: any = (
-        await this.platform.axios.get(`${settings.DeviceURL}/thermostats/${this.device.deviceID}`, {
-=======
-      const { body, statusCode, headers } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
-        query: {
-          locationId: this.locationId,
-        },
+      const { body, statusCode } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
         method: 'GET',
-        headers: { 'content-type': 'application/json' },
+        query: {
+          'locationId': this.locationId,
+          'apikey': this.config.credentials?.consumerKey,
+        },
+        headers: {
+          'Authorization': `Bearer ${this.config.credentials?.accessToken}`,
+          'Content-Type': 'application/json',
+        },
       });
-      this.log.debug(`body: ${JSON.stringify(body)}`);
-      this.log.debug(`statusCode: ${statusCode}`);
-      this.log.debug(`headers: ${JSON.stringify(headers)}`);
+      const action = 'refreshStatus';
+      await this.statusCode(statusCode, action);
       const device: any = await body.json();
-      this.log.debug(`Location: ${JSON.stringify(device)}`);
-      this.log.debug(`Location StatusCode: ${device.statusCode}`);
+      this.log.debug(`(refreshStatus) ${device.deviceClass}: ${JSON.stringify(device)}`);
       /*const device: any = (
         await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
->>>>>>> Stashed changes
           params: {
             locationId: this.locationId,
           },
@@ -374,11 +340,7 @@ export class RoomSensorThermostat {
       this.log.debug(`Room Sensor Thermostat: ${this.accessory.displayName} device: ${JSON.stringify(device)}`);
       this.log.debug(
         `Room Sensor Thermostat: ${this.accessory.displayName}` +
-<<<<<<< Updated upstream
-          ` Fetched update for: ${this.device.name} from Resideo API: ${superStringify(this.device.changeableValues)}`,
-=======
         ` Fetched update for: ${this.device.name} from Resideo API: ${JSON.stringify(this.device.changeableValues)}`,
->>>>>>> Stashed changes
       );
 
       this.parseStatus();
@@ -415,16 +377,12 @@ export class RoomSensorThermostat {
                               this.sensorAccessory = accessory;
                               this.log.debug(
                                 `Room Sensor Thermostat: ${this.accessory.displayName}` +
-<<<<<<< Updated upstream
-                                  ` accessoryAttribute: ${superStringify(this.sensorAccessory.accessoryAttribute)}`,
-=======
                                 ` accessoryAttribute: ${JSON.stringify(this.sensorAccessory.accessoryAttribute)}`,
->>>>>>> Stashed changes
                               );
                               this.log.debug(
                                 `Room Sensor Thermostat: ${this.accessory.displayName}` +
-                                  ` Name: ${this.sensorAccessory.accessoryAttribute.name},` +
-                                  ` Software Version: ${this.sensorAccessory.accessoryAttribute.softwareRevision}`,
+                                ` Name: ${this.sensorAccessory.accessoryAttribute.name},` +
+                                ` Software Version: ${this.sensorAccessory.accessoryAttribute.softwareRevision}`,
                               );
                             }
                           }
@@ -449,26 +407,23 @@ export class RoomSensorThermostat {
 
   async refreshRoomPriority(): Promise<void> {
     if (this.device.thermostat?.roompriority?.deviceType === 'Thermostat') {
-<<<<<<< Updated upstream
-      this.roompriority = (
-        await this.platform.axios.get(`${settings.DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
-=======
-      const { body, statusCode, headers } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
-        query: {
-          locationId: this.locationId,
-        },
+      const { body, statusCode } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
         method: 'GET',
-        headers: { 'content-type': 'application/json' },
+        query: {
+          'locationId': this.locationId,
+          'apikey': this.config.credentials?.consumerKey,
+        },
+        headers: {
+          'Authorization': `Bearer ${this.config.credentials?.accessToken}`,
+          'Content-Type': 'application/json',
+        },
       });
-      this.log.debug(`body: ${JSON.stringify(body)}`);
-      this.log.debug(`statusCode: ${statusCode}`);
-      this.log.debug(`headers: ${JSON.stringify(headers)}`);
+      const action = 'refreshRoomPriority';
+      await this.statusCode(statusCode, action);
       const roompriority: any = await body.json();
-      this.log.debug(`Location: ${JSON.stringify(roompriority)}`);
-      this.log.debug(`Location StatusCode: ${roompriority.statusCode}`);
+      this.log.debug(`(refreshRoomPriority) roompriority: ${JSON.stringify(roompriority)}`);
       /*this.roompriority = (
         await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
->>>>>>> Stashed changes
           params: {
             locationId: this.locationId,
           },
@@ -503,54 +458,42 @@ export class RoomSensorThermostat {
        */
       if (this.device.thermostat?.roompriority?.deviceType === 'Thermostat') {
         if (this.device.thermostat?.roompriority.priorityType === 'FollowMe') {
-<<<<<<< Updated upstream
-          this.platform.log.info(
-=======
           this.log.info(
->>>>>>> Stashed changes
             `Room Sensor Thermostat: ${this.accessory.displayName} sent request to Resideo API, Priority Type: ` +
-              `${this.device.thermostat?.roompriority.priorityType} Built-in Occupancy Sensor(s) Will be used to set Priority Automatically.`,
+            `${this.device.thermostat?.roompriority.priorityType} Built-in Occupancy Sensor(s) Will be used to set Priority Automatically.`,
           );
         } else if (this.device.thermostat?.roompriority.priorityType === 'WholeHouse') {
-<<<<<<< Updated upstream
-          this.platform.log.info(
-=======
           this.log.info(
->>>>>>> Stashed changes
             `Room Sensor Thermostat: ${this.accessory.displayName} sent request to Resideo API,` +
-              ` Priority Type: ${this.device.thermostat?.roompriority.priorityType}`,
+            ` Priority Type: ${this.device.thermostat?.roompriority.priorityType}`,
           );
         } else if (this.device.thermostat?.roompriority.priorityType === 'PickARoom') {
-<<<<<<< Updated upstream
-          this.platform.log.info(
-=======
           this.log.info(
->>>>>>> Stashed changes
             `Room Sensor Thermostat: ${this.accessory.displayName} sent request to Resideo API,` +
-              ` Room Priority: ${this.sensorAccessory.accessoryAttribute.name}, Priority Type: ${this.device.thermostat?.roompriority.priorityType}`,
+            ` Room Priority: ${this.sensorAccessory.accessoryAttribute.name}, Priority Type: ${this.device.thermostat?.roompriority.priorityType}`,
           );
         }
 
         // Make the API request
-<<<<<<< Updated upstream
-        await this.platform.axios.put(`${settings.DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
-=======
-        const { body, statusCode, headers } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
-          query: {
-            locationId: this.locationId,
-          },
-          body: JSON.stringify(payload),
+        const { body, statusCode } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
           method: 'PUT',
-          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+          query: {
+            'locationId': this.locationId,
+            'apikey': this.config.credentials?.consumerKey,
+          },
+          headers: {
+            'Authorization': `Bearer ${this.config.credentials?.accessToken}`,
+            'Content-Type': 'application/json',
+          },
         });
-        this.log.debug(`body: ${JSON.stringify(body)}`);
-        this.log.debug(`statusCode: ${statusCode}`);
-        this.log.debug(`headers: ${JSON.stringify(headers)}`);
-        const pushRoomChanges: any = await body.json();
-        this.log.debug(`Location: ${JSON.stringify(pushRoomChanges)}`);
-        this.log.debug(`Location StatusCode: ${pushRoomChanges.statusCode}`);
+        const action = 'pushRoomChanges';
+        await this.statusCode(statusCode, action);
+        this.log.debug(`(pushRoomChanges) body: ${JSON.stringify(body)}`);
+        //const pushRoomChanges: any = await body.json();
+        //this.log.debug(`(pushRoomChanges) pushRoomChanges: ${JSON.stringify(pushRoomChanges)}`);
+        //this.statusCode(pushRoomChanges.statusCode, action);
         /*await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
->>>>>>> Stashed changes
           params: {
             locationId: this.locationId,
           },
@@ -571,7 +514,7 @@ export class RoomSensorThermostat {
         mode: this.resideoMode[Number(this.TargetHeatingCoolingState)],
         thermostatSetpointStatus: this.device.thermostat?.thermostatSetpointStatus,
         autoChangeoverActive: this.device.changeableValues!.autoChangeoverActive,
-      } as settings.payload;
+      } as payload;
 
       // Set the heat and cool set point value based on the selected mode
       switch (this.TargetHeatingCoolingState) {
@@ -580,9 +523,9 @@ export class RoomSensorThermostat {
           payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
           this.log.debug(
             `Room Sensor Thermostat: ${this.accessory.displayName}` +
-              ` TargetHeatingCoolingState (HEAT): ${this.TargetHeatingCoolingState},` +
-              ` TargetTemperature: ${this.toFahrenheit(Number(this.TargetTemperature))} heatSetpoint,` +
-              ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint`,
+            ` TargetHeatingCoolingState (HEAT): ${this.TargetHeatingCoolingState},` +
+            ` TargetTemperature: ${this.toFahrenheit(Number(this.TargetTemperature))} heatSetpoint,` +
+            ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint`,
           );
           break;
         case this.platform.Characteristic.TargetHeatingCoolingState.COOL:
@@ -590,9 +533,9 @@ export class RoomSensorThermostat {
           payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
           this.log.debug(
             `Room Sensor Thermostat: ${this.accessory.displayName}` +
-              ` TargetHeatingCoolingState (COOL): ${this.TargetHeatingCoolingState},` +
-              ` TargetTemperature: ${this.toFahrenheit(Number(this.TargetTemperature))} coolSetpoint,` +
-              ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`,
+            ` TargetHeatingCoolingState (COOL): ${this.TargetHeatingCoolingState},` +
+            ` TargetTemperature: ${this.toFahrenheit(Number(this.TargetTemperature))} coolSetpoint,` +
+            ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`,
           );
           break;
         case this.platform.Characteristic.TargetHeatingCoolingState.AUTO:
@@ -600,9 +543,9 @@ export class RoomSensorThermostat {
           payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
           this.log.debug(
             `Room Sensor Thermostat: ${this.accessory.displayName}` +
-              ` TargetHeatingCoolingState (AUTO): ${this.TargetHeatingCoolingState},` +
-              ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint,` +
-              ` HeatingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`,
+            ` TargetHeatingCoolingState (AUTO): ${this.TargetHeatingCoolingState},` +
+            ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint,` +
+            ` HeatingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`,
           );
           break;
         default:
@@ -610,36 +553,32 @@ export class RoomSensorThermostat {
           payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
           this.log.debug(
             `Room Sensor Thermostat: ${this.accessory.displayName}` +
-              ` TargetHeatingCoolingState (OFF): ${this.TargetHeatingCoolingState},` +
-              ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint,` +
-              ` HeatingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`,
+            ` TargetHeatingCoolingState (OFF): ${this.TargetHeatingCoolingState},` +
+            ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint,` +
+            ` HeatingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`,
           );
       }
-<<<<<<< Updated upstream
-      this.platform.log.info(`Room Sensor Thermostat: ${this.accessory.displayName} set request (${superStringify(payload)}) to Resideo API.`);
-
-      // Make the API request
-      await this.platform.axios.post(`${settings.DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
-=======
       this.log.info(`Room Sensor Thermostat: ${this.accessory.displayName} set request (${JSON.stringify(payload)}) to Resideo API.`);
 
       // Make the API request
-      const { body, statusCode, headers } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
-        query: {
-          locationId: this.locationId,
-        },
-        body: JSON.stringify(payload),
+      const { statusCode } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+        query: {
+          'locationId': this.locationId,
+          'apikey': this.config.credentials?.consumerKey,
+        },
+        headers: {
+          'Authorization': `Bearer ${this.config.credentials?.accessToken}`,
+          'Content-Type': 'application/json',
+        },
       });
-      this.log.debug(`body: ${JSON.stringify(body)}`);
-      this.log.debug(`statusCode: ${statusCode}`);
-      this.log.debug(`headers: ${JSON.stringify(headers)}`);
-      const pushChanges: any = await body.json();
-      this.log.debug(`Location: ${JSON.stringify(pushChanges)}`);
-      this.log.debug(`Location StatusCode: ${pushChanges.statusCode}`);
+      const action = 'pushChanges';
+      await this.statusCode(statusCode, action);
+      //const pushChanges: any = await body.json();
+      //this.log.debug(`(pushChanges) pushChanges: ${JSON.stringify(pushChanges)}`);
+      //this.statusCode(pushChanges.statusCode, action);
       /*await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
->>>>>>> Stashed changes
         params: {
           locationId: this.locationId,
         },
@@ -659,105 +598,65 @@ export class RoomSensorThermostat {
     if (this.TemperatureDisplayUnits === undefined) {
       this.log.debug(`Room Sensor Thermostat: ${this.accessory.displayName} TemperatureDisplayUnits: ${this.TemperatureDisplayUnits}`);
     } else {
-<<<<<<< Updated upstream
-      this.service.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, this.TemperatureDisplayUnits);
-      this.debugLog(
-=======
       this.service.updateCharacteristic(this.hap.Characteristic.TemperatureDisplayUnits, this.TemperatureDisplayUnits);
       this.log.debug(
->>>>>>> Stashed changes
         `Room Sensor Thermostat: ${this.accessory.displayName}` + ` updateCharacteristic TemperatureDisplayUnits: ${this.TemperatureDisplayUnits}`,
       );
     }
     if (this.CurrentTemperature === undefined) {
       this.log.debug(`Room Sensor Thermostat: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}`);
     } else {
-<<<<<<< Updated upstream
-      this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
-      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName}` + ` updateCharacteristic CurrentTemperature: ${this.CurrentTemperature}`);
-=======
       this.service.updateCharacteristic(this.hap.Characteristic.CurrentTemperature, this.CurrentTemperature);
       this.log.debug(`Room Sensor Thermostat: ${this.accessory.displayName} updateCharacteristic CurrentTemperature: ${this.CurrentTemperature}`);
->>>>>>> Stashed changes
     }
     if (this.CurrentRelativeHumidity === undefined) {
       this.log.debug(`Room Sensor Thermostat: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
     } else {
-<<<<<<< Updated upstream
-      this.service.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
-      this.debugLog(
-=======
       this.service.updateCharacteristic(this.hap.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
       this.log.debug(
->>>>>>> Stashed changes
         `Room Sensor Thermostat: ${this.accessory.displayName}` + ` updateCharacteristic CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`,
       );
     }
     if (this.TargetTemperature === undefined) {
       this.log.debug(`Room Sensor Thermostat: ${this.accessory.displayName} TargetTemperature: ${this.TargetTemperature}`);
     } else {
-<<<<<<< Updated upstream
-      this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
-      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} updateCharacteristic TargetTemperature: ${this.TargetTemperature}`);
-=======
       this.service.updateCharacteristic(this.hap.Characteristic.TargetTemperature, this.TargetTemperature);
       this.log.debug(`Room Sensor Thermostat: ${this.accessory.displayName} updateCharacteristic TargetTemperature: ${this.TargetTemperature}`);
->>>>>>> Stashed changes
     }
     if (this.HeatingThresholdTemperature === undefined) {
       this.log.debug(`Room Sensor Thermostat: ${this.accessory.displayName} HeatingThresholdTemperature: ${this.HeatingThresholdTemperature}`);
     } else {
-<<<<<<< Updated upstream
-      this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, this.HeatingThresholdTemperature);
-      this.debugLog(
-=======
       this.service.updateCharacteristic(this.hap.Characteristic.HeatingThresholdTemperature, this.HeatingThresholdTemperature);
       this.log.debug(
->>>>>>> Stashed changes
         `Room Sensor Thermostat: ${this.accessory.displayName} updateCharacteristic` +
-          ` HeatingThresholdTemperature: ${this.HeatingThresholdTemperature}`,
+        ` HeatingThresholdTemperature: ${this.HeatingThresholdTemperature}`,
       );
     }
     if (this.CoolingThresholdTemperature === undefined) {
       this.log.debug(`Room Sensor Thermostat: ${this.accessory.displayName} CoolingThresholdTemperature: ${this.CoolingThresholdTemperature}`);
     } else {
-<<<<<<< Updated upstream
-      this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
-      this.debugLog(
-=======
       this.service.updateCharacteristic(this.hap.Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
       this.log.debug(
->>>>>>> Stashed changes
         `Room Sensor Thermostat: ${this.accessory.displayName} updateCharacteristic` +
-          ` CoolingThresholdTemperature: ${this.CoolingThresholdTemperature}`,
+        ` CoolingThresholdTemperature: ${this.CoolingThresholdTemperature}`,
       );
     }
     if (this.TargetHeatingCoolingState === undefined) {
       this.log.debug(`Room Sensor Thermostat: ${this.accessory.displayName} TargetHeatingCoolingState: ${this.TargetHeatingCoolingState}`);
     } else {
-<<<<<<< Updated upstream
-      this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, this.TargetHeatingCoolingState);
-      this.debugLog(
-=======
       this.service.updateCharacteristic(this.hap.Characteristic.TargetHeatingCoolingState, this.TargetHeatingCoolingState);
       this.log.debug(
->>>>>>> Stashed changes
         `Room Sensor Thermostat: ${this.accessory.displayName} updateCharacteristic` +
-          ` TargetHeatingCoolingState: ${this.TargetHeatingCoolingState}`,
+        ` TargetHeatingCoolingState: ${this.TargetHeatingCoolingState}`,
       );
     }
     if (this.CurrentHeatingCoolingState === undefined) {
       this.log.debug(`Room Sensor Thermostat: ${this.accessory.displayName} CurrentHeatingCoolingState: ${this.CurrentHeatingCoolingState}`);
     } else {
-<<<<<<< Updated upstream
-      this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, this.CurrentHeatingCoolingState);
-      this.debugLog(
-=======
       this.service.updateCharacteristic(this.hap.Characteristic.CurrentHeatingCoolingState, this.CurrentHeatingCoolingState);
       this.log.debug(
->>>>>>> Stashed changes
         `Room Sensor Thermostat: ${this.accessory.displayName} updateCharacteristic` +
-          ` CurrentHeatingCoolingState: ${this.TargetHeatingCoolingState}`,
+        ` CurrentHeatingCoolingState: ${this.TargetHeatingCoolingState}`,
       );
     }
   }
@@ -811,28 +710,6 @@ export class RoomSensorThermostat {
       }
     }
     if (e.message.includes('400')) {
-<<<<<<< Updated upstream
-      this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Bad Request`);
-      this.debugLog('The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.');
-    } else if (e.message.includes('401')) {
-      this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Unauthorized Request`);
-      this.debugLog('Authorization for the API is required, but the request has not been authenticated.');
-    } else if (e.message.includes('403')) {
-      this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Forbidden Request`);
-      this.debugLog('The request has been authenticated but does not have appropriate permissions, or a requested resource is not found.');
-    } else if (e.message.includes('404')) {
-      this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Requst Not Found`);
-      this.debugLog('Specifies the requested path does not exist.');
-    } else if (e.message.includes('406')) {
-      this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Request Not Acceptable`);
-      this.debugLog('The client has requested a MIME type via the Accept header for a value not supported by the server.');
-    } else if (e.message.includes('415')) {
-      this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Unsupported Requst Header`);
-      this.debugLog('The client has defined a contentType header that is not supported by the server.');
-    } else if (e.message.includes('422')) {
-      this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Unprocessable Entity`);
-      this.debugLog(
-=======
       this.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Bad Request`);
       this.log.debug('The client has issued an invalid request. This is commonly used to specify validation errors in a request payload.');
     } else if (e.message.includes('401')) {
@@ -853,24 +730,10 @@ export class RoomSensorThermostat {
     } else if (e.message.includes('422')) {
       this.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Unprocessable Entity`);
       this.log.debug(
->>>>>>> Stashed changes
         'The client has made a valid request, but the server cannot process it.' +
-          ' This is often used for APIs for which certain limits have been exceeded.',
+        ' This is often used for APIs for which certain limits have been exceeded.',
       );
     } else if (e.message.includes('429')) {
-<<<<<<< Updated upstream
-      this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Too Many Requests`);
-      this.debugLog('The client has exceeded the number of requests allowed for a given time window.');
-    } else if (e.message.includes('500')) {
-      this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Internal Server Error`);
-      this.debugLog('An unexpected error on the SmartThings servers has occurred. These errors should be rare.');
-    } else {
-      this.platform.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action},`);
-    }
-    if (this.deviceLogging.includes('debug')) {
-      this.platform.log.error(
-        `Room Sensor Thermostat: ${this.accessory.displayName} failed to pushChanges, ` + `Error Message: ${superStringify(e.message)}`,
-=======
       this.log.error(`Room Sensor Thermostat: ${this.accessory.displayName} failed to ${this.action}, Too Many Requests`);
       this.log.debug('The client has exceeded the number of requests allowed for a given time window.');
     } else if (e.message.includes('500')) {
@@ -882,43 +745,34 @@ export class RoomSensorThermostat {
     if (this.deviceLogging.includes('debug')) {
       this.log.error(
         `Room Sensor Thermostat: ${this.accessory.displayName} failed to pushChanges, ` + `Error Message: ${JSON.stringify(e.message)}`,
->>>>>>> Stashed changes
       );
     }
   }
 
-  async statusCode(statusCode: number): Promise<void> {
-    /**
-    * Meater API Status Codes (https://github.com/apption-labs/meater-cloud-public-rest-api)
-    *
-    * Standard Response Codes: 200(OK), 201(Created), 204(No Content)
-    * https://github.com/apption-labs/meater-cloud-public-rest-api#standard-response
-    *
-    * Error Response: 400(Bad Request), 401(Unauthorized), 404(Not Found), 429(Too Many Requests), 500(Internal Server Error)
-    * https://github.com/apption-labs/meater-cloud-public-rest-api#error-response
-    **/
+  async statusCode(statusCode: number, action: string): Promise<void> {
     switch (statusCode) {
       case 200:
-        this.log.debug(`${this.accessory.displayName} Standard Response, statusCode: ${statusCode}`);
+        this.log.debug(`${this.device.deviceClass}: ${this.accessory.displayName} Standard Response, statusCode: ${statusCode}, Action: ${action}`);
         break;
       case 400:
-        this.log.error(`${this.accessory.displayName} Bad Request, statusCode: ${statusCode}`);
+        this.log.error(`${this.device.deviceClass}: ${this.accessory.displayName} Bad Request, statusCode: ${statusCode}, Action: ${action}`);
         break;
       case 401:
-        this.log.error(`${this.accessory.displayName} Unauthorized, statusCode: ${statusCode}`);
+        this.log.error(`${this.device.deviceClass}: ${this.accessory.displayName} Unauthorized, statusCode: ${statusCode}, Action: ${action}`);
         break;
       case 404:
-        this.log.error(`${this.accessory.displayName} Not Found, statusCode: ${statusCode}`);
+        this.log.error(`${this.device.deviceClass}: ${this.accessory.displayName} Not Found, statusCode: ${statusCode}, Action: ${action}`);
         break;
       case 429:
-        this.log.error(`${this.accessory.displayName} Too Many Requests, statusCode: ${statusCode}`);
+        this.log.error(`${this.device.deviceClass}: ${this.accessory.displayName} Too Many Requests, statusCode: ${statusCode}, Action: ${action}`);
         break;
       case 500:
-        this.log.error(`${this.accessory.displayName} Internal Server Error (Meater Server), statusCode: ${statusCode}`);
+        this.log.error(`${this.device.deviceClass}: ${this.accessory.displayName} Internal Server Error (Meater Server), statusCode: ${statusCode}, `
+          + `Action: ${action}`);
         break;
       default:
-        this.log.info(
-          `${this.accessory.displayName} Unknown statusCode: ${statusCode}, Report Bugs Here: https://bit.ly/homebridge-meater-bug-report`);
+        this.log.info(`${this.device.deviceClass}: ${this.accessory.displayName} Unknown statusCode: ${statusCode}, `
+          + `Action: ${action}, Report Bugs Here: https://bit.ly/homebridge-resideo-bug-report`);
     }
   }
 
@@ -959,13 +813,8 @@ export class RoomSensorThermostat {
   }
 
   async setTemperatureDisplayUnits(value: CharacteristicValue): Promise<void> {
-<<<<<<< Updated upstream
-    this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Set TemperatureDisplayUnits: ${value}`);
-    this.platform.log.warn('Changing the Hardware Display Units from HomeKit is not supported.');
-=======
     this.log.debug(`Room Sensor Thermostat: ${this.accessory.displayName} Set TemperatureDisplayUnits: ${value}`);
     this.log.warn('Changing the Hardware Display Units from HomeKit is not supported.');
->>>>>>> Stashed changes
 
     // change the temp units back to the one the Resideo API said the thermostat was set to
     setTimeout(() => {
@@ -1016,103 +865,4 @@ export class RoomSensorThermostat {
     this.log.debug(`Room Sensor Thermostat: ${this.accessory.displayName} Only Show These Modes: ${JSON.stringify(TargetState)}`);
     return TargetState;
   }
-<<<<<<< Updated upstream
-
-  async config(device: settings.device & settings.devicesConfig): Promise<void> {
-    let config = {};
-    if (device.thermostat?.roompriority) {
-      config = device.thermostat?.roompriority;
-    }
-    if (device.thermostat?.roompriority?.logging !== undefined) {
-      config['logging'] = device.thermostat?.roompriority?.logging;
-    }
-    if (device.thermostat?.roompriority?.refreshRate !== undefined) {
-      config['refreshRate'] = device.thermostat?.roompriority?.refreshRate;
-    }
-    if (Object.entries(config).length !== 0) {
-      this.infoLog(`Room Sensor Thermostat: ${this.accessory.displayName} Config: ${superStringify(config)}`);
-    }
-  }
-
-  async refreshRate(device: settings.device & settings.devicesConfig): Promise<void> {
-    if (device.thermostat?.roompriority?.refreshRate) {
-      this.deviceRefreshRate = this.accessory.context.refreshRate = device.thermostat?.roompriority?.refreshRate;
-      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Device Config refreshRate: ${this.deviceRefreshRate}`);
-    } else if (device.refreshRate) {
-      this.deviceRefreshRate = this.accessory.context.refreshRate = device.refreshRate;
-      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Thermostat Device Config refreshRate: ${this.deviceRefreshRate}`);
-    } else if (this.platform.config.options!.refreshRate) {
-      this.deviceRefreshRate = this.accessory.context.refreshRate = this.platform.config.options!.refreshRate;
-      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Platform Config refreshRate: ${this.deviceRefreshRate}`);
-    }
-  }
-
-  async logs(device: settings.device & settings.devicesConfig): Promise<void> {
-    if (this.platform.debugMode) {
-      this.deviceLogging = this.accessory.context.logging = 'debugMode';
-      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Debug Mode Logging: ${this.deviceLogging}`);
-    } else if (device.thermostat?.roompriority?.logging) {
-      this.deviceLogging = this.accessory.context.logging = device.thermostat?.roompriority?.logging;
-      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Device Config Logging: ${this.deviceLogging}`);
-    } else if (this.platform.config.options?.logging) {
-      this.deviceLogging = this.accessory.context.logging = this.platform.config.options?.logging;
-      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Using Platform Config Logging: ${this.deviceLogging}`);
-    } else {
-      this.deviceLogging = this.accessory.context.logging = 'standard';
-      this.debugLog(`Room Sensor Thermostat: ${this.accessory.displayName} Logging Not Set, Using: ${this.deviceLogging}`);
-    }
-  }
-
-  /**
-   * Logging for Device
-   */
-  infoLog(...log: any[]): void {
-    if (this.enablingDeviceLogging()) {
-      this.platform.log.info(String(...log));
-    }
-  }
-
-  warnLog(...log: any[]): void {
-    if (this.enablingDeviceLogging()) {
-      this.platform.log.warn(String(...log));
-    }
-  }
-
-  debugWarnLog(...log: any[]): void {
-    if (this.enablingDeviceLogging()) {
-      if (this.deviceLogging?.includes('debug')) {
-        this.platform.log.warn('[DEBUG]', String(...log));
-      }
-    }
-  }
-
-  errorLog(...log: any[]): void {
-    if (this.enablingDeviceLogging()) {
-      this.platform.log.error(String(...log));
-    }
-  }
-
-  debugErrorLog(...log: any[]): void {
-    if (this.enablingDeviceLogging()) {
-      if (this.deviceLogging?.includes('debug')) {
-        this.platform.log.error('[DEBUG]', String(...log));
-      }
-    }
-  }
-
-  debugLog(...log: any[]): void {
-    if (this.enablingDeviceLogging()) {
-      if (this.deviceLogging === 'debug') {
-        this.platform.log.info('[DEBUG]', String(...log));
-      } else {
-        this.platform.log.debug(String(...log));
-      }
-    }
-  }
-
-  enablingDeviceLogging(): boolean {
-    return this.deviceLogging.includes('debug') || this.deviceLogging === 'standard';
-  }
-=======
->>>>>>> Stashed changes
 }

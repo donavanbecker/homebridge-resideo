@@ -1,13 +1,8 @@
-<<<<<<< Updated upstream
-import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
-=======
 /* Copyright(C) 2017-2023, donavanbecker (https://github.com/donavanbecker). All rights reserved.
  *
  * protect-platform.ts: homebridge-cloudflared-tunnel platform class.
  */
-import { API, DynamicPlatformPlugin, Logging, PlatformAccessory } from 'homebridge';
 import {
-  resideoDevice,
   AuthURL,
   DeviceURL,
   LocationURL,
@@ -18,28 +13,18 @@ import {
   accessoryAttribute,
   devicesConfig,
   location,
+  resideoDevice,
   sensorAccessory,
 } from './settings.js';
 import { request } from 'undici';
->>>>>>> Stashed changes
 import { readFileSync, writeFileSync } from 'fs';
-import { API, Characteristic, DynamicPlatformPlugin, Logger, PlatformAccessory, Service } from 'homebridge';
+import { API, DynamicPlatformPlugin, Logging, PlatformAccessory, Characteristic, Service } from 'homebridge';
 import { stringify } from 'querystring';
-<<<<<<< Updated upstream
-import superStringify from 'super-stringify';
-import { LeakSensor } from './devices/leaksensors';
-import { Valve } from './devices/valve';
-import { RoomSensors } from './devices/roomsensors';
-import { RoomSensorThermostat } from './devices/roomsensorthermostats';
-import { Thermostats } from './devices/thermostats';
-import * as settings from './settings';
-=======
-import { LeakSensor } from './devices/leaksensors.js';
 import { Valve } from './devices/valve.js';
+import { LeakSensor } from './devices/leaksensors.js';
 import { RoomSensors } from './devices/roomsensors.js';
-import { RoomSensorThermostat } from './devices/roomsensorthermostats.js';
 import { Thermostats } from './devices/thermostats.js';
->>>>>>> Stashed changes
+import { RoomSensorThermostat } from './devices/roomsensorthermostats.js';
 
 /**
  * HomebridgePlatform
@@ -58,43 +43,35 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
   });*/
 
   locations?: any;
-  firmware!: settings.accessoryAttribute['softwareRevision'];
-  sensorAccessory!: settings.sensorAccessory;
+  firmware!: accessoryAttribute['softwareRevision'];
+  sensorAccessory!: sensorAccessory;
   version = process.env.npm_package_version || '1.3.0';
   public sensorData = [];
   private refreshInterval!: NodeJS.Timeout;
   debugMode!: boolean;
   action!: string;
   platformLogging!: string;
-<<<<<<< Updated upstream
-=======
-  config!: ResideoPlatformConfig;
->>>>>>> Stashed changes
 
-  constructor(public readonly log: Logger, public readonly config: settings.ResideoPlatformConfig, public readonly api: API) {
+  constructor(
+    public readonly log: Logging,
+    public readonly config: ResideoPlatformConfig,
+    public readonly api: API,
+  ) {
     this.logs();
-    this.debugLog(`Finished initializing platform: ${this.config.name}`);
+    this.log.debug(`Finished initializing platform: ${this.config.name}`);
     // only load if configured
     if (!this.config) {
       return;
     }
 
-<<<<<<< Updated upstream
-    // HOOBS notice
-    if (__dirname.includes('hoobs')) {
-      this.warnLog('This plugin has not been tested under HOOBS, it is highly recommended that ' + 'you switch to Homebridge: https://git.io/Jtxb0');
-    }
-=======
     // Plugin options into our config variables.
     this.config = {
       platform: 'ResideoPlatform',
       credentials: config.credentials,
       options: config.options,
     };
-    this.logs();
     this.log.debug(`Finished initializing platform: ${config.name}`);
 
->>>>>>> Stashed changes
 
     // verify the config
     try {
@@ -123,17 +100,26 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       this.log.debug('Executed didFinishLaunching callback');
       // run the method to discover / register your devices as accessories
       await this.refreshAccessToken();
-      try {
-        this.locations = await this.discoverlocations();
-      } catch (e: any) {
-        this.action = 'Discober Locations';
-        this.apiError(e);
-      }
-      try {
-        this.discoverDevices();
-      } catch (e: any) {
-        this.action = 'Discober Device';
-        this.apiError(e);
+      if (this.config.credentials?.accessToken) {
+        this.log.debug(`accessToken: ${this.config.credentials?.accessToken}`);
+        try {
+          this.locations = await this.discoverlocations();
+        } catch (e: any) {
+          this.action = 'Discover Locations';
+          this.apiError(e);
+        }
+        if (this.locations !== undefined) {
+          try {
+            this.discoverDevices();
+          } catch (e: any) {
+            this.action = 'Discover Device';
+            this.apiError(e);
+          }
+        } else {
+          this.log.error('Failed to Discover Locations. Re-Link Your Resideo Account.');
+        }
+      } else {
+        this.log.error('Missing Access Token. Re-Link Your Resideo Account.');
       }
     });
   }
@@ -174,6 +160,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
    */
   verifyConfig() {
     this.config.options = this.config.options || {};
+    this.config.credentials = this.config.credentials || {};
 
     const platformConfig = {};
     if (this.config.options.logging) {
@@ -251,45 +238,37 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
    */
   async getAccessToken() {
     try {
-      let result: any;
-
-      if (this.config.credentials!.consumerSecret) {
-        result = (
-<<<<<<< Updated upstream
-          await axios({
-            url: settings.AuthURL,
-=======
-          await /*axios*/({
-            url: AuthURL,
->>>>>>> Stashed changes
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            auth: {
-              username: this.config.credentials!.consumerKey,
-              password: this.config.credentials!.consumerSecret,
-            },
-            data: stringify({
-              grant_type: 'refresh_token',
-              refresh_token: this.config.credentials!.refreshToken,
-            }),
-            responseType: 'json',
-          })
-        ).data;
+      if (this.config.credentials!.consumerSecret && this.config.credentials!.consumerKey && this.config.credentials!.refreshToken) {
+        this.log.debug(`consumerKey: ${this.config.credentials!.consumerKey},` + ` consumerSecret: ${this.config.credentials!.consumerSecret},`
+          + ` refreshToken: ${this.config.credentials!.refreshToken}` + ` accessToken: ${this.config.credentials!.accessToken}`);
+        const { body, statusCode } = await request(AuthURL, {
+          method: 'POST',
+          headers: {
+            Authorization:
+              `Basic ${Buffer.from(`${this.config.credentials!.consumerKey}:${this.config.credentials!.consumerSecret}`).toString('base64')}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: stringify({
+            grant_type: 'refresh_token',
+            refresh_token: this.config.credentials!.refreshToken,
+          }),
+        });
+        const action = 'getAccessToken';
+        await this.statusCode(statusCode, action);
+        this.log.debug(`(getAccessToken) body: ${JSON.stringify(body)}`);
+        const result: any = await body.json();
+        this.log.debug(`(getAccessToken) Result: ${JSON.stringify(result)}`);
+        this.config.credentials!.accessToken = result.access_token;
+        this.log.debug(`Got access token: ${this.config.credentials!.accessToken}`);
+        // check if the refresh token has changed
+        if (result.refresh_token !== this.config.credentials!.refreshToken) {
+          this.log.debug(`New refresh token: ${result.refresh_token}`);
+          await this.updateRefreshToken(result.refresh_token);
+        }
+        this.config.credentials!.refreshToken = result.refresh_token;
       } else {
         this.log.warn('Please re-link your account in the Homebridge UI.');
       }
-
-      this.config.credentials!.accessToken = result.access_token;
-      this.log.debug(`Got access token: ${this.config.credentials!.accessToken}`);
-      // check if the refresh token has changed
-      if (result.refresh_token !== this.config.credentials!.refreshToken) {
-        this.log.debug(`New refresh token: ${result.refresh_token}`);
-        await this.updateRefreshToken(result.refresh_token);
-      }
-
-      this.config.credentials!.refreshToken = result.refresh_token;
     } catch (e: any) {
       this.action = 'refresh access token';
       this.apiError(e);
@@ -317,10 +296,10 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       }
 
       // find this plugins current config
-      const pluginConfig = currentConfig.platforms.find((x: { platform: string }) => x.platform === settings.PLATFORM_NAME);
+      const pluginConfig = currentConfig.platforms.find((x: { platform: string }) => x.platform === PLATFORM_NAME);
 
       if (!pluginConfig) {
-        throw new Error(`Cannot find config for ${settings.PLATFORM_NAME} in platforms array`);
+        throw new Error(`Cannot find config for ${PLATFORM_NAME} in platforms array`);
       }
 
       // check the .credentials is an object before doing object things with it
@@ -344,23 +323,23 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
    * this method discovers the Locations
    */
   async discoverlocations() {
-<<<<<<< Updated upstream
-    const locations = (await this.axios.get(settings.LocationURL)).data;
-=======
-    const { body, statusCode, headers } = await request(LocationURL, {
+    this.log.debug(`accessToken: ${this.config.credentials?.accessToken}, consumerKey: ${this.config.credentials?.consumerKey}`);
+    const { body, statusCode } = await request(LocationURL, {
       method: 'GET',
-      headers: { 'content-type': 'application/json' },
+      query: {
+        'apikey': this.config.credentials?.consumerKey,
+      },
+      headers: {
+        'Authorization': `Bearer ${this.config.credentials?.accessToken}`,
+        'Content-Type': 'application/json',
+      },
     });
-    this.log.debug(`body: ${JSON.stringify(body)}`);
-    this.log.debug(`statusCode: ${statusCode}`);
-    this.log.debug(`headers: ${JSON.stringify(headers)}`);
-    const login: any = await body.json();
-    this.log.debug(`Location: ${JSON.stringify(login)}`);
-    this.log.debug(`Location Data: ${JSON.stringify(login.data)}`);
-    this.log.debug(`Location StatusCode: ${login.statusCode}`);
-    const locations = login.data.locations;
+    const action = 'discoverlocations';
+    await this.statusCode(statusCode, action);
+    this.log.debug(`(discoverlocations) body: ${JSON.stringify(body)}`);
+    const locations: any = await body.json();
+    this.log.debug(`(discoverlocations) Location: ${JSON.stringify(locations)}`);
     //const locations = (await this.axios.get(LocationURL)).data;
->>>>>>> Stashed changes
     return locations;
   }
 
@@ -368,38 +347,37 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
    * this method discovers the rooms at each location
    */
   public async getCurrentSensorData(
-    device: settings.device & settings.devicesConfig,
-    group: settings.T9groups,
-    locationId: settings.location['locationID'],
+    device: resideoDevice & devicesConfig,
+    group: T9groups,
+    locationId: location['locationID'],
   ) {
     if (!this.sensorData[device.deviceID] || this.sensorData[device.deviceID].timestamp < Date.now()) {
-<<<<<<< Updated upstream
-      const response: any = await this.axios.get(`${settings.DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
-=======
-      const { body, statusCode, headers } = await request(`${DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
-        query: {
-          locationId: locationId,
-        },
+      const { body, statusCode } = await request(`${DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
         method: 'GET',
-        headers: { 'content-type': 'application/json' },
+        query: {
+          'locationId': locationId,
+          'apikey': this.config.credentials?.consumerKey,
+        },
+        headers: {
+          'Authorization': `Bearer ${this.config.credentials?.accessToken}`,
+          'Content-Type': 'application/json',
+        },
       });
-      this.log.debug(`body: ${JSON.stringify(body)}`);
-      this.log.debug(`statusCode: ${statusCode}`);
-      this.log.debug(`headers: ${JSON.stringify(headers)}`);
+      const action = 'getCurrentSensorData';
+      await this.statusCode(statusCode, action);
       const response: any = await body.json();
-      this.log.debug(`Response: ${JSON.stringify(response)}`);
-      this.log.debug(`Response StatusCode: ${response.statusCode}`);
-
+      this.log.debug(`(getCurrentSensorData) Response: ${JSON.stringify(response)}`);
       /*const response: any = await this.axios.get(`${DeviceURL}/thermostats/${device.deviceID}/group/${group.id}/rooms`, {
->>>>>>> Stashed changes
         params: {
           locationId: locationId,
         },
       });*/
+
       this.sensorData[device.deviceID] = {
         timestamp: Date.now() + 45000,
-        data: this.normalizeSensorDate(response.data),
+        data: this.normalizeSensorDate(response),
       };
+      this.log.debug(`getCurrentSensorData ${device.deviceType} ${device.deviceModel}: ${this.sensorData[device.deviceID]}`);
     } else {
       this.log.debug(`getCurrentSensorData Cache ${device.deviceType} ${device.deviceModel} - ${device.userDefinedDeviceName}`);
     }
@@ -421,7 +399,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
   /**
    * this method discovers the firmware Veriosn for T9 Thermostats
    */
-  public async getSoftwareRevision(locationId: settings.location['locationID'], device: settings.device & settings.devicesConfig) {
+  public async getSoftwareRevision(locationId: location['locationID'], device: resideoDevice & devicesConfig) {
     if (device.deviceModel.startsWith('T9') && device.groups) {
       for (const group of device.groups) {
         const roomsensors = await this.getCurrentSensorData(device, group, locationId);
@@ -506,7 +484,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  private async deviceClass(device: settings.device & settings.devicesConfig, location: any, locationId: any) {
+  private async deviceClass(device: resideoDevice & devicesConfig, location: any, locationId: any) {
     switch (device.deviceClass) {
       case 'ShutoffValve':
         this.log.debug(`Discovered ${device.userDefinedDeviceName} ${device.deviceClass} @ ${location.name}`);
@@ -521,6 +499,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
         await this.createThermostat(location, device, locationId);
         if (device.deviceModel!.startsWith('T9')) {
           try {
+            this.log.debug(`Discovering Room Sensor(s) for ${device.userDefinedDeviceName} ${device.deviceClass} (${device.deviceModel})`);
             await this.discoverRoomSensors(location.locationID, device);
           } catch (e: any) {
             this.action = 'Find Room Sensor(s)';
@@ -534,10 +513,11 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  private async discoverRoomSensors(locationId: settings.location['locationID'], device: settings.device & settings.devicesConfig) {
+  private async discoverRoomSensors(locationId: location['locationID'], device: resideoDevice & devicesConfig) {
     // get the devices at each location
     this.roomsensordisplaymethod(device);
     if (device.groups) {
+      this.log.debug(`Discovered ${device.groups.length} Group(s) for ${device.userDefinedDeviceName} ${device.deviceClass} (${device.deviceModel})`);
       for (const group of device.groups) {
         const roomsensors = await this.getCurrentSensorData(device, group, locationId);
         for (const accessories of roomsensors) {
@@ -549,7 +529,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
                   if (sensorAccessory.accessoryAttribute.type.startsWith('IndoorAirSensor')) {
                     this.log.debug(
                       `Discovered Room Sensor groupId: ${sensorAccessory.roomId},` +
-                        ` roomId: ${sensorAccessory.accessoryId}, accessoryId: ${sensorAccessory.accessoryAttribute.name}`,
+                      ` roomId: ${sensorAccessory.accessoryId}, accessoryId: ${sensorAccessory.accessoryAttribute.name}`,
                     );
                     if (sensorAccessory.accessoryAttribute.model === '0') {
                       sensorAccessory.accessoryAttribute.model = '4352';
@@ -567,7 +547,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  private roomsensordisplaymethod(device: settings.device & settings.devicesConfig) {
+  private roomsensordisplaymethod(device: resideoDevice & devicesConfig) {
     if (device.thermostat?.roompriority) {
       /**
        * Room Priority
@@ -583,9 +563,9 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
   }
 
   private async createThermostat(
-    location: settings.location,
-    device: settings.device & settings.devicesConfig,
-    locationId: settings.location['locationID'],
+    location: location,
+    device: resideoDevice & devicesConfig,
+    locationId: location['locationID'],
   ) {
     const uuid = this.api.hap.uuid.generate(`${device.deviceID}-${device.deviceClass}`);
 
@@ -642,7 +622,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  private Leak(device: settings.device & settings.devicesConfig, locationId: settings.location['locationID']) {
+  private Leak(device: resideoDevice & devicesConfig, locationId: location['locationID']) {
     const uuid = this.api.hap.uuid.generate(`${device.deviceID}-${device.deviceClass}`);
 
     // see if an accessory with the same uuid has already been registered and restored from
@@ -701,7 +681,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  private Valve(device: settings.device & settings.devicesConfig, locationId: settings.location['locationID']) {
+  private Valve(device: resideoDevice & devicesConfig, locationId: location['locationID']) {
     const uuid = this.api.hap.uuid.generate(`${device.deviceID}-${device.deviceClass}`);
 
     // see if an accessory with the same uuid has already been registered and restored from
@@ -761,10 +741,10 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
   }
 
   private createRoomSensors(
-    device: settings.device & settings.devicesConfig,
-    locationId: settings.location['locationID'],
-    sensorAccessory: settings.sensorAccessory,
-    group: settings.T9groups,
+    device: resideoDevice & devicesConfig,
+    locationId: location['locationID'],
+    sensorAccessory: sensorAccessory,
+    group: T9groups,
   ) {
     // Room Sensor(s)
     const uuid = this.api.hap.uuid.generate(`${sensorAccessory.accessoryAttribute.type}-${sensorAccessory.accessoryId}-RoomSensor`);
@@ -787,7 +767,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
         new RoomSensors(this, existingAccessory, locationId, device, sensorAccessory, group);
         this.log.debug(
           `${sensorAccessory.accessoryAttribute.type}` +
-            ` uuid: ${sensorAccessory.accessoryAttribute.type}-${sensorAccessory.accessoryId}-RoomSensor, (${existingAccessory.UUID})`,
+          ` uuid: ${sensorAccessory.accessoryAttribute.type}-${sensorAccessory.accessoryId}-RoomSensor, (${existingAccessory.UUID})`,
         );
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
@@ -813,7 +793,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       new RoomSensors(this, accessory, locationId, device, sensorAccessory, group);
       this.log.debug(
         `${sensorAccessory.accessoryAttribute.type}` +
-          ` uuid: ${sensorAccessory.accessoryAttribute.type}-${sensorAccessory.accessoryId}-RoomSensor, (${accessory.UUID})`,
+        ` uuid: ${sensorAccessory.accessoryAttribute.type}-${sensorAccessory.accessoryId}-RoomSensor, (${accessory.UUID})`,
       );
 
       // publish device externally or link the accessory to your platform
@@ -823,7 +803,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       if (this.platformLogging?.includes('debug')) {
         this.log.error(
           `Unable to Register new device: ${sensorAccessory.accessoryAttribute.name} ${sensorAccessory.accessoryAttribute.type} ` +
-            `DeviceID: ${sensorAccessory.deviceID}`,
+          `DeviceID: ${sensorAccessory.deviceID}`,
         );
         this.log.error('Check Config to see if DeviceID is being Hidden.');
       }
@@ -831,10 +811,10 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
   }
 
   private createRoomSensorThermostat(
-    device: settings.device & settings.devicesConfig,
-    locationId: settings.location['locationID'],
-    sensorAccessory: settings.sensorAccessory,
-    group: settings.T9groups,
+    device: resideoDevice & devicesConfig,
+    locationId: location['locationID'],
+    sensorAccessory: sensorAccessory,
+    group: T9groups,
   ) {
     const uuid = this.api.hap.uuid.generate(`${sensorAccessory.accessoryAttribute.type}-${sensorAccessory.accessoryId}-RoomSensorThermostat`);
 
@@ -859,7 +839,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
         new RoomSensorThermostat(this, existingAccessory, locationId, device, sensorAccessory, group);
         this.log.debug(
           `${sensorAccessory.accessoryAttribute.type} Thermostat uuid:` +
-            ` ${sensorAccessory.accessoryAttribute.type}-${sensorAccessory.accessoryId}-RoomSensorThermostat, (${existingAccessory.UUID})`,
+          ` ${sensorAccessory.accessoryAttribute.type}-${sensorAccessory.accessoryId}-RoomSensorThermostat, (${existingAccessory.UUID})`,
         );
       } else {
         this.unregisterPlatformAccessories(existingAccessory);
@@ -885,8 +865,8 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       new RoomSensorThermostat(this, accessory, locationId, device, sensorAccessory, group);
       this.log.debug(
         `${sensorAccessory.accessoryAttribute.type} Thermostat uuid:` +
-          ` ${sensorAccessory.accessoryAttribute.name}-${sensorAccessory.accessoryAttribute.type}-${sensorAccessory.accessoryId}-` +
-          `RoomSensorThermostat, (${accessory.UUID})`,
+        ` ${sensorAccessory.accessoryAttribute.name}-${sensorAccessory.accessoryAttribute.type}-${sensorAccessory.accessoryId}-` +
+        `RoomSensorThermostat, (${accessory.UUID})`,
       );
 
       // publish device externally or link the accessory to your platform
@@ -896,14 +876,14 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       if (this.platformLogging?.includes('debug')) {
         this.log.error(
           `Unable to Register new device: ${sensorAccessory.accessoryAttribute.name} ${sensorAccessory.accessoryAttribute.type} ` +
-            `DeviceID: ${sensorAccessory.deviceID}`,
+          `DeviceID: ${sensorAccessory.deviceID}`,
         );
         this.log.error('Check Config to see if DeviceID is being Hidden.');
       }
     }
   }
 
-  private leaksensorFirmwareNewAccessory(device: settings.device & settings.devicesConfig, accessory: PlatformAccessory) {
+  private leaksensorFirmwareNewAccessory(device: resideoDevice & devicesConfig, accessory: PlatformAccessory) {
     if (device.firmware) {
       accessory.context.firmwareRevision = device.firmware;
     } else {
@@ -911,7 +891,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  private leaksensorFirmwareExistingAccessory(device: settings.device & settings.devicesConfig, existingAccessory: PlatformAccessory) {
+  private leaksensorFirmwareExistingAccessory(device: resideoDevice & devicesConfig, existingAccessory: PlatformAccessory) {
     if (device.firmware) {
       existingAccessory.context.firmwareRevision = device.firmware;
     } else {
@@ -919,7 +899,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  private valveFirmwareNewAccessory(device: settings.device & settings.devicesConfig, accessory: PlatformAccessory) {
+  private valveFirmwareNewAccessory(device: resideoDevice & devicesConfig, accessory: PlatformAccessory) {
     if (device.firmware) {
       accessory.context.firmwareRevision = device.firmware;
     } else {
@@ -927,7 +907,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  private valveFirmwareExistingAccessory(device: settings.device & settings.devicesConfig, existingAccessory: PlatformAccessory) {
+  private valveFirmwareExistingAccessory(device: resideoDevice & devicesConfig, existingAccessory: PlatformAccessory) {
     if (device.firmware) {
       existingAccessory.context.firmwareRevision = device.firmware;
     } else {
@@ -935,7 +915,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  private roomsensorFirmwareNewAccessory(accessory, sensorAccessory: settings.sensorAccessory) {
+  private roomsensorFirmwareNewAccessory(accessory, sensorAccessory: sensorAccessory) {
     if (accessory.firmware) {
       accessory.context.firmwareRevision = accessory.firmware;
     } else {
@@ -943,7 +923,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  private roomsensorFirmwareExistingAccessory(existingAccessory, sensorAccessory: settings.sensorAccessory) {
+  private roomsensorFirmwareExistingAccessory(existingAccessory, sensorAccessory: sensorAccessory) {
     if (existingAccessory.firmware) {
       existingAccessory.context.firmwareRevision = existingAccessory.firmware;
     } else {
@@ -951,7 +931,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  public async thermostatFirmwareNewAccessory(device: settings.device & settings.devicesConfig, accessory: PlatformAccessory, location: any) {
+  public async thermostatFirmwareNewAccessory(device: resideoDevice & devicesConfig, accessory: PlatformAccessory, location: any) {
     if (device.firmware) {
       accessory.context.firmwareRevision = device.firmware;
     } else {
@@ -971,7 +951,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
   }
 
   public async thermostatFirmwareExistingAccessory(
-    device: settings.device & settings.devicesConfig,
+    device: resideoDevice & devicesConfig,
     existingAccessory: PlatformAccessory,
     location: any,
   ) {
@@ -993,110 +973,24 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  public async externalOrPlatform(device: settings.device & settings.devicesConfig, accessory: PlatformAccessory) {
+  public async externalOrPlatform(device: resideoDevice & devicesConfig, accessory: PlatformAccessory) {
     if (device.external) {
       this.log.warn(`${accessory.displayName} External Accessory Mode`);
       this.externalAccessory(accessory);
     } else {
-<<<<<<< Updated upstream
-      this.debugLog(`${accessory.displayName} External Accessory Mode: ${device.external}`);
-      this.api.registerPlatformAccessories(settings.PLUGIN_NAME, settings.PLATFORM_NAME, [accessory]);
-=======
       this.log.debug(`${accessory.displayName} External Accessory Mode: ${device.external}`);
       this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
->>>>>>> Stashed changes
     }
   }
 
   public async externalAccessory(accessory: PlatformAccessory) {
-    this.api.publishExternalAccessories(settings.PLUGIN_NAME, [accessory]);
+    this.api.publishExternalAccessories(PLUGIN_NAME, [accessory]);
   }
 
   public unregisterPlatformAccessories(existingAccessory: PlatformAccessory) {
     // remove platform accessories when no longer present
-<<<<<<< Updated upstream
-    this.api.unregisterPlatformAccessories(settings.PLUGIN_NAME, settings.PLATFORM_NAME, [existingAccessory]);
-    this.warnLog(`Removing existing accessory from cache: ${existingAccessory.displayName}`);
-  }
-
-  public locationinfo(location: settings.location) {
-    if (this.platformLogging?.includes('debug')) {
-      if (location) {
-        this.warnLog(superStringify(location));
-      }
-    }
-  }
-
-  public deviceinfo(device: {
-    deviceID: string;
-    deviceType: string;
-    deviceClass: string;
-    deviceModel: string;
-    priorityType: string;
-    settings: settings.Settings;
-    inBuiltSensorState: settings.inBuiltSensorState;
-    groups: settings.device['groups'] & settings.devicesConfig;
-  }) {
-    if (this.platformLogging?.includes('debug')) {
-      this.warnLog(superStringify(device));
-      if (device.deviceID) {
-        this.warnLog(superStringify(device.deviceID));
-        this.errorLog(`Device ID: ${device.deviceID}`);
-      }
-      if (device.deviceType) {
-        this.warnLog(superStringify(device.deviceType));
-        this.errorLog(`Device Type: ${device.deviceType}`);
-      }
-      if (device.deviceClass) {
-        this.warnLog(superStringify(device.deviceClass));
-        this.errorLog(`Device Class: ${device.deviceClass}`);
-      }
-      if (device.deviceModel) {
-        this.warnLog(superStringify(device.deviceModel));
-        this.errorLog(`Device Model: ${device.deviceModel}`);
-      }
-      if (device.priorityType) {
-        this.warnLog(superStringify(device.priorityType));
-        this.errorLog(`Device Priority Type: ${device.priorityType}`);
-      }
-      if (device.settings) {
-        this.warnLog(superStringify(device.settings));
-        if (device.settings.fan) {
-          this.warnLog(superStringify(device.settings.fan));
-          this.errorLog(`Device Fan Settings: ${superStringify(device.settings.fan)}`);
-          if (device.settings.fan.allowedModes) {
-            this.warnLog(superStringify(device.settings.fan.allowedModes));
-            this.errorLog(`Device Fan Allowed Modes: ${device.settings.fan.allowedModes}`);
-          }
-          if (device.settings.fan.changeableValues) {
-            this.warnLog(superStringify(device.settings.fan.changeableValues));
-            this.errorLog(`Device Fan Changeable Values: ${superStringify(device.settings.fan.changeableValues)}`);
-          }
-        }
-      }
-      if (device.inBuiltSensorState) {
-        this.warnLog(superStringify(device.inBuiltSensorState));
-        if (device.inBuiltSensorState.roomId) {
-          this.warnLog(superStringify(device.inBuiltSensorState.roomId));
-          this.errorLog(`Device Built In Sensor Room ID: ${device.inBuiltSensorState.roomId}`);
-        }
-        if (device.inBuiltSensorState.roomName) {
-          this.warnLog(superStringify(device.inBuiltSensorState.roomName));
-          this.errorLog(`Device Built In Sensor Room Name: ${device.inBuiltSensorState.roomName}`);
-        }
-      }
-      if (device.groups) {
-        this.warnLog(superStringify(device.groups));
-
-        for (const group of device.groups) {
-          this.errorLog(`Group: ${group.id}`);
-        }
-      }
-    }
-=======
     this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
     this.log.warn(`Removing existing accessory from cache: ${existingAccessory.displayName}`);
->>>>>>> Stashed changes
   }
 
   apiError(e: any) {
@@ -1122,7 +1016,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       this.log.error(`Failed to ${this.action}: Unprocessable Entity`);
       this.log.debug(
         'The client has made a valid request, but the server cannot process it.' +
-          ' This is often used for APIs for which certain limits have been exceeded.',
+        ' This is often used for APIs for which certain limits have been exceeded.',
       );
     } else if (e.message.includes('429')) {
       this.log.error(`Failed to ${this.action}: Too Many Requests`);
@@ -1138,28 +1032,28 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  async statusCode(statusCode: number): Promise<void> {
+  async statusCode(statusCode: number, action: string): Promise<void> {
     switch (statusCode) {
       case 200:
-        this.log.debug(`Standard Response, statusCode: ${statusCode}`);
+        this.log.debug(`Standard Response, statusCode: ${statusCode}, Action: ${action}`);
         break;
       case 400:
-        this.log.error(`Bad Request, statusCode: ${statusCode}`);
+        this.log.error(`Bad Request, statusCode: ${statusCode}, Action: ${action}`);
         break;
       case 401:
-        this.log.error(`Unauthorized, statusCode: ${statusCode}`);
+        this.log.error(`Unauthorized, statusCode: ${statusCode}, Action: ${action}`);
         break;
       case 404:
-        this.log.error(`Not Found, statusCode: ${statusCode}`);
+        this.log.error(`Not Found, statusCode: ${statusCode}, Action: ${action}`);
         break;
       case 429:
-        this.log.error(`Too Many Requests, statusCode: ${statusCode}`);
+        this.log.error(`Too Many Requests, statusCode: ${statusCode}, Action: ${action}`);
         break;
       case 500:
-        this.log.error(`Internal Server Error (Meater Server), statusCode: ${statusCode}`);
+        this.log.error(`Internal Server Error (Meater Server), statusCode: ${statusCode}, Action: ${action}`);
         break;
       default:
-        this.log.info(`Unknown statusCode: ${statusCode}, Report Bugs Here: https://bit.ly/homebridge-meater-bug-report`);
+        this.log.info(`Unknown statusCode: ${statusCode}, Report Bugs Here: https://bit.ly/homebridge-resideo-bug-report. Action: ${action}`);
     }
   }
 }

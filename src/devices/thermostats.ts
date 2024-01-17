@@ -1,11 +1,3 @@
-<<<<<<< Updated upstream
-import { CharacteristicValue, PlatformAccessory, Service } from 'homebridge';
-import { interval, Subject } from 'rxjs';
-import superStringify from 'super-stringify';
-import { debounceTime, skipWhile, take, tap } from 'rxjs/operators';
-import { ResideoPlatform } from '../platform';
-import * as settings from '../settings';
-=======
 import { request } from 'undici';
 import { interval, Subject } from 'rxjs';
 import { ResideoPlatform } from '../platform.js';
@@ -14,7 +6,6 @@ import { API, CharacteristicValue, HAP, Service, PlatformAccessory, Logging } fr
 import {
   DeviceURL, FanChangeableValues, devicesConfig, holdModes, location, modes, resideoDevice, payload, ResideoPlatformConfig,
 } from '../settings.js';
->>>>>>> Stashed changes
 
 /**
  * Platform Accessory
@@ -22,14 +13,11 @@ import {
  * Each accessory may expose multiple services of different service types.
  */
 export class Thermostats {
-<<<<<<< Updated upstream
-=======
   public readonly api: API;
   public readonly log: Logging;
   public readonly config!: ResideoPlatformConfig;
   protected readonly hap: HAP;
   // Services
->>>>>>> Stashed changes
   service!: Service;
   fanService?: Service;
   humidityService?: Service;
@@ -52,15 +40,15 @@ export class Thermostats {
   TargetFanState!: CharacteristicValue;
 
   // Others
-  modes: settings.modes;
-  holdModes: settings.holdModes;
+  modes: modes;
+  holdModes: holdModes;
   action!: string;
   heatSetpoint!: number;
   coolSetpoint!: number;
   thermostatSetpointStatus!: string;
   resideoMode!: Array<string>;
   resideoHold!: Array<string>;
-  fanMode!: settings.FanChangeableValues;
+  fanMode!: FanChangeableValues;
 
   // Others - T9 Only
   roompriority!: any;
@@ -83,15 +71,6 @@ export class Thermostats {
 
   constructor(
     private readonly platform: ResideoPlatform,
-<<<<<<< Updated upstream
-    private accessory: PlatformAccessory,
-    public readonly locationId: settings.location['locationID'],
-    public device: settings.device & settings.devicesConfig,
-  ) {
-    this.logs(device);
-    this.refreshRate(device);
-    this.config(device);
-=======
     private readonly accessory: PlatformAccessory,
     public readonly locationId: location['locationID'],
     public device: resideoDevice & devicesConfig,
@@ -114,9 +93,10 @@ export class Thermostats {
     this.ProgrammableSwitchOutputState = accessory.context.ProgrammableSwitchOutputState || 0;
     accessory.context.FirmwareRevision = 'v2.0.0';
 
+    this.deviceLogging = this.device.logging || this.config.options?.logging || 'standard';
+
     this.Active = accessory.context.Active || this.hap.Characteristic.Active.ACTIVE;
     this.TargetFanState = accessory.context.TargetFanState || this.hap.Characteristic.TargetFanState.MANUAL;
->>>>>>> Stashed changes
     // Map Resideo Modes to HomeKit Modes
     this.modes = {
       Off: platform.Characteristic.TargetHeatingCoolingState.OFF,
@@ -127,8 +107,8 @@ export class Thermostats {
     // Map Resideo Hold Modes to HomeKit StatefulProgrammableSwitch Events
     this.holdModes = {
       NoHold: platform.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS,
-      TemporaryHold:	platform.Characteristic.ProgrammableSwitchEvent.DOUBLE_PRESS,
-      PermanentHold:	platform.Characteristic.ProgrammableSwitchEvent.LONG_PRESS,
+      TemporaryHold: platform.Characteristic.ProgrammableSwitchEvent.DOUBLE_PRESS,
+      PermanentHold: platform.Characteristic.ProgrammableSwitchEvent.LONG_PRESS,
     };
 
     // Map HomeKit Modes to Resideo Modes
@@ -136,12 +116,6 @@ export class Thermostats {
     this.resideoMode = ['Off', 'Heat', 'Cool', 'Auto'];
     this.resideoHold = ['NoHold', 'TemporaryHold', 'PermanentHold'];
 
-<<<<<<< Updated upstream
-    // default placeholders
-    this.Active = this.platform.Characteristic.Active.INACTIVE;
-    this.TargetFanState = this.platform.Characteristic.TargetFanState.MANUAL;
-=======
->>>>>>> Stashed changes
     if (this.thermostatSetpointStatus === undefined) {
       accessory.context.thermostatSetpointStatus = device.thermostat?.thermostatSetpointStatus;
       this.thermostatSetpointStatus = accessory.context.thermostatSetpointStatus;
@@ -160,29 +134,15 @@ export class Thermostats {
 
     // set accessory information
     accessory
-<<<<<<< Updated upstream
-      .getService(this.platform.Service.AccessoryInformation)!
-      .setCharacteristic(this.platform.Characteristic.Manufacturer, 'Resideo')
-      .setCharacteristic(this.platform.Characteristic.Model, device.deviceModel)
-      .setCharacteristic(this.platform.Characteristic.SerialNumber, device.deviceID)
-      .setCharacteristic(this.platform.Characteristic.FirmwareRevision, accessory.context.firmwareRevision)
-      .getCharacteristic(this.platform.Characteristic.FirmwareRevision)
-      .updateValue(accessory.context.firmwareRevision);
-
-    //Thermostat Service
-    (this.service = this.accessory.getService(this.platform.Service.Thermostat) || this.accessory.addService(this.platform.Service.Thermostat)),
-    accessory.displayName;
-=======
       .getService(this.hap.Service.AccessoryInformation)!
       .setCharacteristic(this.hap.Characteristic.Manufacturer, 'Resideo')
       .setCharacteristic(this.hap.Characteristic.Model, device.deviceModel)
       .setCharacteristic(this.hap.Characteristic.SerialNumber, device.deviceID)
-      .setCharacteristic(this.hap.Characteristic.FirmwareRevision, accessory.context.firmwareRevision);
+      .setCharacteristic(this.hap.Characteristic.FirmwareRevision, accessory.context.firmwareRevision || 'v2.0.0');
 
     //Thermostat Service
     (this.service = this.accessory.getService(this.hap.Service.Thermostat)
       || this.accessory.addService(this.hap.Service.Thermostat)), accessory.displayName;
->>>>>>> Stashed changes
 
     //Service Name
     this.service.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
@@ -241,16 +201,6 @@ export class Thermostats {
 
     // Fan Controls
     if (device.thermostat?.hide_fan) {
-<<<<<<< Updated upstream
-      this.debugLog(`Thermostat: ${accessory.displayName} Removing Fanv2 Service`);
-      this.fanService = this.accessory.getService(this.platform.Service.Fanv2);
-      accessory.removeService(this.fanService!);
-    } else if (!this.fanService && device.settings?.fan) {
-      this.debugLog(`Thermostat: ${accessory.displayName} Add Fanv2 Service`);
-      this.debugLog(`Thermostat: ${accessory.displayName} Available Fan Settings ${superStringify(device.settings.fan)}`);
-      (this.fanService = this.accessory.getService(this.platform.Service.Fanv2) || this.accessory.addService(this.platform.Service.Fanv2)),
-      `${accessory.displayName} Fan`;
-=======
       this.log.debug(`Thermostat: ${accessory.displayName} Removing Fanv2 Service`);
       this.fanService = this.accessory.getService(this.hap.Service.Fanv2);
       accessory.removeService(this.fanService!);
@@ -259,7 +209,6 @@ export class Thermostats {
       this.log.debug(`Thermostat: ${accessory.displayName} Available Fan Settings ${JSON.stringify(device.settings.fan)}`);
       (this.fanService = this.accessory.getService(this.hap.Service.Fanv2)
         || this.accessory.addService(this.hap.Service.Fanv2)), `${accessory.displayName} Fan`;
->>>>>>> Stashed changes
 
       this.fanService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Fan`);
 
@@ -272,24 +221,14 @@ export class Thermostats {
 
     // Humidity Sensor Service
     if (device.thermostat?.hide_humidity) {
-<<<<<<< Updated upstream
-      this.debugLog(`Thermostat: ${accessory.displayName} Removing Humidity Sensor Service`);
-      this.humidityService = this.accessory.getService(this.platform.Service.HumiditySensor);
-=======
       this.log.debug(`Thermostat: ${accessory.displayName} Removing Humidity Sensor Service`);
       this.humidityService = this.accessory.getService(this.hap.Service.HumiditySensor);
->>>>>>> Stashed changes
       accessory.removeService(this.humidityService!);
     } else if (!this.humidityService && device.indoorHumidity) {
       this.log.debug(`Thermostat: ${accessory.displayName} Add Humidity Sensor Service`);
       (this.humidityService =
-<<<<<<< Updated upstream
-        this.accessory.getService(this.platform.Service.HumiditySensor) || this.accessory.addService(this.platform.Service.HumiditySensor)),
-      `${device.name} Humidity Sensor`;
-=======
         this.accessory.getService(this.hap.Service.HumiditySensor)
         || this.accessory.addService(this.hap.Service.HumiditySensor)), `${device.name} Humidity Sensor`;
->>>>>>> Stashed changes
 
       this.humidityService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Humidity Sensor`);
 
@@ -308,14 +247,8 @@ export class Thermostats {
     // get the StatefulProgrammableSwitch service if it exists, otherwise create a new StatefulProgrammableSwitch service
     // you can create multiple services for each accessory
     (this.statefulService =
-<<<<<<< Updated upstream
-      accessory.getService(this.platform.Service.StatefulProgrammableSwitch) ||
-      accessory.addService(this.platform.Service.StatefulProgrammableSwitch)),
-    `${accessory.displayName} ${device.deviceModel}`;
-=======
       accessory.getService(this.hap.Service.StatefulProgrammableSwitch)
       || accessory.addService(this.hap.Service.StatefulProgrammableSwitch)), `${accessory.displayName} ${device.deviceModel}`;
->>>>>>> Stashed changes
 
     this.statefulService.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
     if (!this.statefulService.testCharacteristic(this.platform.Characteristic.ConfiguredName)) {
@@ -439,27 +372,17 @@ export class Thermostats {
   async parseStatus(): Promise<void> {
     this.log.debug(`Thermostat: ${this.accessory.displayName} parseStatus`);
     if (this.device.units === 'Fahrenheit') {
-<<<<<<< Updated upstream
-      this.TemperatureDisplayUnits = this.platform.Characteristic.TemperatureDisplayUnits.FAHRENHEIT;
-      this.debugLog(
-=======
       this.TemperatureDisplayUnits = this.hap.Characteristic.TemperatureDisplayUnits.FAHRENHEIT;
       this.log.debug(
->>>>>>> Stashed changes
         `Thermostat: ${this.accessory.displayName} parseStatus` +
-          ` TemperatureDisplayUnits: ${this.platform.Characteristic.TemperatureDisplayUnits.FAHRENHEIT}`,
+        ` TemperatureDisplayUnits: ${this.platform.Characteristic.TemperatureDisplayUnits.FAHRENHEIT}`,
       );
     }
     if (this.device.units === 'Celsius') {
-<<<<<<< Updated upstream
-      this.TemperatureDisplayUnits = this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS;
-      this.debugLog(
-=======
       this.TemperatureDisplayUnits = this.hap.Characteristic.TemperatureDisplayUnits.CELSIUS;
       this.log.debug(
->>>>>>> Stashed changes
         `Thermostat: ${this.accessory.displayName} parseStatus` +
-          ` TemperatureDisplayUnits: ${this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS}`,
+        ` TemperatureDisplayUnits: ${this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS}`,
       );
     }
 
@@ -475,7 +398,7 @@ export class Thermostats {
       this.HeatingThresholdTemperature = this.toCelsius(this.device.changeableValues!.heatSetpoint);
       this.log.debug(
         `Thermostat: ${this.accessory.displayName} parseStatus` +
-          ` HeatingThresholdTemperature: ${this.toCelsius(this.device.changeableValues!.heatSetpoint)}`,
+        ` HeatingThresholdTemperature: ${this.toCelsius(this.device.changeableValues!.heatSetpoint)}`,
       );
     }
 
@@ -483,7 +406,7 @@ export class Thermostats {
       this.CoolingThresholdTemperature = this.toCelsius(this.device.changeableValues!.coolSetpoint);
       this.log.debug(
         `Thermostat: ${this.accessory.displayName} parseStatus` +
-          ` CoolingThresholdTemperature: ${this.toCelsius(this.device.changeableValues!.coolSetpoint)}`,
+        ` CoolingThresholdTemperature: ${this.toCelsius(this.device.changeableValues!.coolSetpoint)}`,
       );
     }
 
@@ -501,21 +424,21 @@ export class Thermostats {
         this.CurrentHeatingCoolingState = 1;
         this.log.debug(
           `Thermostat: ${this.accessory.displayName}` +
-            ` parseStatus Currently Mode (HEAT): ${this.device.operationStatus!.mode}(${this.CurrentHeatingCoolingState})`,
+          ` parseStatus Currently Mode (HEAT): ${this.device.operationStatus!.mode}(${this.CurrentHeatingCoolingState})`,
         );
         break;
       case 'Cool':
         this.CurrentHeatingCoolingState = 2;
         this.log.debug(
           `Thermostat: ${this.accessory.displayName}` +
-            ` parseStatus Currently Mode (COOL): ${this.device.operationStatus!.mode}(${this.CurrentHeatingCoolingState})`,
+          ` parseStatus Currently Mode (COOL): ${this.device.operationStatus!.mode}(${this.CurrentHeatingCoolingState})`,
         );
         break;
       default:
         this.CurrentHeatingCoolingState = 0;
         this.log.debug(
           `Thermostat: ${this.accessory.displayName}` +
-            ` parseStatus Currently Mode (OFF): ${this.device.operationStatus!.mode}(${this.CurrentHeatingCoolingState})`,
+          ` parseStatus Currently Mode (OFF): ${this.device.operationStatus!.mode}(${this.CurrentHeatingCoolingState})`,
         );
     }
 
@@ -525,7 +448,7 @@ export class Thermostats {
         this.TargetTemperature = this.toCelsius(this.device.changeableValues!.heatSetpoint);
         this.log.debug(
           `Thermostat: ${this.accessory.displayName}` +
-            ` parseStatus TargetTemperature (HEAT): ${this.toCelsius(this.device.changeableValues!.heatSetpoint)})`,
+          ` parseStatus TargetTemperature (HEAT): ${this.toCelsius(this.device.changeableValues!.heatSetpoint)})`,
         );
       }
     } else {
@@ -533,7 +456,7 @@ export class Thermostats {
         this.TargetTemperature = this.toCelsius(this.device.changeableValues!.coolSetpoint);
         this.log.debug(
           `Thermostat: ${this.accessory.displayName}` +
-            ` parseStatus TargetTemperature (OFF/COOL): ${this.toCelsius(this.device.changeableValues!.coolSetpoint)})`,
+          ` parseStatus TargetTemperature (OFF/COOL): ${this.toCelsius(this.device.changeableValues!.coolSetpoint)})`,
         );
       }
     }
@@ -561,26 +484,23 @@ export class Thermostats {
    */
   async refreshStatus(): Promise<void> {
     try {
-<<<<<<< Updated upstream
-      const device: any = (
-        await this.platform.axios.get(`${settings.DeviceURL}/thermostats/${this.device.deviceID}`, {
-=======
-      const { body, statusCode, headers } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
-        query: {
-          locationId: this.locationId,
-        },
+      const { body, statusCode } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
         method: 'GET',
-        headers: { 'content-type': 'application/json' },
+        query: {
+          'locationId': this.locationId,
+          'apikey': this.config.credentials?.consumerKey,
+        },
+        headers: {
+          'Authorization': `Bearer ${this.config.credentials?.accessToken}`,
+          'Content-Type': 'application/json',
+        },
       });
-      this.log.debug(`body: ${JSON.stringify(body)}`);
-      this.log.debug(`statusCode: ${statusCode}`);
-      this.log.debug(`headers: ${JSON.stringify(headers)}`);
+      const action = 'refreshStatus';
+      await this.statusCode(statusCode, action);
       const device: any = await body.json();
-      this.log.debug(`Location: ${JSON.stringify(device)}`);
-      this.log.debug(`Location StatusCode: ${device.statusCode}`);
+      this.log.debug(`(refreshStatus) ${device.deviceClass}: ${JSON.stringify(device)}`);
       /*const device: any = (
         await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
->>>>>>> Stashed changes
           params: {
             locationId: this.locationId,
           },
@@ -588,32 +508,28 @@ export class Thermostats {
       ).data;*/
       this.device = device;
       this.log.debug(`Thermostat: ${this.accessory.displayName} device: ${JSON.stringify(this.device)}`);
-      this.log.debug(`Thermostat: ${this.accessory.displayName} refreshStatus for ${this.device.name}
-       from Resideo API: ${JSON.stringify(this.device.changeableValues)}`);
+      this.log.debug(`Thermostat: ${this.accessory.displayName} refreshStatus for ${this.device.name}` +
+        `from Resideo API: ${JSON.stringify(this.device.changeableValues)}`);
       await this.refreshRoomPriority();
       if (this.device.settings?.fan && !device.thermostat?.hide_fan) {
-<<<<<<< Updated upstream
-        const fanMode: any = (
-          await this.platform.axios.get(`${settings.DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
-=======
-
-        const { body, statusCode, headers } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
-          query: {
-            locationId: this.locationId,
-          },
+        const { body, statusCode } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
           method: 'GET',
-          headers: { 'content-type': 'application/json' },
+          query: {
+            'locationId': this.locationId,
+            'apikey': this.config.credentials?.consumerKey,
+          },
+          headers: {
+            'Authorization': `Bearer ${this.config.credentials?.accessToken}`,
+            'Content-Type': 'application/json',
+          },
         });
-        this.log.debug(`body: ${JSON.stringify(body)}`);
-        this.log.debug(`statusCode: ${statusCode}`);
-        this.log.debug(`headers: ${JSON.stringify(headers)}`);
+        const action = 'refreshStatus/fan';
+        await this.statusCode(statusCode, action);
+        this.log.debug(`(refreshStatus:fan) statusCode: ${statusCode}`);
         const fanMode: any = await body.json();
-        this.log.debug(`Fan Mode: ${JSON.stringify(fanMode)}`);
-        this.log.debug(`Fan Mode StatusCode: ${fanMode.statusCode}`);
-
+        this.log.debug(`(refreshStatus:fan) Fan Mode: ${JSON.stringify(fanMode)}`);
         /*const fanMode: any = (
           await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
->>>>>>> Stashed changes
             params: {
               locationId: this.locationId,
             },
@@ -621,8 +537,8 @@ export class Thermostats {
         ).data;*/
         this.fanMode = fanMode;
         this.log.debug(`Thermostat: ${this.accessory.displayName} fanMode: ${JSON.stringify(this.fanMode)}`);
-        this.log.debug(`Thermostat: ${this.accessory.displayName} refreshStatus for ${this.device.name} Fan
-        from Resideo Fan API: ${JSON.stringify(this.fanMode)}`);
+        this.log.debug(`Thermostat: ${this.accessory.displayName} refreshStatus for ${this.device.name} Fan` +
+          `from Resideo Fan API: ${JSON.stringify(this.fanMode)}`);
       }
       this.pushChangesthermostatSetpointStatus();
       this.parseStatus();
@@ -636,32 +552,29 @@ export class Thermostats {
 
   async refreshRoomPriority(): Promise<void> {
     if (this.device.thermostat?.roompriority?.deviceType === 'Thermostat' && this.device.deviceModel === 'T9-T10') {
-<<<<<<< Updated upstream
-      this.roompriority = (
-        await this.platform.axios.get(`${settings.DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
-=======
-      const { body, statusCode, headers } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
-        query: {
-          locationId: this.locationId,
-        },
+      const { body, statusCode } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
         method: 'GET',
-        headers: { 'content-type': 'application/json' },
+        query: {
+          'locationId': this.locationId,
+          'apikey': this.config.credentials?.consumerKey,
+        },
+        headers: {
+          'Authorization': `Bearer ${this.config.credentials?.accessToken}`,
+          'Content-Type': 'application/json',
+        },
       });
-      this.log.debug(`body: ${JSON.stringify(body)}`);
-      this.log.debug(`statusCode: ${statusCode}`);
-      this.log.debug(`headers: ${JSON.stringify(headers)}`);
+      const action = 'refreshRoomPriority';
+      await this.statusCode(statusCode, action);
       const roompriority: any = await body.json();
-      this.log.debug(`Location: ${JSON.stringify(roompriority)}`);
-      this.log.debug(`Location StatusCode: ${roompriority.statusCode}`);
+      this.log.debug(`(refreshRoomPriority) roompriority: ${JSON.stringify(roompriority)}`);
       /*this.roompriority = (
         await this.platform.axios.get(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
->>>>>>> Stashed changes
           params: {
             locationId: this.locationId,
           },
         })
       ).data;*/
-      this.log.debug(`Thermostat: ${this.accessory.displayName} Priority: ${JSON.stringify(this.roompriority.data)}`);
+      this.log.debug(`Thermostat: ${this.accessory.displayName} Priority: ${JSON.stringify(roompriority)}`);
     }
   }
 
@@ -670,8 +583,7 @@ export class Thermostats {
    */
   async pushChanges(): Promise<void> {
     try {
-      const payload = {} as settings.payload;
-
+      const payload = {} as payload;
       // Only include mode on certain models
       switch (this.device.deviceModel) {
         case 'Unknown':
@@ -681,7 +593,7 @@ export class Thermostats {
           payload.mode = this.resideoMode[Number(this.TargetHeatingCoolingState)];
           this.log.debug(
             `Thermostat: ${this.accessory.displayName} send TargetHeatingCoolingState` +
-              ` mode: ${this.resideoMode[Number(this.TargetHeatingCoolingState)]}`,
+            ` mode: ${this.resideoMode[Number(this.TargetHeatingCoolingState)]}`,
           );
       }
 
@@ -696,12 +608,12 @@ export class Thermostats {
           if (this.thermostatSetpointStatus === 'TemporaryHold') {
             this.log.warn(
               `Thermostat: ${this.accessory.displayName} send thermostatSetpointStatus: ` +
-                `${payload.thermostatSetpointStatus}, Model: ${this.device.deviceModel}`,
+              `${payload.thermostatSetpointStatus}, Model: ${this.device.deviceModel}`,
             );
           } else {
             this.log.debug(
               `Thermostat: ${this.accessory.displayName} send thermostatSetpointStatus: ` +
-                `${payload.thermostatSetpointStatus}, Model: ${this.device.deviceModel}`,
+              `${payload.thermostatSetpointStatus}, Model: ${this.device.deviceModel}`,
             );
           }
       }
@@ -718,14 +630,14 @@ export class Thermostats {
             payload.autoChangeoverActive = true;
             this.log.debug(
               `Thermostat: ${this.accessory.displayName} Heating/Cooling state set to Auto for` +
-                ` Model: ${this.device.deviceModel}, Force autoChangeoverActive: ${payload.autoChangeoverActive}`,
+              ` Model: ${this.device.deviceModel}, Force autoChangeoverActive: ${payload.autoChangeoverActive}`,
             );
           } else {
             payload.autoChangeoverActive = this.device.changeableValues?.autoChangeoverActive;
             this.log.debug(
               `Thermostat: ${this.accessory.displayName} Heating/cooling state not set to Auto for` +
-                ` Model: ${this.device.deviceModel}, Using device setting` +
-                ` autoChangeoverActive: ${this.device.changeableValues!.autoChangeoverActive}`,
+              ` Model: ${this.device.deviceModel}, Using device setting` +
+              ` autoChangeoverActive: ${this.device.changeableValues!.autoChangeoverActive}`,
             );
           }
           break;
@@ -736,7 +648,7 @@ export class Thermostats {
           payload.autoChangeoverActive = this.device.changeableValues!.autoChangeoverActive;
           this.log.debug(
             `Thermostat: ${this.accessory.displayName} set autoChangeoverActive to ` +
-              `${this.device.changeableValues!.autoChangeoverActive} for Model: ${this.device.deviceModel}`,
+            `${this.device.changeableValues!.autoChangeoverActive} for Model: ${this.device.deviceModel}`,
           );
       }
 
@@ -754,7 +666,7 @@ export class Thermostats {
           }
           this.log.info(
             `Thermostat: ${this.accessory.displayName} sent request to Resideo API thermostatSetpoint:` +
-              ` ${payload.thermostatSetpoint}, unit: ${payload.unit}`,
+            ` ${payload.thermostatSetpoint}, unit: ${payload.unit}`,
           );
 
           break;
@@ -766,8 +678,8 @@ export class Thermostats {
               payload.coolSetpoint = this.toFahrenheit(Number(this.CoolingThresholdTemperature));
               this.log.debug(
                 `Thermostat: ${this.accessory.displayName} TargetHeatingCoolingState (HEAT): ${this.TargetHeatingCoolingState},` +
-                  ` TargetTemperature: ${this.toFahrenheit(Number(this.TargetTemperature))} heatSetpoint,` +
-                  ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint`,
+                ` TargetTemperature: ${this.toFahrenheit(Number(this.TargetTemperature))} heatSetpoint,` +
+                ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint`,
               );
               break;
             case this.platform.Characteristic.TargetHeatingCoolingState.COOL:
@@ -775,8 +687,8 @@ export class Thermostats {
               payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
               this.log.debug(
                 `Thermostat: ${this.accessory.displayName} TargetHeatingCoolingState (COOL): ${this.TargetHeatingCoolingState},` +
-                  ` TargetTemperature: ${this.toFahrenheit(Number(this.TargetTemperature))} coolSetpoint,` +
-                  ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`,
+                ` TargetTemperature: ${this.toFahrenheit(Number(this.TargetTemperature))} coolSetpoint,` +
+                ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`,
               );
               break;
             case this.platform.Characteristic.TargetHeatingCoolingState.AUTO:
@@ -784,8 +696,8 @@ export class Thermostats {
               payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
               this.log.debug(
                 `Thermostat: ${this.accessory.displayName} TargetHeatingCoolingState (AUTO): ${this.TargetHeatingCoolingState},` +
-                  ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint,` +
-                  ` HeatingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`,
+                ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint,` +
+                ` HeatingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`,
               );
               break;
             default:
@@ -793,38 +705,40 @@ export class Thermostats {
               payload.heatSetpoint = this.toFahrenheit(Number(this.HeatingThresholdTemperature));
               this.log.debug(
                 `Thermostat: ${this.accessory.displayName} TargetHeatingCoolingState (OFF): ${this.TargetHeatingCoolingState},` +
-                  ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint,` +
-                  ` HeatingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`,
+                ` CoolingThresholdTemperature: ${this.toFahrenheit(Number(this.CoolingThresholdTemperature))} coolSetpoint,` +
+                ` HeatingThresholdTemperature: ${this.toFahrenheit(Number(this.HeatingThresholdTemperature))} heatSetpoint`,
               );
           }
           this.log.info(`Room Sensor Thermostat: ${this.accessory.displayName} set request (${JSON.stringify(payload)}) to Resideo API.`);
       }
 
       // Attempt to make the API request
-<<<<<<< Updated upstream
-      await this.platform.axios.post(`${settings.DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
-=======
-      const { body, statusCode, headers } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
-        query: {
-          locationId: this.locationId,
-        },
-        body: JSON.stringify(payload),
+      const { statusCode } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}`, {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+        query: {
+          'locationId': this.locationId,
+          'apikey': this.config.credentials?.consumerKey,
+        },
+        headers: {
+          'Authorization': `Bearer ${this.config.credentials?.accessToken}`,
+          'Content-Type': 'application/json',
+        },
       });
-      this.log.debug(`body: ${JSON.stringify(body)}`);
-      this.log.debug(`statusCode: ${statusCode}`);
-      this.log.debug(`headers: ${JSON.stringify(headers)}`);
-      const pushChanges: any = await body.json();
-      this.log.debug(`Location: ${JSON.stringify(pushChanges)}`);
-      this.log.debug(`Location StatusCode: ${pushChanges.statusCode}`);
+      const action = 'pushChanges';
+      await this.statusCode(statusCode, action);
+      //const pushChanges: any = await body.json();
+      //this.log.debug(`(pushChanges) pushChanges: ${JSON.stringify(pushChanges)}`);
+      //this.log.debug(`(pushChanges) pushChanges StatusCode: ${pushChanges.statusCode}`);
+      //this.statusCode(pushChanges.statusCode, action);
       /*await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
->>>>>>> Stashed changes
         params: {
           locationId: this.locationId,
         },
       });*/
       this.log.debug(`Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(payload)}`);
+      await this.parseStatus();
+      await this.updateHomeKitCharacteristics();
     } catch (e: any) {
       this.action = 'pushChanges';
       this.resideoAPIError(e);
@@ -870,36 +784,36 @@ export class Thermostats {
         if (this.device.priorityType === 'FollowMe') {
           this.log.info(
             `Sending request for ${this.accessory.displayName} to Resideo API Priority Type:` +
-              ` ${this.device.priorityType}, Built-in Occupancy Sensor(s) Will be used to set Priority Automatically`,
+            ` ${this.device.priorityType}, Built-in Occupancy Sensor(s) Will be used to set Priority Automatically`,
           );
         } else if (this.device.priorityType === 'WholeHouse') {
           this.log.info(`Sending request for ${this.accessory.displayName} to Resideo API Priority Type:` + ` ${this.device.priorityType}`);
         } else if (this.device.priorityType === 'PickARoom') {
           this.log.info(
             `Sending request for ${this.accessory.displayName} to Resideo API Room Priority:` +
-              ` ${this.device.inBuiltSensorState!.roomName}, Priority Type: ${this.device.thermostat?.roompriority.priorityType}`,
+            ` ${this.device.inBuiltSensorState!.roomName}, Priority Type: ${this.device.thermostat?.roompriority.priorityType}`,
           );
         }
         // Make the API request
-<<<<<<< Updated upstream
-        await this.platform.axios.put(`${settings.DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
-=======
-        const { body, statusCode, headers } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
-          query: {
-            locationId: this.locationId,
-          },
-          body: JSON.stringify(payload),
+        const { statusCode } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, {
           method: 'PUT',
-          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+          query: {
+            'locationId': this.locationId,
+            'apikey': this.config.credentials?.consumerKey,
+          },
+          headers: {
+            'Authorization': `Bearer ${this.config.credentials?.accessToken}`,
+            'Content-Type': 'application/json',
+          },
         });
-        this.log.debug(`body: ${JSON.stringify(body)}`);
-        this.log.debug(`statusCode: ${statusCode}`);
-        this.log.debug(`headers: ${JSON.stringify(headers)}`);
-        const pushRoomChanges: any = await body.json();
-        this.log.debug(`Location: ${JSON.stringify(pushRoomChanges)}`);
-        this.log.debug(`Location StatusCode: ${pushRoomChanges.statusCode}`);
+        const action = 'pushRoomChanges';
+        await this.statusCode(statusCode, action);
+        //const pushRoomChanges: any = await body.json();
+        //this.log.debug(`(pushRoomChanges) pushRoomChanges: ${JSON.stringify(pushRoomChanges)}`);
+        //this.log.debug(`(pushRoomChanges) pushRoomChanges StatusCode: ${pushRoomChanges.statusCode}`);
+        //this.statusCode(pushRoomChanges.statusCode, action);
         /*await this.platform.axios.put(`${DeviceURL}/thermostats/${this.device.deviceID}/priority`, payload, {
->>>>>>> Stashed changes
           params: {
             locationId: this.locationId,
           },
@@ -916,96 +830,56 @@ export class Thermostats {
     if (this.TemperatureDisplayUnits === undefined) {
       this.log.debug(`Thermostat: ${this.accessory.displayName} TemperatureDisplayUnits: ${this.TemperatureDisplayUnits}`);
     } else {
-<<<<<<< Updated upstream
-      this.service.updateCharacteristic(this.platform.Characteristic.TemperatureDisplayUnits, this.TemperatureDisplayUnits);
-      this.debugLog(`Thermostat: ${this.accessory.displayName} updateCharacteristic TemperatureDisplayUnits: ${this.TemperatureDisplayUnits}`);
-=======
       this.service.updateCharacteristic(this.hap.Characteristic.TemperatureDisplayUnits, this.TemperatureDisplayUnits);
       this.log.debug(`Thermostat: ${this.accessory.displayName} updateCharacteristic TemperatureDisplayUnits: ${this.TemperatureDisplayUnits}`);
->>>>>>> Stashed changes
     }
     if (this.CurrentTemperature === undefined) {
       this.log.debug(`Thermostat: ${this.accessory.displayName} CurrentTemperature: ${this.CurrentTemperature}`);
     } else {
-<<<<<<< Updated upstream
-      this.service.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, this.CurrentTemperature);
-      this.debugLog(`Thermostat: ${this.accessory.displayName} updateCharacteristic CurrentTemperature: ${this.CurrentTemperature}`);
-=======
       this.service.updateCharacteristic(this.hap.Characteristic.CurrentTemperature, this.CurrentTemperature);
       this.log.debug(`Thermostat: ${this.accessory.displayName} updateCharacteristic CurrentTemperature: ${this.CurrentTemperature}`);
->>>>>>> Stashed changes
     }
     if (!this.device.indoorHumidity || this.device.thermostat?.hide_humidity || this.CurrentRelativeHumidity === undefined) {
       this.log.debug(`Thermostat: ${this.accessory.displayName} CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
     } else {
-<<<<<<< Updated upstream
-      this.humidityService!.updateCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
-      this.debugLog(`Thermostat: ${this.accessory.displayName} updateCharacteristic CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
-=======
       this.humidityService!.updateCharacteristic(this.hap.Characteristic.CurrentRelativeHumidity, this.CurrentRelativeHumidity);
       this.log.debug(`Thermostat: ${this.accessory.displayName} updateCharacteristic CurrentRelativeHumidity: ${this.CurrentRelativeHumidity}`);
->>>>>>> Stashed changes
     }
     if (this.TargetTemperature === undefined) {
       this.log.debug(`Thermostat: ${this.accessory.displayName} TargetTemperature: ${this.TargetTemperature}`);
     } else {
-<<<<<<< Updated upstream
-      this.service.updateCharacteristic(this.platform.Characteristic.TargetTemperature, this.TargetTemperature);
-      this.debugLog(`Thermostat: ${this.accessory.displayName} updateCharacteristic TargetTemperature: ${this.TargetTemperature}`);
-=======
       this.service.updateCharacteristic(this.hap.Characteristic.TargetTemperature, this.TargetTemperature);
       this.log.debug(`Thermostat: ${this.accessory.displayName} updateCharacteristic TargetTemperature: ${this.TargetTemperature}`);
->>>>>>> Stashed changes
     }
     if (this.HeatingThresholdTemperature === undefined) {
       this.log.debug(`Thermostat: ${this.accessory.displayName} HeatingThresholdTemperature: ${this.HeatingThresholdTemperature}`);
     } else {
-<<<<<<< Updated upstream
-      this.service.updateCharacteristic(this.platform.Characteristic.HeatingThresholdTemperature, this.HeatingThresholdTemperature);
-      this.debugLog(
-=======
       this.service.updateCharacteristic(this.hap.Characteristic.HeatingThresholdTemperature, this.HeatingThresholdTemperature);
       this.log.debug(
->>>>>>> Stashed changes
         `Thermostat: ${this.accessory.displayName} updateCharacteristic` + ` HeatingThresholdTemperature: ${this.HeatingThresholdTemperature}`,
       );
     }
     if (this.CoolingThresholdTemperature === undefined) {
       this.log.debug(`Thermostat: ${this.accessory.displayName} CoolingThresholdTemperature: ${this.CoolingThresholdTemperature}`);
     } else {
-<<<<<<< Updated upstream
-      this.service.updateCharacteristic(this.platform.Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
-      this.debugLog(
-=======
       this.service.updateCharacteristic(this.hap.Characteristic.CoolingThresholdTemperature, this.CoolingThresholdTemperature);
       this.log.debug(
->>>>>>> Stashed changes
         `Thermostat: ${this.accessory.displayName} updateCharacteristic` + ` CoolingThresholdTemperature: ${this.CoolingThresholdTemperature}`,
       );
     }
     if (this.TargetHeatingCoolingState === undefined) {
       this.log.debug(`Thermostat: ${this.accessory.displayName} TargetHeatingCoolingState: ${this.TargetHeatingCoolingState}`);
     } else {
-<<<<<<< Updated upstream
-      this.service.updateCharacteristic(this.platform.Characteristic.TargetHeatingCoolingState, this.TargetHeatingCoolingState);
-      this.debugLog(
-=======
       this.service.updateCharacteristic(this.hap.Characteristic.TargetHeatingCoolingState, this.TargetHeatingCoolingState);
       this.log.debug(
->>>>>>> Stashed changes
         `Thermostat: ${this.accessory.displayName} updateCharacteristic` + ` TargetHeatingCoolingState: ${this.TargetHeatingCoolingState}`,
       );
     }
     if (this.CurrentHeatingCoolingState === undefined) {
       this.log.debug(`Thermostat: ${this.accessory.displayName} CurrentHeatingCoolingState: ${this.CurrentHeatingCoolingState}`);
     } else {
-<<<<<<< Updated upstream
-      this.service.updateCharacteristic(this.platform.Characteristic.CurrentHeatingCoolingState, this.CurrentHeatingCoolingState);
-      this.debugLog(
-=======
       this.service.updateCharacteristic(this.hap.Characteristic.CurrentHeatingCoolingState, this.CurrentHeatingCoolingState);
       this.log.debug(
->>>>>>> Stashed changes
         `Thermostat: ${this.accessory.displayName} updateCharacteristic` + ` CurrentHeatingCoolingState: ${this.TargetHeatingCoolingState}`,
       );
     }
@@ -1013,24 +887,14 @@ export class Thermostats {
       if (this.TargetFanState === undefined) {
         this.log.debug(`Thermostat Fan: ${this.accessory.displayName} TargetFanState: ${this.TargetFanState}`);
       } else {
-<<<<<<< Updated upstream
-        this.fanService?.updateCharacteristic(this.platform.Characteristic.TargetFanState, this.TargetFanState);
-        this.debugLog(`Thermostat Fan: ${this.accessory.displayName} updateCharacteristic TargetFanState: ${this.TargetFanState}`);
-=======
         this.fanService?.updateCharacteristic(this.hap.Characteristic.TargetFanState, this.TargetFanState);
         this.log.debug(`Thermostat Fan: ${this.accessory.displayName} updateCharacteristic TargetFanState: ${this.TargetFanState}`);
->>>>>>> Stashed changes
       }
       if (this.Active === undefined) {
         this.log.debug(`Thermostat Fan: ${this.accessory.displayName} Active: ${this.Active}`);
       } else {
-<<<<<<< Updated upstream
-        this.fanService?.updateCharacteristic(this.platform.Characteristic.Active, this.Active);
-        this.debugLog(`Thermostat Fan: ${this.accessory.displayName} updateCharacteristic Active: ${this.Active}`);
-=======
         this.fanService?.updateCharacteristic(this.hap.Characteristic.Active, this.Active);
         this.log.debug(`Thermostat Fan: ${this.accessory.displayName} updateCharacteristic Active: ${this.Active}`);
->>>>>>> Stashed changes
       }
     }
   }
@@ -1119,7 +983,7 @@ export class Thermostats {
       this.log.error(`Thermostat: ${this.accessory.displayName} failed to ${this.action}, Unprocessable Entity`);
       this.log.debug(
         'The client has made a valid request, but the server cannot process it.' +
-          ' This is often used for APIs for which certain limits have been exceeded.',
+        ' This is often used for APIs for which certain limits have been exceeded.',
       );
     } else if (e.message.includes('429')) {
       this.log.error(`Thermostat: ${this.accessory.displayName} failed to ${this.action}, Too Many Requests`);
@@ -1135,38 +999,30 @@ export class Thermostats {
     }
   }
 
-  async statusCode(statusCode: number): Promise<void> {
-    /**
-    * Meater API Status Codes (https://github.com/apption-labs/meater-cloud-public-rest-api)
-    *
-    * Standard Response Codes: 200(OK), 201(Created), 204(No Content)
-    * https://github.com/apption-labs/meater-cloud-public-rest-api#standard-response
-    *
-    * Error Response: 400(Bad Request), 401(Unauthorized), 404(Not Found), 429(Too Many Requests), 500(Internal Server Error)
-    * https://github.com/apption-labs/meater-cloud-public-rest-api#error-response
-    **/
+  async statusCode(statusCode: number, action: string): Promise<void> {
     switch (statusCode) {
       case 200:
-        this.log.debug(`${this.accessory.displayName} Standard Response, statusCode: ${statusCode}`);
+        this.log.debug(`${this.device.deviceClass}: ${this.accessory.displayName} Standard Response, statusCode: ${statusCode}, Action: ${action}`);
         break;
       case 400:
-        this.log.error(`${this.accessory.displayName} Bad Request, statusCode: ${statusCode}`);
+        this.log.error(`${this.device.deviceClass}: ${this.accessory.displayName} Bad Request, statusCode: ${statusCode}, Action: ${action}`);
         break;
       case 401:
-        this.log.error(`${this.accessory.displayName} Unauthorized, statusCode: ${statusCode}`);
+        this.log.error(`${this.device.deviceClass}: ${this.accessory.displayName} Unauthorized, statusCode: ${statusCode}, Action: ${action}`);
         break;
       case 404:
-        this.log.error(`${this.accessory.displayName} Not Found, statusCode: ${statusCode}`);
+        this.log.error(`${this.device.deviceClass}: ${this.accessory.displayName} Not Found, statusCode: ${statusCode}, Action: ${action}`);
         break;
       case 429:
-        this.log.error(`${this.accessory.displayName} Too Many Requests, statusCode: ${statusCode}`);
+        this.log.error(`${this.device.deviceClass}: ${this.accessory.displayName} Too Many Requests, statusCode: ${statusCode}, Action: ${action}`);
         break;
       case 500:
-        this.log.error(`${this.accessory.displayName} Internal Server Error (Meater Server), statusCode: ${statusCode}`);
+        this.log.error(`${this.device.deviceClass}: ${this.accessory.displayName} Internal Server Error (Meater Server), statusCode: ${statusCode}, `
+          + `Action: ${action}`);
         break;
       default:
-        this.log.info(
-          `${this.accessory.displayName} Unknown statusCode: ${statusCode}, Report Bugs Here: https://bit.ly/homebridge-meater-bug-report`);
+        this.log.info(`${this.device.deviceClass}: ${this.accessory.displayName} Unknown statusCode: ${statusCode}, `
+          + `Action: ${action}, Report Bugs Here: https://bit.ly/homebridge-resideo-bug-report`);
     }
   }
 
@@ -1305,25 +1161,25 @@ export class Thermostats {
 
       this.log.info(`Sending request for ${this.accessory.displayName} to Resideo API Fan Mode: ${payload.mode}`);
       // Make the API request
-<<<<<<< Updated upstream
-      await this.platform.axios.post(`${settings.DeviceURL}/thermostats/${this.device.deviceID}/fan`, payload, {
-=======
-      const { body, statusCode, headers } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
-        query: {
-          locationId: this.locationId,
-        },
-        body: JSON.stringify(payload),
+      const { statusCode } = await request(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, {
         method: 'PUT',
-        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+        query: {
+          'locationId': this.locationId,
+          'apikey': this.config.credentials?.consumerKey,
+        },
+        headers: {
+          'Authorization': `Bearer ${this.config.credentials?.accessToken}`,
+          'Content-Type': 'application/json',
+        },
       });
-      this.log.debug(`body: ${JSON.stringify(body)}`);
-      this.log.debug(`statusCode: ${statusCode}`);
-      this.log.debug(`headers: ${JSON.stringify(headers)}`);
-      const pushRoomChanges: any = await body.json();
-      this.log.debug(`Location: ${JSON.stringify(pushRoomChanges)}`);
-      this.log.debug(`Location StatusCode: ${pushRoomChanges.statusCode}`);
+      const action = 'pushFanChanges';
+      await this.statusCode(statusCode, action);
+      //const pushRoomChanges: any = await body.json();
+      //this.log.debug(`(pushFanChanges) pushFanChanges: ${JSON.stringify(pushRoomChanges)}`);
+      //this.log.debug(`(pushFanChanges) pushFanChanges StatusCode: ${pushRoomChanges.statusCode}`);
+      //this.statusCode(pushRoomChanges.statusCode, action);
       /*await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}/fan`, payload, {
->>>>>>> Stashed changes
         params: {
           locationId: this.locationId,
         },
@@ -1367,100 +1223,4 @@ export class Thermostats {
     this.log.debug(`Thermostat: ${this.accessory.displayName} Only Show These Modes: ${JSON.stringify(TargetState)}`);
     return TargetState;
   }
-<<<<<<< Updated upstream
-
-  async config(device: settings.device & settings.devicesConfig): Promise<void> {
-    let config = {};
-    if (device.thermostat) {
-      config = device.thermostat;
-    }
-    if (device.logging !== undefined) {
-      config['logging'] = device.logging;
-    }
-    if (device.refreshRate !== undefined) {
-      config['refreshRate'] = device.refreshRate;
-    }
-    if (Object.entries(config).length !== 0) {
-      this.infoLog(`Thermostat: ${this.accessory.displayName} Config: ${superStringify(config)}`);
-    }
-  }
-
-  async refreshRate(device: settings.device & settings.devicesConfig): Promise<void> {
-    if (device.refreshRate) {
-      this.deviceRefreshRate = this.accessory.context.refreshRate = device.refreshRate;
-      this.debugLog(`Thermostat: ${this.accessory.displayName} Using Device Config refreshRate: ${this.deviceRefreshRate}`);
-    } else if (this.platform.config.options!.refreshRate) {
-      this.deviceRefreshRate = this.accessory.context.refreshRate = this.platform.config.options!.refreshRate;
-      this.debugLog(`Thermostat: ${this.accessory.displayName} Using Platform Config refreshRate: ${this.deviceRefreshRate}`);
-    }
-  }
-
-  async logs(device: settings.device & settings.devicesConfig): Promise<void> {
-    if (this.platform.debugMode) {
-      this.deviceLogging = this.accessory.context.logging = 'debugMode';
-      this.debugLog(`Thermostat: ${this.accessory.displayName} Using Debug Mode Logging: ${this.deviceLogging}`);
-    } else if (device.logging) {
-      this.deviceLogging = this.accessory.context.logging = device.logging;
-      this.debugLog(`Thermostat: ${this.accessory.displayName} Using Device Config Logging: ${this.deviceLogging}`);
-    } else if (this.platform.config.options?.logging) {
-      this.deviceLogging = this.accessory.context.logging = this.platform.config.options?.logging;
-      this.debugLog(`Thermostat: ${this.accessory.displayName} Using Platform Config Logging: ${this.deviceLogging}`);
-    } else {
-      this.deviceLogging = this.accessory.context.logging = 'standard';
-      this.debugLog(`Thermostat: ${this.accessory.displayName} Logging Not Set, Using: ${this.deviceLogging}`);
-    }
-  }
-
-  /**
-   * Logging for Device
-   */
-  infoLog(...log: any[]): void {
-    if (this.enablingDeviceLogging()) {
-      this.platform.log.info(String(...log));
-    }
-  }
-
-  warnLog(...log: any[]): void {
-    if (this.enablingDeviceLogging()) {
-      this.platform.log.warn(String(...log));
-    }
-  }
-
-  debugWarnLog({ log = [] }: { log?: any[] } = {}): void {
-    if (this.enablingDeviceLogging()) {
-      if (this.deviceLogging?.includes('debug')) {
-        this.platform.log.warn('[DEBUG]', String(...log));
-      }
-    }
-  }
-
-  errorLog(...log: any[]): void {
-    if (this.enablingDeviceLogging()) {
-      this.platform.log.error(String(...log));
-    }
-  }
-
-  debugErrorLog(...log: any[]): void {
-    if (this.enablingDeviceLogging()) {
-      if (this.deviceLogging?.includes('debug')) {
-        this.platform.log.error('[DEBUG]', String(...log));
-      }
-    }
-  }
-
-  debugLog(...log: any[]): void {
-    if (this.enablingDeviceLogging()) {
-      if (this.deviceLogging === 'debug') {
-        this.platform.log.info('[DEBUG]', String(...log));
-      } else {
-        this.platform.log.debug(String(...log));
-      }
-    }
-  }
-
-  enablingDeviceLogging(): boolean {
-    return this.deviceLogging.includes('debug') || this.deviceLogging === 'standard';
-  }
-=======
->>>>>>> Stashed changes
 }
