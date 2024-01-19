@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
-## [Beta 2.0.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v2.0.0) (2024-XX-XX)
+## [2.0.0](https://github.com/donavanbecker/homebridge-resideo/releases/tag/v2.0.0) (2024-XX-XX)
 
 ### What's Changes
 - Moved from CommonJS to ES Module
