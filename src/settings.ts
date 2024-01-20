@@ -1,28 +1,28 @@
-import { PlatformConfig } from 'homebridge';
+import { PlatformConfig } from "homebridge";
 /**
  * This is the name of the platform that users will use to register the plugin in the Homebridge config.json
  */
-export const PLATFORM_NAME = 'Resideo';
+export const PLATFORM_NAME = "Resideo";
 
 /**
  * This must match the name of your plugin as defined the package.json
  */
-export const PLUGIN_NAME = 'homebridge-resideo';
+export const PLUGIN_NAME = "homebridge-resideo";
 
 /**
  * This is the main url used to access Resideo API
  */
-export const AuthURL = 'https://api.honeywell.com/oauth2/token';
+export const AuthURL = "https://api.honeywell.com/oauth2/token";
 
 /**
  * This is the main url used to access Resideo API
  */
-export const LocationURL = 'https://api.honeywell.com/v2/locations';
+export const LocationURL = "https://api.honeywell.com/v2/locations";
 
 /**
  * This is the main url used to access Resideo API
  */
-export const DeviceURL = 'https://api.honeywell.com/v2/devices';
+export const DeviceURL = "https://api.honeywell.com/v2/devices";
 
 //Config
 export interface ResideoPlatformConfig extends PlatformConfig {

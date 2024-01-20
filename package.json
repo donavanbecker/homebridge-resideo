@@ -26,10 +26,11 @@
     "check": "npm install && npm outdated",
     "update": "ncu -u && npm update && npm install",
     "lint": "eslint src/**.ts",
+    "jlint": "eslint homebridge-ui/public/**.mjs",
     "watch": "npm run build && npm link && nodemon",
     "build": "rimraf ./dist && tsc",
-    "prepublishOnly": "npm run lint && npm run build",
     "postpublish": "npm run clean",
+    "prepublishOnly": "npm run lint && npm run build",
     "clean": "rimraf ./dist",
     "test": "eslint src/**.ts"
   },
@@ -72,12 +73,10 @@
     "@typescript-eslint/parser": "^6.19.0",
     "eslint": "^8.56.0",
     "homebridge": "^1.7.0",
-    "homebridge-config-ui-x": "^4.55.1",
     "nodemon": "^3.0.3",
     "npm-check-updates": "^16.14.12",
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3",
-    "typescript-axios-wb": "^1.0.3"
+    "typescript": "^5.3.3"
   }
 }
