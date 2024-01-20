@@ -90,11 +90,11 @@ export class Valve {
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
-    // this.accessory.getService('NAME') ?? this.accessory.addService(this.platform.Service.Lightbulb, 'NAME', 'USER_DEFINED_SUBTYPE');
+    // this.accessory.getService('NAME') ?? this.accessory.addService(this.hap.Service.Lightbulb, 'NAME', 'USER_DEFINED_SUBTYPE');
 
     // set the service name, this is what is displayed as the default name on the Home app
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
-    this.service.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
+    this.service.setCharacteristic(this.hap.Characteristic.Name, accessory.displayName);
 
     // each service must implement at-minimum the "required characteristics" for the given service type
     // see https://developers.homebridge.io/#/service/
@@ -103,21 +103,21 @@ export class Valve {
     this.parseStatus();
 
     // create handlers for required characteristics
-    this.service.getCharacteristic(this.platform.Characteristic.Active).onSet(this.setActive.bind(this));
+    this.service.getCharacteristic(this.hap.Characteristic.Active).onSet(this.setActive.bind(this));
 
-    this.service.getCharacteristic(this.platform.Characteristic.InUse)
+    this.service.getCharacteristic(this.hap.Characteristic.InUse)
       .onGet(() => {
         return this.InUse!;
       });
 
     // Set Valve Type
-    this.service.setCharacteristic(this.platform.Characteristic.ValveType, this.valvetype);
+    this.service.setCharacteristic(this.hap.Characteristic.ValveType, this.valvetype);
 
     // Retrieve initial values and updateHomekit
     this.updateHomeKitCharacteristics();
 
     // Start an update interval
-    interval(this.platform.config.options!.refreshRate! * 1000)
+    interval(this.config.options!.refreshRate! * 1000)
       .pipe(skipWhile(() => this.valveUpdateInProgress))
       .subscribe(async () => {
         await this.refreshStatus();
@@ -155,16 +155,16 @@ export class Valve {
   async parseStatus(): Promise<void> {
     // Active
     if (this.isAlive) {
-      this.Active = this.platform.Characteristic.Active.ACTIVE;
+      this.Active = this.hap.Characteristic.Active.ACTIVE;
     } else {
-      this.Active = this.platform.Characteristic.Active.INACTIVE;
+      this.Active = this.hap.Characteristic.Active.INACTIVE;
     }
 
     // InUse
     if (this.valveStatus === 'Open') {
-      this.InUse = this.platform.Characteristic.InUse.IN_USE;
+      this.InUse = this.hap.Characteristic.InUse.IN_USE;
     } else {
-      this.InUse = this.platform.Characteristic.InUse.NOT_IN_USE;
+      this.InUse = this.hap.Characteristic.InUse.NOT_IN_USE;
     }
   }
 
@@ -188,13 +188,6 @@ export class Valve {
       await this.statusCode(statusCode, action);
       const device: any = await body.json();
       this.log.debug(`(refreshStatus) ${device.deviceClass}: ${JSON.stringify(device)}`);
-      /*const device: any = (
-        await this.platform.axios.get(`${DeviceURL}/shutoffvalve/${this.device.deviceID}`, {
-          params: {
-            locationId: this.locationId,
-          },
-        })
-      ).data;*/
       this.device = device;
       this.isAlive = device.isAlive;
       this.valveStatus = device.actuatorValve.valveStatus;
@@ -214,7 +207,7 @@ export class Valve {
   async pushChanges(): Promise<void> {
     try {
       const payload = {} as payload;
-      if (this.Active === this.platform.Characteristic.Active.ACTIVE) {
+      if (this.Active === this.hap.Characteristic.Active.ACTIVE) {
         payload.state = 'open';
       } else {
         payload.state = 'closed';
@@ -233,15 +226,6 @@ export class Valve {
       });
       const action = 'pushChanges';
       await this.statusCode(statusCode, action);
-      //const pushChanges: any = await body.json();
-      //this.log.debug(`(pushChanges) ${this.device.deviceClass}: ${JSON.stringify(pushChanges)}`);
-      //this.log.debug(`(pushChanges) ${this.device.deviceClass} StatusCode: ${JSON.stringify(pushChanges.statusCode)}`);
-      //this.statusCode(pushChanges.statusCode, action);
-      /*await this.platform.axios.post(`${DeviceURL}/thermostats/${this.device.deviceID}`, payload, {
-        params: {
-          locationId: this.locationId,
-        },
-      });*/
       this.log.debug(`Thermostat: ${this.accessory.displayName} pushChanges: ${JSON.stringify(payload)}`);
     } catch (e: any) {
       this.log.error(`pushChanges: ${JSON.stringify(e)}`);
@@ -283,13 +267,13 @@ export class Valve {
     this.log.debug('Triggered GET InUse');
 
     // set this to a valid value for InUse
-    const currentValue = this.platform.Characteristic.InUse.NOT_IN_USE;
+    const currentValue = this.hap.Characteristic.InUse.NOT_IN_USE;
 
     return currentValue;
   }
 
   async apiError(e: any): Promise<void> {
-    this.service.updateCharacteristic(this.platform.Characteristic.Active, e);
+    this.service.updateCharacteristic(this.hap.Characteristic.Active, e);
   }
 
   async resideoAPIError(e: any): Promise<void> {
@@ -367,5 +351,56 @@ export class Valve {
         this.log.info(`${this.device.deviceClass}: ${this.accessory.displayName} Unknown statusCode: ${statusCode}, `
           + `Action: ${action}, Report Bugs Here: https://bit.ly/homebridge-resideo-bug-report`);
     }
+  }
+
+  /**
+   * Logging for Device
+   */
+  infoLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      this.platform.log.info(String(...log));
+    }
+  }
+
+  warnLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      this.platform.log.warn(String(...log));
+    }
+  }
+
+  debugWarnLog({ log = [] }: { log?: any[]; } = {}): void {
+    if (this.enablingDeviceLogging()) {
+      if (this.deviceLogging?.includes('debug')) {
+        this.platform.log.warn('[DEBUG]', String(...log));
+      }
+    }
+  }
+
+  errorLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      this.platform.log.error(String(...log));
+    }
+  }
+
+  debugErrorLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      if (this.deviceLogging?.includes('debug')) {
+        this.platform.log.error('[DEBUG]', String(...log));
+      }
+    }
+  }
+
+  debugLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      if (this.deviceLogging === 'debug') {
+        this.platform.log.info('[DEBUG]', String(...log));
+      } else {
+        this.platform.log.debug(String(...log));
+      }
+    }
+  }
+
+  enablingDeviceLogging(): boolean {
+    return this.deviceLogging.includes('debug') || this.deviceLogging === 'standard';
   }
 }

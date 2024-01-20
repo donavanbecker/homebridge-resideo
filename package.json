@@ -1,10 +1,14 @@
 {
   "displayName": "Resideo",
   "name": "homebridge-resideo",
-  "version": "1.4.6",
+  "version": "2.0.0",
   "description": "The Resideo plugin allows you to access your Resideo device(s) from HomeKit.",
-  "author": "donavanbecker",
-  "license": "Apache-2.0",
+  "author": {
+    "name": "donavanbecker",
+    "url": "https://github.com/donavanbecker"
+  },
+  "type": "module",
+  "license": "ISC",
   "icon": "https://raw.githubusercontent.com/donavanbecker/homebridge-resideo/beta-1.4.4/branding/icon.png",
   "repository": {
     "type": "git",
@@ -58,9 +62,9 @@
     "leak"
   ],
   "dependencies": {
-    "@homebridge/plugin-ui-utils": "=1.0.0",
-    "undici": "^6.3.0",
-    "rxjs": "^7.8.1"
+    "@homebridge/plugin-ui-utils": "^1.0.1",
+    "rxjs": "^7.8.1",
+    "undici": "^6.4.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.5",
@@ -70,10 +74,10 @@
     "homebridge": "^1.7.0",
     "homebridge-config-ui-x": "^4.55.1",
     "nodemon": "^3.0.3",
+    "npm-check-updates": "^16.14.12",
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
-    "typescript-axios-wb": "^1.0.3",
-    "npm-check-updates": "^16.14.12"
+    "typescript-axios-wb": "^1.0.3"
   }
 }

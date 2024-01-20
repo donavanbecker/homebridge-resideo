@@ -37,6 +37,7 @@ export class LeakSensor {
   humidity!: number;
   batteryRemaining!: number;
   waterPresent!: boolean;
+  debugMode!: boolean;
 
   // Config
   deviceLogging!: string;
@@ -66,7 +67,7 @@ export class LeakSensor {
     this.CurrentRelativeHumidity = accessory.context.CurrentRelativeHumidity || 50;
     accessory.context.FirmwareRevision = 'v2.0.0';
 
-    this.deviceLogging = this.device.logging || this.config.options?.logging || 'standard';
+    this.deviceLogs();
 
     // this is subject we use to track when we need to POST changes to the Resideo API
     this.doSensorUpdate = new Subject();
@@ -82,16 +83,16 @@ export class LeakSensor {
 
     // get the LightBulb service if it exists, otherwise create a new LightBulb service
     // you can create multiple services for each accessory
-    (this.service = this.accessory.getService(this.platform.Service.Battery) || this.accessory.addService(this.platform.Service.Battery)),
+    (this.service = this.accessory.getService(this.hap.Service.Battery) || this.accessory.addService(this.hap.Service.Battery)),
     `${accessory.displayName} Battery`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
-    // this.accessory.getService('NAME') ?? this.accessory.addService(this.platform.Service.Lightbulb, 'NAME', 'USER_DEFINED_SUBTYPE');
+    // this.accessory.getService('NAME') ?? this.accessory.addService(this.hap.Service.Lightbulb, 'NAME', 'USER_DEFINED_SUBTYPE');
 
     // set the service name, this is what is displayed as the default name on the Home app
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
-    this.service.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
+    this.service.setCharacteristic(this.hap.Characteristic.Name, accessory.displayName);
 
     // each service must implement at-minimum the "required characteristics" for the given service type
     // see https://developers.homebridge.io/#/service/
@@ -100,7 +101,7 @@ export class LeakSensor {
     this.parseStatus();
 
     // Set Charging State
-    this.service.setCharacteristic(this.platform.Characteristic.ChargingState, 2);
+    this.service.setCharacteristic(this.hap.Characteristic.ChargingState, 2);
 
     // Leak Sensor Service
     if (this.device.leaksensor?.hide_leak) {
@@ -112,7 +113,7 @@ export class LeakSensor {
       (this.leakService = this.accessory.getService(this.hap.Service.LeakSensor)
         || this.accessory.addService(this.hap.Service.LeakSensor)), `${accessory.displayName} Leak Sensor`;
 
-      this.leakService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Leak Sensor`);
+      this.leakService.setCharacteristic(this.hap.Characteristic.Name, `${accessory.displayName} Leak Sensor`);
     } else {
       this.log.debug(`Leak Sensor: ${accessory.displayName} Leak Sensor Service Not Added`);
     }
@@ -125,13 +126,13 @@ export class LeakSensor {
     } else if (!this.temperatureService) {
       this.log.debug(`Leak Sensor: ${accessory.displayName} Add Temperature Sensor Service`);
       (this.temperatureService =
-        this.accessory.getService(this.platform.Service.TemperatureSensor) || this.accessory.addService(this.platform.Service.TemperatureSensor)),
+        this.accessory.getService(this.hap.Service.TemperatureSensor) || this.accessory.addService(this.hap.Service.TemperatureSensor)),
       `${accessory.displayName} Temperature Sensor`;
 
-      this.temperatureService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Temperature Sensor`);
+      this.temperatureService.setCharacteristic(this.hap.Characteristic.Name, `${accessory.displayName} Temperature Sensor`);
 
       this.temperatureService
-        .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+        .getCharacteristic(this.hap.Characteristic.CurrentTemperature)
         .setProps({
           minValue: -273.15,
           maxValue: 100,
@@ -152,13 +153,13 @@ export class LeakSensor {
     } else if (!this.humidityService) {
       this.log.debug(`Leak Sensor: ${accessory.displayName} Add Humidity Sensor Service`);
       (this.humidityService =
-        this.accessory.getService(this.platform.Service.HumiditySensor) || this.accessory.addService(this.platform.Service.HumiditySensor)),
+        this.accessory.getService(this.hap.Service.HumiditySensor) || this.accessory.addService(this.hap.Service.HumiditySensor)),
       `${accessory.displayName} Humidity Sensor`;
 
-      this.humidityService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Humidity Sensor`);
+      this.humidityService.setCharacteristic(this.hap.Characteristic.Name, `${accessory.displayName} Humidity Sensor`);
 
       this.humidityService
-        .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
+        .getCharacteristic(this.hap.Characteristic.CurrentRelativeHumidity)
         .setProps({
           minStep: 0.1,
         })
@@ -174,7 +175,7 @@ export class LeakSensor {
     this.updateHomeKitCharacteristics();
 
     // Start an update interval
-    interval(this.platform.config.options!.refreshRate! * 1000)
+    interval(this.config.options!.refreshRate! * 1000)
       .pipe(skipWhile(() => this.SensorUpdateInProgress))
       .subscribe(async () => {
         await this.refreshStatus();
@@ -209,11 +210,11 @@ export class LeakSensor {
 
     // Battery Service
     this.BatteryLevel = Number(this.device.batteryRemaining);
-    this.service.getCharacteristic(this.platform.Characteristic.BatteryLevel).updateValue(this.BatteryLevel);
+    this.service.getCharacteristic(this.hap.Characteristic.BatteryLevel).updateValue(this.BatteryLevel);
     if (this.device.batteryRemaining < 15) {
-      this.StatusLowBattery = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW;
+      this.StatusLowBattery = this.hap.Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW;
     } else {
-      this.StatusLowBattery = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL;
+      this.StatusLowBattery = this.hap.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL;
     }
     this.log.debug(`Leak Sensor: ${this.accessory.displayName} BatteryLevel: ${this.BatteryLevel},` + ` StatusLowBattery: ${this.StatusLowBattery}`);
   }
@@ -306,13 +307,13 @@ export class LeakSensor {
   }
 
   async apiError(e: any): Promise<void> {
-    this.service.updateCharacteristic(this.platform.Characteristic.BatteryLevel, e);
-    this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, e);
+    this.service.updateCharacteristic(this.hap.Characteristic.BatteryLevel, e);
+    this.service.updateCharacteristic(this.hap.Characteristic.StatusLowBattery, e);
     if (!this.device.leaksensor?.hide_leak) {
-      this.leakService?.updateCharacteristic(this.platform.Characteristic.LeakDetected, e);
-      this.leakService?.updateCharacteristic(this.platform.Characteristic.StatusActive, e);
+      this.leakService?.updateCharacteristic(this.hap.Characteristic.LeakDetected, e);
+      this.leakService?.updateCharacteristic(this.hap.Characteristic.StatusActive, e);
     }
-    //throw new this.platform.api.hap.HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+    //throw new this.api.hap.HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
   }
 
   async resideoAPIError(e: any): Promise<void> {
@@ -390,5 +391,79 @@ export class LeakSensor {
         this.log.info(`${this.device.deviceClass}: ${this.accessory.displayName} Unknown statusCode: ${statusCode}, `
           + `Action: ${action}, Report Bugs Here: https://bit.ly/homebridge-resideo-bug-report`);
     }
+  }
+
+  async deviceLogs() {
+    this.debugMode = process.argv.includes('-D') || process.argv.includes('--debug');
+    this.deviceLogging = this.device.logging || this.config.options?.logging || 'standard';
+    if (this.debugMode) {
+      this.deviceLogging = 'debugMode';
+      this.debugLog(`${this.constructor.name}: ${this.accessory.displayName} Using Debug Mode Logging: ${this.deviceLogging}`);
+    } else if (this.device.logging) {
+      this.deviceLogging = this.device.logging;
+      this.debugLog(`${this.constructor.name}: ${this.accessory.displayName} Using Device Config Logging: ${this.deviceLogging}`);
+    } else if (this.config.options?.logging) {
+      this.deviceLogging = this.config.options?.logging;
+      this.debugLog(`${this.constructor.name}: ${this.accessory.displayName} Using Platform Config Logging: ${this.deviceLogging}`);
+    } else {
+      this.deviceLogging = 'standard';
+      this.debugLog(`${this.constructor.name}: ${this.accessory.displayName} Logging Not Set, Using: ${this.deviceLogging}`);
+    }
+  }
+
+  /**
+   * Logging for Device
+   */
+  infoLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      this.platform.log.info(String(...log));
+    }
+  }
+
+  warnLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      this.platform.log.warn(String(...log));
+    }
+  }
+
+  debugWarnLog({ log = [] }: { log?: any[]; } = {}): void {
+    if (this.enablingDeviceLogging()) {
+      if (this.deviceLogging?.includes('debug')) {
+        this.platform.log.warn('[DEBUG]', String(...log));
+      }
+    }
+  }
+
+  errorLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      this.platform.log.error(String(...log));
+    }
+  }
+
+  debugErrorLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      if (this.deviceLogging?.includes('debug')) {
+        this.platform.log.error('[DEBUG]', String(...log));
+      }
+    }
+  }
+
+  debugLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      if (this.deviceLogging === 'debugMode') {
+        this.log.debug('[HOMEBRIDGE DEBUGMODE]', String(...log));
+      } else if (this.deviceLogging === 'debug') {
+        this.log.info('[DEBUG]', String(...log));
+      }
+      /*if (this.deviceLogging === 'debug') {
+        this.platform.log.info('[DEBUG]', String(...log));
+      } else {
+        this.platform.log.debug(String(...log));
+      }*/
+    }
+  }
+
+  enablingDeviceLogging(): boolean {
+    return this.deviceLogging.includes('debug') || this.deviceLogging === 'standard';
   }
 }

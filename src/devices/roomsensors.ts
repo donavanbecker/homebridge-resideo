@@ -78,16 +78,16 @@ export class RoomSensors {
 
     // get the BatteryService service if it exists, otherwise create a new Battery service
     // you can create multiple services for each accessory
-    (this.service = this.accessory.getService(this.platform.Service.Battery) || this.accessory.addService(this.platform.Service.Battery)),
+    (this.service = this.accessory.getService(this.hap.Service.Battery) || this.accessory.addService(this.hap.Service.Battery)),
     `${accessory.displayName} Battery`;
 
     // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
     // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
-    // this.accessory.getService('NAME') ?? this.accessory.addService(this.platform.Service.Battery, 'NAME', 'USER_DEFINED_SUBTYPE');
+    // this.accessory.getService('NAME') ?? this.accessory.addService(this.hap.Service.Battery, 'NAME', 'USER_DEFINED_SUBTYPE');
 
     // set the service name, this is what is displayed as the default name on the Home app
     // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
-    this.service.setCharacteristic(this.platform.Characteristic.Name, accessory.displayName);
+    this.service.setCharacteristic(this.hap.Characteristic.Name, accessory.displayName);
 
     // each service must implement at-minimum the "required characteristics" for the given service type
     // see https://developers.homebridge.io/#/service/
@@ -96,7 +96,7 @@ export class RoomSensors {
     this.parseStatus();
 
     // Set Charging State
-    this.service.setCharacteristic(this.platform.Characteristic.ChargingState, 2);
+    this.service.setCharacteristic(this.hap.Characteristic.ChargingState, 2);
 
     // Temperature Sensor Service
     if (device.thermostat?.roomsensor?.hide_temperature) {
@@ -106,13 +106,13 @@ export class RoomSensors {
     } else if (!this.temperatureService) {
       this.log.debug(`Room Sensor: ${accessory.displayName} Add Temperature Sensor Service`);
       (this.temperatureService =
-        this.accessory.getService(this.platform.Service.TemperatureSensor) || this.accessory.addService(this.platform.Service.TemperatureSensor)),
+        this.accessory.getService(this.hap.Service.TemperatureSensor) || this.accessory.addService(this.hap.Service.TemperatureSensor)),
       `${accessory.displayName} Temperature Sensor`;
 
-      this.temperatureService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Temperature Sensor`);
+      this.temperatureService.setCharacteristic(this.hap.Characteristic.Name, `${accessory.displayName} Temperature Sensor`);
 
       this.temperatureService
-        .getCharacteristic(this.platform.Characteristic.CurrentTemperature)
+        .getCharacteristic(this.hap.Characteristic.CurrentTemperature)
         .setProps({
           minValue: -273.15,
           maxValue: 100,
@@ -133,10 +133,10 @@ export class RoomSensors {
     } else if (!this.occupancyService) {
       this.log.debug(`Room Sensor: ${accessory.displayName} Add Occupancy Sensor Service`);
       (this.occupancyService =
-        this.accessory.getService(this.platform.Service.OccupancySensor) || this.accessory.addService(this.platform.Service.OccupancySensor)),
+        this.accessory.getService(this.hap.Service.OccupancySensor) || this.accessory.addService(this.hap.Service.OccupancySensor)),
       `${accessory.displayName} Occupancy Sensor`;
 
-      this.occupancyService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Occupancy Sensor`);
+      this.occupancyService.setCharacteristic(this.hap.Characteristic.Name, `${accessory.displayName} Occupancy Sensor`);
     } else {
       this.log.debug(`Room Sensor: ${accessory.displayName} Occupancy Sensor Service Not Added`);
     }
@@ -149,13 +149,13 @@ export class RoomSensors {
     } else if (!this.humidityService) {
       this.log.debug(`Room Sensor: ${accessory.displayName} Add Humidity Sensor Service`);
       (this.humidityService =
-        this.accessory.getService(this.platform.Service.HumiditySensor) || this.accessory.addService(this.platform.Service.HumiditySensor)),
+        this.accessory.getService(this.hap.Service.HumiditySensor) || this.accessory.addService(this.hap.Service.HumiditySensor)),
       `${accessory.displayName} Humidity Sensor`;
 
-      this.humidityService.setCharacteristic(this.platform.Characteristic.Name, `${accessory.displayName} Humidity Sensor`);
+      this.humidityService.setCharacteristic(this.hap.Characteristic.Name, `${accessory.displayName} Humidity Sensor`);
 
       this.humidityService
-        .getCharacteristic(this.platform.Characteristic.CurrentRelativeHumidity)
+        .getCharacteristic(this.hap.Characteristic.CurrentRelativeHumidity)
         .setProps({
           minStep: 0.1,
         })
@@ -170,7 +170,7 @@ export class RoomSensors {
     this.updateHomeKitCharacteristics();
 
     // Start an update interval
-    interval(this.platform.config.options!.refreshRate! * 1000)
+    interval(this.config.options!.refreshRate! * 1000)
       .pipe(skipWhile(() => this.SensorUpdateInProgress))
       .subscribe(async () => {
         await this.refreshStatus();
@@ -183,9 +183,9 @@ export class RoomSensors {
   async parseStatus(): Promise<void> {
     // Set Room Sensor State
     if (this.sensorAccessory.accessoryValue.batteryStatus.startsWith('Ok')) {
-      this.StatusLowBattery = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL;
+      this.StatusLowBattery = this.hap.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL;
     } else {
-      this.StatusLowBattery = this.platform.Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW;
+      this.StatusLowBattery = this.hap.Characteristic.StatusLowBattery.BATTERY_LEVEL_LOW;
     }
     this.log.debug(`Room Sensor: ${this.accessory.displayName} StatusLowBattery: ${this.StatusLowBattery}`);
 
@@ -258,11 +258,11 @@ export class RoomSensors {
   }
 
   async apiError(e: any): Promise<void> {
-    this.service.updateCharacteristic(this.platform.Characteristic.StatusLowBattery, e);
+    this.service.updateCharacteristic(this.hap.Characteristic.StatusLowBattery, e);
     if (!this.device.thermostat?.roomsensor?.hide_temperature) {
-      this.temperatureService?.updateCharacteristic(this.platform.Characteristic.CurrentTemperature, e);
+      this.temperatureService?.updateCharacteristic(this.hap.Characteristic.CurrentTemperature, e);
     }
-    //throw new this.platform.api.hap.HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+    //throw new this.api.hap.HapStatusError(HAPStatus.SERVICE_COMMUNICATION_FAILURE);
   }
 
   async resideoAPIError(e: any): Promise<void> {
@@ -345,11 +345,62 @@ export class RoomSensors {
    * Converts the value to celsius if the temperature units are in Fahrenheit
    */
   toCelsius(value: number): number {
-    if (this.TemperatureDisplayUnits === this.platform.Characteristic.TemperatureDisplayUnits.CELSIUS) {
+    if (this.TemperatureDisplayUnits === this.hap.Characteristic.TemperatureDisplayUnits.CELSIUS) {
       return value;
     }
 
     // celsius should be to the nearest 0.5 degree
     return Math.round((5 / 9) * (value - 32) * 2) / 2;
+  }
+
+  /**
+   * Logging for Device
+   */
+  infoLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      this.platform.log.info(String(...log));
+    }
+  }
+
+  warnLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      this.platform.log.warn(String(...log));
+    }
+  }
+
+  debugWarnLog({ log = [] }: { log?: any[]; } = {}): void {
+    if (this.enablingDeviceLogging()) {
+      if (this.deviceLogging?.includes('debug')) {
+        this.platform.log.warn('[DEBUG]', String(...log));
+      }
+    }
+  }
+
+  errorLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      this.platform.log.error(String(...log));
+    }
+  }
+
+  debugErrorLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      if (this.deviceLogging?.includes('debug')) {
+        this.platform.log.error('[DEBUG]', String(...log));
+      }
+    }
+  }
+
+  debugLog(...log: any[]): void {
+    if (this.enablingDeviceLogging()) {
+      if (this.deviceLogging === 'debug') {
+        this.platform.log.info('[DEBUG]', String(...log));
+      } else {
+        this.platform.log.debug(String(...log));
+      }
+    }
+  }
+
+  enablingDeviceLogging(): boolean {
+    return this.deviceLogging.includes('debug') || this.deviceLogging === 'standard';
   }
 }

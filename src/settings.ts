@@ -24,11 +24,6 @@ export const LocationURL = 'https://api.honeywell.com/v2/locations';
  */
 export const DeviceURL = 'https://api.honeywell.com/v2/devices';
 
-/**
- * This is the url used to access UI Login to Resideo API
- */
-export const UIurl = 'https://homebridge-honeywell.iot.oz.nu/user/refresh';
-
 //Config
 export interface ResideoPlatformConfig extends PlatformConfig {
   credentials?: credentials;
