@@ -172,6 +172,7 @@
       try {
          const currentConfig = await homebridge.getPluginConfig()
          const hostname = window.location.hostname
+         const port = currentConfig[0].port
          try {
             await homebridge.request('Start Resideo Login Server')
          } catch (err) {
@@ -187,6 +188,9 @@
                      consumerSecret: event.data.secret,
                      accessToken: event.data.access,
                      refreshToken: event.data.refresh
+                  }
+                  currentConfig[0] = {
+                     port: event.data.port
                   }
                   await homebridge.updatePluginConfig(currentConfig)
                   await homebridge.savePluginConfig()
@@ -221,7 +225,7 @@
             const h = 700;
             const y = window.top.outerHeight / 2 + window.top.screenY - (h / 2);
             const x = window.top.outerWidth / 2 + window.top.screenX - (w / 2);
-            const urlToOpen = 'http://' + hostname + ':8585/start?' +
+            const urlToOpen = 'http://' + hostname + `:${port}/start?` +
                'key=' + document.getElementById('inputConsumerKey').value +
                '&secret=' + document.getElementById('inputConsumerSecret').value +
                '&host=' + encodeURI(hostname);
@@ -254,7 +258,7 @@
          }
          showIntro = () => {
             const introLink = document.getElementById('introLink')
-            document.getElementById('copyMe').value = 'http://' + hostname + ':8585/auth'
+            document.getElementById('copyMe').value = 'http://' + hostname + `:${port}/auth`
             introLink.addEventListener('click', () => {
                homebridge.showSpinner()
                document.getElementById('pageIntro').style.display = 'none'
