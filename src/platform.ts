@@ -3,13 +3,13 @@
  * protect-platform.ts: homebridge-cloudflared-tunnel platform class.
  */
 import {
-  AuthURL,
   DeviceURL,
   LocationURL,
   PLATFORM_NAME,
   PLUGIN_NAME,
   ResideoPlatformConfig,
   T9groups,
+  TokenURL,
   accessoryAttribute,
   devicesConfig,
   location,
@@ -128,16 +128,16 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
   }
 
   async platformConfigOptions() {
-    const platformConfig = {};
+    const platformConfig: ResideoPlatformConfig['options'] = {};
     if (this.config.options) {
       if (this.config.options.logging) {
-        platformConfig['logging'] = this.config.options.logging;
+        platformConfig.logging = this.config.options.logging;
       }
       if (this.config.options.refreshRate) {
-        platformConfig['refreshRate'] = this.config.options.refreshRate;
+        platformConfig.refreshRate = this.config.options.refreshRate;
       }
       if (this.config.options.pushRate) {
-        platformConfig['pushRate'] = this.config.options.pushRate;
+        platformConfig.pushRate = this.config.options.pushRate;
       }
       if (Object.entries(platformConfig).length !== 0) {
         this.debugLog(`Platform Config: ${JSON.stringify(platformConfig)}`);
@@ -167,7 +167,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
     if (this.config.options) {
       // Device Config
       if (this.config.options.devices) {
-        for (const deviceConfig of this.config.options.devices!) {
+        for (const deviceConfig of this.config.options.devices) {
           if (!deviceConfig.hide_device && !deviceConfig.deviceClass) {
             throw new Error('The devices config section is missing the "Device Type" in the config, Check Your Conifg.');
           }
@@ -178,7 +178,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       }
     }
 
-    if (this.config.options!.refreshRate! < 30) {
+    if (this.config.options.refreshRate! < 30) {
       throw new Error('Refresh Rate must be above 30 seconds.');
     }
 
@@ -188,7 +188,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
 
     if (!this.config.options.refreshRate && !this.config.disablePlugin) {
       // default 120 seconds (2 minutes)
-      this.config.options!.refreshRate! = 120;
+      this.config.options.refreshRate = 120;
       if (this.platformLogging?.includes('debug')) {
         this.warnLog('Using Default Refresh Rate of 2 Minutes.');
       }
@@ -196,7 +196,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
 
     if (!this.config.options.pushRate && !this.config.disablePlugin) {
       // default 100 milliseconds
-      this.config.options!.pushRate! = 0.1;
+      this.config.options.pushRate = 0.1;
       if (this.platformLogging?.includes('debug')) {
         this.warnLog('Using Default Push Rate.');
       }
@@ -229,7 +229,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       if (this.config.credentials!.consumerSecret && this.config.credentials!.consumerKey && this.config.credentials!.refreshToken) {
         this.debugLog(`consumerKey: ${this.config.credentials!.consumerKey},` + ` consumerSecret: ${this.config.credentials!.consumerSecret},`
           + ` refreshToken: ${this.config.credentials!.refreshToken}` + ` accessToken: ${this.config.credentials!.accessToken}`);
-        const { body, statusCode } = await request(AuthURL, {
+        const { body, statusCode } = await request(TokenURL, {
           method: 'POST',
           headers: {
             Authorization:
@@ -484,7 +484,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       case 'Thermostat':
         this.debugLog(`Discovered ${device.userDefinedDeviceName} ${device.deviceClass} (${device.deviceModel}) @ ${location.name}`);
         await this.createThermostat(location, device, locationId);
-        if (device.deviceModel!.startsWith('T9')) {
+        if (device.deviceModel.startsWith('T9')) {
           try {
             this.debugLog(`Discovering Room Sensor(s) for ${device.userDefinedDeviceName} ${device.deviceClass} (${device.deviceModel})`);
             await this.discoverRoomSensors(location.locationID, device);
@@ -1047,7 +1047,7 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
   async platformLogs() {
     this.debugMode = process.argv.includes('-D') || process.argv.includes('--debug');
     if (this.config.options?.logging === 'debug' || this.config.options?.logging === 'standard' || this.config.options?.logging === 'none') {
-      this.platformLogging = this.config.options!.logging;
+      this.platformLogging = this.config.options.logging;
       if (this.platformLogging.includes('debug')) {
         this.debugWarnLog(`Using Config Logging: ${this.platformLogging}`);
       }

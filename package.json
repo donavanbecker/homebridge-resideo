@@ -28,9 +28,10 @@
     "lint": "eslint src/**.ts",
     "jlint": "eslint homebridge-ui/public/**.mjs",
     "watch": "npm run build && npm link && nodemon",
+    "plugin-ui": "mkdir ./dist/homebridge-ui/public/ && cp ./src/homebridge-ui/public/index.html ./dist/homebridge-ui/public/",
     "build": "rimraf ./dist && tsc",
     "postpublish": "npm run clean",
-    "prepublishOnly": "npm run lint && npm run build",
+    "prepublishOnly": "npm run lint && npm run build && npm run plugin-ui",
     "clean": "rimraf ./dist",
     "test": "eslint src/**.ts"
   },
