@@ -12,7 +12,7 @@ export const PLUGIN_NAME = 'homebridge-resideo';
 /**
  * This is the main url used to access Resideo API
  */
-export const AuthorizeURL = 'https://api.honeywell.com/oauth2/token';
+export const AuthorizeURL = 'https://api.honeywell.com/oauth2/authorize';
 
 /**
  * This is the main url used to access Resideo API

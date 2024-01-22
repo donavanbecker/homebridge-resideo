@@ -10,13 +10,9 @@ class PluginUiServer extends HomebridgePluginUiServer {
   public key!: string;
   public secret!: string;
   public hostname!: string;
-
-  constructor(
-  ) {
+  constructor() {
     super();
-
     this.onRequest('Start Resideo Login Server', (): any => {
-
       const runningServer = createServer(async (req, res) => {
         try {
           res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -39,7 +35,6 @@ class PluginUiServer extends HomebridgePluginUiServer {
                 try {
                   const code = query.code;
                   const auth = Buffer.from(this.key + ':' + this.secret).toString('base64');
-
                   const { body, statusCode } = await request(TokenURL, {
                     body: JSON.stringify({
                       'code': code,
