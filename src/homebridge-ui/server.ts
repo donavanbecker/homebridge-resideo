@@ -7,7 +7,6 @@ import fs from 'fs';
 import url from 'node:url';
 
 class PluginUiServer extends HomebridgePluginUiServer {
-  public port!: string;
   public key!: string;
   public secret!: string;
   public hostname!: string;
@@ -30,9 +29,8 @@ class PluginUiServer extends HomebridgePluginUiServer {
               this.key = query.key as string;
               this.secret = query.secret as string;
               this.hostname = query.host as string;
-              this.port = query.port as string || '8585';
               const url = AuthorizeURL + '?response_type=code&redirect_uri=' + encodeURI('http://' + this.hostname
-                + `:${this.port}/auth`) + '&' + 'client_id=' + this.key;
+                + ':8585/auth') + '&' + 'client_id=' + this.key;
               res.end('<script>window.location.replace(\'' + url + '\');</script>');
               break;
             }
@@ -46,7 +44,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
                     body: JSON.stringify({
                       'code': code,
                       'grant_type': 'authorization_code',
-                      'redirect_uri': encodeURI('http://' + this.hostname + `:${this.port}/auth`),
+                      'redirect_uri': encodeURI('http://' + this.hostname + ':8585/auth'),
                     }),
                     headers: {
                       'Accept': 'application/json',
@@ -85,7 +83,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
           console.log(err);
         }
       });
-      runningServer.listen(this.port, () => {
+      runningServer.listen(8585, () => {
         console.log('Server is running');
       });
       setTimeout(() => {
