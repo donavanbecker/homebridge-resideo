@@ -69,6 +69,10 @@
       <label for="inputConsumerSecret">Consumer Secret <span class="text-danger">*</span></label>
       <input type="text" class="form-control" id="inputConsumerSecret">
    </div>
+   <div class="form-group">
+      <label for="inputPort">Port <span class="text-danger">*</span></label>
+      <input type="text" class="form-control" id="inputPort">
+   </div>
    <div class="form-group text-center">
       <button type="button" class="btn btn-primary" id="backToIntro">&larr;</button>
       <button type="button" class="btn btn-primary" id="linkButton">Continue &rarr;</button>
@@ -216,7 +220,8 @@
             document.getElementById('validateForm').style.display = 'none'
             if (
                !document.getElementById('inputConsumerKey').value ||
-               !document.getElementById('inputConsumerSecret').value
+               !document.getElementById('inputConsumerSecret').value ||
+               !document.getElementById('inputPort').value
             ) {
                document.getElementById('validateForm').style.display = 'block'
                return
@@ -393,8 +398,10 @@
             if (currentConfig[0] && currentConfig[0].credentials) {
                const key = currentConfig[0].credentials.consumerKey || ''
                const secret = currentConfig[0].credentials.consumerSecret || ''
+               const port = currentConfig[0].port || ''
                document.getElementById('inputConsumerKey').value = key
                document.getElementById('inputConsumerSecret').value = secret
+               document.getElementById('inputPort').value = port
                if (key && secret) {
                   isRelink = true
                   document.getElementById('unLinkButton').style.display = 'inline-block'

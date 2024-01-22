@@ -16,7 +16,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
   constructor(
   ) {
     super();
-    const port = this.port || '8585';
+    //const port = this.port || '8585';
 
     this.onRequest('Start Resideo Login Server', (): any => {
 
@@ -32,9 +32,9 @@ class PluginUiServer extends HomebridgePluginUiServer {
               this.key = query.key as string;
               this.secret = query.secret as string;
               this.hostname = query.host as string;
-              this.port = query.port as string;
+              this.port = query.port as string || '8585';
               const url = AuthorizeURL + '?response_type=code&redirect_uri=' + encodeURI('http://' + this.hostname
-                + `:${port || this.port}/auth`) + '&' + 'client_id=' + this.key;
+                + `:${this.port}/auth`) + '&' + 'client_id=' + this.key;
               res.end('<script>window.location.replace(\'' + url + '\');</script>');
               break;
             }
@@ -48,7 +48,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
                     body: JSON.stringify({
                       'code': code,
                       'grant_type': 'authorization_code',
-                      'redirect_uri': encodeURI('http://' + this.hostname + `:${port || this.port}/auth`),
+                      'redirect_uri': encodeURI('http://' + this.hostname + `:${this.port}/auth`),
                     }),
                     headers: {
                       'Accept': 'application/json',
@@ -87,7 +87,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
           console.log(err);
         }
       });
-      runningServer.listen(port, () => {
+      runningServer.listen(this.port, () => {
         console.log('Server is running');
       });
       setTimeout(() => {
