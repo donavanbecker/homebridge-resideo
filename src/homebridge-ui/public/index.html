@@ -48,6 +48,12 @@
       Support
    </button>
 </div>
+<div id="disabledBanner" class="alert alert-secondary mb-0 mt-3" role="alert" style="display: none;">
+   Plugin is currently disabled
+   <button id="disabledEnable" type="button" class="btn btn-link p-0 m-0 float-right">
+      Enable
+   </button>
+</div>
 <div id="pageAccount" class="mt-4" style="display: none;">
    <div class="alert alert-warning" style="display: none;" id="validateForm">
       Please enter both values
@@ -62,10 +68,6 @@
    <div class="form-group">
       <label for="inputConsumerSecret">Consumer Secret <span class="text-danger">*</span></label>
       <input type="text" class="form-control" id="inputConsumerSecret">
-   </div>
-   <div class="form-group">
-      <label for="inputPort">Port <span class="text-danger">*</span></label>
-      <input type="text" class="form-control" id="inputPort">
    </div>
    <div class="form-group text-center">
       <button type="button" class="btn btn-primary" id="backToIntro">&larr;</button>
@@ -170,11 +172,6 @@
       try {
          const currentConfig = await homebridge.getPluginConfig()
          const hostname = window.location.hostname
-         let port = '8585'
-         if (currentConfig[0].port) {
-            document.getElementById('inputPort').value = currentConfig[0].port
-            port = currentConfig[0].port
-         }
          try {
             await homebridge.request('Start Resideo Login Server')
          } catch (err) {
@@ -190,9 +187,6 @@
                      consumerSecret: event.data.secret,
                      accessToken: event.data.access,
                      refreshToken: event.data.refresh
-                  }
-                  currentConfig[0] = {
-                     port: event.data.port
                   }
                   await homebridge.updatePluginConfig(currentConfig)
                   await homebridge.savePluginConfig()
@@ -218,8 +212,7 @@
             document.getElementById('validateForm').style.display = 'none'
             if (
                !document.getElementById('inputConsumerKey').value ||
-               !document.getElementById('inputConsumerSecret').value ||
-               !document.getElementById('inputPort').value
+               !document.getElementById('inputConsumerSecret').value
             ) {
                document.getElementById('validateForm').style.display = 'block'
                return
@@ -228,7 +221,7 @@
             const h = 700;
             const y = window.top.outerHeight / 2 + window.top.screenY - (h / 2);
             const x = window.top.outerWidth / 2 + window.top.screenX - (w / 2);
-            const urlToOpen = 'http://' + hostname + `:${port}/start?` +
+            const urlToOpen = 'http://' + hostname + ':8585/start?' +
                'key=' + document.getElementById('inputConsumerKey').value +
                '&secret=' + document.getElementById('inputConsumerSecret').value +
                '&host=' + encodeURI(hostname);
@@ -261,7 +254,7 @@
          }
          showIntro = () => {
             const introLink = document.getElementById('introLink')
-            document.getElementById('copyMe').value = 'http://' + hostname + `:${port}/auth`
+            document.getElementById('copyMe').value = 'http://' + hostname + ':8585/auth'
             introLink.addEventListener('click', () => {
                homebridge.showSpinner()
                document.getElementById('pageIntro').style.display = 'none'
@@ -396,13 +389,8 @@
             if (currentConfig[0] && currentConfig[0].credentials) {
                const key = currentConfig[0].credentials.consumerKey || ''
                const secret = currentConfig[0].credentials.consumerSecret || ''
-               let port = '8585'
-               if (currentConfig[0].port) {
-                  port = currentConfig[0].port
-               }
                document.getElementById('inputConsumerKey').value = key
                document.getElementById('inputConsumerSecret').value = secret
-               document.getElementById('inputPort').value = port
                if (key && secret) {
                   isRelink = true
                   document.getElementById('unLinkButton').style.display = 'inline-block'
@@ -418,13 +406,28 @@
             }
             homebridge.hideSpinner()
          }
+         showDisabledBanner = () => {
+            document.getElementById('disabledBanner').style.display = 'block'
+         }
+         enablePlugin = async () => {
+            homebridge.showSpinner()
+            document.getElementById('disabledBanner').style.display = 'none'
+            currentConfig[0].disablePlugin = false
+            await homebridge.updatePluginConfig(currentConfig)
+            await homebridge.savePluginConfig()
+            homebridge.hideSpinner()
+         }
          menuHome.addEventListener('click', () => showSupport())
          menuAccount.addEventListener('click', () => showAccount())
          menuDevices.addEventListener('click', () => showDevices())
          menuSettings.addEventListener('click', () => showSettings())
+         disabledEnable.addEventListener('click', () => enablePlugin())
          if (currentConfig.length) {
             document.getElementById('menuWrapper').style.display = 'inline-flex'
             showAccount()
+            if (currentConfig[0].disablePlugin) {
+               showDisabledBanner()
+            }
          } else {
             currentConfig.push({ name: 'Resideo' })
             await homebridge.updatePluginConfig(currentConfig)

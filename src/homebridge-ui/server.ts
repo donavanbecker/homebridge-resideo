@@ -1,13 +1,12 @@
 /* eslint-disable no-console */
 import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
-import { AuthorizeURL, ResideoPlatformConfig, TokenURL } from '../settings.js';
+import { AuthorizeURL, TokenURL } from '../settings.js';
 import { request } from 'undici';
 import { createServer } from 'http';
 import fs from 'fs';
 import url from 'node:url';
 
 class PluginUiServer extends HomebridgePluginUiServer {
-  public readonly config!: ResideoPlatformConfig;
   public port!: string;
   public key!: string;
   public secret!: string;
@@ -16,7 +15,6 @@ class PluginUiServer extends HomebridgePluginUiServer {
   constructor(
   ) {
     super();
-    //const port = this.port || '8585';
 
     this.onRequest('Start Resideo Login Server', (): any => {
 
