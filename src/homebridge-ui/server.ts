@@ -5,6 +5,7 @@ import { request } from 'undici';
 import { createServer } from 'http';
 import fs from 'fs';
 import url from 'node:url';
+import { exec } from 'child_process';
 
 class PluginUiServer extends HomebridgePluginUiServer {
   public key!: string;
@@ -32,7 +33,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
             }
             case 'auth': {
               if (query.code) {
-                try {
+                /*try {
                   const code = query.code;
                   const auth = Buffer.from(this.key + ':' + this.secret).toString('base64');
                   const { body, statusCode } = await request(TokenURL, {
@@ -49,7 +50,23 @@ class PluginUiServer extends HomebridgePluginUiServer {
                     method: 'POST',
                   });
                   const response: any = await body.json();
-                  console.log(`(Token) ${response}: ${JSON.stringify(response)}, statusCode: ${statusCode}`);
+                  console.log(`(Token) ${response}: ${JSON.stringify(response)}, statusCode: ${statusCode}`);*/
+                const code = query.code;
+                const auth = Buffer.from(this.key + ':' + this.secret).toString('base64');
+                let curlString = '';
+                curlString += 'curl -X POST ';
+                curlString += '--header "Authorization: Basic ' + auth + '" ';
+                curlString += '--header "Accept: application/json" ';
+                curlString += '--header "Content-Type: application/x-www-form-urlencoded" ';
+                curlString += '-d "';
+                curlString += 'grant_type=authorization_code&';
+                curlString += 'code=' + code + '&';
+                curlString += 'redirect_uri=' + encodeURI('http://' + this.hostname + ':8585/auth');
+                curlString += '" ';
+                curlString += '"https://api.honeywell.com/oauth2/token"';
+                try {
+                  const { stdout } = await exec(curlString);
+                  const response = JSON.parse(String(stdout));
                   if (response.access_token) {
                     this.pushEvent('creds-received', {
                       access: response.access_token,
