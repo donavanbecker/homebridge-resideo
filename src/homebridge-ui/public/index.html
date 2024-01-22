@@ -176,7 +176,7 @@
       try {
          const currentConfig = await homebridge.getPluginConfig()
          const hostname = window.location.hostname
-         const port = currentConfig[0].port
+         const port = currentConfig[0].port || '8585'
          try {
             await homebridge.request('Start Resideo Login Server')
          } catch (err) {
