@@ -176,6 +176,7 @@
       try {
          const currentConfig = await homebridge.getPluginConfig()
          const hostname = window.location.hostname
+         const port = currentConfig[0].port
          try {
             await homebridge.request('Start Resideo Login Server')
          } catch (err) {
@@ -191,6 +192,9 @@
                      consumerSecret: event.data.secret,
                      accessToken: event.data.access,
                      refreshToken: event.data.refresh
+                  }
+                  currentConfig[0] = {
+                     port: event.data.port
                   }
                   await homebridge.updatePluginConfig(currentConfig)
                   await homebridge.savePluginConfig()
@@ -394,10 +398,10 @@
             if (currentConfig[0] && currentConfig[0].credentials) {
                const key = currentConfig[0].credentials.consumerKey || ''
                const secret = currentConfig[0].credentials.consumerSecret || ''
-               const port = currentConfig[0].port || ''
+               const port = currentConfig[0].port || '8585'
                document.getElementById('inputConsumerKey').value = key
                document.getElementById('inputConsumerSecret').value = secret
-               document.getElementById('inputPort').value = port || '8585'
+               document.getElementById('inputPort').value = port
                if (key && secret) {
                   isRelink = true
                   document.getElementById('unLinkButton').style.display = 'inline-block'
