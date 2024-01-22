@@ -46,9 +46,9 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
   private refreshInterval!: NodeJS.Timeout;
   debugMode!: boolean;
   action!: string;
-  platformLogging!: string;
   config!: ResideoPlatformConfig;
   platformConfig!: ResideoPlatformConfig['options'];
+  platformLogging!: ResideoPlatformConfig['logging'];
 
   constructor(
     log: Logging,
@@ -85,15 +85,6 @@ export class ResideoPlatform implements DynamicPlatformPlugin {
       this.apiError(e);
       return;
     }
-
-    // setup axios interceptor to add headers / api key to each request
-    /*this.axios.interceptors.request.use((request: InternalAxiosRequestConfig) => {
-      request.headers!.Authorization = `Bearer ${this.config.credentials?.accessToken}`;
-      request.params = request.params || {};
-      request.params.apikey = this.config.credentials?.consumerKey;
-      request.headers!['Content-Type'] = 'application/json';
-      return request;
-    });*/
 
     // When this event is fired it means Homebridge has restored all cached accessories from disk.
     // Dynamic Platform plugins should only register new accessories after this event was fired,
