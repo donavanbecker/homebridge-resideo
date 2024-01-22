@@ -48,7 +48,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
                     }),
                     headers: {
                       'Accept': 'application/json',
-                      'Authorization': `Bearer ${auth}`,
+                      'Authorization': `Basic ${auth}`,
                       'Content-Type': 'application/x-www-form-urlencoded',
                     },
                     method: 'POST',
