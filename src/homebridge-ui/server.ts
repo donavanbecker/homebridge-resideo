@@ -37,13 +37,13 @@ class PluginUiServer extends HomebridgePluginUiServer {
                   const auth = Buffer.from(this.key + ':' + this.secret).toString('base64');
                   const { body, statusCode } = await request(TokenURL, {
                     body: JSON.stringify({
-                      'code': code,
                       'grant_type': 'authorization_code',
+                      'code': code,
                       'redirect_uri': encodeURI('http://' + this.hostname + ':8585/auth'),
                     }),
                     headers: {
-                      'Accept': 'application/json',
                       'Authorization': `Basic ${auth}`,
+                      'Accept': 'application/json',
                       'Content-Type': 'application/x-www-form-urlencoded',
                     },
                     method: 'POST',
