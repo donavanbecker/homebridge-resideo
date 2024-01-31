@@ -12,7 +12,12 @@ export const PLUGIN_NAME = 'homebridge-resideo';
 /**
  * This is the main url used to access Resideo API
  */
-export const AuthURL = 'https://api.honeywell.com/oauth2/token';
+export const AuthorizeURL = 'https://api.honeywell.com/oauth2/authorize';
+
+/**
+ * This is the main url used to access Resideo API
+ */
+export const TokenURL = 'https://api.honeywell.com/oauth2/token';
 
 /**
  * This is the main url used to access Resideo API
@@ -24,23 +29,19 @@ export const LocationURL = 'https://api.honeywell.com/v2/locations';
  */
 export const DeviceURL = 'https://api.honeywell.com/v2/devices';
 
-/**
- * This is the url used to access UI Login to Resideo API
- */
-export const UIurl = 'https://homebridge-honeywell.iot.oz.nu/user/refresh';
-
 //Config
 export interface ResideoPlatformConfig extends PlatformConfig {
   credentials?: credentials;
   disablePlugin?: boolean;
   options?: options | Record<string, never>;
+  port?: string;
 }
 
 export type credentials = {
-  accessToken?: any;
-  consumerKey?: any;
-  consumerSecret?: any;
-  refreshToken?: any;
+  accessToken?: string;
+  consumerKey?: string;
+  consumerSecret?: string;
+  refreshToken?: string;
 };
 
 export type options = {
@@ -50,7 +51,7 @@ export type options = {
   logging?: string;
 };
 
-export interface devicesConfig extends device {
+export interface devicesConfig extends resideoDevice {
   deviceClass: string;
   deviceID: string;
   thermostat?: thermostat;
@@ -123,16 +124,17 @@ export type payload = {
   autoChangeoverActive?: boolean;
   thermostatSetpoint?: number;
   unit?: string;
+  state?: string;
 };
 
 // Location
 export type location = {
   locationID: number;
   name: string;
-  devices: Array<device>;
+  devices: Array<resideoDevice>;
 };
 
-export type device = {
+export type resideoDevice = {
   groups?: Array<T9groups>;
   inBuiltSensorState?: inBuiltSensorState;
   settings?: Settings;
@@ -183,6 +185,12 @@ export type device = {
   isRegistered: boolean;
   hasDeviceCheckedIn: boolean;
   isDeviceOffline: boolean;
+  deviceMac: string	//Device MAC address
+  dataSyncInfo: dataSyncInfo;
+  lastCheckin: Date;	//Last time data received from device
+  actuatorValve: actuatorValve;	//Values specific to the valve operation
+  daylightSavingsInfo: daylightSavingsInfo	//Daylight savings time config info
+  maintenance: maintenance	//Maintenance settings
 };
 
 export type T9groups = {
@@ -406,7 +414,32 @@ export type Accessory = {
   detectMotion: boolean;
 };
 
-export interface AxiosRequestConfig {
-  params?: Record<string, unknown>;
-  headers?: any;
+export type dataSyncInfo = {
+  state: string; //'NotStarted' | 'Initiated' | 'Completed' | 'Failed'
+  transactionId: string;	//Internal reference ID for the DataSync operation
+}
+
+export type actuatorValve = {
+  commandSource: string;//'app' | 'wldFreeze' | 'wldLeak' | 'manual' | 'buildInLeak' | 'maintenance';
+  runningTime: number;	//Operation time
+  valveStatus: string //'unknown' | 'open' | 'close' | 'notOpen' | 'notClose' | 'opening' | 'closing' | 'antiScaleOpening' | 'antiScaleClosing';
+  motorCycles: number;	//Count of motor operations
+  motorCurrentAverage: number;
+  motorCurrentMax: number;
+  deviceTemperature: number;	//Current temperature of device in Fahrenheit units
+  lastAntiScaleTime: Date;	//Last time of anti - scale operation
+  leakStatus: string; //'ok' | 'leak' | 'na' | 'err'
+  timeValveChanged: Date;	//Time of last valve change
+}
+
+export type daylightSavingsInfo = {
+  isDaylightSaving: boolean	//If device is currently using DST or not
+  nextOffsetChange: Date	//Next scheduled DST changeover
+}
+
+export type maintenance = {
+  antiScaleSettings: string;	//Current anti - scale cycle: 'OncePerWeek' | 'OncePerTwoWeeks' | 'OncePerMonth' | 'OncePerTwoMonths' | 'Disabled'
+  antiScaleDOWSettings: string;	//'Sunday' | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday'
+  antiScaleDOMSettings: number;	//If monthly anti - scale is used, day of the month.
+  antiScaleTimeSettings: string;	//Time for anti - scale in 24 hrs format
 }
