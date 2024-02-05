@@ -224,7 +224,7 @@ export class LeakSensor {
    */
   async refreshStatus(): Promise<void> {
     try {
-      const { body, statusCode, trailers, opaque, context } = await request(`${DeviceURL}/waterLeakDetectors/${this.device.deviceID}`, {
+      const { body, statusCode } = await request(`${DeviceURL}/waterLeakDetectors/${this.device.deviceID}`, {
         method: 'GET',
         query: {
           'locationId': this.locationId,
@@ -235,11 +235,8 @@ export class LeakSensor {
           'Content-Type': 'application/json',
         },
       });
-      const action = 'pushChanges';
+      const action = 'refreshStatus';
       await this.statusCode(statusCode, action);
-      this.log.debug(`(pushChanges) trailers: ${JSON.stringify(trailers)}`);
-      this.log.debug(`(pushChanges) opaque: ${JSON.stringify(opaque)}`);
-      this.log.debug(`(pushChanges) context: ${JSON.stringify(context)}`);
       const device: any = await body.json();
       this.log.debug(`(refreshStatus) ${device.deviceClass}: ${JSON.stringify(device)}`);
       this.device = device;
