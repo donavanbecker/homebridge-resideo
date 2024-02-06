@@ -27,7 +27,7 @@
       "port": {
         "type": "string",
         "title": "Login UI Port",
-        "default": "8585",
+        "placeholder": "8585",
         "description": "Port for the Homebridge Resideo UI. Default is 8585.",
         "x-schema-form": {
           "type": "number"
