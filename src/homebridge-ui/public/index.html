@@ -414,15 +414,19 @@
                      document.getElementById('unLinkButton').style.display = 'none'
                   }
                }
-               if (url === '') {
-                  document.getElementById('inputConsumerUrl').value = document.getElementById("copyIntroCallbackUrl");
-               } else {
-                  document.getElementById('inputConsumerUrl').value = url
+               if (currentConfig[0].callbackUrl) {
+                  if (url === '') {
+                     document.getElementById('inputConsumerUrl').value = document.getElementById("copyIntroCallbackUrl");
+                  } else {
+                     document.getElementById('inputConsumerUrl').value = url
+                  }
                }
-               /*if (port === '8585') {
-                  document.getElementById('inputConsumerPort').value = '8585'
-               } else {
-                  document.getElementById('inputConsumerPort').value = port
+               /*if (currentConfig[0].port) {
+                  if (port === '8585') {
+                     document.getElementById('inputConsumerPort').value = '8585'
+                  } else {
+                     document.getElementById('inputConsumerPort').value = port
+                  }
                }*/
             }
             document.getElementById('linkButton').innerHTML = isRelink
