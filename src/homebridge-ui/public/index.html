@@ -373,7 +373,6 @@
                showIntro()
             })
             backToIntro.style.display = 'none'
-            document.getElementById('copyMe').value = 'http://' + hostname + ':8585/auth'
             const linkButton = document.getElementById('linkButton')
             linkButton.addEventListener('click', () => {
                linkAccount()
@@ -396,6 +395,7 @@
             document.getElementById('pageSupport').style.display = 'none'
             document.getElementById('pageDevices').style.display = 'none'
             document.getElementById('pageAccount').style.display = 'block'
+            document.getElementById('copyMe').value = 'http://' + hostname + ':8585/auth'
             document.getElementById('linkButton').style.display = 'inline-block'
             let isRelink = false
             if (currentConfig[0] && currentConfig[0].credentials) {
@@ -415,6 +415,8 @@
                : 'Link Account &rarr;'
             if (!isRelink) {
                document.getElementById('backToIntro').style.display = 'inline-block'
+            } else {
+               document.getElementById('backToIntro').style.display = 'none'
             }
             homebridge.hideSpinner()
          }
