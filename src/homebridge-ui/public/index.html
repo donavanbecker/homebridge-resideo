@@ -56,6 +56,10 @@
       Config saved, please close this window and restart Homebridge
    </div>
    <div class="form-group">
+      <label for="inputConsumeUrl">Consumer Provided URL <span class="text-danger">*</span></label>
+      <input type="text" class="form-control" id="inputConsumerUrl">
+   </div>
+   <div class="form-group">
       <label for="inputConsumerKey">Consumer Key <span class="text-danger">*</span></label>
       <input type="text" class="form-control" id="inputConsumerKey">
    </div>
@@ -217,10 +221,19 @@
             const h = 700;
             const y = window.top.outerHeight / 2 + window.top.screenY - (h / 2);
             const x = window.top.outerWidth / 2 + window.top.screenX - (w / 2);
-            const urlToOpen = 'http://' + hostname + ':8585/start?' +
+            let urlToOpen
+            const userProvidedUrl = document.getElementById('inputConsumerUrl').value
+            if (userProvidedUrl) { 
+               urlToOpen = userProvidedUrl + '/start?' +
                'key=' + document.getElementById('inputConsumerKey').value +
                '&secret=' + document.getElementById('inputConsumerSecret').value +
                '&host=' + encodeURI(hostname);
+            } else {
+            urlToOpen = protocol + hostname + ':8585/start?' +
+               'key=' + document.getElementById('inputConsumerKey').value +
+               '&secret=' + document.getElementById('inputConsumerSecret').value +
+               '&host=' + encodeURI(hostname);
+            }
             this.popup = window.open(
                urlToOpen, 'honeywell-auth',
                'toolbar=no, location=no, directories=no, status=no, menubar=no scrollbars=no, resizable=no, copyhistory=no, ' +
@@ -240,6 +253,7 @@
                delete currentConfig[0].credentials
                await homebridge.updatePluginConfig(currentConfig)
                await homebridge.savePluginConfig()
+               document.getElementById('inputConsumerUrl').value = ''
                document.getElementById('inputConsumerKey').value = ''
                document.getElementById('inputConsumerSecret').value = ''
                document.getElementById('unLinkButton').style.display = 'none'
@@ -385,8 +399,10 @@
             document.getElementById('linkButton').style.display = 'inline-block'
             let isRelink = false
             if (currentConfig[0] && currentConfig[0].credentials) {
+               const url = currentConfig[0].credentials.url || ''
                const key = currentConfig[0].credentials.consumerKey || ''
                const secret = currentConfig[0].credentials.consumerSecret || ''
+               document.getElementById('inputConsumerUrl').value = url
                document.getElementById('inputConsumerKey').value = key
                document.getElementById('inputConsumerSecret').value = secret
                if (key && secret) {
