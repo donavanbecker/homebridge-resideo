@@ -26,6 +26,7 @@ export class LeakSensor {
   LeakDetected!: CharacteristicValue;
   BatteryLevel!: CharacteristicValue;
   ChargingState!: CharacteristicValue;
+  FirmwareRevision!: CharacteristicValue;
   StatusLowBattery!: CharacteristicValue;
   CurrentTemperature!: CharacteristicValue;
   CurrentRelativeHumidity!: CharacteristicValue;
@@ -58,15 +59,7 @@ export class LeakSensor {
     this.config = this.platform.config;
     this.hap = this.api.hap;
 
-    this.StatusActive = accessory.context.StatusActive || false;
-    this.LeakDetected = accessory.context.LeakDetected || this.hap.Characteristic.LeakDetected.LEAK_NOT_DETECTED;
-    this.BatteryLevel = accessory.context.BatteryLevel || 100;
-    this.ChargingState = accessory.context.ChargingState || this.hap.Characteristic.ChargingState.NOT_CHARGING;
-    this.StatusLowBattery = accessory.context.StatusLowBattery || this.hap.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL;
-    this.CurrentTemperature = accessory.context.CurrentTemperature || 20;
-    this.CurrentRelativeHumidity = accessory.context.CurrentRelativeHumidity || 50;
-    accessory.context.FirmwareRevision = 'v2.0.0';
-
+    this.deviceContext(accessory);
     this.deviceLogs();
 
     // this is subject we use to track when we need to POST changes to the Resideo API
@@ -79,19 +72,13 @@ export class LeakSensor {
       .setCharacteristic(this.hap.Characteristic.Manufacturer, 'Resideo')
       .setCharacteristic(this.hap.Characteristic.Model, device.deviceType)
       .setCharacteristic(this.hap.Characteristic.SerialNumber, device.deviceID)
-      .setCharacteristic(this.hap.Characteristic.FirmwareRevision, accessory.context.firmwareRevision || 'v2.0.0');
+      .setCharacteristic(this.hap.Characteristic.FirmwareRevision, this.FirmwareRevision);
 
-    // get the LightBulb service if it exists, otherwise create a new LightBulb service
-    // you can create multiple services for each accessory
+    // get the Battery service if it exists, otherwise create a new Battery service
     (this.service = this.accessory.getService(this.hap.Service.Battery) || this.accessory.addService(this.hap.Service.Battery)),
     `${accessory.displayName} Battery`;
 
-    // To avoid "Cannot add a Service with the same UUID another Service without also defining a unique 'subtype' property." error,
-    // when creating multiple services of the same type, you need to use the following syntax to specify a name and subtype id:
-    // this.accessory.getService('NAME') ?? this.accessory.addService(this.hap.Service.Lightbulb, 'NAME', 'USER_DEFINED_SUBTYPE');
-
     // set the service name, this is what is displayed as the default name on the Home app
-    // in this example we are using the name we stored in the `accessory.context` in the `discoverDevices` method.
     this.service.setCharacteristic(this.hap.Characteristic.Name, accessory.displayName);
 
     // each service must implement at-minimum the "required characteristics" for the given service type
@@ -387,6 +374,49 @@ export class LeakSensor {
       default:
         this.log.info(`${this.device.deviceClass}: ${this.accessory.displayName} Unknown statusCode: ${statusCode}, `
           + `Action: ${action}, Report Bugs Here: https://bit.ly/homebridge-resideo-bug-report`);
+    }
+  }
+
+  async deviceContext(accessory: PlatformAccessory) {
+    if (accessory.context.StatusActive === undefined) {
+      this.StatusActive = false;
+    } else {
+      this.StatusActive = accessory.context.StatusActive;
+    }
+    if (accessory.context.LeakDetected === undefined) {
+      this.LeakDetected = this.hap.Characteristic.LeakDetected.LEAK_NOT_DETECTED;
+    } else {
+      this.LeakDetected = accessory.context.LeakDetected;
+    }
+    if (accessory.context.BatteryLevel === undefined) {
+      this.BatteryLevel = 100;
+    } else {
+      this.BatteryLevel = accessory.context.BatteryLevel;
+    }
+    if (accessory.context.ChargingState === undefined) {
+      this.ChargingState = this.hap.Characteristic.ChargingState.NOT_CHARGING;
+    } else {
+      this.ChargingState = accessory.context.ChargingState;
+    }
+    if (accessory.context.StatusLowBattery === undefined) {
+      this.StatusLowBattery = this.hap.Characteristic.StatusLowBattery.BATTERY_LEVEL_NORMAL;
+    } else {
+      this.StatusLowBattery = accessory.context.StatusLowBattery;
+    }
+    if (accessory.context.CurrentTemperature === undefined) {
+      this.CurrentTemperature = 20;
+    } else {
+      this.CurrentTemperature = accessory.context.CurrentTemperature;
+    }
+    if (accessory.context.CurrentRelativeHumidity === undefined) {
+      this.CurrentRelativeHumidity = 50;
+    } else {
+      this.CurrentRelativeHumidity = accessory.context.CurrentRelativeHumidity;
+    }
+    if (accessory.context.FirmwareRevision === undefined) {
+      this.FirmwareRevision = 'v2.0.0';
+    } else {
+      this.FirmwareRevision = accessory.context.FirmwareRevision;
     }
   }
 
