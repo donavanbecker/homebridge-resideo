@@ -1,16 +1,18 @@
 /* eslint-disable no-console */
 import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
+import { API } from 'homebridge';
 //import { AuthorizeURL, TokenURL } from '../settings.js';
 //import { request } from 'undici';
-import { AuthorizeURL } from '../settings.js';
+import { AuthorizeURL, PLATFORM_NAME } from '../settings.js';
 import { createServer } from 'http';
-import fs from 'fs';
+import fs, { readFileSync } from 'fs';
 import url from 'url';
 import { exec as execCb } from 'child_process';
 import util from 'util';
 const exec = util.promisify(execCb);
 
 class PluginUiServer extends HomebridgePluginUiServer {
+  public readonly api!: API;
   public key!: string;
   public secret!: string;
   public hostname!: string;
@@ -24,12 +26,33 @@ class PluginUiServer extends HomebridgePluginUiServer {
           const pathArr = urlParts.pathname ? urlParts.pathname.split('?') : [];
           const action = pathArr[0].replace('/', '');
           const query = urlParts.query;
+
+          const currentConfig = JSON.parse(readFileSync(this.api.user.configPath(), 'utf8'));
+
+          // check the platforms section is an array before we do array things on it
+          if (!Array.isArray(currentConfig.platforms)) {
+            throw new Error('Cannot find platforms array in config');
+          }
+
+          // find this plugins current config
+          const pluginConfig = currentConfig.platforms.find((x: { platform: string }) => x.platform === PLATFORM_NAME);
+
+          if (!pluginConfig) {
+            throw new Error(`Cannot find config for ${PLATFORM_NAME} in platforms array`);
+          }
+          // set the refresh token
+          let callbackUrl;
+          if (pluginConfig.callbackUrl) {
+            callbackUrl = pluginConfig.callbackUrl;
+          } else {
+            callbackUrl = 'http://' + this.hostname + ':8585/auth';
+          }
           switch (action) {
             case 'start': {
               this.key = query.key as string;
               this.secret = query.secret as string;
               this.hostname = query.host as string;
-              const url = AuthorizeURL + 'response_type=code&redirect_uri=' + encodeURI('http://' + this.hostname + ':8585/auth') + '&'
+              const url = AuthorizeURL + 'response_type=code&redirect_uri=' + encodeURI(callbackUrl) + '&'
                 + 'client_id=' + query.key;
               res.end('<script>window.location.replace(\'' + url + '\');</script>');
               break;
@@ -95,7 +118,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
                 curlString += '-d "';
                 curlString += 'grant_type=authorization_code&';
                 curlString += 'code=' + code + '&';
-                curlString += 'redirect_uri=' + encodeURI('http://' + this.hostname + ':8585/auth');
+                curlString += 'redirect_uri=' + encodeURI(callbackUrl);
                 curlString += '" ';
                 curlString += '"https://api.honeywell.com/oauth2/token"';
                 try {

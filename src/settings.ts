@@ -34,6 +34,7 @@ export interface ResideoPlatformConfig extends PlatformConfig {
   credentials?: credentials;
   disablePlugin?: boolean;
   options?: options | Record<string, never>;
+  callbackUrl?: string;
   port?: string;
 }
 
