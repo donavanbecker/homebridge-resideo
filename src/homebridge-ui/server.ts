@@ -25,6 +25,15 @@ class PluginUiServer extends HomebridgePluginUiServer {
               this.key = query.key as string;
               this.secret = query.secret as string;
               this.hostname = query.host as string;
+              const url = AuthorizeURL + 'response_type=code&redirect_uri=' + encodeURI('http://' + this.hostname + ':8585/auth') + '&'
+                + 'client_id=' + query.key;
+              res.end('<script>window.location.replace(\'' + url + '\');</script>');
+              break;
+            }
+            /*case 'start': {
+              this.key = query.key as string;
+              this.secret = query.secret as string;
+              this.hostname = query.host as string;
               const { body, statusCode } = await request(AuthorizeURL, {
                 query: {
                   'client_id': this.key,
@@ -33,14 +42,13 @@ class PluginUiServer extends HomebridgePluginUiServer {
                 },
                 method: 'GET',
               });
-              console.log(`(Authroize) body: ${JSON.stringify(body)}, statusCode: ${statusCode}`);
               const url: any = await body.text();
               console.log(`(Authroize) url: ${url}, statusCode: ${statusCode}`);
               //const url = AuthorizeURL + '?response_type=code&redirect_uri=' + encodeURI('http://' + this.hostname
               //+ ':8585/auth') + '&' + 'client_id=' + this.key;
               res.end('<script>window.location.replace(\'' + url + '\');</script>');
               break;
-            }
+            }*/
             case 'auth': {
               if (query.code) {
                 const code = query.code;
@@ -132,13 +140,13 @@ class PluginUiServer extends HomebridgePluginUiServer {
 
         // Check the file exists
         if (fs.existsSync(accFile)) {
-        // read the cached accessories file
+          // read the cached accessories file
           const cachedAccessories: any[] = JSON.parse(fs.readFileSync(accFile, 'utf8'));
 
           cachedAccessories.forEach((accessory: any) => {
-          // Check the accessory is from this plugin
+            // Check the accessory is from this plugin
             if (accessory.plugin === plugin) {
-            // Add the cached accessory to the array
+              // Add the cached accessory to the array
               devicesToReturn.push(accessory.accessory as never);
             }
           });
@@ -146,7 +154,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
         // Return the array
         return devicesToReturn;
       } catch (err) {
-      // Just return an empty accessory list in case of any errors
+        // Just return an empty accessory list in case of any errors
         return [];
       }
     });
