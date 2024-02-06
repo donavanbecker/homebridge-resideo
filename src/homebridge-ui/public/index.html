@@ -48,12 +48,6 @@
       Support
    </button>
 </div>
-<div id="disabledBanner" class="alert alert-secondary mb-0 mt-3" role="alert" style="display: none;">
-   Plugin is currently disabled
-   <button id="disabledEnable" type="button" class="btn btn-link p-0 m-0 float-right">
-      Enable
-   </button>
-</div>
 <div id="pageAccount" class="mt-4" style="display: none;">
    <div class="alert alert-warning" style="display: none;" id="validateForm">
       Please enter both values
@@ -374,6 +368,15 @@
             homebridge.hideSpinner()
          }
          showAccount = () => {
+            const introLink = document.getElementById('introLink')
+            document.getElementById('copyMe').value = 'http://' + hostname + ':8585/auth'
+            introLink.addEventListener('click', () => {
+               homebridge.showSpinner()
+               document.getElementById('pageIntro').style.display = 'none'
+               document.getElementById('menuWrapper').style.display = 'inline-flex'
+               showAccount()
+               homebridge.hideSpinner()
+            })
             homebridge.showSpinner()
             const backToIntro = document.getElementById('backToIntro')
             backToIntro.addEventListener('click', () => {
@@ -424,28 +427,13 @@
             }
             homebridge.hideSpinner()
          }
-         showDisabledBanner = () => {
-            document.getElementById('disabledBanner').style.display = 'block'
-         }
-         enablePlugin = async () => {
-            homebridge.showSpinner()
-            document.getElementById('disabledBanner').style.display = 'none'
-            currentConfig[0].disablePlugin = false
-            await homebridge.updatePluginConfig(currentConfig)
-            await homebridge.savePluginConfig()
-            homebridge.hideSpinner()
-         }
          menuHome.addEventListener('click', () => showSupport())
          menuAccount.addEventListener('click', () => showAccount())
          menuDevices.addEventListener('click', () => showDevices())
          menuSettings.addEventListener('click', () => showSettings())
-         disabledEnable.addEventListener('click', () => enablePlugin())
          if (currentConfig.length) {
             document.getElementById('menuWrapper').style.display = 'inline-flex'
             showAccount()
-            if (currentConfig[0].disablePlugin) {
-               showDisabledBanner()
-            }
          } else {
             currentConfig.push({ name: 'Resideo' })
             await homebridge.updatePluginConfig(currentConfig)
