@@ -111,12 +111,15 @@ class PluginUiServer extends HomebridgePluginUiServer {
                       });
                       res.end('Success. You can close this window now.');
                     } else {
+                      console.log(`(auth) response: ${JSON.stringify(response)}`);
                       res.end('oops.');
                     }
                   } else {
+                    console.log(`(auth) stdout: ${JSON.stringify(stdout)}`);
                     res.end('<strong>An error occurred:</strong><br>Close this window and start again');
                   }
                 } catch (err) {
+                  console.log(`(auth) err: ${JSON.stringify(err)}`);
                   res.end('<strong>An error occurred:</strong><br>' + JSON.stringify(err) + '<br><br>Close this window and start again');
                 }
               } else {
