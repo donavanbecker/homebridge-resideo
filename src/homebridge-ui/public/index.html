@@ -402,7 +402,7 @@
                const url = currentConfig[0].credentials.url || ''
                const key = currentConfig[0].credentials.consumerKey || ''
                const secret = currentConfig[0].credentials.consumerSecret || ''
-               document.getElementById('inputConsumerUrl').value = url
+               document.getElementById('inputConsumerUrl').value = url || document.getElementById('copyMe').value
                document.getElementById('inputConsumerKey').value = key
                document.getElementById('inputConsumerSecret').value = secret
                if (key && secret) {
