@@ -33,9 +33,9 @@ class PluginUiServer extends HomebridgePluginUiServer {
                 },
                 method: 'GET',
               });
-              console.log(`(Authroize) ${body}: ${JSON.stringify(body)}, statusCode: ${statusCode}`);
-              const url: any = await body.json();
-              console.log(`(Authroize) json ${url}: ${JSON.stringify(url)}, statusCode: ${statusCode}`);
+              console.log(`(Authroize) body: ${JSON.stringify(body)}, statusCode: ${statusCode}`);
+              const url: any = await body.text();
+              console.log(`(Authroize) url: ${url}, statusCode: ${statusCode}`);
               //const url = AuthorizeURL + '?response_type=code&redirect_uri=' + encodeURI('http://' + this.hostname
               //+ ':8585/auth') + '&' + 'client_id=' + this.key;
               res.end('<script>window.location.replace(\'' + url + '\');</script>');
@@ -58,9 +58,9 @@ class PluginUiServer extends HomebridgePluginUiServer {
                   },
                   method: 'POST',
                 });
-                console.log(`(Token) ${body}: ${JSON.stringify(body)}, statusCode: ${statusCode}`);
-                const response: any = await body.json();
-                console.log(`(Token) json ${response}: ${JSON.stringify(response)}, statusCode: ${statusCode}`);
+                console.log(`(Token) body: ${JSON.stringify(body)}, statusCode: ${statusCode}`);
+                const response: any = await body.text();
+                console.log(`(Token) response: ${response}, statusCode: ${statusCode}`);
                 /*const code = query.code;
                 const auth = Buffer.from(this.key + ':' + this.secret).toString('base64');
                 let curlString = '';
