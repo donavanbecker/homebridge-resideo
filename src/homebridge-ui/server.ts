@@ -6,7 +6,9 @@ import { AuthorizeURL } from '../settings.js';
 import { createServer } from 'http';
 import fs from 'fs';
 import url from 'url';
-import { exec } from 'child_process';
+import { exec as execCb } from 'child_process';
+import util from 'util';
+const exec = util.promisify(execCb);
 
 class PluginUiServer extends HomebridgePluginUiServer {
   public key!: string;
