@@ -399,21 +399,31 @@
             document.getElementById('copyIntroCallbackUrl').value = 'http://' + hostname + ':8585/auth'
             document.getElementById('linkButton').style.display = 'inline-block'
             let isRelink = false
-            if (currentConfig[0] && currentConfig[0].credentials) {
+            if (currentConfig[0]) {
                const url = currentConfig[0].callbackUrl || ''
                const port = currentConfig[0].port || ''
-               const key = currentConfig[0].credentials.consumerKey || ''
-               const secret = currentConfig[0].credentials.consumerSecret || ''
-               document.getElementById('inputConsumerUrl').value = url || document.getElementById('copyIntroCallbackUrl').value
-               document.getElementById('inputConsumerPort').value = port || '8585'
-               document.getElementById('inputConsumerKey').value = key
-               document.getElementById('inputConsumerSecret').value = secret
-               if (key && secret) {
-                  isRelink = true
-                  document.getElementById('unLinkButton').style.display = 'inline-block'
-               } else {
-                  document.getElementById('unLinkButton').style.display = 'none'
+               if (currentConfig[0].credentials) {
+                  const key = currentConfig[0].credentials.consumerKey || ''
+                  const secret = currentConfig[0].credentials.consumerSecret || ''
+                  document.getElementById('inputConsumerKey').value = key
+                  document.getElementById('inputConsumerSecret').value = secret
+                  if (key && secret) {
+                     isRelink = true
+                     document.getElementById('unLinkButton').style.display = 'inline-block'
+                  } else {
+                     document.getElementById('unLinkButton').style.display = 'none'
+                  }
                }
+               if (url === '') {
+                  document.getElementById('inputConsumerUrl').value = document.getElementById("copyIntroCallbackUrl");
+               } else {
+                  document.getElementById('inputConsumerUrl').value = url
+               }
+               /*if (port === '8585') {
+                  document.getElementById('inputConsumerPort').value = '8585'
+               } else {
+                  document.getElementById('inputConsumerPort').value = port
+               }*/
             }
             document.getElementById('linkButton').innerHTML = isRelink
                ? 'Relink Account &rarr;'
