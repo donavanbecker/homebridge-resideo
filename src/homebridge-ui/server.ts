@@ -1,10 +1,12 @@
 /* eslint-disable no-console */
 import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
-import { AuthorizeURL, TokenURL } from '../settings.js';
-import { request } from 'undici';
+//import { AuthorizeURL, TokenURL } from '../settings.js';
+//import { request } from 'undici';
+import { AuthorizeURL } from '../settings.js';
 import { createServer } from 'http';
 import fs from 'fs';
 import url from 'url';
+import { exec } from 'child_process';
 
 class PluginUiServer extends HomebridgePluginUiServer {
   public key!: string;
@@ -30,28 +32,9 @@ class PluginUiServer extends HomebridgePluginUiServer {
               res.end('<script>window.location.replace(\'' + url + '\');</script>');
               break;
             }
-            /*case 'start': {
-              this.key = query.key as string;
-              this.secret = query.secret as string;
-              this.hostname = query.host as string;
-              const { body, statusCode } = await request(AuthorizeURL, {
-                query: {
-                  'client_id': this.key,
-                  'redirect_uri': encodeURI('http://' + this.hostname + ':8585/auth'),
-                  'response_type': 'code',
-                },
-                method: 'GET',
-              });
-              const url: any = await body.text();
-              console.log(`(Authroize) url: ${url}, statusCode: ${statusCode}`);
-              //const url = AuthorizeURL + '?response_type=code&redirect_uri=' + encodeURI('http://' + this.hostname
-              //+ ':8585/auth') + '&' + 'client_id=' + this.key;
-              res.end('<script>window.location.replace(\'' + url + '\');</script>');
-              break;
-            }*/
             case 'auth': {
               if (query.code) {
-                const code = query.code;
+                /*const code = query.code;
                 const auth = Buffer.from(this.key + ':' + this.secret).toString('base64');
                 const { body, statusCode } = await request(TokenURL, {
                   body: JSON.stringify({
@@ -69,7 +52,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
                 console.log(`(Token) body: ${JSON.stringify(body)}, statusCode: ${statusCode}`);
                 const response: any = await body.text();
                 console.log(`(Token) response: ${response}, statusCode: ${statusCode}`);
-                /*const code = query.code;
+                const code = query.code;
                 const auth = Buffer.from(this.key + ':' + this.secret).toString('base64');
                 let curlString = '';
                 curlString += 'curl -X POST ';
@@ -84,7 +67,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
                 curlString += '"https://api.honeywell.com/oauth2/token"';
                 try {
                   const { stdout } = await exec(curlString);
-                  const response = JSON.parse(String(stdout));*/
+                  const response = JSON.parse(String(stdout));
                 try {
                   if (response.access_token) {
                     this.pushEvent('creds-received', {
@@ -96,6 +79,40 @@ class PluginUiServer extends HomebridgePluginUiServer {
                     res.end('Success. You can close this window now.');
                   } else {
                     res.end('Failed to get access token. Close this window and start again');
+                  }
+                } catch (err) {
+                  res.end('<strong>An error occurred:</strong><br>' + JSON.stringify(err) + '<br><br>Close this window and start again');
+                }*/
+                const code = query.code;
+                const auth = Buffer.from(this.key + ':' + this.secret).toString('base64');
+                let curlString = '';
+                curlString += 'curl -X POST ';
+                curlString += '--header "Authorization: Basic ' + auth + '" ';
+                curlString += '--header "Accept: application/json" ';
+                curlString += '--header "Content-Type: application/x-www-form-urlencoded" ';
+                curlString += '-d "';
+                curlString += 'grant_type=authorization_code&';
+                curlString += 'code=' + code + '&';
+                curlString += 'redirect_uri=' + encodeURI('http://' + this.hostname + ':8585/auth');
+                curlString += '" ';
+                curlString += '"https://api.honeywell.com/oauth2/token"';
+                try {
+                  const { stdout } = await exec(curlString);
+                  if (stdout) {
+                    const response = JSON.parse(stdout.toString());
+                    if (response.access_token) {
+                      this.pushEvent('creds-received', {
+                        key: this.key,
+                        secret: this.secret,
+                        access: response.access_token,
+                        refresh: response.refresh_token,
+                      });
+                      res.end('Success. You can close this window now.');
+                    } else {
+                      res.end('oops.');
+                    }
+                  } else {
+                    res.end('<strong>An error occurred:</strong><br>Close this window and start again');
                   }
                 } catch (err) {
                   res.end('<strong>An error occurred:</strong><br>' + JSON.stringify(err) + '<br><br>Close this window and start again');
