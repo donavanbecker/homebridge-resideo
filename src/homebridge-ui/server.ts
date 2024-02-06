@@ -33,7 +33,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
                 },
                 method: 'GET',
               });
-              console.log(`(Authroize) body: ${JSON.stringify(body)}, statusCode: ${statusCode}`);
+              console.log(`(Authroize) statusCode: ${statusCode}`);
               const url: any = await body.text();
               console.log(`(Authroize) url: ${url}, statusCode: ${statusCode}`);
               //const url = AuthorizeURL + '?response_type=code&redirect_uri=' + encodeURI('http://' + this.hostname
@@ -58,7 +58,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
                   },
                   method: 'POST',
                 });
-                console.log(`(Token) body: ${JSON.stringify(body)}, statusCode: ${statusCode}`);
+                console.log(`(Token) statusCode: ${statusCode}`);
                 const response: any = await body.text();
                 console.log(`(Token) response: ${response}, statusCode: ${statusCode}`);
                 /*const code = query.code;
