@@ -368,21 +368,13 @@
             homebridge.hideSpinner()
          }
          showAccount = () => {
-            const introLink = document.getElementById('introLink')
-            document.getElementById('copyMe').value = 'http://' + hostname + ':8585/auth'
-            introLink.addEventListener('click', () => {
-               homebridge.showSpinner()
-               document.getElementById('pageIntro').style.display = 'none'
-               document.getElementById('menuWrapper').style.display = 'inline-flex'
-               showAccount()
-               homebridge.hideSpinner()
-            })
             homebridge.showSpinner()
             const backToIntro = document.getElementById('backToIntro')
             backToIntro.addEventListener('click', () => {
                showIntro()
             })
             backToIntro.style.display = 'none'
+            document.getElementById('copyMe').value = 'http://' + hostname + ':8585/auth'
             const linkButton = document.getElementById('linkButton')
             linkButton.addEventListener('click', () => {
                linkAccount()
