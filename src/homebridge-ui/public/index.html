@@ -14,9 +14,9 @@
          Give your application a name, and enter the 'Callback URL' exactly as it is displayed below.
          <br>
          <div class="input-group mt-3">
-            <input type="text" class="form-control" disabled id="copyMe">
+            <input type="text" class="form-control" disabled id="copyIntroCallbackUrl">
             <div class="input-group-append">
-               <button class="btn btn-primary m-0 py-0 px-3" onclick="copyMyText()" type="button">
+               <button class="btn btn-primary m-0 py-0 px-3" onclick="copyCallbackUrl()" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
                      class="mb-1 bi bi-clipboard" viewBox="0 0 16 16">
                      <path
@@ -56,9 +56,9 @@
       Config saved, please close this window and restart Homebridge
    </div>
    <div class="form-group">
-      <label for="inputConsumeUrl">Callback URL <span class="text-danger">*</span></label>
+      <label for="inputConsumerUrl">Callback URL <span class="text-danger">*</span></label>
       <input type="text" class="form-control" disabled id="inputConsumerUrl">
-      <button class="btn btn-primary m-0 py-0 px-3" onclick="copyMyText()" type="button">
+      <button class="btn btn-primary m-0 py-0 px-3" onclick="copyConsumerUrl()" type="button">
          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="mb-1 bi bi-clipboard"
             viewBox="0 0 16 16">
             <path
@@ -212,8 +212,13 @@
                homebridge.toast.error('Try again, or see the console message for info.', 'Error')
             }
          })
-         copyMyText = () => {
-            var textToCopy = document.getElementById("copyMe");
+         copyCallbackUrl = () => {
+            var textToCopy = document.getElementById("copyIntroCallbackUrl");
+            textToCopy.select();
+            document.execCommand("copy");
+         }
+         copyConsumerUrl = () => {
+            var textToCopy = document.getElementById("copyAccountConsumerUrl");
             textToCopy.select();
             document.execCommand("copy");
          }
@@ -273,8 +278,7 @@
          }
          showIntro = () => {
             const introLink = document.getElementById('introLink')
-            //document.getElementById('copyMe').value = 'http://' + hostname + ':8585/auth'
-            document.getElementById('copyMe').value = 'http://' + hostname + ':8585/auth'
+            document.getElementById('copyIntroCallbackUrl').value = 'http://' + hostname + ':8585/auth'
             introLink.addEventListener('click', () => {
                homebridge.showSpinner()
                document.getElementById('pageIntro').style.display = 'none'
@@ -404,14 +408,15 @@
             document.getElementById('pageSupport').style.display = 'none'
             document.getElementById('pageDevices').style.display = 'none'
             document.getElementById('pageAccount').style.display = 'block'
-            document.getElementById('copyMe').value = 'http://' + hostname + ':8585/auth'
+            document.getElementById('copyIntroCallbackUrl').value = 'http://' + hostname + ':8585/auth'
+            document.getElementById('copyAccountConsumerUrl').value = 'http://' + hostname + ':8585/auth'
             document.getElementById('linkButton').style.display = 'inline-block'
             let isRelink = false
             if (currentConfig[0] && currentConfig[0].credentials) {
                const url = currentConfig[0].credentials.url || ''
                const key = currentConfig[0].credentials.consumerKey || ''
                const secret = currentConfig[0].credentials.consumerSecret || ''
-               document.getElementById('inputConsumerUrl').value = url || document.getElementById('copyMe').value
+               document.getElementById('inputConsumerUrl').value = url || document.getElementById('copyIntroCallbackUrl').value
                document.getElementById('inputConsumerKey').value = key
                document.getElementById('inputConsumerSecret').value = secret
                if (key && secret) {
