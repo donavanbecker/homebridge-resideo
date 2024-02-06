@@ -166,6 +166,8 @@
       try {
          const currentConfig = await homebridge.getPluginConfig()
          const hostname = window.location.hostname
+         const protocol = location.protocol + '//'
+         const port = (location.port ? ':' + location.port : '')
          try {
             await homebridge.request('Start Resideo Login Server')
          } catch (err) {
@@ -248,7 +250,8 @@
          }
          showIntro = () => {
             const introLink = document.getElementById('introLink')
-            document.getElementById('copyMe').value = 'http://' + hostname + ':8585/auth'
+            //document.getElementById('copyMe').value = 'http://' + hostname + ':8585/auth'
+            document.getElementById('copyMe').value = protocol + hostname + ':8585/auth'
             introLink.addEventListener('click', () => {
                homebridge.showSpinner()
                document.getElementById('pageIntro').style.display = 'none'
