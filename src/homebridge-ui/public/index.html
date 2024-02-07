@@ -224,6 +224,7 @@
             const y = window.top.outerHeight / 2 + window.top.screenY - (h / 2);
             const x = window.top.outerWidth / 2 + window.top.screenX - (w / 2);
             let urlToOpen
+            const port = currentConfig[0].port || '8585'
             const userProvidedUrl = document.getElementById('inputConsumerUrl').value
             if (userProvidedUrl) {
                urlToOpen = userProvidedUrl + '/start?' +
@@ -231,7 +232,7 @@
                   '&secret=' + document.getElementById('inputConsumerSecret').value +
                   '&host=' + encodeURI(hostname);
             } else {
-               urlToOpen = 'http://' + hostname + ':8585/start?' +
+               urlToOpen = 'http://' + hostname + ':' + port + '/start?' +
                   'key=' + document.getElementById('inputConsumerKey').value +
                   '&secret=' + document.getElementById('inputConsumerSecret').value +
                   '&host=' + encodeURI(hostname);
@@ -266,7 +267,8 @@
          }
          showIntro = () => {
             const introLink = document.getElementById('introLink')
-            document.getElementById('copyIntroCallbackUrl').value = 'http://' + hostname + ':8585/auth'
+            const port = currentConfig[0].port || '8585'
+            document.getElementById('copyIntroCallbackUrl').value = 'http://' + hostname + ':' + port + '/auth'
             introLink.addEventListener('click', () => {
                homebridge.showSpinner()
                document.getElementById('pageIntro').style.display = 'none'
@@ -396,12 +398,12 @@
             document.getElementById('pageSupport').style.display = 'none'
             document.getElementById('pageDevices').style.display = 'none'
             document.getElementById('pageAccount').style.display = 'block'
-            document.getElementById('copyIntroCallbackUrl').value = 'http://' + hostname + ':8585/auth'
             document.getElementById('linkButton').style.display = 'inline-block'
             let isRelink = false
             if (currentConfig[0]) {
                const url = currentConfig[0].callbackUrl || ''
-               const port = currentConfig[0].port || ''
+               const port = currentConfig[0].port || '8585'
+               document.getElementById('copyIntroCallbackUrl').value = 'http://' + hostname + ':' + port + '/auth'
                if (currentConfig[0].credentials) {
                   const key = currentConfig[0].credentials.consumerKey || ''
                   const secret = currentConfig[0].credentials.consumerSecret || ''
@@ -421,13 +423,13 @@
                      document.getElementById('inputConsumerUrl').value = url
                   }
                }
-               /*if (currentConfig[0].port) {
+               if (currentConfig[0].port) {
                   if (port === '8585') {
                      document.getElementById('inputConsumerPort').value = '8585'
                   } else {
                      document.getElementById('inputConsumerPort').value = port
                   }
-               }*/
+               }
             }
             document.getElementById('linkButton').innerHTML = isRelink
                ? 'Relink Account &rarr;'
