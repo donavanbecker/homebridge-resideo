@@ -16,6 +16,8 @@ class PluginUiServer extends HomebridgePluginUiServer {
   public key!: string;
   public secret!: string;
   public hostname!: string;
+  public callbackUrl!: string;
+  public port!: string;
   constructor() {
     super();
     this.onRequest('Start Resideo Login Server', (): any => {
@@ -40,19 +42,22 @@ class PluginUiServer extends HomebridgePluginUiServer {
           if (!pluginConfig) {
             throw new Error(`Cannot find config for ${PLATFORM_NAME} in platforms array`);
           }
-          // set the refresh token
-          let callbackUrl;
-          if (pluginConfig.callbackUrl) {
-            callbackUrl = pluginConfig.callbackUrl;
+          if (pluginConfig.port) {
+            this.port = pluginConfig.port;
           } else {
-            callbackUrl = 'http://' + this.hostname + ':8585/auth';
+            this.port = '8585';
+          }
+          if (pluginConfig.callbackUrl) {
+            this.callbackUrl = pluginConfig.callbackUrl;
+          } else {
+            this.callbackUrl = 'http://' + this.hostname + ':' + this.port + '/auth';
           }
           switch (action) {
             case 'start': {
               this.key = query.key as string;
               this.secret = query.secret as string;
               this.hostname = query.host as string;
-              const url = AuthorizeURL + 'response_type=code&redirect_uri=' + encodeURI(callbackUrl) + '&'
+              const url = AuthorizeURL + 'response_type=code&redirect_uri=' + encodeURI(this.callbackUrl) + '&'
                 + 'client_id=' + query.key;
               res.end('<script>window.location.replace(\'' + url + '\');</script>');
               break;
@@ -118,7 +123,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
                 curlString += '-d "';
                 curlString += 'grant_type=authorization_code&';
                 curlString += 'code=' + code + '&';
-                curlString += 'redirect_uri=' + encodeURI(callbackUrl);
+                curlString += 'redirect_uri=' + encodeURI(this.callbackUrl);
                 curlString += '" ';
                 curlString += '"https://api.honeywell.com/oauth2/token"';
                 try {
@@ -159,7 +164,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
           console.log(err);
         }
       });
-      runningServer.listen(8585, () => {
+      runningServer.listen(this.port, () => {
         console.log('Server is running');
       });
       setTimeout(() => {
